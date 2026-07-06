@@ -1,0 +1,55 @@
+\chapter*{Abstract}
+\addcontentsline{toc}{chapter}{Abstract}
+
+The integration of large language models (LLMs) into Agile software development has
+accelerated the production of formal specifications and their associated implementations.
+Within the Agile-SOFL (Structured Object-oriented Formal Language) framework, LLM-assisted
+code generation exposes a critical gap: existing one-shot and test-feedback baselines lack
+the rigorous gating mechanisms needed to prevent scenario-ordering conformance faults from
+propagating into downstream verification artefacts.  Scenario-ordering violations — where
+a synthesised candidate fails to respect the precedence constraints encoded in a Functional
+Scenario Framework (FSF) specification — are the dominant class of defect in
+LLM-generated Agile-SOFL implementations and are not reliably detected by conventional
+unit-testing approaches.
+
+This thesis proposes \textbf{Hybrid Specification-Guided Fault Prevention}
+(HSP-Agile) for Agile-SOFL formal development: a four-stage fault-prevention pipeline designed to impose conjunctive acceptance criteria
+on LLM-synthesised candidates before they are released into the formal development
+lifecycle.  The four stages are: (1)~\emph{LLM Candidate Synthesis}, which queries an LLM
+with an FSF specification and optional repair feedback; (2)~\emph{Formal Conformance
+Checker}, which employs Z3 SMT-guided test-case generation and oracle comparison to
+compute a strict conformance score; (3)~\emph{Counterexample-Guided Repair}, which
+constructs targeted repair prompts from witnessed test failures; and (4)~\emph{Pattern
+Guard}, which screens candidates against a catalogue of high-severity Agile-SOFL fault
+patterns.  A candidate is accepted only when both the conformance threshold $\tau$ is
+satisfied and no pattern violations remain; otherwise the best candidate by score is
+returned with a full audit trace.
+
+We evaluate HSP-Agile on a hard benchmark of 120 Agile-SOFL tasks, all drawn from the
+precedence-sensitive partition of FSF specifications, across seven execution modes yielding
+840 total experiment runs.  The full pipeline (\textbf{mode~M}) achieves a mean strict
+formal conformance of \textbf{90.4\%}, representing a \textbf{+6.2 percentage-point}
+improvement over the one-shot LLM baseline (B1: 84.2\%) and a \textbf{+2.4
+percentage-point} improvement over the test-feedback baseline (B2: 88.0\%).  Ablation
+analysis isolates the contribution of each stage: removing the repair loop (A3) reduces
+conformance to 84.1\% ($-$6.3\,pp vs.\ M), the largest single-component drop, while
+removing the formal checker (A1) reduces conformance to 86.5\% ($-$3.9\,pp vs.\ M).
+The pattern guard contributes a marginal $+0.5$\,pp when retained, suggesting its primary
+value is diagnostic rather than filtering.  The mean latency of mode~M is
+43{,}659\,ms per task versus 10{,}769\,ms for B2 (4.6$\times$ overhead), reflecting the
+additional LLM API calls (mean 2.08 per task) and Z3 checking steps.  A Wilcoxon
+signed-rank test on strict success rates yields $p = 0.921$ (not significant), consistent
+with the interpretation that binary pass/fail is insufficient to discriminate pipeline
+quality on hard benchmarks; formal conformance provides richer and more appropriate
+differentiation.
+
+HSP-Agile provides measurable and reproducible quality improvement in formal conformance
+through conjunctive acceptance gating, without requiring specification-language annotations
+beyond those already present in FSF specifications.  The pipeline is particularly suited
+to CI/CD pre-merge quality gates in Agile-SOFL projects where downstream formal
+verification costs are high and marginal improvements in specification conformance have
+compounding benefits on verification effort.
+
+\bigskip
+\noindent\textbf{Keywords:} Agile-SOFL, fault prevention, formal specification, large
+language model, Z3 SMT solving, mutation analysis, counterexample-guided synthesis.

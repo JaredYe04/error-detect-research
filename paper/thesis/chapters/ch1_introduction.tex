@@ -1,0 +1,155 @@
+\chapter{Introduction}
+\label{ch:intro}
+
+The history of software engineering is, in large part, a history of successive attempts to make informal human intentions precise enough to be executed correctly by machines.  This thesis sits at the intersection of two contemporary forces reshaping that gap in opposite directions: formal specification-based development \citep{woodcock2009formalsurvey, back1998refinement}, which aspires to state behavioural requirements with mathematical precision, and large language model (LLM)-assisted code generation \citep{chen2021codex, openai2023gpt4}, which produces plausible implementations at machine speed but with no guarantee of formal correctness.  The central claim is that these forces, left unmediated, create a practically dangerous class of conformance failure---one that existing baselines are structurally unable to detect---and that a principled hybrid pipeline can prevent such failures at acceptable operational cost.
+
+
+%% ─── 1.1 ──────────────────────────────────────────────────────────────────────
+\section{Context and Motivation}
+\label{sec:intro:motivation}
+
+Formal methods for software development have long promised a path from specification to implementation that carries mathematical guarantees of correctness.  In practice, industrial adoption has been constrained by two persistent obstacles: the notational overhead of maintaining formal specifications alongside working code, and the cultural distance between the iterative cadences of agile development and the proof-centric workflows of formal methods research \citep{woodcock2009formalsurvey}.  The Structured Object-oriented Formal Language (SOFL), introduced by \citet{liu1997sofl} and elaborated in a series of subsequent works \citep{liu2004sofl, liu2014sofl}, was designed precisely to reduce both obstacles.  SOFL provides the Functional Specification Format (FSF) as its primary specification unit: a structured notation in which a software function is described as an ordered sequence of scenarios, each pairing a guard predicate (a pre-condition distinguishing this scenario from the others) with a postcondition that defines the required input-to-output mapping when the guard holds.  The ordered structure of FSF is not merely a presentational convenience; it encodes a priority semantics in which the guard of scenario $S_i$ is evaluated only when the guards of all preceding scenarios $S_1, \ldots, S_{i-1}$ have failed.  This ordered evaluation semantics gives FSF specifications their precision: they are not just a collection of independent input-output cases but a deterministic, precedence-respecting decision structure.
+
+The Agile-SOFL framework \citep{li2022agilesofl} carries FSF specifications directly into iterative, sprint-based development.  In an Agile-SOFL project, each user story is refined into a set of FSF tasks during the sprint planning phase.  These tasks serve simultaneously as design documents, automated test oracles, and the basis for code review: a candidate implementation is accepted into the sprint deliverable only if it can be demonstrated to conform to its FSF specification at the scenario level.  The framework thus achieves the dual goal of formal rigour and agile velocity by making specification and conformance checking a routine, tool-supported part of the development process rather than a bespoke verification effort reserved for safety-critical applications.  Prior work on this framework has established fault-detection protocols based on mutation analysis of FSF specifications \citep{li2023iet}, demonstrating that scenario-level mutations—which alter guard conditions or postconditions in ways that represent plausible developer errors—can be reliably exposed by a well-designed conformance suite.
+
+Against this backdrop, the recent surge of LLM-assisted code generation has introduced both an attractive opportunity and a category of risk that the Agile-SOFL framework was not designed to address.  Models such as OpenAI Codex \citep{chen2021codex}, GPT-4 \citep{openai2023gpt4}, and AlphaCode \citep{li2022alphacode} are now routinely used as coding assistants in agile teams, and in more automated settings they are queried to synthesise implementations from formal or semiformal specifications directly.  The opportunity is clear: if an LLM can produce a conforming implementation on the first synthesis attempt, the manual coding effort for a sprint task is eliminated and the development pace accelerates.  The risk is subtler.  LLMs are trained by next-token prediction over large code corpora and acquire statistical associations between code patterns rather than semantic understanding of formal specifications.  They produce implementations that are syntactically correct and often functionally plausible, but they have no mechanism for representing or respecting the ordered evaluation semantics of FSF.  Empirical studies of LLM code quality corroborate this concern at scale: \citet{dakhel2023copilot} find that between 15\% and 40\% of GitHub Copilot suggestions contain subtle semantic defects not caught by coarse test suites, a figure consistent with the broader analysis of \citet{chen2021codex} across the HumanEval benchmark.  In the formal specification context, such defects are not merely quality issues; they are correctness failures that violate precisely-stated behavioural contracts and may silently invalidate the conformance certificates and proof obligations that downstream verification activities depend on.
+
+The underlying structural reason is the gap between how LLMs generate code and how FSF specifications assign meaning to that code \citep{dijkstra1975guarded, lynn2024verifierloop}.  An LLM synthesising from a specification performs pattern-guided program synthesis: it produces code whose structure resembles programs seen in training, not code whose guard order matches FSF precedence.  When two guards can simultaneously hold, reordering scenario handling may yield correct output on most inputs while failing at the boundary regions formal specifications are designed to characterise \citep{zhu1997specification}.  Such failures are unlikely to be exposed by standard test suites that sample an undifferentiated input space without knowledge of scenario boundaries.
+
+
+%% ─── 1.2 ──────────────────────────────────────────────────────────────────────
+\section{Problem Statement}
+\label{sec:intro:problem}
+
+The central problem addressed by this thesis can be stated as a bounded acceptance decision problem over the Agile-SOFL development lifecycle.
+
+\medskip
+\noindent\textbf{Decision problem.}
+Given an Agile-SOFL task $t$ whose FSF specification consists of an ordered scenario sequence $\mathcal{S}_t = (S_1, S_2, \ldots, S_n)$ over input variables $\mathbf{x}$ and output variables $\mathbf{y}$, and given a bounded synthesis budget $K \in \mathbb{N}$ representing the maximum number of LLM generation attempts, determine whether any generated candidate implementation $c : \mathbf{x} \mapsto \mathbf{y}$ satisfies the conjunctive acceptance condition
+\begin{equation}
+  \mathrm{Accept}(c, t)
+  \;\iff\;
+  \mathrm{Conf}(c, t) \geq \tau
+  \;\wedge\;
+  P^H(c) = 0,
+  \label{eq:acceptance}
+\end{equation}
+where $\mathrm{Conf}(c, t) \in [0, 1]$ is a formal conformance score measuring the proportion of scenarios in $\mathcal{S}_t$ for which $c$ satisfies both the guard predicate and the postcondition, $\tau \in (0, 1]$ is a conformance threshold (set to $\tau = 1.0$ in this work), and $P^H(c) = 0$ asserts that $c$ exhibits no high-severity Agile-SOFL fault patterns under static screening.
+
+The hardness of this problem lies in the interaction between the ordered evaluation semantics of FSF and the probabilistic, distribution-driven nature of LLM synthesis.  For each scenario $S_i$ with guard predicate $G_i(\mathbf{x})$ and postcondition $P_i(\mathbf{x}, \mathbf{y})$, computing $\mathrm{Conf}(c, t)$ at the scenario level requires constructing a witness input $\mathbf{x}^* $ such that $G_i(\mathbf{x}^*) \wedge \neg G_1(\mathbf{x}^*) \wedge \cdots \wedge \neg G_{i-1}(\mathbf{x}^*)$ holds, executing $c$ on $\mathbf{x}^*$, and verifying that the output satisfies $P_i(\mathbf{x}^*, c(\mathbf{x}^*))$.  The conjunctive guard condition required for witness construction is non-trivial: when guard predicates involve arithmetic over unbounded integers or real-valued parameters, the existence and density of satisfying inputs is not predictable without SMT-level reasoning \citep{barrett2018smt}.  Standard test generation heuristics—boundary-value analysis, random sampling, or equivalence partitioning—cannot reliably find inputs that satisfy the full guard conjunction for later scenarios, leaving ordering violations undetected.
+
+The following motivating example, drawn from the class of signal classification tasks used in our benchmark, illustrates the problem concisely.  Consider an FSF specification with three scenarios:
+
+\inputfsf{listings/classify_signal.fsf}{FSF specification for \code{classify\_signal} (pseudocode notation).}{lst:fsf-spec}
+
+\noindent The FSF ordering mandates that $S_1$ takes precedence over $S_2$: whenever \code{level}~$< 0$, the result must be \code{"Error"} regardless of the value of \code{threshold}.  Crucially, when \code{threshold} is negative, an input such as (\code{level}~$= -3$, \code{threshold}~$= -10$) satisfies both $G_1$ (\code{level}~$< 0$) and $G_2$ (\code{level}~$\geq$ \code{threshold}), so the ordering is not redundant; it determines a unique output for an entire class of inputs.
+
+A typical LLM-synthesised candidate for this specification may produce the following implementation:
+
+\inputpython{listings/classify_signal_bug.py}{LLM-generated candidate with a scenario-ordering violation.}{lst:llm-incorrect}
+
+\noindent On the input (\code{level}~$= -3$, \code{threshold}~$= -10$), the FSF specification requires \code{"Error"} (via $S_1$), but the candidate returns \code{"Critical"} because it evaluates $S_2$'s guard first.  A test suite that draws inputs from a distribution where \code{threshold} is typically non-negative will never reach this region of the input space, and the violation will remain latent until a production input triggers it.  This scenario ordering fault is semantically plausible—the implementation is logically defensible for most inputs—but formally incorrect, and it constitutes precisely the class of defect that a conjunctive acceptance mechanism must prevent.
+
+
+%% ─── 1.3 ──────────────────────────────────────────────────────────────────────
+\section{Research Challenges}
+\label{sec:intro:challenges}
+
+Constructing a pipeline that reliably enforces Equation~\eqref{eq:acceptance} within a bounded synthesis budget requires addressing three interlocking research challenges that go beyond what existing conformance-checking and LLM repair tools provide.
+
+\subsection*{Challenge 1: Closing the Specification-Code Semantic Gap}
+
+The formal semantics of FSF are inherently relational and precedence-sensitive.  Verifying that a candidate implementation $c$ conforms to scenario $S_i$ is not a matter of evaluating an independent property; it requires finding a concrete input in the conditional feasibility region $G_i(\mathbf{x}) \wedge \bigwedge_{j < i} \neg G_j(\mathbf{x})$ and confirming that $c$'s output satisfies $P_i$ on that input.  For FSF specifications that involve multi-variable guards, real-arithmetic constraints, or comparisons between input components, this feasibility region may be a low-measure subset of the input space.  Enumerative testing over a fixed input grid will miss it entirely; property-based testing with random sampling \citep{claessen2000quickcheck} will reach it only if the sampler happens to generate a satisfying point, with probability that decreases as the guard conjunction becomes more restrictive.
+
+SMT solvers \citep{demoura2008z3,barrett2018smt} offer a principled solution: the guard conjunction can be encoded as a set of constraints over the input variables and submitted to a solver that either produces a satisfying assignment (a concrete witness) or reports unsatisfiability (indicating that the scenario's guard region is empty).  This approach transforms conformance testing from an undirected sampling problem into a directed constraint-satisfaction problem, enabling the pipeline to generate precisely targeted witnesses for each scenario's boundary region regardless of that region's density.  However, exploiting SMT for this purpose requires a faithful encoding of FSF semantics into the solver's input language, careful handling of Python integer vs.\ real arithmetic, and a strategy for dealing with non-linear or non-linear-mixed constraints that arise in more complex specifications.  Designing this encoding and establishing its soundness with respect to the FSF semantics is a non-trivial engineering and formal modelling challenge.
+
+\subsection*{Challenge 2: Structured Counterexample-Guided Repair}
+
+Detecting a conformance failure via SMT witness generation produces a concrete counterexample: an input on which the candidate's output diverges from the specification.  Converting this counterexample into an effective repair prompt for a subsequent LLM synthesis attempt is the second challenge.  The standard iterative prompting strategy used in test-feedback baselines provides the LLM with a failing test case and a brief diagnostic message, expecting the model to generalise from the example to a corrected implementation.  For random or boundary-value test failures, this approach can be adequate: the LLM recognises a common pattern (an off-by-one error, a missing base case) and corrects it.
+
+For scenario-ordering violations, however, the standard approach fails structurally.  The LLM may correctly patch the specific input-output pair surfaced by the counterexample while leaving the underlying guard-ordering issue intact, producing an implementation that passes the repaired test but fails on a different boundary input where the same ordering violation is triggered.  \citet{lynn2024verifierloop} document this phenomenon in the context of formal-specification-guided LLM synthesis, finding that test-feedback loops with underspecified diagnostics converge significantly more slowly—and sometimes not at all—on violations that require structural, rather than local, code changes.
+
+Effective repair guidance for scenario-ordering violations must therefore be structured at the specification level: the repair prompt must identify the scenario whose guard-priority was violated, state the expected ordering constraint explicitly, and provide the concrete witness that exposes the discrepancy.  Constructing such prompts programmatically—translating the output of the SMT solver into natural-language guidance precise enough to direct the LLM toward the correct structural fix—requires a representation layer that sits between the formal conformance checker and the LLM interface.  Designing this layer, and evaluating its effect on repair convergence, is a central methodological contribution of this thesis.
+
+\subsection*{Challenge 3: Operationalising Prevention within a Bounded Budget}
+
+Full formal verification of an LLM-generated implementation against its FSF specification—establishing that $c$ conforms to $\mathcal{S}_t$ for all inputs in each scenario's guard region—is undecidable in general over infinite domains \citep{back1998refinement}.  Even for bounded domains, tools such as Dafny \citep{leino2010dafny} that support full functional correctness proofs require implementations to be annotated with loop invariants, termination metrics, and pre/postcondition assertions that LLM-generated code systematically lacks.  The DafnyBench evaluation \citep{loughman2024dafnybench} demonstrates that state-of-the-art LLMs produce verifiable Dafny implementations for fewer than half of benchmark problems of moderate complexity, indicating that verification-in-the-loop is not yet operationally feasible at agile development throughput.
+
+The practical challenge is therefore one of calibrated prevention: designing a pipeline stronger than coarse test-feedback \citep{chen2021codex}, weaker than full deductive verification \citep{leino2010dafny}, and fast enough for sprint-cycle budgets \citep{beck2001xp, li2022agilesofl}.  This requires characterising the tradeoff between conformance quality and pipeline latency, and a measurement framework more sensitive than binary strict-success yet more rigorous than simple coverage percentage---one that captures partial conformance and supports threshold-based acceptance gating.
+
+
+%% ─── 1.4 ──────────────────────────────────────────────────────────────────────
+\section{Proposed Approach}
+\label{sec:intro:approach}
+
+To address the three challenges above, this thesis proposes \textbf{HSP-Agile} (Hybrid Specification Pipeline for Agile-SOFL), a four-stage fault-prevention pipeline that interposes systematic formal checking and structured counterexample-guided repair between LLM synthesis and the formal Agile-SOFL lifecycle \citep{solarlezama2008sketching, li2023iet}.  The pipeline enforces the conjunctive acceptance condition of Equation~\eqref{eq:acceptance} without full deductive verification, by combining SMT-driven witness generation \citep{demoura2008z3} with LLM-based repair.
+
+\textbf{Stage~1 (LLM Candidate Synthesis)} queries a designated LLM with the FSF specification of the task, formatted as a structured prompt.  If the pipeline is executing a repair iteration, the prompt is augmented with structured repair feedback generated by Stage~3 in the previous iteration, which identifies the violated scenario, provides the counterexample witness, and states the guard-ordering constraint that must be respected.  The LLM produces a candidate Python implementation that is passed to Stage~2.
+
+\textbf{Stage~2 (Formal Conformance Checker)} encodes the FSF scenario guards and postconditions as Z3 constraints \citep{demoura2008z3} using a translation layer developed specifically for the FSF notation.  For each scenario $S_i$, the checker invokes Z3 to find a witness input satisfying the guard conjunction $G_i \wedge \bigwedge_{j < i} \neg G_j$.  If a witness is found, the candidate is executed on that input and its output is compared against the postcondition $P_i$; the result is recorded in a per-scenario conformance vector.  The aggregate score $\mathrm{Conf}(c, t)$ is the fraction of scenarios for which the candidate passes.  If $\mathrm{Conf}(c, t) = \tau$ and the budget is not exhausted, the candidate proceeds to Stage~4; otherwise, the failing scenarios are passed to Stage~3.
+
+\textbf{Stage~3 (Counterexample-Guided Repair)} constructs a structured repair prompt for each non-conforming scenario.  The prompt template identifies the scenario by number, states its guard predicate in natural language, provides the concrete witness input and the observed vs.\ expected outputs, and includes an explicit directive to respect the scenario-ordering semantics of the FSF specification.  This structured prompt is returned to Stage~1 for the next synthesis iteration.
+
+\textbf{Stage~4 (Pattern Guard)} screens the conformance-passing candidate against a catalogue of high-severity Agile-SOFL fault patterns—including off-by-one boundary errors in guard conditions, missing precondition checks on composite outputs, and guard-inversion faults—implemented as static analysis passes over the candidate's abstract syntax tree.  A candidate is accepted into the formal development lifecycle only when $P^H(c) = 0$; if patterns are detected, the candidate is quarantined and the best available candidate by conformance score is returned with a full audit trace.
+
+The key enabling insight of the pipeline is that Z3's model-generation mode can be exploited to navigate directly to the semantically critical regions of the input space where ordering violations manifest, without requiring any prior knowledge of the distribution of test inputs.  By encoding the guard precedence chain as a set of SMT constraints and querying the solver for satisfying assignments, the conformance checker obtains targeted witnesses that are specifically designed to expose precedence-sensitive faults.  This represents a qualitatively different approach from sampling-based test generation, and it is the mechanism that enables the pipeline to detect the class of faults illustrated in Listing~\ref{lst:llm-incorrect} with high reliability.
+
+A full formal specification of HSP-Agile, including the Z3 encoding of FSF semantics, the repair prompt template, and the complete pattern catalogue, is presented in Chapter~\ref{ch:method}.  The underlying formalisation of FSF scenario semantics and the correctness properties of the conformance checker are developed in Chapter~\ref{ch:formalization}.
+
+
+%% ─── 1.5 ──────────────────────────────────────────────────────────────────────
+\section{Contributions}
+\label{sec:intro:contributions}
+
+This thesis makes five concrete and independently evaluable contributions.  Figure~\ref{fig:contribution-map} provides a visual overview of how these contributions relate to the central HSP-Agile framework.
+
+\begin{figure}[h]
+  \centering
+  \tikzinput{diagrams/tikz/contribution_map}
+  \caption{Overview of HSP-Agile research contributions.  The five contributions form an integrated framework from pipeline design through empirical validation.}
+  \label{fig:contribution-map}
+\end{figure}
+
+\begin{enumerate}
+
+\item \textbf{The HSP-Agile Pipeline (C1).}
+We design and implement a novel four-stage hybrid prevention pipeline—LLM Candidate Synthesis, Formal Conformance Checker, Counterexample-Guided Repair, and Pattern Guard—that enforces a conjunctive acceptance criterion on LLM-synthesised candidates before they enter the Agile-SOFL formal development lifecycle.  The pipeline is the first to combine SMT-driven, precedence-sensitive witness generation with structured natural-language repair prompting in a single operational system targeting the FSF specification format.
+
+\item \textbf{Strict Formal Acceptance Predicate (C2).}
+We provide a formal definition of the conjunctive acceptance predicate $\mathrm{Accept}(c, t) \iff \mathrm{Conf}(c, t) \geq \tau \wedge P^H(c) = 0$ (Equation~\eqref{eq:acceptance}), together with a rigorous specification of the conformance score $\mathrm{Conf}(c, t)$ in terms of FSF scenario semantics.  This definition makes the acceptance criterion both machine-checkable and human-auditable, enabling reproducible quality gating that is independent of the specific LLM used for synthesis.
+
+\item \textbf{Precedence-Sensitive Hard Benchmark (C3).}
+We construct and release a benchmark of 120 synthetic Agile-SOFL tasks, each featuring multi-output FSF specifications with two or more scenarios whose guard regions overlap when parameters are varied, creating precedence-sensitive boundary regions that cannot be correctly handled without explicit guard-ordering awareness.  The benchmark is designed to be resistant to the pattern-completion heuristics of contemporary LLMs, and it provides a reproducible, difficulty-calibrated evaluation substrate for future research on formal conformance in LLM synthesis.
+
+\item \textbf{Two-Layer Prevention Evaluation Protocol (C4).}
+We design a prevention evaluation protocol that uses two complementary families of mutants—specification-confusion mutants, which alter FSF guard conditions to create plausible but incorrect specifications that a weak synthesiser might inadvertently satisfy, and implementation-screening mutants, which introduce targeted code-level faults into conforming implementations—to measure the pipeline's Probabilistic Detection Rate (PDR) and False Accept Rate (FAR).  This two-layer evaluation provides a more discriminating assessment of prevention capability than simple pass/fail conformance metrics, and it is applicable to any conformance-checking system operating over FSF-specified tasks.
+
+\item \textbf{Empirical Evidence of Conformance Improvement (C5).}
+We conduct a large-scale evaluation on the hard benchmark (840 runs across 7 execution modes), demonstrating that the full pipeline achieves mean strict formal conformance of 90.4\%, compared with 84.2\% for a one-shot LLM baseline and 88.0\% for test-feedback (+6.2 and +2.4 percentage points, respectively).  Ablation analysis confirms that counterexample-guided repair is the dominant contributor (removing it costs 6.3 percentage points), while formal conformance checking contributes a further 3.9 percentage points.  All experimental artefacts are publicly released to support reproducibility.
+
+\end{enumerate}
+
+Taken together, these contributions constitute an end-to-end framework for preventing formal conformance faults in LLM-assisted Agile-SOFL development, from the design of the pipeline and its acceptance predicate through to its empirical validation on a purpose-built hard benchmark.
+
+
+%% ─── 1.6 ──────────────────────────────────────────────────────────────────────
+\section{Thesis Organisation}
+\label{sec:intro:organisation}
+
+The remainder of this thesis is organised as follows.
+
+\textbf{Chapter~\ref{ch:background}} surveys the background and related work in four areas: the Agile-SOFL formal development framework and the FSF specification format; prior work on fault detection and prevention in formal specifications; the landscape of LLM-assisted code generation and its known limitations; and the foundations of mutation testing, SMT solving, and conformance checking that the HSP-Agile pipeline builds on.
+
+\textbf{Chapter~\ref{ch:formalization}} develops the formal foundations of the thesis: a rigorous definition of FSF scenario semantics, a formal characterisation of the scenario-ordering constraints that define precedence-sensitive behaviour, and the soundness properties of the SMT-based conformance checker with respect to these semantics.
+
+\textbf{Chapter~\ref{ch:method}} presents the HSP-Agile pipeline in full technical detail.  It specifies each of the four stages, defines the acceptance predicate and conformance score formally, describes the repair prompt construction mechanism, and presents the pattern catalogue used in Stage~4.
+
+\textbf{Chapter~\ref{ch:implementation}} describes the software implementation of the pipeline, covering the Z3 encoding module, the LLM interface layer, the repair prompt generator, the static analysis passes, and the infrastructure for running the benchmark experiments.
+
+\textbf{Chapter~\ref{ch:experiments}} reports the experimental evaluation: experimental setup, evaluation modes (seven configurations across 840 runs), results on formal conformance and strict success rates, latency analysis, ablation study, and the two-layer prevention evaluation.
+
+\textbf{Chapter~\ref{ch:discussion}} interprets the results, discusses the threats to validity, and situates the findings in the broader literature on formal methods adoption, LLM synthesis reliability, and the prevention-versus-verification tradeoff.
+
+\textbf{Chapter~\ref{ch:conclusion}} summarises the contributions, states the key findings in relation to the original research challenges, and identifies the most promising directions for future work, including latency reduction, extension of the pattern catalogue, and applicability to other formal specification notations beyond FSF.
+
+The thesis includes three appendices: \textbf{Appendix~\ref{app:reproducibility}} provides full reproducibility instructions for the experimental pipeline; \textbf{Appendix~\ref{app:benchmark}} gives a detailed description of the benchmark construction methodology and a representative sample of task specifications; and \textbf{Appendix~\ref{app:patterns}} documents the complete Agile-SOFL fault pattern catalogue used in the Stage~4 guard.

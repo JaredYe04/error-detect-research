@@ -1,0 +1,35 @@
+\section{Background and Related Work}
+\label{sec:related}
+
+\subsection{SOFL-Oriented Fault Prevention}
+Li and Liu studied requirements-related fault prevention in formal-specification-driven development, including dependency-aware ordering and transformation guidance~\cite{li2022qrs,li2023iet}.
+These works motivate prevention-first design, but they do not directly address integration with current LLM-assisted iterative workflows.
+
+\subsection{LLM + Formal Verification}
+Verifier-guided synthesis has shown encouraging results in Dafny and related domains, commonly using iterative correction and conformance-centric metrics~\cite{lynn2024tosem,dafnybench2024}.
+This literature supports the use of explicit feedback loops, but transferability to Agile-SOFL scenario logic remains an open empirical question.
+
+\subsection{Specification Mutation and Fault-Based Testing}
+Specification mutation is a long-established method for evaluating fault sensitivity of testing and analysis processes~\cite{okun2007nist,circus2017mutation}.
+Following this tradition, we adopt two mutation layers (specification confusion and implementation screening) to assess prevention behavior beyond simple pass/fail outcomes.
+
+\subsection{Counterexample-Guided Inductive Synthesis}
+Counterexample-guided inductive synthesis (CEGIS), introduced by Solar-Lezama et al.~\cite{solar2006sketch}, provides the foundational template for iterative correction loops in program synthesis.
+In the CEGIS schema, a verifier supplies counterexamples to a learner, which refines its candidate until no counterexample can be found.
+HSP-Agile instantiates a practical approximation of this loop: the formal checker plays the role of the verifier, emitting concrete failing cases, while the LLM plays the role of the learner responding to structured feedback.
+Because our setting targets Agile-SOFL scenario logic rather than full program proofs, convergence is not guaranteed, but the repair loop consistently reduces conformance violations across the attempt budget.
+
+\subsection{Static Analysis and Pattern-Based Defect Detection}
+Static analysis tools such as FindBugs~\cite{hovemeyer2004findbugs} and its successor SpotBugs operate by matching program structures against a catalog of known bug patterns, assigning severity ratings without requiring test execution.
+This design---lightweight, oracle-free, and fast---motivates the pattern guard component of HSP-Agile.
+Where static analysis tools target implementation-level code smells, our pattern guard encodes requirement-level anti-patterns specific to SOFL scenario logic (e.g., branch-order confusion, missing guard refinement), extending the defect-detection paradigm to the specification-to-code translation phase.
+
+\subsection{Formal Methods in Agile Development}
+The tension between formal rigor and agile delivery pace is well-studied in software engineering~\cite{agile2001manifesto}.
+Lightweight formal methods---model checking over finite state abstractions, property-based testing, and runtime verification---have been proposed as practical compromises that preserve agile iteration speed while providing bounded correctness guarantees~\cite{clarke1999modelchecking}.
+HSP-Agile contributes to this body of work by demonstrating that a formally grounded acceptance predicate, instantiated through scenario-level checking and repair, can be integrated into a per-sprint delivery cadence without prohibitive latency overhead.
+
+\subsection{Gap and Positioning}
+Existing approaches often emphasize either correctness guarantees or interactive efficiency.
+Our study positions HSP-Agile as a hybrid approach and evaluates it against one-shot and test-feedback baselines under a benchmark designed to expose precedence-sensitive failures.
+The goal is comparative empirical evidence rather than universal claims of superiority.

@@ -1,0 +1,65 @@
+\documentclass[sigconf]{acmart}
+
+\usepackage{booktabs}
+\usepackage{longtable}
+\usepackage{multirow}
+\usepackage{amsmath,amsthm}
+\usepackage{siunitx}
+\usepackage{graphicx}
+\usepackage{subcaption}
+\usepackage{algorithm}
+\usepackage{algpseudocode}
+\usepackage{array}
+\usepackage{xcolor}
+\usepackage{url}
+\usepackage{tikz}
+\usetikzlibrary{shapes.geometric,shapes.symbols,arrows.meta,positioning,fit,backgrounds,shadows,shadows.blur,calc}
+\usepackage{pgfplots}
+\pgfplotsset{compat=1.18}
+\usepackage{pgfplotstable}
+\usepackage{microtype}
+
+\setcopyright{none}
+\acmConference[Preprint]{Preprint for Academic Discussion}{2026}{Shanghai, China}
+\acmBooktitle{Preprint for Academic Discussion}
+\acmDOI{N/A}
+\acmISBN{N/A}
+
+\title{HSP-Agile: Hybrid Specification Pipeline for Error Prevention in Agile-SOFL Development}
+
+\author{Ye Xujun}
+\affiliation{%
+  \institution{East China Normal University}
+  \city{Shanghai}
+  \country{China}
+}
+\email{author@ecnu.edu.cn}
+
+\begin{document}
+
+\begin{abstract}
+LLM-assisted implementation is increasingly used in agile development, but requirements-to-code defects remain difficult to prevent when behavior is specified by ordered formal scenarios.
+This paper studies a conservative acceptance problem for Agile-SOFL tasks: under a bounded interaction budget, decide whether a generated implementation is acceptable with respect to both complete scenario-level functional agreement and requirement-fault safety constraints.
+We present \textbf{HSP-Agile}, a hybrid pipeline that integrates (i) candidate synthesis, (ii) formal conformance checking, (iii) counterexample-guided repair, and (iv) high-severity pattern screening.
+We formalize strict acceptance as a conjunctive predicate and evaluate it on a benchmark containing base Agile-SOFL tasks and precedence-sensitive hard synthetic tasks, using one-shot, iterative test-feedback, and ablation baselines under aligned budgets.
+Empirical analysis follows a two-layer prevention protocol (specification-confusion and implementation-screening mutants) and reports strict correctness, prevention, and efficiency metrics.
+To avoid over-claiming, we report only completed reruns and keep unresolved numerical entries as \texttt{TBD}.
+\end{abstract}
+
+\keywords{Agile-SOFL, fault prevention, formal specification, large language model, software verification, mutation analysis}
+
+\input{sections/01_introduction}
+\input{sections/02_background_related}
+\input{sections/03_method}
+\input{sections/04_experimental_setup}
+\input{sections/05_results}
+\input{sections/06_discussion_threats}
+\input{sections/07_conclusion}
+
+\bibliographystyle{ACM-Reference-Format}
+\bibliography{bib/references}
+
+\appendix
+\input{sections/appendix_reproducibility}
+
+\end{document}

@@ -1,0 +1,124 @@
+% Counterexample-Guided Repair Detail — Ch. 4
+% Fragment: \input{diagrams/tikz/repair_feedback} inside a figure environment.
+% Required TikZ libraries (add to document preamble):
+%   \usetikzlibrary{arrows.meta,shadows,shapes.geometric}
+\usetikzlibrary{arrows.meta,shadows,shapes.geometric}
+
+\begin{tikzpicture}[
+  font=\small\sffamily,
+  >=Stealth,
+  vbox/.style={
+    draw=#1!60!black, fill=#1!10, rounded corners=4pt,
+    minimum width=6.2cm, minimum height=1.1cm,
+    text width=5.8cm, align=center, inner sep=5pt,
+    drop shadow={shadow xshift=0.4ex, shadow yshift=-0.4ex,
+                 shadow opacity=0.30}
+  },
+  arr/.style={-latex, thick}
+]
+
+%----------------------------------------------------------------
+% Main vertical chain
+%----------------------------------------------------------------
+\node[vbox=gray]   (prev) at (0, 0) {%
+  \textbf{Previous Attempt}\quad
+  $c_{k-1}$,\enspace $\mathit{feedback}_{k-1}$};
+
+\node[vbox=blue]   (cand) at (0, -2.1) {%
+  \textbf{New Candidate}\\[2pt]
+  $c_k = \mathrm{LLM}(\mathcal{S}_t,\;\mathit{feedback}_{k-1})$};
+
+\node[vbox=green]  (test) at (0, -4.2) {%
+  \textbf{Test Execution}\\[2pt]
+  Run $c_k$ on $\mathcal{D}(t) = \{x_1,\ldots,x_n\}$};
+
+\node[vbox=red]    (cexbox) at (0, -6.7) {%
+  \textbf{Counterexample}\\[2pt]
+  $(x^*,\;g_t(x^*),\;f_{c_k}(x^*))$};
+
+\node[
+  draw=purple!55!black, fill=purple!8, rounded corners=4pt,
+  minimum width=6.2cm, minimum height=1.3cm,
+  text width=5.8cm, align=left, inner sep=5pt,
+  drop shadow={shadow xshift=0.4ex, shadow yshift=-0.4ex,
+               shadow opacity=0.30}
+] (fbupdate) at (0, -8.9) {%
+  \textbf{Feedback Update}\\[2pt]
+  $\mathit{feedback}_k = \{$%
+  $\mathit{counterexamples}:[\ldots],$%
+  $\mathit{patterns}:[\ldots],$%
+  $\mathit{attempt}:k\}$};
+
+%----------------------------------------------------------------
+% Vertical arrows with labels
+%----------------------------------------------------------------
+\draw[arr]
+  (prev.south) --
+  node[right=3pt, font=\scriptsize\sffamily] {LLM generates}
+  (cand.north);
+
+\draw[arr]
+  (cand.south) --
+  node[right=3pt, font=\scriptsize\sffamily] {Formal check}
+  (test.north);
+
+\draw[arr]
+  (test.south) --
+  node[right=3pt, font=\scriptsize\sffamily] {Some fail}
+  (cexbox.north);
+
+\draw[arr] (cexbox.south) -- (fbupdate.north);
+
+%----------------------------------------------------------------
+% RIGHT BRANCH — "All pass" → Accept check
+%----------------------------------------------------------------
+\node[
+  draw=orange!60!black, fill=orange!8,
+  diamond, aspect=2.2,
+  minimum width=2.8cm, minimum height=1.0cm,
+  align=center, font=\scriptsize\sffamily,
+  drop shadow={shadow xshift=0.4ex, shadow yshift=-0.4ex,
+               shadow opacity=0.30}
+] (chk) at (5.8, -4.2) {Pattern\\clear?};
+
+\node[
+  draw=green!60!black, fill=green!10, rounded corners=4pt,
+  minimum width=2.4cm, minimum height=1.0cm,
+  align=center, font=\small\sffamily\bfseries,
+  drop shadow={shadow xshift=0.4ex, shadow yshift=-0.4ex,
+               shadow opacity=0.30}
+] (ok) at (5.8, -5.9) {ACCEPTED\\$c_k$};
+
+\draw[arr]
+  (test.east) --
+  node[above, font=\scriptsize\sffamily] {All pass}
+  (chk.west);
+
+\draw[arr]
+  (chk.south) --
+  node[right=2pt, font=\scriptsize\sffamily] {yes}
+  (ok.north);
+
+\draw[arr, dashed]
+  (chk.north) -- +(0, 0.75)
+  node[above, font=\scriptsize\sffamily] {no\;$\to$\;continue};
+
+%----------------------------------------------------------------
+% k > K exit arrow
+%----------------------------------------------------------------
+\node[
+  draw=gray!55, fill=gray!5, rounded corners=3pt,
+  minimum width=2.8cm, align=center, inner sep=4pt,
+  font=\scriptsize\sffamily
+] (exit) at (5.8, -8.9) {$k{>}K$: return best $c^*$};
+
+\draw[arr, dashed] (fbupdate.east) -- (exit.west);
+
+%----------------------------------------------------------------
+% Curved loop arrow — Feedback Update back to Previous Attempt
+%----------------------------------------------------------------
+\draw[arr] (fbupdate.west) -- ++(-2.8,0) coordinate (loopW)
+  (loopW) |- node[pos=0.25, anchor=east, font=\scriptsize\sffamily, align=right]
+    {$k := k{+}1$} (prev.west);
+
+\end{tikzpicture}

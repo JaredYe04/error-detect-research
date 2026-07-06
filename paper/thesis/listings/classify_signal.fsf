@@ -1,0 +1,10 @@
+# classify_signal(level: int, threshold: int) -> alert: str
+#
+# S1: WHEN level < 0
+#         THEN alert = "Error"
+#
+# S2: WHEN level >= threshold   -- (evaluated only if NOT S1)
+#         THEN alert = "Critical"
+#
+# S3: OTHERWISE                 -- (evaluated only if NOT S1 and NOT S2)
+#         THEN alert = "Normal"

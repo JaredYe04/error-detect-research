@@ -1,0 +1,59 @@
+@startuml fsf_parser_class
+!include _theme.puml
+scale max 2700 width
+
+class ASFLBridge <<Infra>> {
+    - spec_path : Path
+    --
+    + extract(spec_path : Path) : TaskSpec
+    - _invoke_parser() : str
+    - _parse_json_output(raw : str) : dict
+}
+
+class TaskSpec <<Spec>> {
+    + task_id : str
+    + inputs : list[str]
+    + outputs : list[str]
+    + scenarios : list[FSFScenario]
+    + external_vars : dict[str, str]
+}
+
+class FSFScenario <<Spec>> {
+    + guard_condition : str
+    + def_assignments : list[str]
+    + output_bindings : dict[str, str]
+}
+
+class Z3Translator <<Infra>> {
+    - ctx : z3.Context
+    --
+    + scenario_to_constraints(scenario : FSFScenario) : list[z3.ExprRef]
+    + generate_satisfying_model(constraints : list[z3.ExprRef]) : dict
+    - _parse_expression(expr_str : str) : z3.ExprRef
+    - _bind_vars(vars : dict) : dict[str, z3.ExprRef]
+}
+
+class ConcreteCase <<VO>> {
+    + inputs : dict[str, Any]
+    + expected_outputs : dict[str, Any]
+    + scenario_index : int
+}
+
+class CheckResult <<Result>> {
+    + conformance : float
+    + counterexamples : list[ConcreteCase]
+    + strict_formal_passed : bool
+}
+
+ASFLBridge ..> TaskSpec : extracts >
+TaskSpec "1" *-- "0..*" FSFScenario : contains
+Z3Translator ..> FSFScenario : translates >
+Z3Translator ..> ConcreteCase : produces >
+ConcreteCase ..> CheckResult : aggregated into >
+
+note bottom of Z3Translator
+  Z3 model generation produces concrete
+  witnesses for each scenario guard region
+end note
+
+@enduml

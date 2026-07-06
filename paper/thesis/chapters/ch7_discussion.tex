@@ -1,0 +1,242 @@
+\chapter{Discussion}
+\label{ch:discussion}
+
+This chapter interprets the experimental results presented in Chapter~\ref{ch:experiments},
+examines the counter-intuitive relationship between formal conformance and strict success
+rate, draws practical implications for integrating the HSP-Agile pipeline into sprint
+workflows, and situates the approach within the broader landscape of related research.
+Limitations and threats to external validity are then assessed.
+
+% ---------------------------------------------------------------------------
+\section{Interpretation of Core Findings}
+\label{sec:disc:interpretation}
+% ---------------------------------------------------------------------------
+
+The central empirical finding of this thesis is that the full HSP-Agile pipeline (mode~M)
+achieves a mean strict formal conformance of \textbf{90.4\%} on the hard benchmark of 120
+precedence-sensitive Agile-SOFL tasks.  This represents a gain of \textbf{6.2 percentage
+points} over the one-shot LLM baseline (B1: 84.2\%) and \textbf{2.4 percentage points}
+over the test-feedback loop baseline (B2: 88.0\%).
+
+Two interlocking mechanisms produce this improvement.  First, the formal conformance checker
+generates Z3-driven test cases targeted specifically at the ordering constraints encoded in
+each Functional Scenario Framework (FSF) specification~\citep{barrett2018smt,demoura2008z3,liu2014sofl}.
+These cases expose ordering violations that coarser unit tests, which typically exercise only
+the ``happy path'' of each scenario branch, systematically miss~\citep{zhu1997specification,ammann2016testing}.
+Second, the counterexample-guided repair loop~\citep{solarlezama2008sketching}
+converts witnessed failures into structured repair prompts that direct the language model
+towards the violated constraint~\citep{lynn2024verifierloop,chen2021codex}.
+
+The low conformance of the B0 reference mode (27.5\%) merits comment.  B0 consists of
+auto-generated reference implementations produced by a template-based generator that
+correctly handles straightforward scenario orderings but is not optimised for the
+hardest precedence-sensitive patterns in the benchmark.  Its score therefore establishes a
+meaningful lower bound: it demonstrates how poorly non-LLM template generation performs
+on the hard partition, and it calibrates the difficulty of the benchmark rather than
+representing a realistic baseline for production use.
+
+The ablation results confirm that both principal pipeline stages contribute independently.
+Removing the formal checker entirely (A1) drops conformance to 86.5\% ($-3.9$\,pp
+vs.\ M), while removing the repair loop (A3) drops it to 84.1\% ($-6.3$\,pp vs.\ M).
+Removing the pattern guard (A2) yields a marginal gain of $+0.5$\,pp, a finding discussed
+in detail in Section~\ref{sec:disc:implications}.  Together, the ablation deltas account
+for the bulk of the conformance advantage of M over B1, validating the design rationale of
+each pipeline stage.
+
+% ---------------------------------------------------------------------------
+\section{The Quality–Pass-Rate Paradox}
+\label{sec:disc:paradox}
+% ---------------------------------------------------------------------------
+
+One of the most counter-intuitive results in the evaluation is that the full pipeline M
+exhibits a \emph{lower} strict success rate (25.0\%) than both B1 and B2 (26.7\%), despite
+achieving higher formal conformance.  This apparent paradox requires careful unpacking,
+because it has direct consequences for how one should choose evaluation metrics in
+formal-conformance studies.
+
+The two metrics measure fundamentally different things.  \emph{Strict success rate} is a
+binary per-task metric: a task is marked successful only when \emph{all} generated test
+cases pass.  A single failing case, regardless of how close the candidate is to being
+correct, yields a score of zero for that task.  \emph{Formal conformance}, by contrast, is
+a continuous metric: it records the fraction of test cases that pass, averaged over all
+tasks.  A candidate that satisfies 9 out of 10 generated cases contributes 0.9 to the
+conformance average even though it contributes 0 to the strict success count.
+
+The paradox arises because M's conjunctive acceptance gate is deliberately conservative.
+When a candidate passes all test cases but the pattern guard detects a residual fault
+pattern, M classifies the candidate as ``best effort'' and does \emph{not} emit a strict
+accept.  In other words, M may \emph{raise the bar for acceptance} relative to B1 and B2,
+which accept any candidate that clears their respective stopping criteria.  The result is
+that a subset of tasks that B1 or B2 would count as strict successes are counted by M as
+non-successes because the pattern guard fired — yet those same candidates contribute fully
+to the conformance average, inflating M's conformance relative to its strict success rate.
+
+A useful analogy clarifies this relationship.  Suppose two students sit ten examinations.
+Student~A scores 89\% on every paper.  Student~B scores 100\% on three papers and 65\% on
+the remaining seven.  On a binary pass/fail threshold of 75\%, Student~A passes all ten and
+Student~B passes only three.  Yet Student~B's \emph{mean score} is $0.3 \times 100 + 0.7
+\times 65 = 75.5\%$, below Student~A's 89\%.  The binary metric favours Student~B despite
+lower average quality; the continuous metric correctly orders them.  The HSP-Agile results
+follow the same logic: M is the student who scores consistently high across all tasks
+(conformance), whereas B1 and B2 occasionally solve tasks completely but average lower
+quality.
+
+This analysis provides a clear empirical justification for adopting formal conformance as
+the \emph{primary} metric on the hard benchmark.  The strict success rate is too coarse to
+differentiate between a pipeline that produces consistently high-quality candidates and one
+that occasionally solves a task while producing low-quality candidates on the majority.
+The Wilcoxon signed-rank test on strict success rate yields $p = 0.921$ (not significant),
+consistent with the interpretation that the binary metric cannot distinguish M from B2 on
+this benchmark; the difference is effectively noise in the binary domain even though a
+meaningful quality difference exists in the continuous domain.
+
+% ---------------------------------------------------------------------------
+\section{Implications for Agile-Formal Integration}
+\label{sec:disc:implications}
+% ---------------------------------------------------------------------------
+
+\subsection{Sprint Integration and CI/CD Deployment}
+
+The mean latency of mode~M is 43{,}659\,ms per task, approximately 4.6 times the latency
+of B2 (10{,}769\,ms).  This overhead reflects the additional LLM API calls required by the
+repair loop (mean 2.08 calls per task under M) and the Z3-based conformance checker.
+Whether this latency is acceptable depends critically on the deployment context.
+
+For \emph{interactive} use — a developer waiting in the IDE for a candidate implementation
+— 44 seconds is at the upper boundary of acceptable response times and would likely
+require UX mitigations such as streaming partial results or asynchronous notification.
+However, for \emph{CI/CD pre-merge gates}, 44 seconds per task is well within the range
+of typical automated quality checks.  A sprint team merging 20--30 LLM-assisted
+implementation units per day would incur roughly 15--22 minutes of additional checking
+time in the pipeline, an overhead comparable to compiling a medium-sized Java project or
+running a unit-test suite.  Given that the alternative — propagating conformance faults
+into downstream Agile-SOFL verification artefacts — can require hours of manual
+debugging, the trade-off is clearly favourable in a formal-methods-adjacent workflow.
+
+We therefore recommend deploying HSP-Agile as a background pre-merge quality gate rather
+than as an interactive code-completion tool.  This framing positions the 44-second latency
+not as a user-experience constraint but as a CI step, a context in which it is unremarkable,
+consistent with agile fitness-function practice~\citep{harman2012formalagile,beck2001xp}.
+
+\subsection{The Formal Checker as a Lightweight Oracle}
+
+The Z3-based conformance checker occupies an important middle ground between no formal
+verification and full deductive verification.  Full verification tools such as Dafny~\citep{leino2010dafny} and Coq provide complete guarantees but require annotation-heavy specifications, trained
+verification engineers, and verification times that can span hours for non-trivial
+programs~\citep{woodcock2009formalsurvey}.  The Z3 checker used in HSP-Agile, by contrast, provides \emph{bounded}
+guarantees: it guarantees conformance with respect to the finite test suite it generates,
+not with respect to all possible inputs.  Within those bounds, the overhead per task is
+less than 100\,ms — a negligible fraction of the total pipeline latency.
+
+This lightweight oracle is precisely what Agile-SOFL workflows need.  Agile development
+cycles are short (two-week sprints); full formal verification on every candidate is
+impractical.  The Z3 checker provides meaningful formal grounding — the generated test
+cases are derived directly from the FSF specification structure, not from manually written
+unit tests — at a cost compatible with sprint cadences.  The +3.9\,pp conformance
+contribution of the checker (A1 ablation) demonstrates that this grounding materially
+improves output quality, not merely adds bureaucratic overhead.
+
+\subsection{Pattern Guard Selectivity and Advisory Use}
+
+The A2 ablation result is the most nuanced finding in the evaluation.  Removing the pattern
+guard yields a marginal \emph{improvement} of $+0.5$\,pp in formal conformance, suggesting
+that the guard does not improve pass rates at the current benchmark scale.  At first glance
+this appears to undermine the case for including the pattern guard in the pipeline.
+
+A more careful interpretation, however, is that the pattern guard provides value as a
+\emph{classification and diagnostic tool} rather than as a \emph{filtering gate} that
+improves overall pass rates.  When the guard fires, it identifies the specific fault pattern
+involved (e.g.\ RF07, unconditional success; or RF03, missing precedence guard), providing
+actionable information to the developer.  This diagnostic value is not captured by the
+conformance metric, which measures only whether test cases pass, not \emph{why} they fail.
+
+We therefore recommend a modified deployment strategy: the pattern guard should emit
+\emph{advisory warnings} rather than hard rejection signals for most fault patterns,
+following static-analysis guidance that severity should modulate gating policy~\citep{hovemeyer2004findbugs,ayewah2008findbugs}.
+The exception is RF07 (unconditional success), a pattern that trivially satisfies test cases
+while violating all meaningful specification constraints; for RF07, hard rejection remains
+appropriate.  This approach preserves the diagnostic benefit of the pattern guard while
+avoiding the marginal conformance penalty incurred by its conjunctive gating in the current
+configuration.
+
+% ---------------------------------------------------------------------------
+\section{Limitations}
+\label{sec:disc:limitations}
+% ---------------------------------------------------------------------------
+
+Several limitations bound the scope of the claims made in this thesis.
+
+\paragraph{Benchmark representativeness.}
+The hard benchmark consists of 120 synthetic Agile-SOFL tasks generated from a fixed
+template family.  While the tasks were specifically designed to probe precedence-sensitive
+scenario orderings — the class of faults HSP-Agile targets — they may not capture the full
+diversity of FSF specifications encountered in industrial practice.  Industrial
+specifications may exhibit more complex state dependencies, external service interactions,
+or composite scenario structures not represented in the benchmark.  Replication on
+industrial specifications from real Agile-SOFL projects~\citep{li2022agilesofl,pohl2010requirements} is necessary before broad
+generalisability can be claimed.
+
+\paragraph{Single LLM family.}
+All experiments used Qwen2.5-27B-Instruct via an OpenAI-compatible LLM gateway.  LLMs differ substantially in their tendency
+to produce scenario-ordering violations, their responsiveness to repair prompts, and their
+latency characteristics.  The conformance gains reported here may be larger or smaller with
+GPT-4, Claude~3.5 Sonnet, or Gemini~1.5 Pro.  The qualitative structure of the pipeline
+(checker-guided repair) is model-agnostic, but the quantitative results are specific to the
+evaluated model family.
+
+\paragraph{Z3 test-case coverage.}
+The formal checker currently generates one test case per scenario branch.  Generating
+multiple cases per branch — for example, using boundary-value analysis or random
+perturbation around the Z3 witness — would increase fault detection sensitivity but also
+increase latency.  The current single-case-per-scenario regime likely underestimates the
+conformance advantage of mode~M relative to what a denser test suite would reveal.
+
+\paragraph{Prevention evaluation completeness.}
+The probabilistic detection rate (PDR) and false accept rate (FAR) analysis reported in
+Chapter~\ref{ch:experiments} is based on 40 tasks per mode.  Preliminary figures
+(B1: 7.5\%, B2: 15.0\%, M: 10.0\% PDR) are consistent with conformance trends but require
+a full mutation-injection experiment across all modes and larger mutant populations before
+definitive prevention claims can be made.  The current figures should be treated as
+indicative rather than conclusive.
+
+\paragraph{Repair loop convergence.}
+The maximum repair budget $K$ is fixed across all tasks.  Harder tasks may benefit from
+larger $K$, while simpler tasks waste budget on unnecessary iterations.  An adaptive
+budget-allocation strategy that dynamically scales $K$ based on observed conformance
+improvement per iteration could reduce latency while maintaining quality on the hardest
+tasks.
+
+% ---------------------------------------------------------------------------
+\section{Comparison to Related Approaches}
+\label{sec:disc:related}
+% ---------------------------------------------------------------------------
+
+\paragraph{DafnyBench and full deductive verification.}
+DafnyBench~\citep{loughman2024dafnybench} evaluates LLM synthesis of Dafny programs with machine-checked
+correctness proofs.  Full deductive verification provides stronger guarantees than
+HSP-Agile's bounded Z3 checking: a Dafny proof is valid for all inputs, whereas
+HSP-Agile's conformance certificate covers only the generated test suite.  However,
+Dafny's verification requires formal annotations (invariants, pre/post-conditions, loop
+measures) that are absent from FSF specifications.  HSP-Agile is applicable directly to
+Agile-SOFL FSF inputs without requiring the developer to write verification annotations,
+making it usable by practitioners who are not trained in deductive verification.  The two
+approaches occupy complementary positions in the verification-cost spectrum.
+
+\paragraph{CEGIS-inspired approaches for Dafny (Lynn et al., TOSEM 2024).}
+Lynn et al.~\citep{lynn2024verifierloop} apply counterexample-guided inductive synthesis (CEGIS)
+to assist LLMs in producing correct Dafny programs.  The conceptual similarity to
+HSP-Agile's repair loop is strong: both approaches use witnessed failures to construct
+targeted repair prompts.  The key difference is that Lynn et al.\ operate in the Dafny
+verification context, where counterexamples are generated by the Dafny verifier from
+logical proof obligations, whereas HSP-Agile generates counterexamples from Z3-driven test
+cases derived from FSF scenario semantics.  HSP-Agile's checker is lighter-weight and does
+not require a verification-capable specification language, but it provides weaker
+guarantees as a consequence.
+
+\paragraph{Standard LLM baselines (B1 and B2).}
+Relative to the two LLM baselines evaluated in this thesis, HSP-Agile adds
+$+6.2$\,pp and $+2.4$\,pp formal conformance respectively, at a latency cost of
+approximately $4.6\times$ over B2~\citep{dakhel2023copilot,chen2021codex}.  These figures place HSP-Agile in a ``high quality,
+moderate cost'' regime: it is not suitable as a real-time code-completion assistant but is
+appropriate for quality gates in workflows where downstream formal verification costs
+dominate.

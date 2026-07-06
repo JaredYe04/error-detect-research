@@ -1,0 +1,66 @@
+{
+  "version": 1,
+  "notes": "Each command is executable from repository root.",
+  "figures": [
+    {
+      "figure_id": "mode_distribution_strict_conformance",
+      "output_files": [
+        "paper/hsp-agile/figures/mode_distribution_strict_conformance.html",
+        "paper/hsp-agile/figures/mode_distribution_strict_conformance.png",
+        "paper/hsp-agile/figures/mode_distribution_strict_conformance.pdf"
+      ],
+      "source_files": [
+        "paper/hsp-agile/data/processed/distribution_by_mode.csv"
+      ],
+      "command": "python paper/hsp-agile/figures/scripts/plot_paper_figures.py --only mode_distribution_strict_conformance --static-formats png pdf --dpi 300 --seed 7"
+    },
+    {
+      "figure_id": "mode_distribution_latency",
+      "output_files": [
+        "paper/hsp-agile/figures/mode_distribution_latency.html",
+        "paper/hsp-agile/figures/mode_distribution_latency.png",
+        "paper/hsp-agile/figures/mode_distribution_latency.pdf"
+      ],
+      "source_files": [
+        "paper/hsp-agile/data/processed/distribution_by_mode.csv"
+      ],
+      "command": "python paper/hsp-agile/figures/scripts/plot_paper_figures.py --only mode_distribution_latency --static-formats png pdf --dpi 300 --seed 7"
+    },
+    {
+      "figure_id": "ablation_contribution_ci",
+      "output_files": [
+        "paper/hsp-agile/figures/ablation_contribution_ci.html",
+        "paper/hsp-agile/figures/ablation_contribution_ci.png",
+        "paper/hsp-agile/figures/ablation_contribution_ci.pdf"
+      ],
+      "source_files": [
+        "paper/hsp-agile/data/processed/ablation_contribution.csv"
+      ],
+      "command": "python paper/hsp-agile/figures/scripts/plot_paper_figures.py --only ablation_contribution_ci --static-formats png pdf --dpi 300 --seed 7"
+    },
+    {
+      "figure_id": "prevention_heatmap_by_mode_eval",
+      "output_files": [
+        "paper/hsp-agile/figures/prevention_heatmap_by_mode_eval.html",
+        "paper/hsp-agile/figures/prevention_heatmap_by_mode_eval.png",
+        "paper/hsp-agile/figures/prevention_heatmap_by_mode_eval.pdf"
+      ],
+      "source_files": [
+        "paper/hsp-agile/data/processed/prevention_heatmap.csv"
+      ],
+      "command": "python paper/hsp-agile/figures/scripts/plot_paper_figures.py --only prevention_heatmap_by_mode_eval --static-formats png pdf --dpi 300 --seed 7"
+    },
+    {
+      "figure_id": "pareto_quality_vs_latency",
+      "output_files": [
+        "paper/hsp-agile/figures/pareto_quality_vs_latency.html",
+        "paper/hsp-agile/figures/pareto_quality_vs_latency.png",
+        "paper/hsp-agile/figures/pareto_quality_vs_latency.pdf"
+      ],
+      "source_files": [
+        "paper/hsp-agile/data/processed/pareto_by_mode.csv"
+      ],
+      "command": "python paper/hsp-agile/figures/scripts/plot_paper_figures.py --only pareto_quality_vs_latency --static-formats png pdf --dpi 300 --seed 7"
+    }
+  ]
+}

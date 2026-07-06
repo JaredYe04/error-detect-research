@@ -1,0 +1,50 @@
+{
+  "M_vs_B1": {
+    "baseline": "B1",
+    "method": "M",
+    "metric": "strict_success",
+    "n_pairs": 120,
+    "baseline_mean": 0.26666666666666666,
+    "method_mean": 0.25,
+    "delta": -0.016666666666666663,
+    "wilcoxon_stat": 0.0,
+    "p_value": 0.9213503964748575,
+    "effect_size_rank_biserial": -0.032920110192837464,
+    "significant_0.05": false
+  },
+  "M_vs_B2": {
+    "baseline": "B2",
+    "method": "M",
+    "metric": "strict_success",
+    "n_pairs": 120,
+    "baseline_mean": 0.26666666666666666,
+    "method_mean": 0.25,
+    "delta": -0.016666666666666663,
+    "wilcoxon_stat": 0.0,
+    "p_value": 0.9213503964748575,
+    "effect_size_rank_biserial": -0.032920110192837464,
+    "significant_0.05": false
+  },
+  "B2_vs_B1": {
+    "baseline": "B1",
+    "method": "B2",
+    "metric": "strict_success",
+    "n_pairs": 120,
+    "baseline_mean": 0.26666666666666666,
+    "method_mean": 0.26666666666666666,
+    "delta": 0.0,
+    "wilcoxon_stat": null,
+    "p_value": 1.0,
+    "effect_size_rank_biserial": 0.0,
+    "significant_0.05": false,
+    "note": "all_differences_zero"
+  },
+  "latency_M_vs_B2": {
+    "comparison": "M_latency_vs_B2",
+    "M_mean_ms": 43659.24550500009,
+    "B2_mean_ms": 10768.77275666387,
+    "speedup": 0.24665503565403052,
+    "mannwhitney_p": 0.9999999997187039,
+    "significant_0.05": false
+  }
+}

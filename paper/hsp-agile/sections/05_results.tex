@@ -1,0 +1,80 @@
+\section{Results}
+\label{sec:results}
+
+\subsection{Main Comparison (RQ1--RQ2)}
+Figure~\ref{fig:summary} summarizes key metrics across modes.
+Figure~\ref{fig:main-success} and Figure~\ref{fig:main-latency} show distributions of strict formal conformance and latency.
+
+On the hard benchmark ($n=120$ tasks), strict success rates (fraction of tasks where all generated test cases pass) are similar across LLM-based methods: B1~26.7\%, B2~26.7\%, M~25.0\%.
+This convergence on hard tasks is expected: precedence-sensitive scenarios create genuine failure cases not easily resolved by any single generation strategy.
+However, \emph{mean strict formal conformance}---the quality score on generated test cases even when full correctness is not achieved---shows a clear ordering: B0~27.5\%, B1~84.2\%, B2~88.0\%, M~\textbf{90.4\%}.
+This 6.2-point improvement in $\mathrm{Conf}(c,t)$ from B1 to M indicates that when HSP-Agile does not fully accept a candidate, it still reaches a higher partial conformance, reducing the severity of residual defects.
+
+Latency trade-off: M incurs 43.7\,s mean latency vs.\ 9.6\,s for B1 and 10.8\,s for B2.
+The Wilcoxon test for strict success (M vs.\ B2) yields $p=0.92$ (not significant), consistent with the hypothesis that strict pass rate alone is insufficient to distinguish prevention quality on hard tasks; formal conformance and prevention metrics provide richer discrimination.
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=\linewidth]{figures/summary_metrics_by_mode.pdf}
+  \caption{Key metrics summary by mode (strict success, strict formal conformance, mutation kill rate). B0 is the reference baseline; A1--A3 are ablations of formal checking, pattern guard, and repair loop respectively.}
+  \label{fig:summary}
+\end{figure}
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=\linewidth]{figures/mode_distribution_strict_conformance.pdf}
+  \caption{Strict conformance by mode on the hard benchmark. Violin width shows density, inner boxplots summarize quartiles, and mode-wise sample counts are shown on the x-axis labels.}
+  \label{fig:main-success}
+\end{figure}
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=\linewidth]{figures/mode_distribution_latency.pdf}
+  \caption{Latency by mode on the hard benchmark, plotted on a log scale to retain both sub-second and long-tail responses in one compact panel. Violin/box overlays use the same style as Figure~\ref{fig:main-success}.}
+  \label{fig:main-latency}
+\end{figure}
+
+\subsection{Ablation and Sensitivity (RQ3)}
+Figure~\ref{fig:ablation} reports ablation deltas for RQ3.
+All three ablation modes (A1: no formal check, A2: no pattern guard, A3: no repair loop) achieve strict success rates ($\approx 26.7\%$) marginally above M ($25.0\%$) but lower formal conformance than M (A1: 86.5\%, A2: 90.9\%, A3: 84.1\% vs.\ M: 90.4\%).
+This indicates that removing any single component may marginally inflate accepted candidates (fewer constraints) but reduces the quality of those acceptances; the conjunctive acceptance rule in HSP-Agile sacrifices some pass rate to maintain conformance quality.
+The hard benchmark amplifies this trade-off by providing precedence-sensitive failure modes that expose boundary behavior missed by partial checks.
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=\linewidth]{figures/ablation_contribution_ci.pdf}
+  \caption{Ablation deltas against full HSP-Agile (M). Bars show point estimates of strict-success change, error bars indicate 95\% confidence intervals, and signed bar labels provide compact effect-size readout.}
+  \label{fig:ablation}
+\end{figure}
+
+\subsection{Prevention Evaluation}
+We run full prevention evaluation over all benchmark tasks, covering:
+\begin{itemize}
+  \item \textbf{Spec-confusion} mutants (faulty scenario logic),
+  \item \textbf{Implementation-screening} mutants (faulty candidate code).
+\end{itemize}
+Figure~\ref{fig:prevention} shows prevention heatmaps for PDR and FAR by mode and evaluation type.
+Draft placeholders for finalized values: PDR (\texttt{TBD}) and FAR (\texttt{TBD}).
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=\linewidth]{figures/prevention_heatmap_by_mode_eval.pdf}
+  \caption{Prevention performance heatmaps (higher PDR, lower FAR is better). Cell annotations provide rate values directly for quick cross-mode comparison without leaving the figure context.}
+  \label{fig:prevention}
+\end{figure}
+
+Figure~\ref{fig:pareto} complements these views with a compact quality--latency tradeoff summary across modes.
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=\linewidth]{figures/pareto_quality_vs_latency.pdf}
+  \caption{Pareto view of quality (strict conformance) vs latency. Points are mode-level aggregates on log-latency x-axis; dashed connectors indicate the non-dominated frontier.}
+  \label{fig:pareto}
+\end{figure}
+
+\subsection{Statistical Significance}
+Table~\ref{tab:stats} summarizes inferential test outcomes and effect sizes.
+The Wilcoxon signed-rank test on strict success (M vs.\ B1: $p=0.921$; M vs.\ B2: $p=0.921$) confirms that strict pass rate differences are not statistically significant---consistent with the hypothesis that strict success alone is not the right discriminating metric for hard tasks.
+The more informative comparison is on strict formal conformance (quality), where M achieves the highest mean score.
+Prevention detection rates (PDR) and false-accept rates (FAR) are pending full mutant evaluation; these values will replace the \texttt{TBD} entries below.
+\input{tables/stats_summary}

@@ -1,0 +1,906 @@
+%% ch2_background.tex — Chapter 2: Background and Related Work
+%% HSP-Agile Thesis, Ye Xujun, ECNU, July 2026
+
+\chapter{Background and Related Work}
+\label{ch:background}
+
+This chapter surveys the technical foundations and related prior work
+that underpin the HSP-Agile pipeline.
+We begin with the formal language framework in which our work is
+situated---SOFL and its agile variant---then describe the Functional
+Specification Format (FSF) at the centre of the pipeline, followed by
+reviews of LLM-based code generation, counterexample-guided synthesis,
+SMT solving, requirement-level pattern detection, and mutation testing.
+The chapter closes with a structured comparison of related approaches
+and identifies the research gap that HSP-Agile addresses.
+
+% ─────────────────────────────────────────────────────────────────────────────
+\section{SOFL and Agile-SOFL}
+\label{sec:bg:sofl}
+% ─────────────────────────────────────────────────────────────────────────────
+
+\subsection{The SOFL Formal Method}
+
+Structured Object-Oriented Formal Language (SOFL) was introduced by
+\citet{liu1997sofl} as a \emph{process-oriented} formal method that
+synthesises three influential formalisms: Z notation for specification
+of abstract data types and state transitions, data flow diagrams for
+modelling process decomposition and information flow, and object-oriented
+concepts for structuring large systems into modular, reusable components.
+The motivation behind this synthesis was practical: pure mathematical
+formalisms such as Z or VDM provide strong logical foundations but are
+perceived as inaccessible to practising engineers accustomed to diagrammatic
+notations, while purely graphical methods lack the semantic precision
+required for verification.
+SOFL bridges this gap by providing a uniform textual language whose
+constructs map directly to well-understood notations while supporting
+mechanised analysis.
+
+The cornerstone of SOFL's development paradigm is \emph{stepwise refinement}
+\citep{back1998refinement}.
+A software system is described at successively more concrete levels: from an
+abstract specification that captures \emph{what} a function must do, through
+an intermediate design that begins to constrain \emph{how} it does so, to a
+concrete implementation.
+At each level the developer must demonstrate that the refinement step
+preserves the properties of the more abstract specification, a discipline
+that prevents the accumulation of specification drift over the development
+lifecycle.
+SOFL has been applied to a range of industrial domains including railway
+interlocking systems, medical device firmware, and embedded control software,
+with \citet{liu2014sofl} providing a comprehensive textbook account of the
+method alongside case studies.
+
+A key element of SOFL semantics is the \emph{process specification}, which
+describes a computation by enumerating named scenarios, each governed by a
+guard condition that delimits its domain of applicability and a body that
+defines outputs in terms of inputs.
+This scenario-based structure is the direct ancestor of the Functional
+Specification Format described in Section~\ref{sec:bg:fsf}, and it is the
+primary unit around which the HSP-Agile pipeline is organised.
+
+\subsection{Agile-SOFL: Lightweight Formal Methods in Sprints}
+
+Classical applications of SOFL follow a plan-driven development model in which
+the full specification is completed before any implementation work begins.
+While this discipline is appropriate for safety-critical systems with well-understood
+requirements, it is at odds with the \emph{incremental, iterative} delivery
+cycle of Agile methods \citep{beck2001xp}, in which requirements are
+elaborated progressively and working software is delivered at the end of each
+sprint.
+
+\emph{Agile-SOFL} \citep{li2022agilesofl} was developed to reconcile formal
+specification with agile practice.
+The central insight is that formal rigour need not be applied uniformly across an
+entire system from the outset; instead, it can be concentrated on the
+\emph{behavioural contracts} of individual functions that are part of the current
+sprint's scope.
+Each sprint produces a set of FSF specifications alongside executable code;
+the pipeline then automatically checks conformance, generates test cases,
+and flags violations before the sprint review.
+This confines the cost of formal analysis to a bounded, sprint-sized unit of work
+and avoids the specification-implementation divergence that typically occurs
+when large formal models are maintained alongside an evolving codebase.
+
+The Agile-SOFL toolchain consists of three components: (i)~a parser that
+translates FSF text files into an abstract syntax tree representation suitable
+for downstream analysis; (ii)~a language server that provides editing support
+(syntax highlighting, completion, and real-time error feedback) through the
+Language Server Protocol so that specifications can be authored in standard
+editors; and (iii)~a conformance checker that consumes the parsed AST,
+generates test inputs via SMT solving, and compares implementation outputs
+against the oracle derived from the specification.
+\citet{li2023iet} demonstrated that this toolchain detects a substantially higher
+proportion of specification faults than manual review alone, particularly for
+boundary conditions at scenario guard boundaries.
+
+The survey by \citet{woodcock2009formalsurvey} identifies the primary barrier
+to industrial adoption of formal methods as the difficulty of integrating
+them with mainstream development workflows.
+Agile-SOFL directly attacks this barrier by making formal checking a routine
+artefact of sprint-level testing rather than a heavyweight gate at the end of
+a waterfall lifecycle.
+HSP-Agile builds on this foundation by augmenting the conformance checker
+with an LLM-driven candidate synthesis loop, thereby automating not only
+\emph{verification} but also \emph{repair} of non-conforming implementations.
+
+% ─────────────────────────────────────────────────────────────────────────────
+\section{The Functional Specification Format (FSF)}
+\label{sec:bg:fsf}
+% ─────────────────────────────────────────────────────────────────────────────
+
+\subsection{Syntax and Structure}
+
+The Functional Specification Format is the primary artifact produced during
+the specification phase of an Agile-SOFL sprint \citep{li2022agilesofl, liu2014sofl}.
+An FSF document describes a single function $t$ in terms of its \emph{name},
+\emph{parameter list}, any \emph{external (state) variables} it reads or writes,
+and an ordered sequence of \emph{scenario clauses}.
+The general syntactic skeleton is as follows:
+
+\begin{center}
+\small\ttfamily
+\begin{minipage}{0.82\textwidth}
+\obeylines
+Function: \textit{name}(\textit{param$_1$}, \ldots, \textit{param$_n$})
+~~ext rd \textit{x$_1$}, \textit{x$_2$}, \ldots
+~~ext wr \textit{y$_1$}, \textit{y$_2$}, \ldots
+~~Scenario S1: \textit{guard$_1$}
+~~~~~~\textit{output definitions}
+~~Scenario S2: \textit{guard$_2$}
+~~~~~~\textit{output definitions}
+~~Scenario Sk: others
+~~~~~~\textit{default output definitions}
+\end{minipage}
+\end{center}
+
+\noindent
+Each scenario clause $S_i$ consists of (a) a \emph{guard condition}
+that is a Boolean expression over the function's parameters and readable
+external variables, and (b) an \emph{assignment block} that specifies the
+values of output variables and writable external variables when the guard is
+satisfied.
+The final scenario may use the keyword \texttt{others} as its guard, which
+acts as an unconditional catch-all and must appear last.
+
+\subsection{Scenario Ordering Semantics}
+\label{sec:bg:fsf:semantics}
+
+The defining semantic feature of FSF is that scenario evaluation proceeds
+\emph{top-to-bottom in priority order}: the first scenario whose guard is
+satisfied by the current input determines the function's output.
+This is analogous to an ordered chain of \texttt{if}--\texttt{else if}
+branches rather than a flat set of mutually exclusive conditions.
+An input that satisfies both $S_1$'s guard and $S_2$'s guard is handled
+exclusively by $S_1$; $S_2$ applies only to inputs in its guard region that
+are \emph{not already covered} by higher-priority scenarios.
+
+To make this concrete, consider the following canonical example that appears
+throughout this thesis:
+
+\begin{center}
+\small\ttfamily
+\begin{minipage}{0.85\textwidth}
+\obeylines
+Function: classify\_risk(a, b, c)
+~~Scenario S1: a > 10 and b > 5
+~~~~~~risk := "HIGH"; action := "ESCALATE"; score := 90
+~~Scenario S2: a > 5
+~~~~~~risk := "MEDIUM"; action := "REVIEW"; score := 60
+~~Scenario S3: others
+~~~~~~risk := "LOW"; action := "MONITOR"; score := 30
+\end{minipage}
+\end{center}
+
+\noindent
+For the input $(a, b, c) = (12, 7, 0)$, both $S_1$'s guard
+($12 > 10 \wedge 7 > 5$, i.e.\ true) and $S_2$'s guard ($12 > 5$, i.e.\ true)
+are satisfied.
+Under FSF semantics the output must be
+$\langle\texttt{HIGH}, \texttt{ESCALATE}, 90\rangle$ because $S_1$ has higher priority than $S_2$.
+An implementation that tests $a > 5$ before testing $a > 10 \wedge b > 5$
+would incorrectly classify this input as \texttt{"MEDIUM"}, even though both
+conditions are \emph{individually} satisfiable.
+This constitutes a \emph{scenario-order violation}: a category of fault that
+is invisible to techniques that treat guard conditions as a flat Boolean
+formula without taking their sequential precedence into account.
+
+Figure~\ref{fig:fsf-semantics} (Chapter~\ref{ch:formalization}) illustrates how the three scenarios partition
+the input space.
+Region $S_1$ (innermost) takes highest priority and is a strict subset of the
+region satisfying $S_2$'s guard; the remaining part of $S_2$'s guard region
+that lies outside $S_1$ forms the effective domain of $S_2$; and $S_3$ covers
+everything else.
+
+The generic three-scenario example in Figure~\ref{fig:fsf-semantics} applies
+directly to \code{classify\_risk}: region $S_1$ (red) has highest priority and is a strict subset
+of the $S_2$ guard region (orange); $S_3$ (green) covers the remainder.
+The precedence relation $S_1 \succ S_2 \succ S_3$ is structural,
+not derived from the guards alone.
+
+\subsection{Formal Notation}
+
+We formalise the structure of an FSF task as follows.
+A task is a triple $t = (\mathcal{S}_t,\, \mathcal{X}_t,\, \mathcal{Y}_t)$
+where:
+\begin{itemize}
+  \item $\mathcal{X}_t$ is the set of input variable types;
+  \item $\mathcal{Y}_t$ is the set of output variable types;
+  \item $\mathcal{S}_t = \langle s_1, s_2, \ldots, s_n \rangle$ is the
+        \emph{ordered} sequence of scenarios, with $s_1$ having highest priority.
+\end{itemize}
+Each scenario $s_i = (g_i, \delta_i)$ comprises a guard
+$g_i : \mathcal{X}_t \to \{\mathtt{true}, \mathtt{false}\}$ and an output
+definition $\delta_i : \mathcal{X}_t \to \mathcal{Y}_t$.
+The \emph{oracle} for task $t$ is the function
+\[
+  g_t(x) \;=\; \delta_j(x)
+  \quad\text{where}\quad
+  j = \min\bigl\{i \mid g_i(x) = \mathtt{true}\bigr\}.
+\]
+A conforming implementation $f : \mathcal{X}_t \to \mathcal{Y}_t$ must
+satisfy $f(x) = g_t(x)$ for all $x \in \mathcal{X}_t$.
+Any input $x^*$ for which $f(x^*) \neq g_t(x^*)$ is a
+\emph{counterexample} witnessing non-conformance.
+
+This formulation exposes why scenario ordering matters for conformance
+checking: the oracle $g_t$ is \emph{not} equivalent to any unordered Boolean
+combination of the guards.
+A formal checker that merely asks whether all guards are satisfiable without
+encoding priority will accept implementations that violate the ordering
+constraint.
+The Z3-based conformance checker in HSP-Agile encodes the priority ordering
+explicitly, as detailed in Chapter~\ref{ch:formalization}.
+
+It is worth noting the relationship to Dijkstra's guarded commands
+\citep{dijkstra1975guarded}.
+A guarded command set is \emph{nondeterministic} when multiple guards are
+simultaneously true: the system is free to choose any enabled branch.
+FSF, by contrast, imposes a deterministic priority ordering that resolves
+all overlaps, making the specification suitable for generating a unique
+executable oracle.
+This distinction is crucial for automated test case generation, which requires
+a single ground-truth output for each test input.
+
+% ─────────────────────────────────────────────────────────────────────────────
+\section{LLM-Assisted Code Generation}
+\label{sec:bg:llm}
+% ─────────────────────────────────────────────────────────────────────────────
+
+\subsection{Foundation Models for Code}
+
+The emergence of large language models trained on code corpora has
+fundamentally altered the landscape of automated program synthesis.
+\citet{chen2021codex} introduced Codex, a GPT-3 variant fine-tuned on
+publicly available code from GitHub, and proposed the \emph{pass@k} metric
+to quantify the probability that at least one of $k$ independently drawn
+samples from the model solves a given programming problem.
+Formally, if a model generates $n$ samples of which $c$ pass all unit tests,
+the unbiased estimator is:
+\[
+  \widehat{\mathrm{pass}@k}
+  \;=\;
+  1 - \frac{\binom{n-c}{k}}{\binom{n}{k}}.
+\]
+Codex achieved a pass@1 of 28.8\% and pass@100 of 72.3\% on the HumanEval
+benchmark, establishing that LLMs can solve a substantial fraction of
+introductory programming problems when given multiple attempts.
+The \emph{pass@k} framing has since become the standard evaluation
+protocol for code generation systems and is adopted, in adapted form, as
+one of the baselines in our experimental evaluation.
+
+\citet{openai2023gpt4} documented GPT-4, which substantially improved
+on Codex across a range of coding tasks, including competitive programming
+problems and formal verification benchmarks.
+GPT-4's ability to follow structured prompts and reason about multi-step
+logical constraints makes it particularly relevant for the FSF synthesis
+task, where the model must respect scenario ordering as well as produce
+syntactically correct Python code.
+
+\citet{li2022alphacode} demonstrated that with sufficiently large model scale
+and massive code corpora, LLMs can reach competitive-programmer performance on
+algorithmic contest problems.
+AlphaCode generates large numbers of candidates, filters by a learned
+discriminator, and uses clustering to select a diverse final submission set.
+While impressive in the competitive programming setting, this approach is
+unsuitable for our setting: we require \emph{guaranteed} conformance to a
+formal specification, not merely high probability of passing hidden test cases.
+
+\subsection{Evaluation of Deployed Code Generation Tools}
+
+\citet{dakhel2023copilot} conducted a systematic evaluation of GitHub Copilot
+on an extensive suite of programming exercises and found that while Copilot
+produces correct solutions for straightforward problems, it struggles with
+tasks requiring precise boundary handling, multi-condition logic, and adherence
+to implicit conventions.
+These findings are directly relevant to our setting: FSF scenario guards
+involve exactly the kind of boundary and multi-condition logic that Copilot
+handles poorly.
+In particular, the study observed that Copilot's suggestions were
+\emph{semantically plausible}---they looked reasonable to a human reviewer---but
+contained subtle logical errors such as off-by-one boundaries and incorrect
+operator precedence.
+Semantic plausibility without formal correctness is, as we argue in this thesis,
+the core challenge of LLM-based formal specification implementation.
+
+\subsection{Limitations of LLMs for Formal Specification Compliance}
+
+Three systematic failure modes arise when LLMs generate implementations of
+FSF specifications without additional guidance \citep{dakhel2023copilot, lynn2024verifierloop}:
+
+\begin{enumerate}
+  \item \textbf{Scenario-order blindness.}
+        LLMs trained on code learn the surface syntax of
+        \texttt{if}--\texttt{elif} chains but do not learn to interpret
+        the \emph{specification-level} priority ordering of FSF scenarios.
+        When two scenarios have overlapping guards, the model's training
+        distribution biases it towards the condition that appears more
+        ``natural'' in code rather than the one mandated by the specification.
+
+  \item \textbf{Boundary hallucination.}
+        Numeric comparison operators (\texttt{>}, \texttt{>=}, \texttt{==})
+        are frequently confused at specification boundaries.
+        For example, a specification with guard $a > 10$ may be implemented
+        with $a \geq 10$, introducing a one-point discrepancy that is
+        invisible to random testing but detectable by an SMT-generated boundary
+        test case.
+
+  \item \textbf{Spurious completeness.}
+        LLMs sometimes generate implementations that always return a
+        hard-coded success value for some output fields, producing code that
+        passes superficial tests but violates the specification for inputs
+        that should trigger non-default behaviour.
+        This pattern corresponds to our high-severity requirement fault RF07
+        (\emph{unconditional success}) discussed in Section~\ref{sec:bg:patterns}.
+\end{enumerate}
+
+\noindent
+The standard approach to improving LLM code quality is to provide test-case
+feedback in a repair loop \citep{chen2021codex}.
+In this paradigm, a set of unit tests is executed against each generated
+candidate; failing test cases are included in the prompt for a subsequent
+generation attempt.
+This is the strategy employed by our B2 (test-feedback) baseline.
+However, the test-feedback loop has a fundamental limitation in the FSF
+context: the tests themselves must be \emph{derived from} the specification,
+and if they fail to cover scenario boundary inputs, the loop may converge on
+a candidate that passes all available tests while still violating the
+specification on uncovered inputs.
+HSP-Agile addresses this by using Z3 to \emph{synthesise} boundary-hitting
+test cases that are guaranteed to expose scenario-order violations, rather
+than relying on a fixed test suite.
+
+% ─────────────────────────────────────────────────────────────────────────────
+\section{Counterexample-Guided Synthesis (CEGIS)}
+\label{sec:bg:cegis}
+% ─────────────────────────────────────────────────────────────────────────────
+
+\subsection{The Classical CEGIS Framework}
+
+Counterexample-Guided Inductive Synthesis (CEGIS) was introduced as a
+principled framework for program synthesis by \citet{solarlezama2008sketching}.
+The core idea is to decompose the synthesis problem into two interacting
+sub-problems: a \emph{synthesis} sub-problem that produces a candidate
+program satisfying a partial specification, and a \emph{verification}
+sub-problem that checks whether the candidate satisfies the full specification
+and, if not, produces a \emph{counterexample}---a concrete input that
+witnesses the violation.
+The counterexample is fed back to the synthesiser as an additional constraint,
+and the loop repeats until either a correct program is found or a
+resource budget is exhausted.
+
+In the original formulation of \citet{solarlezama2008sketching}, both the
+synthesiser and the verifier are SAT/SMT solvers: the synthesiser fills in
+``holes'' in a sketch (a program template with unknown sub-expressions) while
+the verifier checks the completed program against a universal quantification
+over inputs.
+The separation between synthesiser and verifier is essential because it
+allows each component to be specialised: the synthesiser operates over
+a \emph{finite} set of counterexamples and can use polynomial-time
+procedures, while the verifier handles the universally quantified
+correctness condition.
+
+\subsection{LLM-Augmented CEGIS Variants}
+
+The classical CEGIS framework assumes that the synthesiser operates over a
+fixed language of program templates.
+With the advent of code-generating LLMs, it became natural to replace the
+template-based synthesiser with a language model that can generate
+free-form code from a natural-language description.
+This hybrid approach retains the formal verifier component, which provides
+the soundness guarantee, while delegating the creative search over the
+program space to the LLM, which is better at generating plausible code
+from high-level descriptions.
+
+\citet{loughman2024dafnybench} introduced DafnyBench, a benchmark for
+evaluating LLM-based synthesis of verified Dafny programs.
+Their evaluation shows that state-of-the-art LLMs can synthesise many
+simple Dafny proofs but consistently fail on programs requiring intricate
+loop invariants or complex pre-/post-condition reasoning, precisely the
+cases where the formal verifier provides the most value.
+
+\citet{lynn2024verifierloop} developed a ``verifier-in-the-loop'' methodology
+for TOSEM in which an LLM generates code and a formal tool checks correctness,
+with failures reported as structured feedback.
+Their system demonstrated improved correctness rates over baseline LLM
+generation across several specification languages, but did not address
+the scenario-ordering semantics of FSF nor provide the pattern-guard
+layer that blocks structurally pathological candidates before formal
+checking.
+
+\subsection{HSP-Agile's CEGIS Adaptation}
+
+HSP-Agile instantiates the CEGIS loop with three specialised components
+tailored to the FSF setting.
+The \emph{synthesiser} is an LLM (GPT-4) prompted with the FSF specification
+and the accumulated repair context from previous iterations.
+The \emph{verifier} is the Z3-based formal conformance checker, which executes
+the candidate on the SMT-generated test suite $\mathcal{D}(t)$ and identifies
+failing inputs.
+The \emph{feedback aggregator} translates failing test cases into a structured
+natural-language repair context that includes the counterexample input, the
+expected output $g_t(x^*)$, and the observed output $f_{c_k}(x^*)$, together
+with any high-severity requirement patterns detected in the candidate's source
+code.
+
+Figure~\ref{fig:cegis-loop} illustrates the four-component loop.
+The key departure from prior LLM+verifier approaches is that the feedback
+aggregator communicates \emph{both} formal counterexamples \emph{and}
+pattern-guard violations, enabling the LLM to simultaneously correct
+logical errors and structural anti-patterns in a single repair step.
+
+\begin{figure}[t]
+  \centering
+  \tikzinput{diagrams/tikz/cegis_loop}
+  \caption{The HSP-Agile CEGIS loop.
+           The LLM synthesiser produces a candidate $c_k$ from the FSF
+           specification $\mathcal{S}_t$ and accumulated repair context.
+           The formal conformance checker verifies $c_k$ against the
+           Z3-generated test suite; failing cases are extracted into
+           counterexamples $(x^*, g_t(x^*), f_{c_k}(x^*))$.
+           The feedback aggregator packages counterexamples and detected
+           anti-patterns into the repair context for the next iteration.
+           If all tests pass and pattern guards are clear, $c_k$ is accepted.}
+  \label{fig:cegis-loop}
+\end{figure}
+
+\noindent
+The budget parameter $K$ controls the maximum number of repair iterations.
+In our experiments we set $K = 5$; if no conforming candidate is found within
+$K$ attempts, the system returns the candidate with the highest number of
+passing tests as a best-effort result.
+This is in line with the budget-bounded CEGIS strategy discussed
+by \citet{barrett2018smt} in the context of bounded model checking.
+
+% ─────────────────────────────────────────────────────────────────────────────
+\section{SMT Solving and Formal Verification}
+\label{sec:bg:smt}
+% ─────────────────────────────────────────────────────────────────────────────
+
+\subsection{Satisfiability Modulo Theories}
+
+Satisfiability Modulo Theories (SMT) extends propositional satisfiability
+(SAT) by allowing formulas to contain atoms drawn from background
+\emph{theories} such as linear arithmetic over integers and reals,
+array theory, uninterpreted functions, and bitvectors
+\citep{barrett2018smt}.
+An SMT solver takes as input a formula $\varphi$ in a combination of
+supported theories and either returns a \emph{satisfying assignment} (a
+concrete valuation of all variables that makes $\varphi$ true) or proves
+that $\varphi$ is \emph{unsatisfiable}.
+The satisfying assignment is directly usable as a concrete test input,
+which is the mechanism exploited by HSP-Agile's test case generation.
+
+\citet{demoura2008z3} introduced Z3, which has become the de facto standard
+SMT solver in software verification research.
+Z3 supports the theories of linear integer and real arithmetic, arrays,
+datatypes, and quantifiers, and exposes both a command-line interface and
+programmatic APIs in Python, C, and other languages.
+Its incremental solving capabilities allow a verifier to assert and retract
+constraints during a single session, an important efficiency property for
+HSP-Agile's conformance checker, which processes each scenario's guard
+incrementally during test case synthesis.
+
+\subsection{Test Case Generation via SMT}
+
+Given an FSF task $t = (\langle s_1, \ldots, s_n \rangle, \mathcal{X}_t,
+\mathcal{Y}_t)$, the conformance checker constructs the test suite
+$\mathcal{D}(t)$ by solving, for each scenario $s_i$, the formula:
+\[
+  \varphi_i \;=\; g_i(x) \;\wedge\; \bigwedge_{j < i} \neg g_j(x).
+\]
+The formula $\varphi_i$ characterises the \emph{effective} guard of $s_i$:
+inputs that satisfy $s_i$'s guard but are \emph{not} already covered by any
+higher-priority scenario.
+A satisfying assignment $x_i^*$ to $\varphi_i$ is a concrete test input that,
+under the oracle, must produce output $\delta_i(x_i^*)$, i.e.\ the output
+defined by scenario $s_i$.
+Testing a candidate $f$ against $x_i^*$ and comparing $f(x_i^*)$ with
+$g_t(x_i^*) = \delta_i(x_i^*)$ directly checks whether $f$ respects the
+priority ordering of the specification.
+
+This approach is related to, but distinct from, property-based testing
+frameworks such as QuickCheck \citep{claessen2000quickcheck}.
+QuickCheck generates random inputs from a user-specified distribution and
+checks them against a user-defined property.
+While highly effective for detecting coarse logical errors, random generation
+does not guarantee coverage of scenario-boundary inputs and cannot encode the
+FSF priority ordering as a test generation strategy.
+SMT-based generation, by contrast, is \emph{targeted}: it produces inputs
+that are guaranteed to lie in the effective guard region of each scenario,
+ensuring that the boundary between adjacent scenarios is always represented
+in the test suite regardless of the distribution of random inputs.
+
+\subsection{Relationship to Full Formal Verification}
+
+The Dafny language \citep{leino2010dafny} supports full deductive verification
+via annotated programs with pre- and post-conditions, loop invariants, and
+termination arguments.
+A Dafny program that passes verification is \emph{proved correct} with respect
+to its specification under all possible inputs, not just the finite set of
+inputs in a test suite.
+This provides stronger guarantees than the bounded checking strategy of
+HSP-Agile.
+
+However, Dafny verification requires the developer to write and maintain
+annotations (loop invariants, in particular) that can be as complex as the
+program itself.
+For the Agile-SOFL context---where specifications are written by engineers
+with limited formal methods background and where sprint velocity is a key
+concern---the annotation burden of full verification is prohibitive.
+HSP-Agile deliberately occupies a middle ground: stronger than
+random testing because test inputs are SMT-generated to target scenario
+boundaries, but lighter than full verification because no annotations are
+required from the developer.
+The scope of the prevention guarantee is bounded by the coverage of the
+generated test suite, which is a known and accepted limitation discussed
+further in Chapter~\ref{ch:discussion}.
+
+% ─────────────────────────────────────────────────────────────────────────────
+\section{Requirement-Level Error Pattern Detection}
+\label{sec:bg:patterns}
+% ─────────────────────────────────────────────────────────────────────────────
+
+\subsection{Static Analysis and Bug Pattern Catalogues}
+
+Static analysis tools detect potential defects in source code without
+executing the program by analysing its syntactic and structural properties.
+\citet{hovemeyer2004findbugs} introduced FindBugs, one of the most widely
+deployed static analysis tools for Java, which encodes a catalogue of
+\emph{bug patterns}---recurring structural templates that correlate strongly
+with runtime defects.
+FindBugs analyses compiled bytecode using a visitor-based abstract
+interpretation \citep{cousot1977abstract} and reports violations of patterns
+such as null pointer dereferences, incorrect \texttt{equals}
+implementations, and misuse of floating-point comparisons.
+
+\citet{ayewah2008findbugs} evaluated FindBugs on production code from
+Sun Microsystems and Google and found that a substantial fraction of its
+warnings corresponded to genuine defects with real-world impact, though the
+false-positive rate varied considerably across pattern categories.
+This observation motivates a tiered severity model for pattern warnings:
+high-severity patterns (low false-positive rate, high defect correlation)
+should block acceptance, while lower-severity patterns (higher false-positive
+rate) should be reported as warnings only.
+
+\subsection{Requirement-Level Patterns in FSF Implementations}
+
+The key conceptual contribution of HSP-Agile's pattern guard layer is the
+recognition that the relevant bug patterns for FSF implementations are
+\emph{requirements-level violations}, not merely code smells.
+A code smell such as an overly long method or a deeply nested conditional is
+a maintainability concern; it does not necessarily indicate a logical error.
+A requirements-level pattern violation, by contrast, signals that the
+implementation cannot possibly conform to the FSF specification regardless
+of the specific inputs considered.
+
+The HSP-Agile pattern catalogue RF01--RF14 was assembled by analysing the
+failure modes observed during LLM-based FSF implementation \citep{li2023iet, hovemeyer2004findbugs}.
+Representative high-severity patterns include RF01 (missing precondition check),
+RF02 (wrong default branch), RF05 (swapped comparison), and RF07 (unconditional
+success); the full catalogue is documented in Appendix~\ref{app:patterns}.
+
+\noindent
+Patterns RF01--RF14 are detected by static analysis of the candidate AST
+\citep{cousot1977abstract}.
+Each pattern checker is a visitor that reports a violation when the
+structural signature matches.
+High-severity patterns ($\mathcal{P}^H$) block acceptance and are included
+in the CEGIS repair context even when all formal test cases pass,
+covering input regions the finite test suite may omit.
+
+% ─────────────────────────────────────────────────────────────────────────────
+\section{Mutation Testing for Specification Assessment}
+\label{sec:bg:mutation}
+% ─────────────────────────────────────────────────────────────────────────────
+
+\subsection{Foundations of Mutation Testing}
+
+Mutation testing was introduced by \citet{demillo1978mutation} as a method
+for assessing the adequacy of a test suite.
+The central idea is to inject small, well-defined syntactic changes
+(\emph{mutations}) into a program to produce a set of \emph{mutants}, and
+then measure what fraction of mutants are \emph{killed} by the test suite
+(i.e.\ cause at least one test to fail).
+A mutant that is not killed by any test is called a \emph{surviving mutant};
+a high rate of survivors suggests that the test suite lacks inputs
+that can distinguish the correct program from plausibly incorrect variants.
+\citet{offutt1992mutation} formalised a set of \emph{mutation operators}---
+templates for syntactic modifications---and showed that killing a carefully
+chosen set of \emph{sufficient operators} implies that the test suite also
+kills a much larger class of higher-order mutants.
+
+\citet{ammann2016testing} provides a comprehensive treatment of mutation
+testing, establishing the relationship between mutation coverage and
+various logical coverage criteria.
+The central result is that achieving full mutation coverage is strictly
+stronger than achieving full condition/decision coverage (MC/DC), making
+mutation testing a useful complement to structural coverage analysis.
+
+\subsection{Specification and Implementation Mutation Operators}
+
+HSP-Agile uses mutation testing at two levels that correspond to the two
+components being assessed.
+
+\paragraph{Specification-level mutation} evaluates whether the FSF specification
+itself is sufficiently discriminating: does the Z3-generated test suite
+$\mathcal{D}(t)$ kill mutants of the oracle $g_t$?
+The specification mutation operators used in our experiments are:
+
+\begin{itemize}
+  \item \textbf{SNO} (Scenario Negate Once): negate the guard condition of
+        one scenario, e.g.\ $a > 10 \wedge b > 5$ becomes
+        $\neg(a > 10 \wedge b > 5)$.
+  \item \textbf{ORO} (Operator Replacement Ordinal): replace a relational
+        operator in a guard, e.g.\ $>$ becomes $\geq$, $<$, or $=$.
+  \item \textbf{SPO} (Scenario Priority Order): swap the priority of two
+        adjacent scenarios, e.g.\ move $S_2$'s assignment block to $S_1$
+        and vice versa.
+\end{itemize}
+
+A high specification-mutation kill rate indicates that the test suite
+covers the boundaries between scenarios and is sensitive to priority-order
+violations---precisely the class of error that HSP-Agile is designed to
+prevent.
+
+\paragraph{Implementation-level mutation} evaluates whether the generated
+implementation $c_k$ is robust to the kinds of implementation errors that
+LLMs are prone to make.
+The implementation mutation operators include:
+
+\begin{itemize}
+  \item \textbf{ICO} (Invert Condition Once): invert a Boolean sub-expression
+        in a conditional guard, e.g.\ \texttt{a > 10} becomes
+        \texttt{not (a > 10)}.
+  \item \textbf{WRO} (Wrong Return Output): replace the return value in one
+        scenario branch with a value from a different scenario's output block.
+  \item \textbf{BCO} (Boundary Change Off-by-one): replace a strict
+        comparison operator with a non-strict one or vice versa at a scenario
+        boundary.
+\end{itemize}
+
+\subsection{Prevention-Oriented Metrics}
+
+Standard mutation testing metrics measure test suite quality.
+In the HSP-Agile context, mutation testing is repurposed as a
+\emph{prevention assessment} tool: we measure not how well a test suite
+detects faults in an existing program, but how well the pipeline \emph{prevents}
+non-conforming implementations from being accepted.
+
+Two prevention metrics are central to our evaluation:
+
+\begin{description}
+  \item[Prevention Detection Rate (PDR).]
+        The fraction of deliberately introduced faults (instantiated
+        via implementation mutations) that the pipeline correctly rejects.
+        A PDR of 1.0 means the pipeline rejects every non-conforming
+        candidate; a lower PDR indicates scenarios where the pipeline
+        admits faulty code.
+
+  \item[False Accept Rate (FAR).]
+        The fraction of correct implementations (true conforming candidates)
+        that the pipeline incorrectly rejects.
+        A low FAR is essential for practical usability: if the pipeline
+        rejects too many correct implementations, it creates excessive repair
+        overhead and undermines developer trust.
+\end{description}
+
+\noindent
+These metrics mirror the sensitivity--specificity trade-off in
+binary classification and are discussed further in
+Chapter~\ref{ch:formalization}.
+\citet{okun2007mutation} used analogous metrics (detection rate and
+false alarm rate) in the context of static analysis tool evaluation,
+and their analysis motivates our choice of PDR and FAR as the
+primary prevention-quality measures.
+
+% ─────────────────────────────────────────────────────────────────────────────
+\section{Related Work and Research Gap}
+\label{sec:bg:related}
+% ─────────────────────────────────────────────────────────────────────────────
+
+\subsection{Formal Methods in Software Engineering Practice}
+
+The integration of formal methods into mainstream software development has
+been a persistent research challenge for four decades.
+\citet{woodcock2009formalsurvey} conducted an extensive survey of industrial
+formal method applications and identified recurring themes: the most
+successful deployments combine formal specification with automated analysis
+tools (model checkers, SMT solvers) and integrate into existing development
+workflows rather than replacing them.
+Projects that adopted formal methods in a narrow, high-value layer
+of a larger system---rather than demanding that all code be formally verified
+---achieved the best balance of rigour and productivity.
+Agile-SOFL is consistent with this prescription; HSP-Agile takes it further
+by automating the synthesis and repair loop so that formal checking requires
+no manual annotation effort.
+
+Requirements engineering research \citep{pohl2010requirements} emphasises
+the importance of detecting ambiguities and inconsistencies at the
+specification level rather than discovering them through integration testing.
+Specification-level error detection is substantially cheaper: the cost of
+correcting a requirements defect grows superlinearly with how late in the
+development lifecycle it is found.
+HSP-Agile's pattern guard layer operates at the requirements level,
+checking whether the generated implementation's structure is consistent with
+the FSF specification before even executing a single test case.
+
+\subsection{Approaches to LLM-Verified Code Synthesis}
+
+Several recent systems have combined LLM-based code generation with
+formal or semi-formal verification.
+We survey the most closely related approaches and compare them
+systematically in Table~\ref{tab:related-work}.
+
+\paragraph{DafnyBench \citep{loughman2024dafnybench}.}
+DafnyBench evaluates LLMs on the task of synthesising Dafny programs with
+correct verification annotations.
+The Dafny verifier provides full deductive proofs of functional correctness,
+offering the strongest possible guarantee.
+However, DafnyBench's repair loop relies on the Dafny compiler's error messages
+rather than semantic counterexamples: when verification fails, the error
+output is appended to the prompt but does not identify a concrete
+failing input that illustrates the logical discrepancy.
+Moreover, DafnyBench has no pattern guard layer: structurally pathological
+candidates (e.g.\ those with missing output fields) are submitted to the
+full verifier without a cheap first-pass filter.
+DafnyBench's evaluation metric is pass@k, which does not distinguish between
+approaches that achieve correctness through rigorous formal reasoning and
+those that do so by statistical luck.
+
+\paragraph{Lynn et al.\ TOSEM \citep{lynn2024verifierloop}.}
+The verifier-in-the-loop methodology of Lynn et al.\ is the closest prior
+work to HSP-Agile.
+Their system uses a formal tool (a model checker or type checker, depending
+on the specification language) as an oracle and feeds failure reports back to
+the LLM.
+The key differences from HSP-Agile are: (i)~their target specification language
+is not FSF and does not encode scenario priority ordering; (ii)~the repair loop
+does not include a pattern guard layer; and (iii)~their evaluation metric is
+a correctness rate over a fixed benchmark, which does not distinguish
+false-accept and false-reject errors in the way that PDR and FAR do.
+Their reported improvement over non-feedback baselines is substantial (up to
+23 percentage points) but their benchmark does not include tasks with
+overlapping guard conditions, where scenario-order violations are most likely.
+
+\paragraph{Standard LLM baseline (B1).}
+The simplest baseline is to prompt a code-generating LLM with the FSF
+specification and accept the first generated candidate without any
+verification or feedback.
+This approach has no formal specification in the conformance sense:
+the LLM is asked to follow the specification as a natural-language prompt
+but there is no formal check that it does so.
+The pass rate on our benchmark for this baseline quantifies how often LLMs
+spontaneously produce conforming implementations, providing a measure of the
+baseline capability that HSP-Agile must improve upon.
+
+\paragraph{Test-feedback baseline (B2).}
+The test-feedback baseline adds an iterative repair loop to B1: a fixed
+set of unit tests (not SMT-generated) is executed against each candidate,
+and failing tests are appended to the repair prompt.
+This baseline is representative of widely deployed LLM coding assistants that
+incorporate automated test execution feedback.
+It does not use a formal specification for test generation and has no pattern
+guard layer.
+The comparison between B2 and HSP-Agile isolates the contribution of
+SMT-based test case generation and pattern guards over purely test-driven
+feedback.
+
+\subsection{Structured Comparison}
+
+\begin{table}[t]
+  \centering
+  \caption{Structured comparison of related approaches to LLM-assisted
+           specification-conformant code generation.
+           Checkmarks (\checkmark) indicate the feature is fully present;
+           dashes (--) indicate it is absent;
+           ``partial'' indicates limited support.
+           Column abbreviations:
+           F.\,Spec = formal specification;
+           Repair = repair loop;
+           Guard = pattern guard;
+           Prev.\,Metr.\ = prevention metrics.}
+  \label{tab:related-work}
+  \thesistable{%
+    \footnotesize
+    \renewcommand{\arraystretch}{1.12}
+    \begin{tabular*}{\linewidth}{@{\extracolsep{\fill}}l c c c c c@{}}
+      \toprule
+      \textbf{Approach}
+        & \textbf{F.\,Spec}
+        & \textbf{LLM}
+        & \textbf{Repair}
+        & \textbf{Guard}
+        & \textbf{Prev.\,Metr.} \\
+      \midrule
+      DafnyBench \citep{loughman2024dafnybench}
+        & \checkmark\ (Dafny)
+        & \checkmark
+        & partial
+        & --
+        & pass@k \\
+      Lynn et al.\ TOSEM \citep{lynn2024verifierloop}
+        & \checkmark
+        & \checkmark
+        & partial
+        & --
+        & correctness \\
+      Standard LLM (B1)
+        & --
+        & \checkmark
+        & --
+        & --
+        & pass rate \\
+      Test-feedback (B2)
+        & --
+        & \checkmark
+        & \checkmark\ (tests)
+        & --
+        & pass rate \\
+      \midrule
+      \textbf{HSP-Agile (ours)}
+        & \checkmark\ \textbf{(FSF)}
+        & \checkmark
+        & \checkmark\ \textbf{(CEGIS)}
+        & \checkmark
+        & \textbf{PDR, FAR, Conf} \\
+      \bottomrule
+    \end{tabular*}%
+  }
+\end{table}
+
+\noindent
+Table~\ref{tab:related-work} reveals that no prior approach combines all four
+dimensions simultaneously: formal FSF specification with scenario ordering,
+LLM-driven synthesis, a CEGIS repair loop with SMT-generated counterexamples,
+and a pattern guard layer.
+Prior work evaluates quality primarily through pass@k or aggregate correctness
+rates \citep{chen2021codex, loughman2024dafnybench}, neither of which
+distinguishes false acceptances from false rejections.
+HSP-Agile introduces PDR and FAR as prevention-quality metrics that measure
+both error types directly.
+
+\subsection{Research Gap}
+
+Synthesising the observations above, the research gap addressed by this
+thesis can be stated precisely:
+
+\begin{enumerate}
+  \item \textbf{Formal scenario semantics.}
+        Existing LLM-based code generation tools---including those with
+        formal verification components---do not account for FSF scenario
+        priority ordering.
+        Tests generated from flat guard conditions or from natural-language
+        descriptions will systematically miss the class of scenario-order
+        violations described in Section~\ref{sec:bg:fsf:semantics}.
+
+  \item \textbf{Requirement-level prevention.}
+        Static analysis tools (FindBugs and its successors) operate at
+        the code level and are not specification-aware.
+        No prior tool provides a pattern guard layer whose patterns are
+        derived from the structure of a formal FSF specification and
+        evaluated before formal test execution.
+
+  \item \textbf{Prevention-oriented evaluation.}
+        The LLM code generation literature evaluates models using
+        generation quality metrics (pass@k, BLEU) that do not address
+        the binary question relevant to formal specification contexts:
+        ``Does this candidate conform to the specification, and at what
+        cost in false rejections?''
+        PDR and FAR provide exactly this distinction.
+
+  \item \textbf{Agile integration.}
+        Prior formal verification tools for LLM-generated code
+        \citep{loughman2024dafnybench, lynn2024verifierloop} are evaluated on
+        academic benchmarks; none reports integration with sprint-based
+        workflows \citep{beck2001xp, li2022agilesofl}.
+        HSP-Agile is designed for Agile-SOFL sprints, and our benchmark
+        comprises sprint-sized FSF tasks.
+\end{enumerate}
+
+\noindent
+HSP-Agile addresses all four gaps through a unified pipeline whose components
+are described formally in Chapter~\ref{ch:formalization} and implemented
+and evaluated in Chapters~\ref{ch:implementation}--\ref{ch:experiments}.
+The following chapter establishes the mathematical foundations that underpin
+each component of the pipeline.

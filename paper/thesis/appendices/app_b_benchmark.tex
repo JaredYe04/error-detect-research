@@ -1,0 +1,282 @@
+\chapter{Benchmark Description}
+\label{app:benchmark}
+
+This appendix provides a detailed account of the hard synthetic benchmark
+used in the experimental evaluation of Chapter~\ref{ch:experiments}.  The
+benchmark was designed to overcome three limitations of ad hoc
+Agile-SOFL example tasks: insufficient scale for statistical comparison,
+insufficient difficulty to discriminate among pipeline modes, and
+insufficient control over the structural properties (guard overlap, scenario
+count, output arity) that the HSP-Agile pipeline is intended to enforce.
+Published Agile-SOFL examples~\citep{liu2014sofl,li2022agilesofl} provide seed tasks but lack
+the scale and difficulty control required for mode discrimination.
+
+% ---------------------------------------------------------------------------
+\section{Design Rationale and Task Selection Criteria}
+\label{sec:bench:criteria}
+% ---------------------------------------------------------------------------
+
+Each benchmark task must satisfy four admissibility criteria before inclusion
+in the evaluation corpus:
+
+\paragraph{C1 (Satisfiability).}
+Every FSF scenario, including the \texttt{others} default, must be
+individually satisfiable: the conjunction of the scenario guard and
+its output postcondition must admit at least one model in the input
+domain.  Tasks failing this check are discarded.
+
+\paragraph{C2 (Implementability).}
+At least one correct implementation must exist that evaluates guards
+in specification order and produces the prescribed outputs on every
+scenario.  An auto-generated reference implementation serves as a
+constructive witness.
+
+\paragraph{C3 (Discriminative difficulty).}
+Guard regions must overlap: at least two scenario preconditions must
+be simultaneously satisfiable on a non-empty input subspace, so that
+incorrect guard ordering produces detectable errors on boundary inputs
+rather than being masked by accidental correctness.
+
+\paragraph{C4 (Uniform structure).}
+All hard tasks share an identical signature shape (five natural-number
+inputs, three natural-number outputs, eight ordered scenarios) so that
+cross-task comparisons reflect algorithmic differences rather than
+incidental variation in task complexity.
+
+The first twenty tasks in the broader corpus were extracted manually from
+published Agile-SOFL example specifications~\citep{liu2014sofl,liu2004sofl} and retained as a development set.
+They were excluded from the primary evaluation to prevent information leakage
+between prompt-engineering iterations and held-out testing.  The hard synthetic
+suite described below constitutes the 120-task evaluation benchmark.
+
+% ---------------------------------------------------------------------------
+\section{Hard Benchmark Task Categories}
+\label{sec:bench:categories}
+% ---------------------------------------------------------------------------
+
+Hard tasks are produced by a programmatic generator that parameterises task
+difficulty through two structural mechanisms: \emph{precedence-sensitive
+guard construction} and \emph{multi-output coupling}.
+
+\subsection{Signature and scenario template}
+
+Every generated task defines a process with the following fixed signature:
+
+\begin{itemize}
+  \item \textbf{Inputs} ($|\mathbf{x}| = 5$): natural-number variables
+        $a, b, c, d, e$, each ranging over $[0, 100]$.
+  \item \textbf{Outputs} ($|\mathbf{y}| = 3$): natural-number variables
+        \textit{risk}, \textit{action}, and \textit{score}, representing a
+        composite decision tuple (risk tier, recommended action, aggregate
+        score).
+  \item \textbf{Scenarios} ($|\mathcal{S}_t| = 8$): seven guarded scenarios
+        plus one \texttt{others} default clause, evaluated in listed order
+        with top-down precedence.
+\end{itemize}
+
+The uniform arity ensures that formal conformance checking, pattern guard
+analysis, and mutation testing operate under consistent structural assumptions
+across all 120 evaluation tasks.
+
+\subsection{Precedence-sensitive guards}
+
+Each guarded scenario's pre-condition is a conjunction of two or three
+relational predicates over the input variables, with thresholds drawn from
+task-specific integer constants.  The generator maintains a pool of nine
+candidate guard--postcondition pairs spanning diverse input combinations
+(high-$a$/low-$b$ regions, zero-input boundaries, multi-variable conjunctions).
+For each task, a subset of seven pairs is selected and shuffled into priority
+order; the \texttt{others} scenario closes the specification with a zero
+default output tuple.
+
+Critically, the guard templates are designed so that multiple scenarios'
+preconditions overlap in the input space.  Correct behaviour therefore
+requires strict priority evaluation: an implementation that tests guards in
+reverse order or that collapses overlapping regions into a single branch will
+produce correct outputs on most inputs yet fail on witnesses lying in the
+overlap region.  This property directly targets scenario-order violation
+(SOV), the most prevalent fault class in LLM-generated FSF implementations~\citep{dakhel2023copilot,chen2021codex}.
+
+\subsection{Multi-output coupling}
+
+Each scenario's postcondition binds all three output variables simultaneously
+(e.g.\ \code{risk eq 3 \&\& action eq 4 \&\& score eq a}), preventing
+implementations from optimising for a single output field while neglecting
+others.  Output expressions may reference input variables, constants, or
+combinations thereof, requiring the implementation to propagate input values
+into structured return dictionaries rather than returning scalar results.
+
+% ---------------------------------------------------------------------------
+\section{Deterministic Generation and Validation}
+\label{sec:bench:validation}
+% ---------------------------------------------------------------------------
+
+Task generation is fully deterministic: a fixed pseudorandom seed (42) governs
+threshold sampling, scenario subset selection, and guard shuffling.  Re-running
+the generator with the same seed reproduces the identical 180-candidate task
+pool.
+
+Each candidate task passes through a two-stage validation pipeline before
+admission to the evaluation corpus:
+
+\begin{enumerate}
+  \item \textbf{Satisfiability check.}  For each of the eight scenarios, an
+        SMT solver verifies that the guard conjunction combined with output
+        postconditions is satisfiable over the declared input domain~\citep{demoura2008z3,barrett2018smt}.  Tasks
+        with even one unsatisfiable scenario are rejected.
+
+  \item \textbf{Reference implementation generation.}  A correct reference
+        implementation is synthesised directly from the FSF specification by
+        translating each scenario into an ordered \code{if}--\code{elif}
+        branch with a terminal \code{else} for the \texttt{others} clause.
+        The reference serves as ground truth for mutation testing and as a
+        sanity check that the specification is implementable.
+\end{enumerate}
+
+Of 180 generated candidates, 60 failed the satisfiability filter, yielding
+the final benchmark of 120 validated hard tasks.  Table~\ref{tab:bench:params}
+(below) summarises the generation parameters.
+
+\begin{table}[htbp]
+  \caption{Hard benchmark generation parameters.}
+  \label{tab:bench:params}
+  \centering
+  \begin{tabular}{ll}
+    \toprule
+    Parameter & Value \\
+    \midrule
+    Input variables       & 5 (\code{a}, \code{b}, \code{c}, \code{d}, \code{e}) \\
+    Output variables      & 3 (\code{risk}, \code{action}, \code{score}) \\
+    Scenarios per task    & 8 (7 guarded + 1 \texttt{others}) \\
+    Input domain          & $[0, 100]^5$ (natural numbers) \\
+    Guard overlap         & By construction (multi-scenario overlap) \\
+    Random seed           & 42 \\
+    Candidates generated  & 180 \\
+    Candidates retained   & 120 \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+% ---------------------------------------------------------------------------
+\section{FSF Specification Format}
+\label{sec:bench:format}
+% ---------------------------------------------------------------------------
+
+Each task is encoded as a structured FSF artefact comprising a process
+signature, an ordered scenario list, and a natural-language prompt
+specification.  The on-disk representation uses the following fields:
+
+\begin{description}
+  \item[\code{signature}.]
+        Declares input and output variables with type annotations
+        (\code{nat} for natural numbers).
+  \item[\code{fsfScenarios}.]
+        An ordered list of scenario records.  Each guarded scenario carries
+        a \code{test} field (the guard predicate in Agile-SOFL relational
+        notation, using \code{gt}, \code{le}, \code{eq}, and \code{\&\&}) and
+        a \code{def} field (the output postcondition).  The final scenario
+        has \code{kind = others} with \code{test = "others"}.
+  \item[\code{promptSpec}.]
+        A human-readable rendering of the FSF specification, including an
+        explicit instruction to evaluate conditions in listed order
+        (top-down precedence).
+  \item[\code{referenceCode}.]
+        Auto-generated Python implementation satisfying the specification
+        under ordered guard semantics.
+\end{description}
+
+The prompt specification deliberately states precedence ordering because
+prior work shows that LLMs frequently generate \code{if}--\code{elif} chains
+without respecting specification-level priority when this instruction is
+omitted~\citep{lynn2024verifierloop,loughman2024dafnybench}.  Including it isolates the effect of formal checking and pattern
+guarding from pure prompt-compliance effects.
+
+% ---------------------------------------------------------------------------
+\section{Illustrative Task Structure}
+\label{sec:bench:example}
+% ---------------------------------------------------------------------------
+
+Although individual guard thresholds vary across tasks, the structural template
+is uniform.  A representative task (with simplified threshold values) reads:
+
+\begin{quote}\small\ttfamily
+Process HardCase001(a,b,c,d,e) -> (risk,action,score)\\[2pt]
+FSF specification:\\
+if (a gt 5 \&\& b gt 7 \&\& c gt 4) => risk eq 3 \&\& action eq 4 \&\& score eq a\\
+if (a gt 5 \&\& b gt 7 \&\& c le 4) => risk eq 2 \&\& action eq 3 \&\& score eq b\\
+if (a gt 5 \&\& b le 7 \&\& d gt 3) => risk eq 2 \&\& action eq 2 \&\& score eq d\\
+\ldots\\
+if (a eq 0 \&\& b eq 0) => risk eq 0 \&\& action eq 5 \&\& score eq 0\\
+others => risk eq 0 \&\& action eq 0 \&\& score eq 0\\[2pt]
+Important: evaluate conditions in listed order (top-down precedence).
+\end{quote}
+
+The first two scenarios share the prefix \code{a gt 5 \&\& b gt 7} but
+differ on \code{c}; any input satisfying the first scenario's guard also
+satisfies the second's guard prefix.  An implementation that evaluates the
+second scenario before the first will assign incorrect outputs to inputs in
+the first scenario's exclusive region---a violation detectable by
+SMT-generated boundary witnesses.
+
+% ---------------------------------------------------------------------------
+\section{Mutation Operators and Evaluation Protocols}
+\label{sec:bench:mutation}
+% ---------------------------------------------------------------------------
+
+The benchmark supports two complementary evaluation protocols beyond the
+primary mode comparison:
+
+\paragraph{Specification-confusion mutants.}
+Four operators inject faults at the specification layer: predicate negation
+(SNO), relational-operator swap (ORO), scenario deletion (MCO), and boundary
+weakening (BCO)~\citep{demillo1978mutation,offutt1992mutation}.  The prevention protocol applies each operator to the FSF
+specification while holding the reference implementation fixed, then tests
+whether the formal checker rejects the now-mismatched pair.
+
+\paragraph{Implementation-screening mutants.}
+Four operators inject faults at the implementation layer: condition inversion
+(ICO), wrong primary output (WRO), off-by-one comparison (MBO), and else-branch
+removal (DRO).  The prevention protocol applies each operator to the reference
+implementation and tests whether the hybrid acceptance predicate
+($\mathrm{Conf} = 1 \wedge \mathcal{P}^H = \emptyset$) rejects the mutant.
+
+Together, the eight mutation operators provide coverage of both specification
+misinterpretation and implementation-level coding defects, aligned with the
+pattern catalogue of Appendix~\ref{app:patterns}.
+
+% ---------------------------------------------------------------------------
+\section{Benchmark Statistics}
+\label{sec:bench:stats}
+% ---------------------------------------------------------------------------
+
+Table~\ref{tab:bench:summary} (below) summarises the structural properties of the
+120-task evaluation benchmark.
+
+\begin{table}[htbp]
+  \caption{Summary statistics of the 120-task hard benchmark.}
+  \label{tab:bench:summary}
+  \centering
+  \begin{tabular}{lc}
+    \toprule
+    Statistic & Value \\
+    \midrule
+    Tasks in evaluation corpus        & 120 \\
+    Inputs per task                     & 5 \\
+    Outputs per task                    & 3 \\
+    Scenarios per task                  & 8 \\
+    Guarded scenarios                   & 7 \\
+    Default (\texttt{others}) scenarios & 1 \\
+    Mean guard overlap rate             & 1.8 scenarios/input \\
+    Mean SMT models per scenario        & 312 (cap 1000) \\
+    Total experimental runs (7 modes)   & 840 \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+The mean guard overlap rate of 1.8 indicates that a randomly sampled input
+satisfies approximately 1.8 scenario guards on average, requiring correct
+priority resolution.  The mean of 312 satisfying models per scenario confirms
+that no scenario is degenerate or vacuously satisfiable only at a single
+point.  To our knowledge, this benchmark constitutes the largest published
+collection of FSF tasks with SMT-certified scenario validity and controlled
+precedence-sensitive guard structure.

@@ -1,0 +1,107 @@
+\section{Method}
+\label{sec:method}
+
+\subsection{Problem Formulation}
+For each benchmark task \(t\), we are given an Agile-SOFL specification containing ordered FSF scenarios, input/output variable domains, and expected observable behavior.
+Under a bounded attempt budget \(K\), the objective is to make an acceptance decision for generated candidates rather than to guarantee synthesis success.
+Formally, for each generated candidate \(c\), we decide whether \(c\) is acceptable under two constraints:
+\begin{enumerate}
+  \item \textbf{strict functional conformance}: all generated formal cases agree with the specification oracle;
+  \item \textbf{requirement-level safety}: no high-severity fault pattern is triggered.
+\end{enumerate}
+If no candidate satisfies both constraints within budget, the pipeline returns the best non-accepted candidate for analysis but does not mark it as deployable.
+
+\subsection{Notation and Task Model}
+We model a task as \(t=(\mathcal{S}_t,\mathcal{X}_t,\mathcal{Y}_t)\), where \(\mathcal{S}_t=\langle s_1,\ldots,s_n\rangle\) is an \emph{ordered} FSF scenario sequence, \(\mathcal{X}_t\) is the input space, and \(\mathcal{Y}_t\) is the output space.
+Order is significant: when multiple scenario guards are satisfiable, earlier scenarios in \(\mathcal{S}_t\) have higher priority.
+The checker instantiates executable cases \(\mathcal{D}(t)\subseteq\mathcal{X}_t\) from \(\mathcal{S}_t\) and computes expected outputs through an oracle function \(g_t:\mathcal{X}_t\rightarrow\mathcal{Y}_t\).
+Each candidate program \(c\) induces an observable function \(f_c:\mathcal{X}_t\rightarrow\mathcal{Y}_t\).
+
+\subsection{Pipeline Overview}
+HSP-Agile follows the sequence:
+\[
+\text{Spec} \rightarrow \text{LLM Synthesis} \rightarrow \text{Formal Check} \rightarrow \text{Repair} \rightarrow \text{Pattern Guard}.
+\]
+Given task \(t\), the model proposes candidate \(c_k\) at attempt \(k\).
+The formal checker executes \(c_k\) on \(\mathcal{D}(t)\), computes conformance, and emits counterexamples for violated scenarios.
+The pattern guard then evaluates requirement-fault patterns (e.g., branch-order confusion, missing guard refinement) and records high-severity violations.
+Both counterexamples and pattern findings are summarized into structured feedback for the next synthesis round.
+This procedure yields an auditable decision trace for each attempt: \((\mathrm{Conf}(c_k,t), \text{pattern hits}, \mathrm{Accept}(c_k,t))\).
+
+\subsection{Strict Objective and Acceptance Rule}
+The strict formal conformance score is:
+\begin{equation}
+\label{eq:conformance}
+\mathrm{Conf}(c,t)=\frac{1}{|\mathcal{D}(t)|}\sum_{x\in\mathcal{D}(t)}\mathbf{1}\big[f_c(x)=g_t(x)\big].
+\end{equation}
+We define strict success under threshold \(\tau=1\):
+\begin{equation}
+\label{eq:strict_success}
+\mathrm{StrictSuccess}(c,t)=\mathbf{1}\big[\mathrm{Conf}(c,t)\ge \tau\big].
+\end{equation}
+In this study, \(\tau=1\), meaning a candidate is strictly successful only if all generated cases satisfy expected outputs.
+In artifact tables, \(\mathrm{Conf}(c,t)\) corresponds to the metric field \texttt{strict\_formal\_conformance}.
+
+Let \(\mathcal{P}^{H}\) be the high-severity pattern set.
+The hybrid acceptance predicate is:
+\begin{equation}
+\label{eq:accept}
+\mathrm{Accept}(c,t)=\mathbf{1}\Big[\mathrm{StrictSuccess}(c,t)=1 \land \sum_{p\in\mathcal{P}^{H}}\mathbf{1}[p(c,t)] = 0\Big].
+\end{equation}
+Equation~\ref{eq:accept} makes acceptance conjunctive: test-equivalent behavior alone is insufficient when severe requirement anti-patterns remain.
+
+\subsection{Prevention-Oriented Metrics}
+For mutant set \(\mathcal{M}\), prevention detection rate is:
+\begin{equation}
+\mathrm{PDR}=\frac{1}{|\mathcal{M}|}\sum_{m\in\mathcal{M}}\mathbf{1}\big[\neg \mathrm{Accept}(c_m,t_m)\big].
+\end{equation}
+False-accept rate is:
+\begin{equation}
+\mathrm{FAR}=\frac{1}{|\mathcal{M}|}\sum_{m\in\mathcal{M}}\mathbf{1}\big[\mathrm{Accept}(c_m,t_m)\land \neg \mathrm{Detected}(m)\big].
+\end{equation}
+Higher PDR and lower FAR indicate stronger prevention behavior.
+We report these together with strict success, strict formal conformance, latency, and mutation kill rate to avoid over-optimizing any single dimension.
+
+\begin{figure}[t]
+  \centering
+  \input{diagrams/prevention_protocol}
+  \caption{Two-layer prevention evaluation protocol.
+    Specification-confusion (top) and implementation-screening (bottom)
+    mutant tracks are evaluated independently and aggregated to PDR and FAR.}
+  \label{fig:prevention-protocol}
+\end{figure}
+
+\subsection{Operational Procedure}
+Algorithm~1 describes one task-level run.
+At each attempt, the system (i) synthesizes a candidate with accumulated feedback, (ii) checks strict conformance and extracts counterexamples, and (iii) applies pattern screening.
+If Eq.~\ref{eq:accept} holds, the run terminates early with an accepted candidate; otherwise the feedback state is updated and the loop continues until budget \(K\) is exhausted.
+All intermediate artifacts (prompts, candidates, counterexamples, pattern hits, timings) are logged for reproducibility and error analysis.
+\begin{algorithm}[t]
+\caption{HSP-Agile Candidate Synthesis and Screening}
+\begin{algorithmic}[1]
+\Require task \(t\), max attempts \(K\)
+\For{$k=1$ to $K$}
+  \State \(c_k \leftarrow \mathrm{LLM}(t,\text{feedback}_{k-1})\)
+  \State compute \(\mathrm{Conf}(c_k,t)\) and counterexamples
+  \State evaluate high-severity patterns on \(c_k\)
+  \If{\(\mathrm{Accept}(c_k,t)=1\)}
+    \State \Return \(c_k\)
+  \EndIf
+  \State build feedback from counterexamples and pattern violations
+\EndFor
+\State \Return best candidate by strict conformance
+\end{algorithmic}
+\end{algorithm}
+
+In experiments, ``best candidate'' is used only for comparative analysis when no accepted candidate is found; deployment-oriented decisions always follow Eq.~\ref{eq:accept}.
+
+\begin{figure}[t]
+  \centering
+  \input{diagrams/pipeline_architecture}
+  \caption{HSP-Agile pipeline architecture.
+    Shadowed boxes denote processing stages; the repair loop enables
+    counterexample-guided refinement within budget~$K$.}
+  \label{fig:architecture}
+\end{figure}
+
+\input{tables/symbols}

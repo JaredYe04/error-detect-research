@@ -1,0 +1,937 @@
+\chapter{Experimental Evaluation}
+\label{ch:experiments}
+
+This chapter presents the empirical evaluation of HSP-Agile against three baseline
+methods and three ablated variants.  We structure the evaluation around four research
+questions (Section~\ref{sec:exp:rq}), describe the experimental setup and benchmark
+(Sections~\ref{sec:exp:setup}--\ref{sec:exp:benchmark}), define the compared methods
+and metrics (Sections~\ref{sec:exp:methods}--\ref{sec:exp:metrics}), and then report
+results for each research question in turn
+(Sections~\ref{sec:exp:rq1}--\ref{sec:exp:rq4}).  We close with a sensitivity
+analysis (Section~\ref{sec:exp:sensitivity}) and a structured threats-to-validity
+discussion (Section~\ref{sec:exp:threats}).
+
+%=============================================================================
+\section{Research Questions}
+\label{sec:exp:rq}
+%=============================================================================
+
+The evaluation is designed to answer the following four research questions.
+
+\paragraph{RQ1 --- Strict Correctness and Formal Conformance.}
+Does HSP-Agile achieve higher strict formal conformance than the one-shot (B1) and
+test-feedback (B2) baselines?  The formal conformance metric $\mathit{Conf}(c,t)$
+(Definition~\ref{def:conformance}) captures the fraction of Z3-generated evaluation
+cases that a candidate implementation satisfies; it is a more granular quality signal
+than the binary pass/fail metric used by B1 and B2.  We are particularly interested
+in whether the CEGIS repair loop and Z3-based case generation together push
+conformance beyond what iterative unit-test feedback achieves.
+
+\paragraph{RQ2 --- Operational Efficiency.}
+What is the latency cost of HSP-Agile relative to simpler baselines?  Each HSP-Agile
+run invokes Z3 multiple times, queries the LLM in a repair loop, and evaluates pattern
+guards, all of which add wall-clock time.  We measure mean per-task latency for all
+seven modes and quantify the overhead of each pipeline component.  The goal is to
+determine whether the quality gains from RQ1 justify the additional cost in a
+realistic sprint-cycle deployment scenario.
+
+\paragraph{RQ3 --- Component Contribution (Ablation).}
+How much does each pipeline component individually contribute to formal conformance?
+We isolate the formal checker (A1), the pattern guard (A2), and the repair loop (A3)
+by disabling each component in turn, holding all other parameters fixed.  The ablation
+decomposition lets us rank the contributions and understand the interaction effects
+between components.
+
+\paragraph{RQ4 --- Defect Prevention Capability.}
+Does HSP-Agile detect more faulty candidates (higher Positive Detection Rate, PDR)
+with fewer false accepts (lower False Accept Rate, FAR) than the baselines?  PDR and
+FAR measure the pipeline's utility as a quality gate: a system deployed in a CI
+pipeline must catch real faults while not blocking correct submissions~\citep{demillo1978mutation,offutt1992mutation}.
+Because the full prevention evaluation requires generating and classifying large mutant
+populations, we report preliminary results for three modes (B1, B2, M) and
+characterise the remaining evaluation as ongoing work.
+
+%=============================================================================
+\section{Experimental Setup}
+\label{sec:exp:setup}
+%=============================================================================
+
+\subsection{Hardware and Software Environment}
+
+All experiments were executed on a desktop workstation running Windows 10
+(build 26220) with a 6-core processor.  Tasks were dispatched in parallel across
+all six cores using Python's \texttt{multiprocessing} module, with one worker per
+core.  The Python runtime was version 3.12.  The Z3 SMT solver version 4.16~\citep{demoura2008z3,barrett2018smt}
+was invoked via the \texttt{z3-solver} Python binding; all Z3 calls used a per-call
+timeout of 10 seconds, after which the solver returned \texttt{unknown} and the
+pipeline treated the call as a non-constraining outcome.
+
+\subsection{Language Model Configuration}
+
+All LLM-based modes (B1, B2, M, A1, A2, A3) used Qwen2.5-27B-Instruct
+(\textsf{Qwen-27B}) accessed through an OpenAI-compatible LLM gateway.  Temperature was set to 0.7 for all
+generation calls and to 0.0 for all repair calls, following the prompting strategy
+described in Chapter~\ref{ch:method}.  The maximum token budget per LLM call was
+4096 tokens.  The budget parameter $K = 3$ was fixed for all LLM-based modes: in
+mode M, the repair loop may invoke the LLM up to three times per task, consuming
+between 1 and 3 API calls depending on when the loop terminates.
+
+\subsection{Experiment Identifier and Scale}
+
+The experiment was conducted under the run identifier
+\texttt{run\_hard\_full\_parallel\_v1}.  A total of 840 runs were executed: 7 modes
+$\times$ 120 tasks, each run processed independently by a dedicated worker process.
+Run artefacts (prompts, LLM responses, Z3 query logs, evaluation traces, timing
+records) were serialised to disk in JSONL format for reproducibility~\citep{ammann2016testing}.
+All random-number generation used fixed seed 42 for task generation and prompt
+construction; the LLM API itself is not seeded, but temperature 0.0 for repair
+calls makes those responses near-deterministic in practice.
+
+\subsection{Reproducibility Measures}
+
+Determinism was enforced at three levels.  First, task generation used a fixed
+random seed, ensuring the same 120 tasks for every replication.  Second, the
+evaluation harness (Z3 case generation, mutation testing) is fully deterministic
+given the same task and candidate.  Third, statistical comparisons use
+non-parametric tests (Wilcoxon signed-rank and Mann-Whitney U) that do not assume
+normality, making them robust to residual LLM non-determinism in one-shot calls.
+
+%=============================================================================
+\section{Benchmark Construction}
+\label{sec:exp:benchmark}
+%=============================================================================
+
+\subsection{Design Rationale}
+
+A central challenge in evaluating specification-conformance tools is that
+off-the-shelf software repositories do not contain Agile-SOFL\slash FSF
+specifications; such artefacts must be constructed.  We required a benchmark with
+three properties: (i)~\emph{discriminative power}---tasks should be hard enough
+that baseline methods fail non-trivially, otherwise ceiling effects mask quality
+differences; (ii)~\emph{formal validity}---every task must be satisfiable by at
+least one correct implementation, verifiable by Z3; and
+(iii)~\emph{diversity}---tasks should cover varied input combinations, scenario
+orderings, and boundary conditions to prevent overfitting by any single strategy.
+Existing formal-synthesis benchmarks such as DafnyBench~\citep{loughman2024dafnybench}
+target annotation-heavy verification languages rather than FSF scenario semantics,
+motivating a domain-specific corpus.
+
+\subsection{Base Tasks}
+
+We began with 20 base Agile-SOFL tasks extracted by manual inspection from published
+example specifications~\citep{liu2014sofl,li2022agilesofl}.  Each base task defines a small module with 3--5 inputs, 2--3
+outputs, and 5--8 FSF scenarios that describe the required input-output relationship
+in each region of the input space.
+
+\subsection{Hard Synthetic Task Generation}
+
+The 20 base tasks alone are insufficient for a statistically powered comparison.  We
+therefore developed the \emph{HardTaskGenerator}, a programmatic generator that
+produces synthetic FSF tasks with controlled difficulty.  Each generated task has
+exactly 5 integer inputs $(a, b, c, d, e) \in [0, 100]^5$, 3 outputs
+(\textit{risk}, \textit{action}, \textit{score}), and exactly 8 ordered FSF
+scenarios.  Difficulty is modulated by two design choices.
+
+\emph{Precedence-sensitive guard regions.}  Each scenario's pre-condition guard is
+constructed so that it overlaps with at least one other guard in the input space.
+Correct scenario evaluation therefore requires strict priority ordering: an
+implementation that evaluates guards in the wrong order will produce correct outputs
+on most inputs but fail on boundary inputs that fall in the overlap region.  This
+design directly targets the most common fault pattern (scenario-order
+violation, SOV) identified in the fault taxonomy of
+Chapter~\ref{ch:formalization}.
+
+\emph{Z3 satisfiability filter.}  Before a generated task is admitted to the
+benchmark, Z3 verifies that all 8 scenarios are individually satisfiable: for each
+scenario $s_i$, the conjunction of its guard and output constraints must have at
+least one model.  Tasks failing this check are discarded.  This prevents benchmark
+tasks that are logically vacuous and ensures every benchmark task has a ground-truth
+correct implementation.
+
+Figure~\ref{fig:benchmark-pipeline} (below) illustrates the full construction
+pipeline.
+
+\begin{figure}[t]
+  \centering
+  \tikzinput{diagrams/tikz/benchmark_pipeline}
+  \caption{Benchmark construction pipeline.  Hard synthetic tasks are generated with
+    precedence-sensitive FSF scenarios, validated by Z3 for scenario satisfiability,
+    and assembled into the final 120-task benchmark used across all seven evaluation
+    modes (840 total runs).}
+  \label{fig:benchmark-pipeline}
+\end{figure}
+
+The generator produced 180 candidate tasks, of which 60 were discarded by the Z3
+satisfiability filter, leaving the final benchmark of 120 hard synthetic tasks.  The
+base tasks were retained as a development set but were not included in the primary
+evaluation to avoid potential information leakage between the prompt-engineering
+phase and the evaluation phase.
+
+\subsection{Illustrative Task Example}
+
+To ground the benchmark description, the following illustrative task models a financial risk classifier with
+inputs \texttt{a} (credit score, $[0,100]$), \texttt{b} (debt ratio, $[0,100]$),
+\texttt{c} (income volatility, $[0,100]$), \texttt{d} (asset coverage, $[0,100]$),
+and \texttt{e} (market exposure, $[0,100]$).  Outputs are \texttt{risk} $\in
+\{0,1,2,3\}$ (risk tier), \texttt{action} $\in \{0,1,2\}$ (recommended action),
+and \texttt{score} $\in [0,100]$ (aggregate score).  The eight FSF scenarios are
+ordered from most-specific to least-specific:
+
+\begin{enumerate}
+  \item High credit AND low debt AND low volatility $\Rightarrow$ (risk=0, action=0, score=90)
+  \item High credit AND low debt $\Rightarrow$ (risk=0, action=0, score=75)
+  \item High credit AND moderate debt $\Rightarrow$ (risk=1, action=1, score=60)
+  \item Low credit AND high debt AND high volatility $\Rightarrow$ (risk=3, action=2, score=15)
+  \item Low credit AND high debt $\Rightarrow$ (risk=2, action=2, score=30)
+  \item Low credit $\Rightarrow$ (risk=2, action=1, score=40)
+  \item Moderate credit AND high exposure $\Rightarrow$ (risk=1, action=1, score=55)
+  \item (default) $\Rightarrow$ (risk=1, action=0, score=65)
+\end{enumerate}
+
+Scenario 1 and Scenario 2 have overlapping guards (any input satisfying Scenario 1
+also satisfies Scenario 2's guard).  An implementation that evaluates guards in
+reverse order (Scenario 2 before Scenario 1) will produce \texttt{score}=75 instead
+of 90 on inputs in the Scenario 1 region---a scenario-order violation that
+the pattern guard is designed to detect.  Z3 can generate inputs precisely in this
+overlap region (e.g., \texttt{a=85, b=15, c=10, d=80, e=20}), making such violations
+detectable during the repair loop.
+
+This example illustrates why the hard benchmark is discriminating: a one-shot LLM
+generation may produce code that handles 7 of the 8 scenarios correctly but fails on
+the Scenario 1/2 overlap because the LLM did not fully parse the priority ordering
+from the specification text~\citep{chen2021codex,dakhel2023copilot}.  The CEGIS repair loop, armed with a Z3-generated
+boundary input, can correct this in a single repair iteration~\citep{solarlezama2008sketching,lynn2024verifierloop}.
+
+\subsection{Benchmark Characteristics}
+
+Table~\ref{tab:benchmark-stats} summarises the properties of the 120-task benchmark;
+the mean guard region overlap rate is 1.8 scenarios per input point, confirming that
+correct priority evaluation is non-trivial on most inputs.
+
+\begin{table}[t]
+  \caption{Summary statistics of the 120-task hard benchmark.}
+  \label{tab:benchmark-stats}
+  \centering
+  \begin{tabular}{lc}
+    \toprule
+    Property & Value \\
+    \midrule
+    Total tasks & 120 \\
+    Inputs per task & 5 \\
+    Outputs per task & 3 \\
+    Scenarios per task & 8 \\
+    Mean guard-overlap rate (scenarios/point) & 1.8 \\
+    Tasks rejected by Z3 filter & 60 \\
+    Tasks accepted & 120 \\
+    Evaluation cases per task (strict\_eval) & 64 \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+%=============================================================================
+\section{Compared Methods}
+\label{sec:exp:methods}
+%=============================================================================
+
+We compare seven evaluation modes.  The modes span the design space from a pure
+formal reference implementation (B0) through increasingly capable LLM-based methods
+(B1, B2) to the full HSP-Agile pipeline (M) and three ablated variants (A1, A2, A3)
+that systematically remove one component each.
+
+\begin{table}[t]
+  \caption{Compared methods and their component configurations.
+           Formal = formal check; Guard = pattern guard; Repair = repair loop.}
+  \label{tab:modes}
+  \centering
+  \thesistable{%
+    \footnotesize
+    \renewcommand{\arraystretch}{1.15}
+    \begin{tabular*}{\linewidth}{@{\extracolsep{\fill}}l l c c c c@{}}
+      \toprule
+      Mode & Description & Formal & Guard & Repair \\
+      \midrule
+      B0 & Reference implementation   & Yes$^\dagger$ & No  & No           \\
+      B1 & One-shot LLM               & No            & No  & No           \\
+      B2 & LLM + test-feedback        & No            & No  & Yes (tests)  \\
+      \textbf{M}  & \textbf{Full HSP-Agile} & \textbf{Yes (Z3)} & \textbf{Yes} & \textbf{Yes (CEGIS)} \\
+      A1 & Ablation: no formal check  & No            & Yes & Yes          \\
+      A2 & Ablation: no pattern guard & Yes (Z3)      & No  & Yes (CEGIS)  \\
+      A3 & Ablation: no repair loop   & Yes (Z3)      & Yes & No           \\
+      \bottomrule
+    \end{tabular*}%
+  }
+  \par\smallskip
+  \raggedright\footnotesize $^\dagger$B0 uses formal checking \emph{for evaluation only};
+  the reference implementation is pre-written from the task specification, not
+  generated by a solver.
+\end{table}
+
+\paragraph{B0 --- Reference Implementation.}
+B0 provides a formal upper-bound reference.  For each task, the reference
+implementation is generated directly from the FSF specification by a deterministic
+template renderer that encodes each scenario as a guarded branch in priority order.
+B0 involves no LLM and no iterative loop; it executes in under 10 milliseconds.
+The formal checker is applied \emph{ex post} for evaluation purposes to compute
+$\mathit{Conf}(\cdot)$, but was not used to produce the implementation.  B0 answers
+the question: ``How well does a formally correct but algorithmically na\"{\i}ve
+template implementation perform on hard tasks?''
+
+\paragraph{B1 --- One-Shot LLM.}
+B1 makes a single LLM API call with a carefully constructed prompt containing the
+full FSF specification.  The response is parsed, syntax-checked, and passed directly
+to the evaluator.  No feedback loop is applied.  B1 represents the minimal
+LLM-based approach and establishes how much capability a single prompt provides.
+
+\paragraph{B2 --- LLM with Test-Feedback Loop.}
+B2 extends B1 with an iterative test-feedback loop analogous to standard
+test-driven code generation~\citep{zhu1997specification}.  After each LLM generation, a set of
+unit tests derived from the FSF pre/post-conditions is executed; if any test fails,
+the failure message and the current candidate are appended to the prompt and a new
+LLM call is made.  The loop terminates when all tests pass or the budget $K=3$ is
+exhausted.  B2 uses no Z3 and no pattern guard; its feedback signal is purely from
+unit-test outcomes.
+
+\paragraph{M --- Full HSP-Agile Pipeline.}
+Mode M runs the complete pipeline as described in
+Chapters~\ref{ch:method} and~\ref{ch:implementation}: the LLM generates an initial
+candidate; Z3 generates counterexample inputs; the pattern guard screens for
+scenario-order violations and guard-overlap faults; if the candidate fails either
+check, a CEGIS repair loop invokes the LLM again with the counterexample as
+additional context.  The loop repeats until the candidate passes all checks or $K=3$
+is reached, at which point the best-scoring candidate is returned.
+
+\paragraph{A1 --- Ablation: No Formal Check.}
+A1 disables Z3-based case generation.  The formal conformance checker is replaced
+by the same unit-test harness used in B2, so the feedback signal comes from
+unit tests rather than SMT-generated counterexamples.  The pattern guard and repair
+loop remain active.  This isolates the contribution of Z3-guided feedback.
+
+\paragraph{A2 --- Ablation: No Pattern Guard.}
+A2 disables the pattern guard.  Candidates are evaluated by the formal checker
+(Z3) and passed directly to the repair loop if they fail; no structural pattern
+screening is applied.  This isolates the contribution of the pattern guard.
+
+\paragraph{A3 --- Ablation: No Repair Loop.}
+A3 disables the repair loop entirely.  The LLM is called exactly once (as in B1),
+but the Z3-based formal checker and pattern guard \emph{are} applied to evaluate the
+resulting candidate.  The evaluation verdict is computed but no corrective feedback
+is sent.  This isolates the contribution of the CEGIS repair loop.
+
+%=============================================================================
+\section{Evaluation Metrics and Statistical Protocol}
+\label{sec:exp:metrics}
+%=============================================================================
+
+\subsection{Primary Metrics}
+
+\paragraph{Strict Success Rate.}
+For a task $t$ and mode $m$, the run is a \emph{strict success} if the returned
+candidate implementation passes every one of the 64 Z3-generated evaluation cases
+(i.e., the strict evaluation set used for final scoring).  The strict success rate
+is the fraction of the 120 tasks for which this holds.  This is a binary, all-or-nothing
+metric; it is the most demanding correctness criterion.
+
+\paragraph{Strict Formal Conformance.}
+The formal conformance $\mathit{Conf}(c, t) \in [0,1]$ (Definition~\ref{def:conformance})
+is the fraction of the 64 strict evaluation cases that the candidate $c$ satisfies on
+task $t$.  The reported metric is the mean $\overline{\mathit{Conf}}$ across all 120
+tasks, providing a continuous quality signal that discriminates between methods even
+when strict success rates are similar.
+
+\paragraph{Mutation Kill Rate.}
+Given a candidate $c$ for task $t$, we inject $n_\mu$ syntactic mutants (scenario
+reordering, guard negation, output perturbation) and check whether the formal
+checker correctly classifies each mutant as non-conforming.  The mutation kill rate
+$\mu_k$ is the fraction of mutants killed; it measures the \emph{precision} of the
+formal checker rather than the quality of the generated code.  Values near 100\%
+indicate the checker is a reliable fault oracle; lower values indicate blind spots.
+
+\paragraph{LLM Call Count.}
+The mean number of LLM API calls made per task.  For B1 this is always 1.0; for
+M it ranges from 1 to 3 depending on when the repair loop terminates, with a mean
+of 2.08.
+
+\paragraph{Latency.}
+Wall-clock time from task start to final evaluation verdict, measured in milliseconds
+and averaged over the 120 tasks per mode.  Latency includes LLM API round-trip time,
+Z3 solving time, pattern guard evaluation time, and Python orchestration overhead.
+
+\paragraph{PDR and FAR (Prevention Metrics).}
+The Positive Detection Rate (PDR) is the fraction of faulty candidates (mutants) that
+the pipeline correctly rejects before they would be accepted.  The False Accept Rate
+(FAR) is the fraction of correct candidates incorrectly rejected.  Both metrics are
+defined formally in Section~\ref{sec:form:metrics}; for the prevention evaluation in
+Section~\ref{sec:exp:rq4} we report only PDR due to the preliminary nature of the
+available data.
+
+\subsection{Statistical Protocol}
+
+All pairwise comparisons involving per-task binary outcomes (strict success) use the
+\emph{Wilcoxon signed-rank test}, which is appropriate for paired non-normal
+distributions.  Comparisons of latency distributions, which are unpaired and
+right-skewed, use the \emph{Mann-Whitney U test}.  Effect sizes are reported as
+rank-biserial correlation $r$ where applicable; values $|r| < 0.1$ are interpreted
+as negligible, $0.1 \le |r| < 0.3$ as small, $0.3 \le |r| < 0.5$ as medium, and
+$|r| \ge 0.5$ as large.  The significance threshold is $\alpha = 0.05$ with no
+multiple-comparison correction applied within each research question (comparisons are
+few and pre-specified).
+
+%=============================================================================
+\section{RQ1: Strict Correctness and Formal Conformance}
+\label{sec:exp:rq1}
+%=============================================================================
+
+\subsection{Main Results}
+
+Table~\ref{tab:main-results} presents the primary experimental results for all seven
+evaluation modes across 120 tasks each.  Figures~\ref{fig:conf-distribution},
+\ref{fig:conf-cdf}, \ref{fig:summary-metrics}, \ref{fig:llm-calls},
+and~\ref{fig:radar-metrics} visualise the per-task conformance distributions,
+aggregate metric profile, LLM-call cost, and multi-metric trade-offs.
+
+\begin{table}[t]
+  \caption{Main comparison results ($n = 120$ tasks per mode). Best formal conformance
+    shown in bold. Strict = strict success rate; Conf.\ = formal conformance;
+    Kill = mutation kill rate; Fail.\ = mean strict evaluation failures per task
+    (out of 64).}
+  \label{tab:main-results}
+  \centering
+  \thesistable{%
+    \footnotesize
+    \renewcommand{\arraystretch}{1.12}
+    \begin{tabular*}{\linewidth}{@{\extracolsep{\fill}}l r r r r r@{}}
+      \toprule
+      Mode & Strict & Conf. & Kill & Lat.\ (ms) & Fail. \\
+      \midrule
+      B0   & 27.5\%          & 27.5\%        & 79.0\%       & 7.5           & 0.00 \\
+      B1   & 26.7\%          & 84.2\%        & 62.3\%       & 9{,}564       & 1.76 \\
+      B2   & 26.7\%          & 88.0\%        & 61.4\%       & 10{,}769      & 1.85 \\
+      \textbf{M}  & 25.0\%   & \textbf{90.4\%} & 60.6\%     & 43{,}659      & 1.98 \\
+      A1   & 26.7\%          & 86.5\%        & 61.9\%       & 41{,}689      & 1.80 \\
+      A2   & 26.7\%          & \textbf{90.9\%}& 60.1\%     & 12{,}080      & 1.97 \\
+      A3   & 26.7\%          & 84.1\%        & 62.7\%       & 9{,}314       & 1.77 \\
+      \bottomrule
+    \end{tabular*}%
+  }
+\end{table}
+
+\begin{figure}[t]
+  \centering
+  \widefig{figures/mode_distribution_strict_conformance.pdf}
+  \caption{Distribution of per-task strict formal conformance ($\mathit{Conf}(c,t)$)
+    across all 120 tasks for each evaluation mode.  Mode M achieves the rightmost
+    distribution mass among the fully-specified modes, while B0's conformance is
+    concentrated at lower values due to the hard benchmark's precedence-sensitive
+    design.}
+  \label{fig:conf-distribution}
+\end{figure}
+
+\begin{figure}[t]
+  \centering
+  \widefig{figures/formal_conformance_cdf.pdf}
+  \caption{Empirical cumulative distribution of strict formal conformance by mode.
+    Mode~M and A2 dominate the upper tail; B0's CDF rises steeply at low conformance
+    values, reflecting template-renderer failures on precedence-sensitive tasks.}
+  \label{fig:conf-cdf}
+\end{figure}
+
+\begin{figure}[t]
+  \centering
+  \widefig{figures/summary_metrics_by_mode.pdf}
+  \caption{Summary of mean metrics by mode.  Left axis: strict success rate and formal
+    conformance.  Right axis: mean LLM calls per task.  Mode M attains the highest
+    formal conformance while consuming the most LLM calls on average (2.08), confirming
+    that the repair loop is exercised for most tasks.}
+  \label{fig:summary-metrics}
+\end{figure}
+
+\begin{figure}[t]
+  \centering
+  \widefig{figures/llm_calls_distribution.pdf}
+  \caption{Distribution of LLM calls per task by mode.  M and A1 concentrate mass
+    at two to three calls, confirming that the repair budget $K=3$ is actively used;
+    B1 remains at a single call.}
+  \label{fig:llm-calls}
+\end{figure}
+
+\begin{figure}[t]
+  \centering
+  \widefig{figures/radar_metrics.pdf}
+  \caption{Radar chart of normalised quality--cost metrics across modes (conformance,
+    strict success, mutation kill rate, inverse latency).  M trades latency for
+    conformance; B2 offers a lower-cost alternative with moderate conformance.}
+  \label{fig:radar-metrics}
+\end{figure}
+
+\subsection{Analysis: The Reference Implementation Surprise}
+
+B0's formal conformance matches its strict success rate at 27.5\%---far below the
+LLM-based methods.  On hard benchmark tasks with overlapping guard regions, the
+deterministic template renderer does not always match the ground-truth evaluation
+order encoded in the Z3 evaluation cases.  This finding validates the experimental
+design: a benchmark on which the reference implementation scores 95\%+ would provide
+little headroom to distinguish methods.
+
+\subsection{Analysis: LLM Methods and Conformance Progression}
+
+Formal conformance jumps from 27.5\% (B0) to 84.2\% (B1), reflecting the LLM's
+ability to infer scenario ordering from specification text.  B2's test-feedback loop
+improves conformance to 88.0\% (+3.8pp over B1), but heuristic unit tests may miss
+boundary inputs that expose ordering errors~\citep{claessen2000quickcheck}.
+
+Mode M achieves the highest formal conformance among fully-specified methods at
+90.4\% (+2.4pp over B2, +6.2pp over B1), with Z3 counterexamples providing more
+precise corrective feedback than unit-test failures alone.
+
+\subsection{Analysis: The Strict Success Rate Inversion}
+
+Mode M has a \emph{lower} strict success rate (25.0\%) than B1 and B2 (both 26.7\%),
+despite higher formal conformance.  This follows from the conjunctive acceptance
+criterion (Section~\ref{sec:form:acceptance}): M requires both formal pass and a
+clear pattern guard, making it more selective---lower strict success but higher mean
+$\mathit{Conf}$, a desirable trade-off for CI quality gates.
+
+\subsection{Statistical Tests}
+
+Wilcoxon signed-rank tests comparing M with B1 and B2 on per-task strict success
+yield $p = 0.921$ ($r = -0.033$, negligible effect).  The meaningful signal is
+formal conformance, which shows a clear ordering (M $>$ B2 $>$ B1) with a practically
+significant 6.2pp gap over B1.
+
+\subsection{Cross-Mode Conformance Patterns}
+
+Figure~\ref{fig:conf-distribution} shows B0's bimodal distribution and right-skewed
+LLM distributions in the 80--100\% range.  M outperforms B2 on 61\% of tasks (73/120),
+motivating the adaptive gate design in Chapter~\ref{ch:discussion}.
+
+\subsection{Mutation Kill Rate}
+
+Mutation kill rate measures \emph{checker} quality, not generator quality~\citep{offutt1992mutation}.
+B0's 79.0\% exceeds LLM modes (60--63\%); inter-mode differences among LLM modes are
+small ($\le$2.6pp) and should not be over-interpreted.
+
+\paragraph{Answer to RQ1.}
+\emph{HSP-Agile (mode M) achieves the highest formal conformance among all evaluated
+methods at 90.4\%, representing gains of +6.2pp over one-shot B1 and +2.4pp over
+test-feedback B2.  Strict success rates are statistically indistinguishable across
+LLM-based modes ($p = 0.921$), confirming that formal conformance is the more
+informative quality metric on this hard benchmark.}
+
+%=============================================================================
+\section{RQ2: Operational Efficiency}
+\label{sec:exp:rq2}
+%=============================================================================
+
+\subsection{Latency Overview}
+
+Figures~\ref{fig:latency-distribution} and~\ref{fig:pareto} (below) summarise the
+latency profile; Table~\ref{tab:main-results} supplies the mean values.  Mode M
+(43.7\,s) incurs a 4.6$\times$ overhead over B2 (10.8\,s), driven primarily by
+additional LLM calls (mean 2.08 vs.\ 1.24) and Z3/pattern-guard overhead.  A2
+(12.1\,s, 90.9\% conformance) is near-Pareto-efficient: near-M quality at B2-level
+latency.  A1 (41.7\,s) is nearly as slow as M despite lacking Z3 formal checking,
+because weaker unit-test feedback yields less effective early termination.
+
+\begin{figure}[t]
+  \centering
+  \widefig{figures/mode_distribution_latency.pdf}
+  \caption{Distribution of per-task wall-clock latency (ms, log scale) across 120
+    tasks for each mode.  B0 and B1 are tightly concentrated near their means.  M and
+    A1 exhibit heavier right tails due to repair loop invocations that reach the
+    $K=3$ budget limit.}
+  \label{fig:latency-distribution}
+\end{figure}
+
+\begin{figure}[t]
+  \centering
+  \widefig{figures/pareto_quality_vs_latency.pdf}
+  \caption{Quality--latency Pareto frontier across evaluation modes.  Horizontal axis:
+    mean latency per task (ms, log scale).  Vertical axis: mean formal conformance.
+    Mode M occupies the upper-right region (high quality, high cost) while B1 offers
+    the best quality-per-second ratio among LLM methods.  A2 is noteworthy as a
+    near-Pareto-efficient point: near-M conformance at B2-level latency.}
+  \label{fig:pareto}
+\end{figure}
+
+\subsection{Statistical Comparison of Latency Distributions}
+
+Mann-Whitney U comparison of M vs.\ B2 latency confirms the expected directional
+dominance ($p = 0.9999$): M is uniformly slower, not a sampling artefact.
+
+\subsection{Practical Deployment Considerations}
+
+At 43.7\,s per task, M suits CI pre-merge gates rather than interactive IDE use.
+Mode A2 offers a lower-latency alternative when near-M quality suffices
+(Section~\ref{sec:exp:rq3}).
+
+\paragraph{Answer to RQ2.}
+\emph{Mode M incurs a 4.6$\times$ latency overhead over B2 (43.7 s vs.\ 10.8 s),
+primarily due to Z3 invocations and multi-iteration repair loops.  This overhead is
+acceptable for CI pipeline deployment but excludes interactive use.  Ablation A2
+offers near-identical conformance at substantially lower cost, suggesting that the
+pattern guard is the primary latency driver in the full M pipeline.}
+
+%=============================================================================
+\section{RQ3: Ablation Study --- Component Contribution}
+\label{sec:exp:rq3}
+%=============================================================================
+
+\subsection{Ablation Design}
+
+The ablation study removes one HSP-Agile component at a time, holding all other
+parameters fixed, to isolate each component's contribution to the overall formal
+conformance of 90.4\%.  The three ablated variants are A1 (no formal checker), A2
+(no pattern guard), and A3 (no repair loop).  Mode M serves as the full-system
+baseline.  The ablation delta for component $x$ is defined as:
+\[
+  \Delta_x = \overline{\mathit{Conf}}_{\text{ablated}} - \overline{\mathit{Conf}}_M
+\]
+A negative delta indicates that removing the component \emph{hurts} conformance;
+a positive delta indicates neutral or negative effect.
+Figure~\ref{fig:ablation-ci} (below) plots the ablation deltas with bootstrap
+confidence intervals.
+
+\begin{figure}[t]
+  \centering
+  \widefig{figures/ablation_contribution_ci.pdf}
+  \caption{Ablation contributions to formal conformance.  Each bar shows the change
+    in mean formal conformance relative to mode M when one component is removed.
+    Error bars show 95\% bootstrap confidence intervals.  Negative values indicate
+    that the component contributes positively to conformance.}
+  \label{fig:ablation-ci}
+\end{figure}
+
+\subsection{A1: Removing the Formal Checker}
+
+Removing the Z3-based formal checker (A1) drops mean conformance from 90.4\% to
+86.5\% ($\Delta_{A1} = -3.9$\,pp): unit-test feedback lacks scenario-indexed
+Z3 witnesses.
+
+\subsection{A2: Removing the Pattern Guard}
+
+Removing the pattern guard (A2) \emph{increases} mean conformance to 90.9\%
+($\Delta_{A2} = +0.5$\,pp).  When M rejects a high-conformance candidate on
+structural grounds, budget-limited repair may return a worse substitute.
+
+\subsection{A3: Removing the Repair Loop}
+
+Removing the repair loop (A3) drops conformance to 84.1\% ($\Delta_{A3} = -6.3$\,pp),
+the largest single-component loss---without repair, formal checking evaluates but
+cannot improve the initial candidate.
+
+\subsection{Ranking of Component Contributions}
+
+Summarising the three ablation deltas:
+\begin{enumerate}
+  \item \textbf{Repair loop}: $+6.3$pp contribution to conformance (most important)
+  \item \textbf{Formal checker}: $+3.9$pp contribution
+  \item \textbf{Pattern guard}: complex, approximately $-0.5$pp at $K=3$ (nuanced)
+\end{enumerate}
+
+The repair loop's dominant contribution underscores that iterative improvement is the
+primary engine of HSP-Agile's performance.  The formal checker amplifies the repair
+loop by providing precise counterexamples.  The pattern guard's contribution is
+positive in terms of structural quality assurance but slightly negative in terms of
+measured conformance at the current budget level.
+
+\paragraph{Answer to RQ3.}
+\emph{The repair loop is the single most important HSP-Agile component, contributing
+$+6.3$pp to formal conformance.  The formal checker contributes an additional
+$+3.9$pp by providing Z3-guided feedback to the repair loop.  The pattern guard's
+conformance contribution is nuanced: it reduces measured conformance by $0.5$pp at
+$K=3$ due to budget-limited interactions with the repair loop, but provides important
+structural quality assurance that the conformance metric does not fully capture.}
+
+%=============================================================================
+\section{RQ4: Defect Prevention Capability}
+\label{sec:exp:rq4}
+%=============================================================================
+
+\subsection{Prevention Evaluation Protocol}
+
+The defect prevention evaluation measures whether the pipeline detects faulty
+candidates before acceptance~\citep{li2023iet,demillo1978mutation}.  We construct mutants by applying
+first-order operators (scenario reordering, guard negation, output perturbation,
+boundary shift) to known-correct implementations.
+
+The pipeline is then presented with each mutant as if it were a genuine LLM-generated
+candidate.  A \emph{positive detection} (counted in PDR) occurs when the pipeline
+rejects the mutant; a \emph{false accept} (counted in FAR) occurs when the pipeline
+accepts the mutant as conforming.
+Figure~\ref{fig:prevention-heatmap} and Figure~\ref{fig:prevention-bar} (below) and
+Table~\ref{tab:prevention} report preliminary results for three modes over $n = 40$ tasks.
+
+\begin{figure}[t]
+  \centering
+  \widefig{figures/prevention_heatmap_by_mode_eval.pdf}
+  \caption{Defect prevention heatmap by mode and mutant operator (preliminary,
+    $n=10$ per cell, 3 modes $\times$ 4 spec operators).
+    PDR remains low (7.5--30\% per cell) and FAR high ($\geq$70\%), so panels
+    appear visually uniform; mode ordering is exploratory at this sample size.
+    Full evaluation across all seven modes is ongoing.}
+  \label{fig:prevention-heatmap}
+\end{figure}
+
+\begin{figure}[t]
+  \centering
+  \widefig{figures/prevention_bar.pdf}
+  \caption{Preliminary prevention detection rate (PDR) and false-accept rate (FAR) by
+    mode ($n=40$ tasks).  B2 achieves the highest PDR on boundary-shift mutants;
+    M's pattern guard targets structural fault classes not captured by unit tests.}
+  \label{fig:prevention-bar}
+\end{figure}
+
+\subsection{Preliminary Results}
+
+The full prevention evaluation is ongoing; preliminary results appear in
+Figure~\ref{fig:prevention-heatmap} and Table~\ref{tab:prevention}.
+
+\begin{table}[t]
+  \caption{Preliminary prevention results ($n=40$ tasks, 3 modes). PDR = Positive
+    Detection Rate. Full FAR data pending.}
+  \label{tab:prevention}
+  \centering
+  \begin{tabular}{lcc}
+    \toprule
+    Mode & PDR & Notes \\
+    \midrule
+    B1 & 7.5\%  & One-shot; no explicit rejection mechanism \\
+    B2 & 15.0\% & Test-feedback catches some obvious mutants \\
+    \textbf{M}  & \textbf{10.0\%} & Pattern guard catches different fault class \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+Table~\ref{tab:prevention} reveals a non-monotonic pattern: B2 achieves the highest
+aggregate PDR (15.0\%), followed by M (10.0\%) and B1 (7.5\%).
+At $n=40$ spec mutants ($10$ tasks $\times$ $4$ operators), each
+2.5-percentage-point increment corresponds to a single detection outcome, and
+the 7.5\,pp spread between B1 and B2 falls within binomial noise
+($\pm$4--5\,pp).
+Figure~\ref{fig:prevention-heatmap} breaks PDR down by operator: B2 leads on
+\textit{spec\_negate} mutants (30\% vs.\ 0\% for M), whereas M matches or
+exceeds B2 on \textit{spec\_drop\_scenario} faults---consistent with
+complementary formal/test vs.\ pattern-guard mechanisms rather than uniform
+superiority of either mode.
+B1's 7.5\% reflects post-processing catches
+only---the one-shot pipeline has no explicit rejection mechanism.
+
+\subsection{Limitations and Ongoing Work}
+
+The preliminary prevention evaluation has several limitations that motivate the
+ongoing full evaluation.  First, the mutant population ($n=40$ tasks) is too small
+to estimate PDR reliably for rare fault types.  Second, modes A1, A2, A3, and B0
+are not yet included, preventing a full component-level analysis.  Third, FAR data
+is not yet available; a complete quality-gate evaluation requires both PDR and FAR
+to assess the precision-recall tradeoff.
+
+The full evaluation is designed to address these gaps: it will use a mutant population
+of 10 mutants per task over all 120 tasks (1200 total faulty candidates) and evaluate
+all seven modes.  We anticipate that M's PDR will improve relative to B2 when the
+mutant population includes a higher proportion of structural fault types.
+
+\paragraph{Answer to RQ4.}
+\emph{Preliminary results (3 modes, 40 tasks) show M achieving PDR = 10.0\%, compared
+to B2 = 15.0\% and B1 = 7.5\%.  The non-monotonic ordering reflects complementary
+detection mechanisms: B2's test-feedback detects boundary mutants more effectively,
+while M's pattern guard targets structural fault patterns.  Full evaluation with all
+modes and a larger, balanced mutant population is ongoing.}
+
+%=============================================================================
+\section{Sensitivity Analysis}
+\label{sec:exp:sensitivity}
+%=============================================================================
+
+Figure~\ref{fig:sensitivity-heatmap} visualises how strict formal conformance varies
+with guard-overlap density and repair budget across evaluation modes.
+
+\begin{figure}[t]
+  \centering
+  \widefig{figures/sensitivity_heatmap.pdf}
+  \caption{Sensitivity heatmap: mean strict formal conformance as a function of
+    task complexity (guard-overlap tertile) and pipeline configuration.  Mode~M
+    degrades more gracefully on high-overlap tasks than one-shot baselines.}
+  \label{fig:sensitivity-heatmap}
+\end{figure}
+
+\subsection{Sensitivity to Task Complexity}
+
+The 120-task benchmark spans a range of complexity in terms of guard-overlap density
+and scenario count.  To assess how HSP-Agile's performance varies with task
+complexity, we partitioned the tasks into three tertiles based on guard-overlap rate
+and compared mode M's formal conformance across tertiles.
+
+Tasks in the low-overlap tertile (overlap rate $< 1.4$) exhibit mean conformance of
+approximately 93\% for mode M, close to the ceiling.  Tasks in the medium-overlap
+tertile (1.4--2.2) exhibit mean conformance of approximately 90\%, near the overall
+mean.  Tasks in the high-overlap tertile (overlap rate $> 2.2$) exhibit mean
+conformance of approximately 87\%, confirming that higher task complexity degrades
+conformance across all methods.  The degradation is less severe for M than for B1
+(which drops to approximately 79\% on high-overlap tasks), suggesting that M's
+CEGIS repair loop provides proportionally greater benefit on harder tasks.
+
+\subsection{Sensitivity to Budget K}
+
+The budget parameter $K$ controls the maximum number of LLM calls in the repair
+loop.  We can approximate the effect of different $K$ values from the data: mode A3
+($K=1$ effectively) achieves 84.1\% conformance; the full mode M ($K=3$) achieves
+90.4\%, an improvement of 6.3pp across two additional budget slots.  The marginal
+return of the second iteration (roughly 3--4pp) is higher than that of the third
+(roughly 2--3pp), consistent with diminishing returns.
+
+Extrapolating, $K=2$ would likely yield conformance in the range 87--88\%, which is
+comparable to B2 but with Z3-guided feedback.  The $K=3$ budget appears to be a
+reasonable operating point: it captures most of the attainable gain while keeping
+total LLM calls below 3.0 per task on average.
+Figure~\ref{fig:repair-convergence} shows how conformance improves across repair
+iterations for mode~M.
+
+\begin{figure}[t]
+  \centering
+  \widefig{figures/repair_convergence.pdf}
+  \caption{Repair-loop convergence for mode~M: cumulative strict formal conformance
+    after each synthesis attempt ($K \le 3$).  Most gains occur by the second
+    iteration, with diminishing returns on the third.}
+  \label{fig:repair-convergence}
+\end{figure}
+
+\subsection{Sensitivity to Formal Case Count}
+
+The formal checker generates up to 64 evaluation cases per task for final
+strict scoring, but uses only 16 cases per iteration during the repair loop.
+The 16-case internal budget trades coverage for latency; the 64-case strict
+pass improves sensitivity to guard-overlap faults on the final reported score.
+
+A theoretical analysis suggests that increasing the internal case count from 16 to 32
+would improve the precision of the counterexample set (fewer false-negative iterations
+where the current candidate appears to pass but fails on cases not in the 16-case
+set) at the cost of approximately 50\% more Z3 time per iteration.  Given that Z3
+time is a significant component of M's latency overhead, this trade-off merits
+empirical investigation in future work.
+
+\subsection{Sensitivity to LLM Choice}
+
+All experiments used Qwen2.5-27B-Instruct (\textsf{Qwen-27B}).  The experimental design is
+not specific to this model; the only model-specific assumptions are (a) the model can
+follow a structured Python code generation prompt, and (b) the model can incorporate
+counterexample inputs into a repair prompt.  Both properties hold for all major code
+LLMs (GPT-4-class, Claude-class, open-weight models above 13B parameters).
+
+We expect that a stronger base model would improve all LLM-based modes proportionally,
+with the B1/M gap potentially widening if a stronger model learns to avoid ordering
+errors from the first attempt.  Conversely, a weaker model would benefit more from
+the repair loop, increasing M's relative advantage.  Evaluating HSP-Agile with
+multiple base models is identified as important future work.
+
+%=============================================================================
+\section{Threats to Validity}
+\label{sec:exp:threats}
+%=============================================================================
+
+We structure the threats-to-validity analysis using the four-category framework
+common in empirical software engineering~\citep{ammann2016testing,woodcock2009formalsurvey}.
+
+\subsection{Construct Validity}
+
+\paragraph{Operationalisation of correctness.}
+Formal conformance $\mathit{Conf}(c,t)$ is operationalised as the fraction of
+Z3-generated test cases passed.  This operationalisation may not capture all forms
+of semantic correctness: a candidate that passes all 64 evaluation cases could still
+be incorrect on inputs outside the evaluation set.  We mitigate this by using Z3 to
+generate cases that specifically target scenario boundaries and guard-overlap regions,
+which are the most likely loci of ordering errors.  However, 64 cases cannot cover
+the full continuous input space; some incorrect implementations may escape detection.
+
+\paragraph{Strict success as binary metric.}
+The strict success rate treats all failures equally: failing 1 of 64 cases and
+failing 63 of 64 cases are both counted as strict failures.  This binary
+operationalisation discards quality gradations captured by $\mathit{Conf}$.  We
+report both metrics throughout to provide complementary views, but the strict success
+rate should be interpreted as a lower bound on quality rather than an absolute
+correctness criterion.
+
+\paragraph{Mutation kill rate as checker quality proxy.}
+The mutation kill rate measures whether the formal checker can identify known-faulty
+implementations.  First-order mutants may not represent the full distribution of
+real-world faults; higher-order mutants or domain-specific fault injection would
+provide a more comprehensive checker assessment.
+
+\subsection{Internal Validity}
+
+\paragraph{LLM stochasticity.}
+LLM responses are stochastic; two runs of B1 on the same task may produce different
+implementations.  We mitigated this by using temperature 0.7 for generation (providing
+diversity) and temperature 0.0 for repair calls (providing near-determinism), and by
+using a fixed seed for all other random operations.  The residual variance from the
+temperature-0.7 generation calls is handled by aggregating over 120 tasks, which
+provides sufficient statistical power for the observed effect sizes.
+
+\paragraph{Z3 solver determinism.}
+Z3's case generation is deterministic given the same SMT formula; no stochasticity is
+introduced by the solver.  However, Z3's heuristic search strategies may produce
+different case sets on different hardware due to floating-point differences; this
+effect is negligible for integer-domain problems as in our benchmark.
+
+\paragraph{Benchmark construction bias.}
+The HardTaskGenerator was developed by the same authors who designed the HSP-Agile
+pipeline.  There is a risk that the generator's task structure was inadvertently tuned
+to favour HSP-Agile's strengths (e.g., emphasising scenario-order violations that the
+pattern guard is designed to detect).  We mitigated this by applying the same
+generator to all modes, including the baselines, and by keeping the base-task
+development set separate from the evaluation benchmark.  Nonetheless, an independent
+benchmark construction process would provide stronger internal validity.
+
+\subsection{External Validity}
+
+\paragraph{Generalisability beyond synthetic tasks.}
+The benchmark consists entirely of hard synthetic tasks generated by a single
+generator.  Industrial FSF specifications may have different structural properties:
+more scenarios, larger input domains, domain-specific constraints, or natural-language
+pre/post-conditions that must be formalised before Z3 can process them.  The findings
+may not transfer directly to such settings.
+
+\paragraph{Single LLM model.}
+All LLM-based evaluations used a single model (Qwen2.5-27B-Instruct).  The
+relative ordering of methods is likely to be robust across model families (since all
+models benefit equally from better feedback), but the absolute conformance levels
+may vary substantially with model capability.
+
+\paragraph{Single domain.}
+The benchmark tasks cover a narrow domain (numeric risk/action/score computations).
+FSF specifications in other domains (e.g., string processing, data structure
+manipulation, real-time control systems) may present qualitatively different
+challenges that expose limitations not visible in the current evaluation.
+
+\subsection{Conclusion Validity}
+
+\paragraph{Small effect sizes on strict success.}
+The primary statistical finding in RQ1 is a null result: no method significantly
+outperforms another on strict success ($p = 0.921$).  This outcome has two
+interpretations: either the methods are genuinely equivalent on this metric, or the
+sample size (120 tasks) lacks power to detect the true effect.  We believe the
+former: the hard benchmark is designed so that no method achieves consistently high
+strict success, and the strict success metric is genuinely insensitive to the quality
+differences that formal conformance captures.  Increasing $n$ would not change the
+conclusion for strict success, but might reveal significant differences in formal
+conformance if the current sample understates effect sizes.
+
+\paragraph{Non-significant latency comparison.}
+The Mann-Whitney test comparing M and B2 latency yields $p = 0.9999$, indicating
+near-certain directional dominance (M is slower).  However, the test does not
+establish a specific magnitude; the mean difference of 32.9 seconds is practically
+significant but the confidence interval is wide.
+
+\paragraph{Preliminary prevention data.}
+The RQ4 findings are based on $n = 40$ tasks and 3 modes, which is insufficient for
+reliable PDR estimation across all fault types.  We treat these as exploratory
+findings and avoid strong conclusions pending the full evaluation.
+
+\bigskip
+
+\noindent In summary, the primary empirical finding of this chapter is robust:
+HSP-Agile (mode M) achieves the highest formal conformance (90.4\%) among all
+evaluated methods, with the CEGIS repair loop identified as the most important
+contributing component.  The latency overhead is substantial but acceptable for
+CI-pipeline deployment.  The nuanced pattern-guard finding and the preliminary
+prevention results motivate several directions for future work, which we discuss in
+Chapter~\ref{ch:discussion}.

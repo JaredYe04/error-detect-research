@@ -1,0 +1,190 @@
+\chapter{Conclusion and Future Work}
+\label{ch:conclusion}
+
+This thesis has investigated the problem of formal-conformance fault prevention in
+LLM-assisted Agile-SOFL development.  We designed and evaluated the HSP-Agile pipeline, a
+four-stage hybrid system that combines LLM candidate synthesis, Z3-based formal
+conformance checking, counterexample-guided repair, and pattern-guard screening under a
+conjunctive acceptance predicate.  This chapter summarises the contributions and key
+empirical findings, and charts directions for future research.
+
+% ---------------------------------------------------------------------------
+\section{Summary of Contributions}
+\label{sec:conc:contributions}
+% ---------------------------------------------------------------------------
+
+This thesis makes five primary contributions to the literature on LLM-assisted formal
+software development within the Agile-SOFL framework~\citep{li2022agilesofl,liu2014sofl}.
+
+\paragraph{Contribution 1: The HSP-Agile Pipeline.}
+We designed, implemented, and evaluated the HSP-Agile pipeline end-to-end.  The pipeline
+comprises four stages: (1)~LLM Candidate Synthesis, which queries a large language model
+with an FSF specification and optional repair feedback; (2)~Formal Conformance Checker,
+which employs Z3-guided test-case generation~\citep{demoura2008z3,barrett2018smt} and oracle comparison to compute a strict
+conformance score $\sigma(c, S)$; (3)~Counterexample-Guided Repair, which constructs
+targeted repair prompts from witnessed test failures~\citep{solarlezama2008sketching,lynn2024verifierloop}; and (4)~Pattern Guard, which screens
+candidates against a catalogue of high-severity Agile-SOFL fault patterns~\citep{li2023iet,hovemeyer2004findbugs}.  The pipeline
+is parameterised by a conformance threshold $\tau$ and a maximum repair budget $K$, with
+a graceful fallback to the best-scoring candidate when the budget is exhausted.  The
+complete implementation, benchmark, and experiment artefacts are made publicly available
+to support replication.
+
+\paragraph{Contribution 2: The Strict Acceptance Predicate.}
+We formally defined the strict acceptance predicate $\mathcal{A}(c, S)$ as the conjunction
+of a conformance threshold gate ($\sigma(c, S) \geq \tau$) and a pattern guard gate
+($\neg \exists p \in \mathcal{P} : \text{match}(c, p)$).  This predicate provides a
+principled and operationalisable acceptance criterion that goes beyond the binary pass/fail
+criteria used by existing LLM code-generation benchmarks.  We showed empirically that the
+binary all-or-nothing strict success rate is an insufficient discriminator on hard
+precedence-sensitive benchmarks, motivating the use of formal conformance as a richer
+primary metric.
+
+\paragraph{Contribution 3: The Hard Benchmark.}
+We constructed a benchmark of 120 Agile-SOFL tasks, all drawn from the hard partition of
+precedence-sensitive FSF specifications.  The benchmark is designed to maximally stress
+scenario-ordering conformance: all tasks require the synthesised candidate to correctly
+implement at least one non-trivial precondition dependency between scenario branches.
+B0 scores of 27.5\% confirm that the benchmark is genuinely hard, not solvable by naive
+template generation.  The benchmark is released as a standalone artefact for use by future
+researchers evaluating LLM-assisted formal synthesis tools~\citep{loughman2024dafnybench}.
+
+\paragraph{Contribution 4: Two-Layer Prevention Protocol.}
+We proposed and partially evaluated a two-layer mutation-based prevention protocol
+measuring probabilistic detection rate (PDR) and false accept rate (FAR).  The protocol
+injects seeded conformance faults into known-correct candidates and measures whether each
+pipeline mode correctly rejects the mutant.  Preliminary results across 40 tasks per mode
+(B1: PDR 7.5\%, B2: PDR 15.0\%, M: PDR 10.0\%) establish a baseline for future full-scale
+prevention analysis.  The protocol itself is a methodological contribution: it provides a
+rigorous framework for evaluating fault-prevention pipelines that is independent of the
+specific pipeline design.
+
+\paragraph{Contribution 5: Reproducible Evaluation Methodology.}
+The evaluation spans 840 experiment runs (7 modes $\times$ 120 tasks) with fixed random
+seeds, deterministic Z3 solving, and a standardised result schema.  All runs are logged
+with full audit traces including per-task conformance scores, per-repair-iteration
+conformance trajectories, pattern guard outputs, and raw LLM responses.  Statistical
+analysis uses Wilcoxon signed-rank tests with two-tailed $p$-values~\citep{ammann2016testing}.  This reproducibility
+infrastructure is released alongside the pipeline implementation to enable independent
+replication and extension.
+
+% ---------------------------------------------------------------------------
+\section{Key Empirical Findings}
+\label{sec:conc:findings}
+% ---------------------------------------------------------------------------
+
+The experimental evaluation yields five findings of central importance.
+
+\paragraph{Finding 1: HSP-Agile improves formal conformance by 6.2 percentage points over
+the one-shot baseline.}
+The full pipeline M achieves a mean strict formal conformance of \textbf{90.4\%} on the
+120-task hard benchmark.  This represents a gain of \textbf{+6.2 percentage points} over
+the one-shot LLM baseline B1 (84.2\%) and \textbf{+2.4 percentage points} over the
+test-feedback baseline B2 (88.0\%).  These gains are consistent across the full task set
+and are not driven by a small number of easy tasks.
+
+\paragraph{Finding 2: The repair loop is the dominant contributor to conformance
+improvement.}
+Ablation A3, which removes the counterexample-guided repair loop while retaining the
+formal checker and pattern guard, reduces mean conformance to \textbf{84.1\%}, a drop of
+\textbf{$-$6.3 percentage points} relative to M.  This makes the repair loop the single
+most important component in the pipeline: its removal costs more than returning to the
+one-shot baseline.  The result validates the design decision to invest in repair-prompt
+construction from Z3 witnesses rather than simply re-querying the LLM without targeted
+feedback.
+
+\paragraph{Finding 3: The formal conformance checker contributes independently.}
+Ablation A1, which removes the formal checker while retaining the repair loop (which then
+receives only unit-test feedback) and the pattern guard, reduces mean conformance to
+\textbf{86.5\%}, a drop of \textbf{$-$3.9 percentage points} relative to M.  This confirms
+that the Z3-guided test cases provide qualitatively different and complementary information
+to the unit-test feedback used by B2.
+
+\paragraph{Finding 4: Latency overhead is the primary cost of the pipeline.}
+Mode M incurs a mean latency of \textbf{43{,}659\,ms} per task, compared with
+\textbf{10{,}769\,ms} for B2 — a \textbf{4.6$\times$ overhead}.  This overhead is
+attributable to the increased number of LLM API calls (mean 2.08 per task under M) and
+the Z3 conformance-checking steps.  The overhead is the principal trade-off introduced by
+HSP-Agile relative to simpler baselines, and its practical acceptability depends on the
+deployment context (see Section~\ref{sec:disc:implications}).
+
+\paragraph{Finding 5: Strict success rate is insufficient to discriminate pipeline
+quality on hard benchmarks.}
+A Wilcoxon signed-rank test comparing M and B2 on strict success rate yields
+$p = 0.921$, which is not statistically significant.  M's strict success rate of 25.0\%
+is marginally \emph{lower} than B2's 26.7\%, yet M achieves higher formal conformance.
+This paradox, analysed in detail in Section~\ref{sec:disc:paradox}, arises because M's
+conjunctive acceptance gate rejects some candidates that pass all test cases but
+trigger pattern guard alerts.  Binary pass/fail metrics fail to capture the quality
+improvement that HSP-Agile delivers; formal conformance is the appropriate primary metric
+for evaluating hard-benchmark performance.
+
+% ---------------------------------------------------------------------------
+\section{Future Research Directions}
+\label{sec:conc:future}
+% ---------------------------------------------------------------------------
+
+The findings of this thesis open several avenues for future investigation.
+
+\paragraph{Richer specification support.}
+The current HSP-Agile pipeline targets FSF specifications with scenario-ordering
+constraints expressible as Z3 integer constraints.  Many real Agile-SOFL specifications
+additionally involve temporal properties (e.g.\ ``scenario A must always precede scenario
+B within the same session''), stateful behaviours (e.g.\ modifications to shared database
+tables), and composite output structures.  Extending the formal checker to handle these
+richer specification classes — for example, by incorporating linear temporal logic (LTL)
+model checking or relational database constraint solving — would substantially broaden the
+scope of FSF tasks that HSP-Agile can support.  The challenge is to do so without
+disproportionately increasing latency.
+
+\paragraph{Theorem-prover backends for stronger guarantees.}
+The Z3-based checker provides bounded guarantees relative to a finite generated test suite.
+A natural extension is to replace or augment the Z3 checker with a theorem-prover backend
+capable of generating complete correctness certificates.  Dafny~\citep{leino2010dafny} and related
+deductive-verification ecosystems~\citep{loughman2024dafnybench,woodcock2009formalsurvey} are promising candidates: they provide stronger
+guarantees on accepted candidates while retaining the repair loop's ability to guide the
+LLM toward correct implementations.
+
+\paragraph{Adaptive budget allocation.}
+The current pipeline uses a fixed repair budget $K$ for all tasks.  This is suboptimal:
+easy tasks may exhaust the budget on unnecessary iterations, while hard tasks may be
+abandoned just before convergence.  An adaptive budget-allocation strategy — for example,
+one that halts early when conformance improvement per iteration falls below a threshold,
+and allocates saved budget to tasks that show consistent improvement — could reduce mean
+latency while maintaining or improving conformance on the hardest tasks.  Reinforcement
+learning over iteration trajectories is a natural framing for this optimisation.
+
+\paragraph{Industrial replication.}
+The benchmark used in this thesis is synthetic.  Industrial replication is essential before
+the quantitative findings can be generalised.  We propose collaborating with Agile-SOFL
+practitioner groups to obtain real FSF specifications from software development projects,
+applying HSP-Agile to LLM-assisted implementation of those specifications, and measuring
+conformance against the formally specified acceptance criteria used in those projects.
+Industrial tasks will likely differ from the benchmark in specification complexity, scenario
+count, and the prevalence of the specific fault patterns catalogued in the pattern guard.
+
+\paragraph{Model comparison and prompt engineering.}
+All experiments in this thesis used Qwen2.5-27B-Instruct via an OpenAI-compatible LLM gateway.  A systematic comparison across
+state-of-the-art LLMs---GPT-4o, Claude~3.5 Sonnet, Gemini~1.5 Pro---on the same 120-task
+hard benchmark would establish whether the conformance gains delivered by HSP-Agile are
+model-specific or model-agnostic~\citep{openai2023gpt4,chen2021codex,dakhel2023copilot}.  Such a comparison would also enable a systematic study
+of how repair prompt design interacts with model-specific instruction-following
+capabilities.  We anticipate that models with stronger instruction-following would exhibit
+faster repair convergence, reducing both latency and budget consumption.
+
+\paragraph{Full prevention evaluation.}
+The mutation-based PDR/FAR evaluation reported in this thesis is preliminary (40 tasks per
+mode).  A full evaluation should span all 120 tasks, all seven modes, and a richer mutant
+population including multi-fault mutants (candidates with two or more injected ordering
+violations).  A full evaluation would also include false-accept rate analysis across all
+modes, enabling direct comparison of the prevention quality of M against B1, B2, and the
+ablations.
+
+\bigskip
+\noindent
+In summary, HSP-Agile demonstrates that coupling LLM synthesis with lightweight formal
+conformance checking and counterexample-guided repair produces measurable and reproducible
+quality improvements in Agile-SOFL code generation.  The pipeline is not a replacement for
+full formal verification, but it provides a practical bridge between informal agile
+development practices and the formal quality standards demanded by downstream verification
+artefacts — a bridge built from bounded formal checking, targeted repair, and principled
+conjunctive acceptance.

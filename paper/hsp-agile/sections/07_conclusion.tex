@@ -1,0 +1,14 @@
+\section{Conclusion}
+\label{sec:conclusion}
+
+We addressed the problem of reliable acceptance decision-making in Agile-SOFL development: given an automatically generated implementation candidate and an ordered FSF specification, how can a pipeline determine acceptability under strict functional correctness and requirement-level safety constraints within a bounded interaction budget?
+HSP-Agile answers this question by integrating four components---LLM-based synthesis, formal scenario conformance checking, counterexample-guided repair, and pattern-based anti-pattern screening---under a unified conjunctive acceptance rule (Equation~\ref{eq:accept}).
+
+Our empirical evaluation on a hard benchmark of precedence-sensitive, multi-output scenarios yields several key findings.
+HSP-Agile achieves strict success and strict formal conformance of \texttt{TBD} and \texttt{TBD}, respectively, compared to \texttt{TBD} and \texttt{TBD} for the strongest test-feedback baseline (B2), at a latency overhead of \texttt{TBD}.
+Prevention evaluation shows prevention detection rate (PDR) of \texttt{TBD} and false-accept rate (FAR) of \texttt{TBD}, with the pattern guard contributing the largest marginal PDR gain in the ablation study.
+
+Limitations of the current study include reliance on a synthetic benchmark that may not reflect all industrial specification styles, restriction to a single LLM family and temperature setting, and the absence of multi-run statistical finalization (pending reruns marked \texttt{TBD}).
+The acceptance predicate also assumes that the formal checker's generated cases adequately cover the specification; inputs outside the checked space are not guaranteed.
+
+Future directions include: extending the formal checker to stateful and temporally-ordered properties; integrating theorem-prover backends for stronger soundness guarantees; applying the pipeline to industrial Agile-SOFL projects with team-level workflows; and investigating adaptive repair strategies that prioritize counterexamples by fault severity rather than treating all violations uniformly.

@@ -1,0 +1,27 @@
+\section{Introduction}
+\label{sec:intro}
+
+Defects introduced during requirements-to-implementation transformation remain a persistent source of rework in software projects.
+Prior SOFL-oriented studies show that early fault prevention can reduce downstream correction costs~\cite{li2022qrs,li2023iet}, but practical adoption in agile settings remains challenging.
+At the same time, LLM-assisted synthesis accelerates coding yet often increases run-to-run variance in semantic correctness.
+
+This paper studies the following decision problem: \emph{given an Agile-SOFL task with ordered FSF scenarios, how can we determine whether an automatically generated implementation should be accepted under strict functional correctness and requirement-level fault constraints, within a bounded interaction budget?}
+The problem is difficult for three reasons.
+First, scenario order and guard conditions create precedence-sensitive behavior that is poorly captured by coarse unit tests.
+Second, purely test-driven repair loops may overfit observed failures while still missing requirement anti-patterns.
+Third, agile workflows require decisions fast enough for iterative delivery, so prevention procedures must be both rigorous and operationally lightweight.
+
+Recent verifier-in-the-loop work in verification-oriented programming (e.g., Dafny) suggests that iterative correction can improve functional validity~\cite{lynn2024tosem,dafnybench2024}.
+Motivated by this evidence, we evaluate whether a hybrid pipeline can provide more reliable acceptance decisions than one-shot and test-only baselines while keeping turnaround practical for Agile-SOFL tasks.
+
+This paper makes the following contributions:
+\begin{enumerate}
+  \item We define \textbf{HSP-Agile}, a hybrid pipeline that combines specification-guided synthesis, formal scenario checking, counterexample-guided repair, and pattern-based screening under a unified acceptance rule.
+  \item We formalize the \textbf{strict acceptance objective} and key prevention metrics (strict formal conformance, PDR, FAR), with notation and definitions designed for reproducible empirical comparison.
+  \item We build a \textbf{challenging benchmark suite} that augments base tasks with precedence-sensitive, multi-output scenarios to improve discrimination in comparative evaluation.
+  \item We introduce a \textbf{two-layer prevention evaluation protocol} with both specification-confusion and implementation-screening mutants, plus ablation-based component analysis.
+  \item We release a reproducible artifact including data preparation, analysis scripts, and plotting pipelines.
+\end{enumerate}
+
+Our empirical analysis is organized by three research questions (Section~\ref{sec:setup}): strict correctness, efficiency, and component-wise contribution.
+To keep claims conservative, we report only observed outcomes from completed runs; numerical findings still under rerun or audit are explicitly marked as \texttt{TBD}.

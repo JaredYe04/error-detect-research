@@ -1,0 +1,170 @@
+%% diagrams/prevention_protocol.tex
+%% TikZ fragment �?\input{} into main document.
+%% Preamble requirements (already in main.tex):
+%%   \usetikzlibrary{shapes.geometric,arrows.meta,positioning,shadows,calc,fit,backgrounds}
+
+%% ---- Colour palette -------------------------------------------------------
+\colorlet{TrackAFg}{blue!65!cyan}       % Specification-Confusion track
+\colorlet{TrackBFg}{teal!70!black}      % Implementation-Screening track
+\colorlet{AggFg}{orange!75!red}         % Aggregation node
+\colorlet{PipelineFg}{black!42}         % Shared pipeline box
+
+%% ---- Diagram --------------------------------------------------------------
+\scalebox{0.85}{%
+\begin{tikzpicture}[
+  every node/.style = {font=\small\sffamily},
+  %% Generic state (rounded rectangle)
+  st/.style = {
+    draw          = #1!75!black,
+    fill          = #1!14,
+    rounded corners = 4pt,
+    minimum width  = 2.45cm,
+    minimum height = 0.68cm,
+    align = center,
+    drop shadow={shadow xshift=0.4ex, shadow yshift=-0.4ex, shadow opacity=0.30}
+  },
+  st/.default = black,
+  %% Shared pipeline box (same width, gray)
+  pipe/.style = {
+    st = PipelineFg,
+    minimum width = 2.8cm,
+    font = \scriptsize\sffamily
+  },
+  %% Final aggregation node
+  agg/.style  = {
+    st = AggFg,
+    minimum width  = 2.8cm,
+    minimum height = 0.92cm,
+    font = \scriptsize\sffamily
+  },
+  %% Track-A arrow
+  arrA/.style = {-{Stealth[length=5pt,width=3.2pt]}, thick, draw=TrackAFg!80!black},
+  %% Track-B arrow
+  arrB/.style = {-{Stealth[length=5pt,width=3.2pt]}, thick, draw=TrackBFg!80!black},
+  %% Aggregation merge arrow
+  arrAgg/.style = {-{Stealth[length=5pt,width=3.2pt]}, thick, draw=AggFg!80!black},
+  %% Inter-node horizontal gap
+  hgap/.style = {right=0.80cm of #1},
+]
+
+%% ===========================================================================
+%% TOP TRACK �?Specification-Confusion Mutants
+%% ===========================================================================
+
+%% Base specification
+\node[st=TrackAFg] (SA1)
+  {\textbf{Base Spec.}\\$t \in \mathcal{T}$};
+
+%% Inject spec-confusion mutant
+\node[st=TrackAFg, right=0.85cm of SA1] (SA2)
+  {SC Mutant\\$m_s \sim t$};
+
+%% Run HSP-Agile on mutated spec
+\node[pipe, right=0.85cm of SA2] (SA3)
+  {HSP-Agile\\Run};
+
+%% Rejection outcome
+\node[st=TrackAFg, right=0.85cm of SA3] (SA4)
+  {Rejection\\Check\\{\tiny$\neg\mathrm{Accept}(c_{m_s},t_{m_s})$}};
+
+%% ===========================================================================
+%% BOTTOM TRACK �?Implementation-Screening Mutants
+%% ===========================================================================
+
+\node[st=TrackBFg, below=1.85cm of SA1] (SB1)
+  {\textbf{Base Impl.}\\$c \in \mathcal{C}$};
+
+\node[st=TrackBFg, right=0.85cm of SB1] (SB2)
+  {IS Mutant\\$m_i \sim c$};
+
+\node[pipe, right=0.85cm of SB2] (SB3)
+  {HSP-Agile\\Run};
+
+\node[st=TrackBFg, right=0.85cm of SB3] (SB4)
+  {Rejection\\Check\\{\tiny$\neg\mathrm{Accept}(c_{m_i},t_{m_i})$}};
+
+%% ===========================================================================
+%% AGGREGATION NODE �?centred vertically between the two tracks
+%% ===========================================================================
+
+\node[agg, right=1.10cm of SA4,
+      yshift=-0.925cm]   % vertically centred between SA4 and SB4
+  (AGG)
+  {\textbf{Aggregate}\\PDR \& FAR\\computation};
+
+%% ===========================================================================
+%% Track arrows �?TOP (Track A)
+%% ===========================================================================
+
+\draw[arrA] (SA1) -- node[above, font=\scriptsize] {inject} (SA2);
+\draw[arrA] (SA2) -- node[above, font=\scriptsize] {run}    (SA3);
+\draw[arrA] (SA3) -- (SA4);
+\draw[arrAgg, rounded corners=4pt]
+  (SA4.east) -- ++(0.35,0) |- (AGG.north)
+  node[pos=0.35, right=1pt, font=\scriptsize\sffamily,
+       text=AggFg!85!black, align=left]
+    {rejected\\(PDR$\uparrow$)};
+
+%% ===========================================================================
+%% Track arrows �?BOTTOM (Track B)
+%% ===========================================================================
+
+\draw[arrB] (SB1) -- node[below, font=\scriptsize] {inject} (SB2);
+\draw[arrB] (SB2) -- node[below, font=\scriptsize] {run}    (SB3);
+\draw[arrB] (SB3) -- (SB4);
+\draw[arrAgg, rounded corners=4pt]
+  (SB4.east) -- ++(0.35,0) |- (AGG.south)
+  node[pos=0.35, right=1pt, font=\scriptsize\sffamily,
+       text=AggFg!85!black, align=left]
+    {accepted\\(FAR$\uparrow$)};
+
+%% ===========================================================================
+%% Track labels (left margin annotations)
+%% ===========================================================================
+
+\node[font=\scriptsize\bfseries\sffamily, text=TrackAFg!80!black,
+      anchor=south west, yshift=2pt]
+  at (SA1.north west)
+  {Spec.-Confusion Track};
+
+\node[font=\scriptsize\bfseries\sffamily, text=TrackBFg!80!black,
+      anchor=north west, yshift=-2pt]
+  at (SB1.south west)
+  {Impl.-Screening Track};
+
+%% ===========================================================================
+%% Background shading for each track (optional subtle band)
+%% ===========================================================================
+
+\begin{scope}[on background layer]
+  \node[
+    fill       = TrackAFg!5,
+    draw       = TrackAFg!25,
+    rounded corners = 5pt,
+    inner sep  = 6pt,
+    fit         = (SA1)(SA4)
+  ] {};
+  \node[
+    fill       = TrackBFg!5,
+    draw       = TrackBFg!25,
+    rounded corners = 5pt,
+    inner sep  = 6pt,
+    fit         = (SB1)(SB4)
+  ] {};
+\end{scope}
+
+%% ===========================================================================
+%% PDR / FAR output labels below AGG
+%% ===========================================================================
+
+\node[font=\scriptsize\sffamily, align=center,
+      below=0.55cm of AGG,
+      text=AggFg!85!black]
+  (METRICS)
+  {$\mathrm{PDR}=\frac{|\{\text{rejected }m\}|}{|\mathcal{M}|}$\quad
+   $\mathrm{FAR}=\frac{|\{\text{accepted }m\}|}{|\mathcal{M}|}$};
+
+\draw[arrAgg, dashed] (AGG.south) -- (METRICS.north);
+
+\end{tikzpicture}%
+}

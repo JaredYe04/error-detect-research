@@ -1,0 +1,42 @@
+@startuml pipeline_state
+!include _theme.puml
+scale max 2700 width
+
+state INIT <<Init>> : Load config\nReset feedback\nattempt = 0
+
+state SYNTHESIZING <<Process>> : Call LLM with\nspec + feedback
+
+state FORMAL_CHECKING <<Process>> : Generate Z3 cases\nRun candidate\nCompute conformance
+
+state REPAIRING <<Repair>> : Inject counterexamples\ninto feedback buffer
+
+state PATTERN_CHECKING <<Process>> : Evaluate high-severity\nfault patterns
+
+state ACCEPTED <<Success>> : Candidate satisfies\nAccept(c,t) = 1
+
+state EXHAUSTED <<Fail>> : Budget K exhausted\nReturn best candidate
+
+[*] --> INIT
+INIT --> SYNTHESIZING : start run
+
+SYNTHESIZING --> FORMAL_CHECKING : candidate received
+
+FORMAL_CHECKING --> PATTERN_CHECKING : Conf(c,t) >= tau
+FORMAL_CHECKING --> REPAIRING : Conf(c,t) < tau
+
+PATTERN_CHECKING --> ACCEPTED : P^H(c) = 0
+PATTERN_CHECKING --> REPAIRING : pattern hits > 0
+
+REPAIRING --> SYNTHESIZING : k <= K\n(increment k)
+REPAIRING --> EXHAUSTED : k > K
+
+ACCEPTED --> [*]
+EXHAUSTED --> [*]
+
+note right of REPAIRING
+  Structured feedback includes
+  scenario index, witness input,
+  expected vs observed outputs
+end note
+
+@enduml

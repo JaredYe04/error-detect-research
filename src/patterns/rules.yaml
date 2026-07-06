@@ -1,0 +1,106 @@
+# Agile-SOFL error pattern knowledge base
+# Based on requirements-related fault taxonomy (Li & Liu, QRS 2022 / IET Software 2023)
+
+patterns:
+  - id: RF01
+    name: missing_precondition_check
+    category: requirement
+    severity: high
+    description: Input validation missing before business logic
+    code_regex: '(?s)def\s+\w+\([^)]*\):\s*\n(?:\s+"""[^"]*"""\s*\n)?\s+(?!if\b)[\w.]'
+    spec_hint: "Check inputs against FSF test predicates before assignment"
+
+  - id: RF02
+    name: wrong_default_branch
+    category: fsf
+    severity: high
+    description: Missing explicit others/default branch handling
+    code_regex: '(?s)def\s+\w+.*?(?!else:).*return'
+    spec_hint: "Ensure 'others' FSF scenario is handled"
+
+  - id: RF03
+    name: hardcoded_magic_number
+    category: implementation
+    severity: medium
+    description: Magic numbers not tied to spec constants
+    code_regex: 'return\s+\d+\s*$'
+    exclude_regex: 'return\s+(0|1)\s*$'
+
+  - id: RF04
+    name: missing_output_field
+    category: interface
+    severity: high
+    description: Return dict may omit required output variables
+    code_regex: 'return\s*\{[^}]*\}'
+    ast_check: missing_output_key
+
+  - id: RF05
+    name: swapped_comparison
+    category: logic
+    severity: high
+    description: Suspected reversed comparison operator
+    code_regex: '(?<![<>!=])=(?!=)'
+
+  - id: RF06
+    name: no_guard_zero_input
+    category: boundary
+    severity: high
+    description: Zero-valued inputs not explicitly handled
+    code_regex: '(?s)def\s+\w+\([^)]*\):'
+    spec_hint: "FSF often uses x eq 0 or x gt 0 branches"
+
+  - id: RF07
+    name: unconditional_success
+    category: logic
+    severity: critical
+    description: Always returns success without conditions
+    code_regex: "success\\s*=\\s*1|[\"']success[\"']\\s*:\\s*1"
+
+  - id: RF08
+    name: missing_type_coercion
+    category: implementation
+    severity: medium
+    description: Return values not cast to int
+    code_regex: 'return\s+\{[^}]*\}'
+
+  - id: RF09
+    name: incomplete_fsf_coverage
+    category: fsf
+    severity: high
+    description: Fewer conditional branches than FSF scenarios
+    ast_check: branch_count_lt_scenarios
+
+  - id: RF10
+    name: ext_var_ignored
+    category: sofl
+    severity: medium
+    description: External variables from spec not referenced in code
+    ast_check: ext_var_unused
+
+  - id: RF11
+    name: off_by_one_boundary
+    category: boundary
+    severity: high
+    description: Uses > instead of >= or similar boundary errors
+    code_regex: '>\s*0'
+
+  - id: RF12
+    name: duplicate_assignment
+    category: implementation
+    severity: low
+    description: Same output assigned multiple times
+    code_regex: '(\w+)\s*=\s*\d+[\s\S]*\1\s*='
+
+  - id: RF13
+    name: empty_handler
+    category: logic
+    severity: high
+    description: Empty else/pass branch
+    code_regex: 'else:\s*pass'
+
+  - id: RF14
+    name: spec_comment_mismatch
+    category: requirement
+    severity: medium
+    description: Implementation lacks docstring referencing spec process
+    code_regex: '(?s)def\s+\w+\([^)]*\):\s*(?!""")'

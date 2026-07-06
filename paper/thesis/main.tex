@@ -1,0 +1,39 @@
+\documentclass[12pt,a4paper]{report}
+\usepackage{thesis}
+
+\title{Hybrid Specification-Guided Fault Prevention\\for Agile-SOFL Formal Development}
+\author{Ye Xujun}
+\date{July 2026}
+
+\begin{document}
+
+% Front matter
+\include{front/cover}
+\pagenumbering{roman}
+\include{front/abstract}
+\tableofcontents
+\clearpage
+\pagenumbering{arabic}
+
+% Chapters
+\include{chapters/ch1_introduction}
+\include{chapters/ch2_background}
+\include{chapters/ch3_formalization}
+\include{chapters/ch4_method}
+\include{chapters/ch5_implementation}
+\include{chapters/ch6_experiments}
+\include{chapters/ch7_discussion}
+\include{chapters/ch8_conclusion}
+
+% Bibliography (numbered [1], [2], ...)
+\bibliographystyle{plainnat}
+\bibliography{bib/references}
+
+% Appendices
+\appendix
+\thesisappendixstyle
+\include{appendices/app_a_reproducibility}
+\include{appendices/app_b_benchmark}
+\include{appendices/app_c_patterns}
+
+\end{document}
