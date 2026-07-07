@@ -1,0 +1,45 @@
+@startuml pipeline_sequence
+!include _theme.puml
+scale max 2400 width
+
+actor Researcher as R
+participant "PipelineRunner" as PR
+participant "LLMClient\n(Qwen2.5-27B)" as LLM
+participant "FormalChecker" as FC
+participant "PatternMatcher" as PM
+
+R -> PR : run(task, config)
+activate PR
+
+loop k = 1 to K (max_attempts)
+  PR -> LLM : synthesize(spec, feedback)
+  activate LLM
+  LLM --> PR : candidate_code
+  deactivate LLM
+
+  PR -> FC : check(candidate, task)
+  activate FC
+  FC --> PR : CheckResult(conformance, counterexamples)
+  deactivate FC
+
+  alt conformance == 1.0
+    PR -> PM : match(candidate, task)
+    activate PM
+    PM --> PR : PatternHits
+    deactivate PM
+
+    alt no high-severity hits
+      PR --> R : **ACCEPTED**(candidate)
+    else pattern violations
+      PR -> PR : update_feedback(counterexamples, hits)
+    end
+
+  else conformance < 1.0
+    PR -> PR : update_feedback(counterexamples)
+  end
+end
+
+PR --> R : BEST_CANDIDATE(candidate, conformance)
+deactivate PR
+
+@enduml

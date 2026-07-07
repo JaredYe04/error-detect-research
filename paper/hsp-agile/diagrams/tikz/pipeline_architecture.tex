@@ -1,0 +1,137 @@
+%% diagrams/tikz/pipeline_architecture.tex
+%% TikZ fragment -- \input{} into main document.
+%% Preamble requirements (loaded by thesis.sty):
+%%   \usetikzlibrary{shapes.geometric,arrows.meta,positioning,shadows,calc}
+%%   \usepackage{xcolor}
+
+%% ---- Colour palette -------------------------------------------------------
+\colorlet{PipeBlue}{blue!55!cyan!85!white}
+\colorlet{PipeGray}{black!38}
+\colorlet{PipeOrange}{orange!80!red}
+
+%% ---- Diagram --------------------------------------------------------------
+\scalebox{0.92}{%
+\begin{tikzpicture}[
+  every node/.style = {font=\small\sffamily},
+  %% Filled processing stage
+  stage/.style = {
+    draw       = PipeGray!80!black,
+    fill       = PipeGray!13,
+    rounded corners = 3pt,
+    minimum width  = 5.8cm,
+    minimum height = 0.74cm,
+    align = center,
+    drop shadow={shadow xshift=0.4ex, shadow yshift=-0.4ex, shadow opacity=0.30}
+  },
+  %% Input / output stage (blue)
+  inout/.style = {
+    stage,
+    draw = PipeBlue!80!black,
+    fill = PipeBlue!18
+  },
+  %% Accept / reject decision diamond (orange)
+  decnode/.style = {
+    draw   = PipeOrange!85!black,
+    fill   = PipeOrange!14,
+    diamond,
+    aspect = 2.5,
+    minimum width  = 6.2cm,
+    minimum height = 0.92cm,
+    align  = center,
+    font   = \scriptsize\sffamily,
+    drop shadow={shadow xshift=0.4ex, shadow yshift=-0.4ex, shadow opacity=0.30}
+  },
+  %% Output boxes (narrower, blue)
+  outnode/.style = {
+    inout,
+    minimum width  = 2.7cm,
+    minimum height = 0.68cm,
+    font = \scriptsize\sffamily
+  },
+  %% Standard orthogonal arrow
+  arr/.style  = {-{Stealth[length=5.5pt,width=3.5pt]}, thick, draw=black!65},
+  %% Repair-feedback curved arrow
+  farr/.style = {
+    -{Stealth[length=5.5pt,width=3.5pt]},
+    thick,
+    draw      = PipeOrange!80!black,
+    dashed,
+    line width = 0.75pt
+  },
+  %% Plain line (no arrowhead) for branch trunk
+  trunk/.style = {thick, draw=black!65},
+]
+
+%% ===========================================================================
+%% Nodes
+%% ===========================================================================
+
+\node[inout] (IN)
+  {\textbf{Input:} Agile-SOFL Specification\;%
+   {\footnotesize(FSF Scenarios, Input/Output Domains)}};
+
+\node[stage, below=1.25cm of IN]  (S1)
+  {\textbf{Stage 1:} LLM Candidate Synthesis};
+
+\node[stage, below=1.1cm of S1]  (S2)
+  {\textbf{Stage 2:} Formal Conformance Checker\\
+   {\footnotesize SMT-guided case generation + oracle comparison}};
+
+\node[stage, below=1.1cm of S2]  (S3)
+  {\textbf{Stage 3:} Counterexample-Guided Repair};
+
+\node[stage, below=1.1cm of S3]  (S4)
+  {\textbf{Stage 4:} Pattern Guard\;%
+   {\footnotesize(high-severity fault pattern screening)}};
+
+\node[decnode, below=1.35cm of S4] (DEC)
+  {$\mathrm{Accept}(c,t)=\mathrm{StrictSuccess}(c,t)\wedge\mathrm{PatternClear}(c,t)$};
+
+%% Branch split point 0.45 cm below DEC.south
+\coordinate (SPLIT) at ($(DEC.south)+(0,-0.45)$);
+
+%% Output nodes: symmetric around SPLIT x-axis
+\node[outnode] (OUTYES) at ($(SPLIT)+(-1.55,-1.05)$)
+  {\textbf{Accepted Candidate}};
+
+\node[outnode] (OUTNO)  at ($(SPLIT)+(+1.55,-1.05)$)
+  {\textbf{Best Candidate}\\+ Audit Trace};
+
+%% ===========================================================================
+%% Main flow arrows (orthogonal / straight)
+%% ===========================================================================
+
+\draw[arr] (IN.south)  -- (S1.north);
+\draw[arr] (S1.south)  -- (S2.north);
+\draw[arr] (S2.south)  -- (S3.north);
+\draw[arr] (S3.south)  -- (S4.north);
+\draw[arr] (S4.south)  -- (DEC.north);
+
+%% Trunk from DEC.south to SPLIT (no arrowhead)
+\draw[trunk] (DEC.south) -- (SPLIT);
+
+%% Yes branch -> Accepted Candidate
+\draw[arr, rounded corners=4pt]
+  (SPLIT) -- ++(-1.55,0) |- (OUTYES.north);
+\node[font=\footnotesize\sffamily, anchor=south east]
+  at ($(SPLIT)+(-0.18,-0.02)$) {Yes};
+
+%% No branch (budget exhausted) -> Best Candidate
+\draw[arr, rounded corners=4pt]
+  (SPLIT) -- ++(+1.55,0) |- (OUTNO.north);
+\node[font=\footnotesize\sffamily, anchor=south west]
+  at ($(SPLIT)+(+0.18,-0.02)$) {No};
+
+%% ===========================================================================
+%% Repair Feedback Loop -- curved arrow from Stage 3 -> Stage 1
+%% ===========================================================================
+
+\draw[farr, rounded corners=2pt]
+  (S3.west) -- ++(-1.8,0) coordinate (loopL)
+  (loopL) |- node[pos=0.25, anchor=east, align=center, font=\scriptsize\sffamily,
+    text=PipeOrange!85!black]
+    {Repair Feedback\\(counterexamples + pattern hits)}
+  (S1.west);
+
+\end{tikzpicture}%
+}

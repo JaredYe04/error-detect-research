@@ -61,6 +61,9 @@ def parse_relational_atom(atom: str) -> tuple[str, str, str] | None:
     m = re.match(r"^(\w+)\s*<\s*(\w+|-?\d+)$", atom)
     if m:
         return m.group(1), "<", m.group(2)
+    m = re.match(r"^(\w+)\s+eq\s+(.+)$", atom, re.IGNORECASE)
+    if m:
+        return m.group(1), "==", m.group(2).strip()
     if atom.lower() == "true":
         return "__true__", "==", "1"
     return None
@@ -133,11 +136,20 @@ def parse_def_assignments(def_expr: str) -> dict[str, int | str]:
 
 def resolve_expected(assignments: dict[str, int | str], env: dict[str, Any]) -> dict[str, int]:
     expected: dict[str, int] = {}
+    safe_env = {k: int(v) for k, v in env.items()}
     for k, v in assignments.items():
         if isinstance(v, int):
             expected[k] = v
         elif isinstance(v, str) and v in env:
             expected[k] = int(env[v])
+        elif isinstance(v, str):
+            try:
+                expected[k] = int(eval(v, {"__builtins__": {}}, safe_env))  # noqa: S307
+            except Exception:
+                try:
+                    expected[k] = int(v)  # type: ignore[arg-type]
+                except (TypeError, ValueError):
+                    pass
         else:
             try:
                 expected[k] = int(v)  # type: ignore[arg-type]

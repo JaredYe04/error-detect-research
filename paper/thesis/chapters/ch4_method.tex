@@ -1,4 +1,4 @@
-%% ch4_method.tex  —  Chapter 4: The HSP-Agile Pipeline: Design and Theory
+%% ch4_method.tex  ?? Chapter 4: The HSP-Agile Pipeline: Design and Theory
 %% HSP-Agile Thesis, East China Normal University, 2026
 %% Ye Xujun
 
@@ -35,7 +35,7 @@ The design of HSP-Agile is motivated by five principles, each addressing a
 concrete limitation of existing automated software engineering approaches
 \citep{woodcock2009formalsurvey, chen2021codex}.
 
-\paragraph{P1 — Precision over approximation.}
+\paragraph{P1 ??Precision over approximation.}
 A key weakness of purely statistical approaches to code generation is their
 reliance on learned heuristics that cannot provide correctness guarantees.
 HSP-Agile addresses this by using a formal SMT solver as the conformance
@@ -46,15 +46,15 @@ from a human-annotated expected value.  This means that every acceptance
 decision is backed by a formal semantics rather than a distributional
 approximation.
 
-\paragraph{P2 — Bounded budget with guaranteed termination.}
-Autonomous agents that do not terminate — or that have no formal bound on the
-number of LLM calls they make — are impractical in production settings.
+\paragraph{P2 ??Bounded budget with guaranteed termination.}
+Autonomous agents that do not terminate ??or that have no formal bound on the
+number of LLM calls they make ??are impractical in production settings.
 HSP-Agile enforces a hard budget $K$ on the number of synthesis-check
 iterations.  Regardless of the difficulty of the task, the pipeline will
 complete within $K$ LLM calls and $K$ formal checking passes.  In our
 experiments we set $K = 5$; the pipeline never runs indefinitely.
 
-\paragraph{P3 — Counterexample specificity.}
+\paragraph{P3 ??Counterexample specificity.}
 When a candidate fails conformance checking, the feedback returned to the
 LLM must be informative enough to guide a targeted repair rather than a
 random re-generation.  Generic feedback such as ``your code is wrong'' is
@@ -64,7 +64,7 @@ actual output $f_c(x^*)$, and the index of the FSF scenario that should have
 been matched.  This specificity transforms the repair step into a targeted
 correction problem rather than a blind regeneration.
 
-\paragraph{P4 — Conservative acceptance.}
+\paragraph{P4 ??Conservative acceptance.}
 Acceptance is conjunctive: a candidate is accepted only when it satisfies
 \emph{both} the formal conformance criterion \emph{and} the requirement
 pattern criterion.  A disjunctive predicate would allow formally correct code
@@ -73,7 +73,7 @@ unconditionally returning success without inspecting the inputs) to be
 accepted.  The conjunctive design ensures that no single stage acts as a
 sufficient acceptance criterion in isolation.
 
-\paragraph{P5 — Modularity and ablation transparency.}
+\paragraph{P5 ??Modularity and ablation transparency.}
 Because the pipeline is composed of four independently configurable stages,
 each stage can be enabled or disabled via a boolean configuration flag.  This
 design choice has two consequences: (i)~it allows clean \emph{ablation
@@ -150,7 +150,7 @@ for one run.
 The pipeline is controlled by five configuration parameters, summarised in
 Table~\ref{tab:config}.
 
-\begin{table}[t]
+\begin{table}[H]
   \caption{HSP-Agile pipeline configuration parameters.}
   \label{tab:config}
   \centering
@@ -179,8 +179,8 @@ Chapter~\ref{ch:experiments}.
 \label{sec:method:synthesis}
 % ---------------------------------------------------------------------------
 
-Stage 1 maps a task specification — possibly augmented with feedback from a
-previous iteration — to a candidate Python implementation.  It is the only
+Stage 1 maps a task specification ??possibly augmented with feedback from a
+previous iteration ??to a candidate Python implementation.  It is the only
 stage that involves a large language model call; all other stages are
 deterministic.
 
@@ -313,7 +313,7 @@ simply $\hat{g}_i$ but the \emph{priority-constrained formula}:
   \label{eq:priority-constraint}
 \end{equation}
 which ensures that the satisfying model generated for scenario $i$ does not
-also satisfy any earlier guard — i.e.\ the concrete input genuinely activates
+also satisfy any earlier guard ??i.e.\ the concrete input genuinely activates
 scenario $i$ under first-match evaluation.
 
 \subsection{Step 2: Satisfying Model Generation}
@@ -324,8 +324,8 @@ instance is created and queried:
 
 \inputpython{listings/z3_gen.py}{Z3 test-case generation for scenario~$i$.}{lst:z3-gen}
 
-If $\Phi_i$ is unsatisfiable — which can happen when the guard combination is
-logically contradictory — the scenario contributes no test case to
+If $\Phi_i$ is unsatisfiable ??which can happen when the guard combination is
+logically contradictory ??the scenario contributes no test case to
 $\mathcal{D}(t)$.  In practice this occurs only for the ``others'' scenario
 when all earlier guards collectively cover the entire input domain; the
 solver returns \textsf{unsat} and the scenario is skipped.
@@ -459,11 +459,11 @@ counterexample into a sentence of the form:
 
 \begin{quote}
   \textit{``For inputs $(a=15,\; b=8,\; c=3,\; d=0,\; e=0)$, your code
-  returned $\{\textit{risk}=\texttt{'MEDIUM'},\; \textit{action}=
-  \texttt{'REVIEW'},\; \textit{score}=60\}$, but the specification requires
-  $\{\textit{risk}=\texttt{'HIGH'},\; \textit{action}=\texttt{'ESCALATE'},
-  \; \textit{score}=90\}$.  This input satisfies Scenario S1
-  ($a > 10$ AND $b > 5$), which should be matched first.''}
+  returned \{\textit{risk}=\code{MEDIUM}, \textit{action}=\code{REVIEW},
+  \textit{score}=60\}, but the specification requires
+  \{\textit{risk}=\code{HIGH}, \textit{action}=\code{ESCALATE},
+  \textit{score}=90\}.
+  This input satisfies Scenario S1 ($a > 10$ AND $b > 5$), which should be matched first.''}
 \end{quote}
 
 This sentence encodes all four components of the counterexample tuple:
@@ -539,7 +539,7 @@ patterns; Table~\ref{tab:patterns} lists all 14 patterns and their severities.
 The HSP-Agile pattern catalog $\mathcal{P}$ contains 14 patterns formalising
 implementation faults observed in LLM outputs on Agile-SOFL tasks.
 
-\begin{table}[t]
+\begin{table}[H]
   \caption{HSP-Agile Error Pattern Catalog ($|\mathcal{P}| = 14$).
            Severity follows the convention: \textbf{critical} patterns
            cause immediate acceptance failure; \textit{high} patterns
@@ -581,7 +581,7 @@ does not read or modify it.
 
 \paragraph{Logic patterns (RF05, RF07, RF13).}
 \emph{RF05} (Swapped comparison) fires when a comparison operator is inverted
-relative to the specification — e.g.\ $a < 10$ in the code where $a > 10$
+relative to the specification ??e.g.\ $a < 10$ in the code where $a > 10$
 is required.  Detection combines guard extraction from the FSF with AST
 analysis of the candidate.
 \emph{RF07} (Unconditional success) is the most critical pattern: it fires
@@ -683,8 +683,7 @@ This design choice reflects Principle~P4 (Section~\ref{sec:method:principles})
 and is justified by two complementary observations.
 
 \paragraph{Why formal conformance alone is insufficient.}
-The formal checker generates exactly $n$ test cases — one per FSF scenario —
-from which each covers only a single point in the scenario's exclusive guard
+The formal checker generates exactly $n$ test cases ??one per FSF scenario ??from which each covers only a single point in the scenario's exclusive guard
 region.  A pathological implementation that hard-codes the correct output for
 each of these $n$ points would achieve $\mathrm{Conf}(c,t) = 1$ while being
 completely wrong on all other inputs.  Stage 4 detects this via pattern RF07
@@ -842,7 +841,7 @@ satisfy one of the first $n-1$ guards; the solver returns \textsf{unsat} for
 $\Phi_n$ and the ``others'' case contributes no test case.  In that setting
 $|\mathcal{D}(t)| = n - 1$, and conformance is computed over $n-1$ cases.
 This does not affect the soundness guarantee of
-Theorem~\ref{thm:soundness} — it merely reduces the strength of the
+Theorem~\ref{thm:soundness} ??it merely reduces the strength of the
 test suite for that particular scenario.
 \end{remark}
 
@@ -863,8 +862,8 @@ The guarantee holds within $K$ LLM calls regardless of the task.
 This corollary is the formal counterpart of the thesis's central claim: that
 HSP-Agile \emph{prevents} rather than merely \emph{detects} specification
 faults, within a bounded computational budget.  The prevention is not
-universal — it is bounded by the completeness of $\mathcal{D}(t)$ and
-$\mathcal{P}^H$ — but it is decidable, transparent, and auditable in a way
+universal ??it is bounded by the completeness of $\mathcal{D}(t)$ and
+$\mathcal{P}^H$ ??but it is decidable, transparent, and auditable in a way
 that post-hoc statistical fault detection is not.
 
 \subsection{Computational Complexity}
@@ -885,10 +884,8 @@ for benchmark sizes with $n \le 8$.
 Table~\ref{tab:stage-summary} summarises the role, inputs, outputs, and
 formal properties of each pipeline stage.
 
-\begin{table}[t]
-  \caption{Summary of HSP-Agile pipeline stages.}
+\begin{inlinetable}{Summary of HSP-Agile pipeline stages.}
   \label{tab:stage-summary}
-  \centering
   \thesistable{%
     \footnotesize
     \setlength{\tabcolsep}{3pt}
@@ -900,11 +897,11 @@ formal properties of each pipeline stage.
       2     & Formal Check  & $c_k$, $t$          & $\mathrm{Conf}$, $\mathit{cexs}$ & sound (Thm.~\ref{thm:soundness}) \\
       3     & Repair        & $\mathit{cexs}$, $\mathit{hits}$ & $\mathit{fb}_k$ & CEGIS bridge \\
       4     & Pattern Guard & $c_k$, $t$          & $\mathit{hits}$            & finite catalog \\
-      —     & Accept        & $\mathrm{Conf}$, $\mathit{hits}$ & $\{0,1\}$     & conjunctive \\
+      5     & Accept        & $\mathrm{Conf}$, $\mathit{hits}$ & $\{0,1\}$     & conjunctive \\
       \bottomrule
     \end{tabularx}%
   }
-\end{table}
+\end{inlinetable}
 
 % ---------------------------------------------------------------------------
 \section*{Chapter Summary}

@@ -1,0 +1,101 @@
+@startuml system_class
+!include _theme.puml
+left to right direction
+scale max 3000 width
+
+class PipelineRunner <<Core>> {
+    - config : PipelineConfig
+    - llm : LLMClient
+    - checker : FormalChecker
+    - guard : PatternMatcher
+    --
+    + run(task : BenchmarkTask) : PipelineResult
+    - _synthesize() : str
+    - _check_formal() : CheckResult
+    - _repair() : str
+    - _check_patterns() : list
+}
+
+class PipelineConfig <<VO>> {
+    + mode : str
+    + max_attempts : int
+    + enable_formal : bool
+    + enable_patterns : bool
+    + enable_repair : bool
+    + model : str
+    + temperature : float
+    + formal_max_cases : int
+    + strict_eval_cases : int
+}
+
+class LLMClient <<LLM>> {
+    --
+    + complete(prompt : str) : str
+    - _retry_with_backoff() : None
+}
+
+class FormalChecker <<Infra>> {
+    --
+    + check(code : str, task : BenchmarkTask) : CheckResult
+    + generate_cases(task : BenchmarkTask) : list
+    + evaluate_candidate(code : str, cases : list) : CheckResult
+}
+
+class PatternMatcher <<Infra>> {
+    --
+    + match(code : str, task : BenchmarkTask) : list
+    - _ast_check() : list
+    - _regex_check() : list
+}
+
+class BenchmarkTask <<Spec>> {
+    + task_id : str
+    + spec_text : str
+    + scenarios : list
+    + inputs : list
+    + outputs : list
+    + reference_impl : str
+}
+
+class CheckResult <<Result>> {
+    + conformance : float
+    + counterexamples : list
+    + strict_formal_passed : bool
+}
+
+class PipelineResult <<Result>> {
+    + success : bool
+    + formal_conformance : float
+    + strict_formal_passed : bool
+    + mutation_kill_rate : float
+    + latency_ms : int
+    + attempts : int
+}
+
+class PatternHit <<VO>> {
+    + pattern_id : str
+    + severity : str
+    + location : str
+    + message : str
+}
+
+PipelineRunner *-- PipelineConfig : config
+PipelineRunner --> LLMClient : uses
+PipelineRunner --> FormalChecker : uses
+PipelineRunner --> PatternMatcher : uses
+PipelineRunner ..> BenchmarkTask : processes
+PipelineRunner ..> PipelineResult : returns
+FormalChecker ..> CheckResult : returns
+PatternMatcher ..> PatternHit : returns
+
+note bottom of PipelineConfig
+  Immutable configuration object
+  passed at pipeline construction
+end note
+
+note bottom of PipelineResult
+  Aggregated evaluation metrics
+  and audit trace for one task run
+end note
+
+@enduml

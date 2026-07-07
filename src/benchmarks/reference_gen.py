@@ -22,6 +22,8 @@ def _py_condition(test_expr: str) -> str:
     expr = re.sub(r"\bfalse\b", "False", expr, flags=re.IGNORECASE)
     expr = re.sub(r"\band\b", "and", expr, flags=re.IGNORECASE)
     expr = re.sub(r"\bor\b", "or", expr, flags=re.IGNORECASE)
+    expr = re.sub(r"&&", " and ", expr)
+    expr = re.sub(r"\|\|", " or ", expr)
     return expr.strip()
 
 
@@ -48,7 +50,13 @@ def generate_reference_code(task: dict[str, Any]) -> str:
         branch = "if" if i == 0 else "elif"
         lines.append(f"    {branch} {cond}:")
         if assignments:
-            ret = ", ".join(f'"{k}": {v}' if isinstance(v, int) else f'"{k}": {k}' for k, v in assignments.items())
+            parts = []
+            for k, v in assignments.items():
+                if isinstance(v, int):
+                    parts.append(f'"{k}": {v}')
+                else:
+                    parts.append(f'"{k}": {v}')
+            ret = ", ".join(parts)
             lines.append(f"        return {{{ret}}}")
         else:
             lines.append(f"        return {{{', '.join(f'"{k}": 0' for k in out_keys)}}}")
@@ -57,7 +65,13 @@ def generate_reference_code(task: dict[str, Any]) -> str:
         assignments = parse_def_assignments(others["def"])
         lines.append("    else:")
         if assignments:
-            ret = ", ".join(f'"{k}": {v}' if isinstance(v, int) else f'"{k}": {k}' for k, v in assignments.items())
+            parts = []
+            for k, v in assignments.items():
+                if isinstance(v, int):
+                    parts.append(f'"{k}": {v}')
+                else:
+                    parts.append(f'"{k}": {v}')
+            ret = ", ".join(parts)
             lines.append(f"        return {{{ret}}}")
         else:
             lines.append(f"        return {{{', '.join(f'"{k}": 0' for k in out_keys)}}}")

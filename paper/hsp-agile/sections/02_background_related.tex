@@ -1,35 +1,107 @@
 \section{Background and Related Work}
 \label{sec:related}
 
-\subsection{SOFL-Oriented Fault Prevention}
-Li and Liu studied requirements-related fault prevention in formal-specification-driven development, including dependency-aware ordering and transformation guidance~\cite{li2022qrs,li2023iet}.
-These works motivate prevention-first design, but they do not directly address integration with current LLM-assisted iterative workflows.
+\subsection{Specification-Conformance Defects in LLM Synthesis}
 
-\subsection{LLM + Formal Verification}
-Verifier-guided synthesis has shown encouraging results in Dafny and related domains, commonly using iterative correction and conformance-centric metrics~\cite{lynn2024tosem,dafnybench2024}.
-This literature supports the use of explicit feedback loops, but transferability to Agile-SOFL scenario logic remains an open empirical question.
+LLM-assisted code generation has matured rapidly~\cite{chen2021codex,openai2023gpt4},
+but empirical studies consistently find that 15--40\% of suggestions contain subtle
+semantic defects not caught by coarse test suites~\cite{dakhel2023copilot}.
+In the formal specification setting, these defects are qualitatively different from
+typical correctness failures: they violate a precisely-stated behavioural contract at
+boundary regions that the specification was designed to characterise.
+Prior SOFL-oriented studies showed that early fault prevention reduces downstream
+correction costs~\cite{li2022qrs,li2023iet}, but they assume human-written
+implementations; the integration with LLM-based synthesis creates new failure modes that
+neither human-process prevention nor LLM post-processing alone addresses.
 
-\subsection{Specification Mutation and Fault-Based Testing}
-Specification mutation is a long-established method for evaluating fault sensitivity of testing and analysis processes~\cite{okun2007nist,circus2017mutation}.
-Following this tradition, we adopt two mutation layers (specification confusion and implementation screening) to assess prevention behavior beyond simple pass/fail outcomes.
+\subsection{Verifier-in-the-Loop and CEGIS}
 
-\subsection{Counterexample-Guided Inductive Synthesis}
-Counterexample-guided inductive synthesis (CEGIS), introduced by Solar-Lezama et al.~\cite{solar2006sketch}, provides the foundational template for iterative correction loops in program synthesis.
-In the CEGIS schema, a verifier supplies counterexamples to a learner, which refines its candidate until no counterexample can be found.
-HSP-Agile instantiates a practical approximation of this loop: the formal checker plays the role of the verifier, emitting concrete failing cases, while the LLM plays the role of the learner responding to structured feedback.
-Because our setting targets Agile-SOFL scenario logic rather than full program proofs, convergence is not guaranteed, but the repair loop consistently reduces conformance violations across the attempt budget.
+Counterexample-guided inductive synthesis (CEGIS)~\cite{solar2006sketch} established the
+canonical template for iterative correction: a verifier supplies counterexamples and a
+synthesiser refines its candidate until no counterexample remains.
+Verifier-guided LLM synthesis has shown encouraging results in Dafny and related
+settings~\cite{lynn2024tosem,dafnybench2024}.
+Table~\ref{tab:related-positioning} positions our framework against these approaches on
+the dimensions that matter for specification-conformance defect prevention.
 
-\subsection{Static Analysis and Pattern-Based Defect Detection}
-Static analysis tools such as FindBugs~\cite{hovemeyer2004findbugs} and its successor SpotBugs operate by matching program structures against a catalog of known bug patterns, assigning severity ratings without requiring test execution.
-This design---lightweight, oracle-free, and fast---motivates the pattern guard component of HSP-Agile.
-Where static analysis tools target implementation-level code smells, our pattern guard encodes requirement-level anti-patterns specific to SOFL scenario logic (e.g., branch-order confusion, missing guard refinement), extending the defect-detection paradigm to the specification-to-code translation phase.
+\begin{table}[t]
+  \caption{Positioning \textsc{SgDP} against related approaches.  A tick indicates
+    the property is satisfied; a dash indicates it is not a design goal.}
+  \label{tab:related-positioning}
+  \small
+  \centering
+  \begin{tabular}{lcccc}
+    \toprule
+    & Spec-aware & Structured & Prevention & General \\
+    Approach & witnesses & feedback IR & protocol & framework \\
+    \midrule
+    CEGIS (Solar-Lezama)          & ---  & --- & ---  & \checkmark \\
+    DafnyBench~\cite{dafnybench2024}     & \checkmark & --- & --- & --- \\
+    Self-Refine~\cite{madaan2023selfrefine}   & --- & --- & --- & \checkmark \\
+    Self-Debug~\cite{chen2023selfdebug}    & --- & --- & --- & \checkmark \\
+    Reflexion~\cite{shinn2023reflexion}    & --- & --- & --- & \checkmark \\
+    CodeT~\cite{chen2022codet}           & --- & --- & --- & --- \\
+    \textsc{SgDP} (this paper)    & \checkmark & \checkmark & \checkmark & \checkmark \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+The key gap in all prior approaches is the absence of \emph{specification-aware}
+witness generation: they use random tests, execution traces, or general symbolic
+execution, none of which reliably reaches the low-measure boundary regions where
+specification-conformance defects manifest.
+Our Constraint-guided Witness Generator closes this gap by encoding the specification's
+guard precedence chain as SMT constraints~\cite{barrett2018smt}.
+
+\subsection{Structured Feedback for LLM Repair}
+
+Recent work on LLM repair has explored increasingly rich feedback forms: test
+failures~\cite{chen2023selfdebug}, natural-language critique~\cite{madaan2023selfrefine},
+execution traces~\cite{shinn2023reflexion}, and compiler diagnostics.
+\citet{lynn2024verifierloop} document that test-feedback loops with underspecified
+diagnostics converge significantly more slowly on violations requiring structural code
+changes.  Our Semantic Feedback IR addresses this by surfacing specification-level
+structure — violated scenario identity, guard predicate text, violation type —
+that pure test-feedback discards.
+Controlled comparison (E6) isolates the contribution of this structure from the
+contribution of additional feedback volume.
+
+\subsection{Specification Mutation and Prevention Evaluation}
+
+Specification mutation is a long-established method for evaluating fault sensitivity of
+testing and analysis processes~\cite{okun2007nist,circus2017mutation,li2023iet}.
+Prior prevention evaluation typically conflates specification-confusion and
+implementation-screening failure modes.
+Our prevention evaluation protocol separates these into two mutant layers (Section~\ref{sec:method})
+and measures both PDR and FAR, providing a more discriminating assessment than simple
+pass/fail conformance metrics.
+
+\subsection{Static Analysis for Specification Anti-patterns}
+
+Static analysis tools such as FindBugs~\cite{hovemeyer2004findbugs} target
+implementation-level code smells.
+Our Pattern Guard component extends this paradigm to the specification-to-code translation
+phase: it encodes SOFL-specific requirement anti-patterns (e.g., guard-order confusion,
+missing precondition check) as AST and regex analysis passes, producing a
+specification-derived defect classifier.
+Unlike general bug-finding tools, the patterns are derived directly from the specification
+language's fault taxonomy, making their precision and recall measurable against the
+mutant population (E7).
 
 \subsection{Formal Methods in Agile Development}
-The tension between formal rigor and agile delivery pace is well-studied in software engineering~\cite{agile2001manifesto}.
-Lightweight formal methods---model checking over finite state abstractions, property-based testing, and runtime verification---have been proposed as practical compromises that preserve agile iteration speed while providing bounded correctness guarantees~\cite{clarke1999modelchecking}.
-HSP-Agile contributes to this body of work by demonstrating that a formally grounded acceptance predicate, instantiated through scenario-level checking and repair, can be integrated into a per-sprint delivery cadence without prohibitive latency overhead.
 
-\subsection{Gap and Positioning}
-Existing approaches often emphasize either correctness guarantees or interactive efficiency.
-Our study positions HSP-Agile as a hybrid approach and evaluates it against one-shot and test-feedback baselines under a benchmark designed to expose precedence-sensitive failures.
-The goal is comparative empirical evidence rather than universal claims of superiority.
+The tension between formal rigour and agile delivery pace is well-studied~\cite{agile2001manifesto}.
+Lightweight formal methods — model checking, property-based testing, runtime verification
+— have been proposed as practical compromises~\cite{clarke1999modelchecking}.
+\textsc{SgDP} contributes to this tradition by demonstrating that specification-grounded
+defect prevention can be integrated into a per-sprint CI/CD gate without prohibitive
+latency overhead, operating in the space between pure test-feedback and full deductive
+verification~\cite{leino2010dafny}.
+
+\subsection{Gap Summary}
+
+Existing approaches either guarantee correctness but require proof annotations that LLMs
+systematically fail to produce~\cite{loughman2024dafnybench}, or they repair code without
+grounding feedback in specification semantics.  \textsc{SgDP} occupies the practical
+middle ground: specification-semantic awareness without proof obligation, with an
+evaluation protocol that measures prevention rather than generation accuracy.

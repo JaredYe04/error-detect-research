@@ -1,0 +1,390 @@
+%% thesis.sty — Custom style package for HSP-Agile Thesis
+%% East China Normal University, 2026
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{thesis}[2026/07/06 HSP-Agile Thesis Style]
+
+%% ─── Core typography ──────────────────────────────────────────────────────────
+\RequirePackage[T1]{fontenc}
+\RequirePackage[utf8]{inputenc}
+\RequirePackage{microtype}
+\RequirePackage[scaled=0.92]{inconsolata}
+
+%% ─── Page geometry ────────────────────────────────────────────────────────────
+\RequirePackage[
+  top=2.5cm, bottom=2.5cm,
+  left=2.5cm, right=2.5cm,
+  headheight=15pt
+]{geometry}
+
+%% ─── Colour ───────────────────────────────────────────────────────────────────
+\RequirePackage[dvipsnames,svgnames,table]{xcolor}
+\colorlet{darkblue}{blue!60!black}
+
+%% ─── Math ─────────────────────────────────────────────────────────────────────
+\RequirePackage{amsmath}
+\RequirePackage{amsthm}
+\RequirePackage{amssymb}
+
+%% ─── Theorem environments ─────────────────────────────────────────────────────
+\theoremstyle{plain}
+\newtheorem{theorem}{Theorem}[chapter]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{corollary}[theorem]{Corollary}
+
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{example}[theorem]{Example}
+
+\theoremstyle{remark}
+\newtheorem*{remark}{Remark}
+\newtheorem*{notation}{Notation}
+
+%% ─── Paragraph layout (ACM/IEEE CS: no indent, small inter-para skip) ───────────
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{0.35\baselineskip}
+
+\numberwithin{equation}{chapter}
+
+%% ─── Headers / footers ────────────────────────────────────────────────────────
+\RequirePackage{fancyhdr}
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\small\nouppercase{\leftmark}}
+\fancyfoot[R]{\small\thepage}
+\renewcommand{\headrulewidth}{0.4pt}
+\renewcommand{\footrulewidth}{0pt}
+
+\fancypagestyle{plain}{%
+  \fancyhf{}%
+  \fancyfoot[R]{\small\thepage}%
+  \renewcommand{\headrulewidth}{0pt}%
+}
+
+%% ─── Chapter / section headings ───────────────────────────────────────────────
+\RequirePackage[explicit]{titlesec}
+
+\titleformat{\chapter}[block]
+  {\normalfont\bfseries\fontsize{18}{22}\selectfont}
+  {\thechapter\quad}
+  {0pt}
+  {#1\vspace{4pt}\hrule height 0.6pt}
+  [\vspace{4pt}]
+
+\titleformat{name=\chapter,numberless}[block]
+  {\normalfont\bfseries\fontsize{18}{22}\selectfont}
+  {}
+  {0pt}
+  {#1\vspace{4pt}\hrule height 0.6pt}
+  [\vspace{4pt}]
+
+\titleformat{\section}
+  {\normalfont\bfseries\fontsize{14}{17}\selectfont}
+  {\thesection}
+  {0.8em}
+  {#1}
+
+\titleformat{\subsection}
+  {\normalfont\bfseries\fontsize{12}{15}\selectfont}
+  {\thesubsection}
+  {0.8em}
+  {#1}
+
+\titleformat{\subsubsection}
+  {\normalfont\bfseries\fontsize{11}{14}\selectfont}
+  {\thesubsubsection}
+  {0.8em}
+  {#1}
+
+\titlespacing*{\chapter}     {0pt}{-6pt}{10pt}
+\titlespacing*{\section}     {0pt}{16pt}{8pt}
+\titlespacing*{\subsection}  {0pt}{12pt}{6pt}
+\titlespacing*{\subsubsection}{0pt}{10pt}{4pt}
+
+%% Appendix chapter prefix (call \thesisappendixstyle after \appendix)
+\newcommand{\thesisappendixstyle}{%
+  \titleformat{\chapter}[block]
+    {\normalfont\bfseries\fontsize{18}{22}\selectfont}
+    {Appendix~\thechapter\quad}
+    {0pt}
+    {##1\vspace{4pt}\hrule height 0.6pt}
+    [\vspace{4pt}]%
+}
+
+\PassOptionsToPackage{hyphens,obeyspaces,spaces}{url}
+\RequirePackage{xurl}
+%% ─── Hyperref ─────────────────────────────────────────────────────────────────
+\RequirePackage[
+  colorlinks = true,
+  linkcolor  = black,
+  citecolor  = darkblue,
+  urlcolor   = teal,
+  bookmarks  = true,
+  pdfusetitle
+]{hyperref}
+
+%% ─── Floats: tight placement, minimal vertical glue ───────────────────────────
+\RequirePackage{float}
+\RequirePackage{flafter}
+\RequirePackage{caption}
+\RequirePackage{needspace}
+\RequirePackage{etoolbox}
+
+\floatplacement{figure}{htbp}
+\floatplacement{table}{htbp}
+
+\setlength{\floatsep}{4pt plus 2pt minus 2pt}
+\setlength{\textfloatsep}{6pt plus 2pt minus 4pt}
+\setlength{\intextsep}{4pt plus 2pt minus 2pt}
+\setlength{\dblfloatsep}{4pt plus 2pt minus 2pt}
+\setlength{\dbltextfloatsep}{6pt plus 2pt minus 4pt}
+
+\setlength{\abovecaptionskip}{4pt}
+\setlength{\belowcaptionskip}{2pt}
+\captionsetup{
+  skip=3pt,
+  font=small,
+  labelfont=bf,
+  singlelinecheck=false,
+}
+
+\makeatletter
+\setlength{\@fptop}{0pt plus 1fil}
+\setlength{\@fpsep}{6pt plus 2fil}
+\setlength{\@fpbot}{0pt plus 1fil}
+\makeatother
+
+\BeforeBeginEnvironment{algorithm}{\vspace{-2pt}}
+\AfterEndEnvironment{algorithm}{\vspace{0pt}}
+\BeforeBeginEnvironment{figure}{\vspace{-2pt}}
+\AfterEndEnvironment{figure}{\vspace{0pt}}
+\BeforeBeginEnvironment{table}{\vspace{-2pt}}
+\AfterEndEnvironment{table}{\vspace{0pt}}
+
+%% Short table embedded in text flow (no float page / orphan top placement)
+\newenvironment{inlinetable}[1]{%
+  \par\vspace{2pt}%
+  \refstepcounter{table}%
+  \captionof{table}{#1}%
+  \vspace{2pt}%
+  \small\centering
+}{%
+  \par\vspace{2pt}%
+}
+
+%% Prefer here placement when a float is used; override per-table with [p] if needed
+\floatname{table}{Table}
+
+%% Breakable quote / example blocks (avoid overflow from long \texttt in quotes)
+\RequirePackage{quoting}
+\renewenvironment{quote}{%
+  \begin{quoting}%
+  \small\raggedright\sloppy
+}{%
+  \end{quoting}\par
+}
+
+\newenvironment{thesisquote}{%
+  \par\vspace{0.15\baselineskip}%
+  \begin{sloppypar}%
+  \small\raggedright
+  \leftskip=1.2em\rightskip=1.2em
+}{%
+  \end{sloppypar}\vspace{0.15\baselineskip}%
+}
+
+%% ─── Graphics & figures ───────────────────────────────────────────────────────
+\RequirePackage{graphicx}
+\RequirePackage{adjustbox}
+\RequirePackage{subcaption}
+
+\newcommand{\thesisfig}[2][]{%
+  \adjustbox{max width=\linewidth,max height=0.82\textheight,keepaspectratio,#1}{%
+    \includegraphics{#2}}%
+}
+%% Vector PDF from Kroki SVG (offset-rect shadows in render_puml.py)
+\newcommand{\pumlfig}[1]{%
+  \IfFileExists{#1.pdf}{%
+    \thesisfig[max width=0.98\linewidth,max height=0.82\textheight]{#1.pdf}%
+  }{%
+    \typeout{Warning: missing PlantUML figure #1.pdf — run scripts/render_puml.py}%
+  }%
+}
+\newcommand{\widefig}[1]{\thesisfig[max width=\linewidth,max height=0.80\textheight]{#1}}
+\newcommand{\tikzfig}[1]{\thesisfig[max width=0.92\linewidth]{#1}}
+\newcommand{\tikzinput}[1]{%
+  \begin{adjustbox}{max width=\linewidth,max height=0.85\textheight,keepaspectratio,center}%
+    \input{#1}%
+  \end{adjustbox}%
+}
+
+%% ─── TikZ ─────────────────────────────────────────────────────────────────────
+\RequirePackage{tikz}
+\usetikzlibrary{
+  shadows,
+  shadows.blur,
+  shapes.geometric,
+  arrows.meta,
+  positioning,
+  fit,
+  backgrounds,
+  calc,
+  decorations.pathmorphing
+}
+
+%% ─── pgfplots ─────────────────────────────────────────────────────────────────
+\RequirePackage{pgfplots}
+\pgfplotsset{compat=1.18}
+
+%% ─── Algorithms (IEEE/CLRS-style: roman function names, consistent math) ──────
+\RequirePackage{algorithm}
+\RequirePackage{algpseudocode}
+\algrenewcommand\algorithmicrequire{\textbf{Input:}}
+\algrenewcommand\algorithmicensure{\textbf{Output:}}
+\algrenewcommand\algorithmiccomment[1]{\hfill$\triangleright$~#1}
+\newcommand{\Fn}[1]{\textsc{#1}}           % function / procedure names
+\newcommand{\ProcCall}[2]{\Fn{#1}(#2)}      % e.g. \ProcCall{TranslateToZ3}{s_i, g_{<i}}
+
+%% ─── Tables ───────────────────────────────────────────────────────────────────
+\RequirePackage{booktabs}
+\RequirePackage{longtable}
+\RequirePackage{multirow}
+\RequirePackage{array}
+\RequirePackage{tabularx}
+
+\newcolumntype{Y}{>{\raggedright\arraybackslash}X}
+\newcolumntype{C}{>{\centering\arraybackslash}X}
+
+%% Full-width tables: distribute columns evenly across \linewidth
+\newcommand{\thesistable}[1]{%
+  \vspace{-2pt}%
+  \small\begin{center}#1\end{center}%
+  \vspace{-2pt}%
+}
+
+%% ─── Units & URLs ─────────────────────────────────────────────────────────────
+\RequirePackage{siunitx}
+
+%% ─── Bibliography ─────────────────────────────────────────────────────────────
+\RequirePackage[numbers,sort&compress,super]{natbib}
+\setcitestyle{super,sort&compress,comma}
+
+\RequirePackage{tocloft}
+\renewcommand{\cftchapdotsep}{\cftdotsep}
+
+%% ─── Breakable code listings (caption OUTSIDE the frame) ──────────────────────
+\RequirePackage[most]{tcolorbox}
+\tcbuselibrary{listings,breakable,skins}
+\RequirePackage{listings}
+
+\lstdefinestyle{fsfstyle}{
+  language={},
+  basicstyle=\small\fontfamily{zi4}\selectfont,
+  columns=fullflexible,
+  keepspaces=true,
+  showstringspaces=false,
+  breaklines=true,
+  breakatwhitespace=false,
+  tabsize=2,
+  numbers=left,
+  numberstyle=\scriptsize\fontfamily{zi4}\selectfont\color{gray!55!black},
+  numbersep=6pt,
+  stepnumber=1,
+  xleftmargin=1.8em,
+  framexleftmargin=1.8em,
+  aboveskip=0pt,
+  belowskip=0pt,
+}
+
+\lstdefinestyle{pythonstyle}{
+  language=Python,
+  basicstyle=\small\fontfamily{zi4}\selectfont,
+  keywordstyle=\bfseries\color{darkblue},
+  commentstyle=\color{gray!55!black},
+  stringstyle=\color{red!55!black},
+  columns=fullflexible,
+  keepspaces=true,
+  breaklines=true,
+  showstringspaces=false,
+  tabsize=4,
+  numbers=left,
+  numberstyle=\scriptsize\fontfamily{zi4}\selectfont\color{gray!55!black},
+  numbersep=6pt,
+  stepnumber=1,
+  xleftmargin=1.8em,
+  framexleftmargin=1.8em,
+  aboveskip=0pt,
+  belowskip=0pt,
+}
+
+\newcounter{codelisting}
+\renewcommand{\thecodelisting}{\thechapter.\arabic{codelisting}}
+
+\RequirePackage{xparse}
+
+\newcommand{\codelistingcaption}{}
+\newcommand{\codelistinglabel}{}
+
+\newcommand{\listingcaption}[2]{%
+  \vspace{0.15\baselineskip}%
+  \noindent\textbf{Listing~\thecodelisting:}~#1\par
+  \label{#2}%
+}
+
+\newcommand{\inputfsf}[3]{%
+  \refstepcounter{codelisting}%
+  \begin{tcolorbox}[
+    enhanced, breakable,
+    colback=gray!4, colframe=gray!55!black,
+    boxrule=0.55pt, arc=1.5pt,
+    left=10pt, right=6pt, top=6pt, bottom=6pt,
+    before skip=0.15\baselineskip,
+    overlay middle={%
+      \node[anchor=south, fill=white, inner sep=2pt,
+            font=\footnotesize\itshape, text=gray!60!black]
+        at ([yshift=2pt]frame.south)
+        {Listing~\thecodelisting\ continued on next page};%
+    },
+  ]%
+  \lstinputlisting[style=fsfstyle]{#1}%
+  \end{tcolorbox}%
+  \listingcaption{#2}{#3}%
+}
+
+\newcommand{\inputpython}[3]{%
+  \refstepcounter{codelisting}%
+  \begin{tcolorbox}[
+    enhanced, breakable,
+    colback=gray!4, colframe=gray!55!black,
+    boxrule=0.55pt, arc=1.5pt,
+    left=10pt, right=6pt, top=6pt, bottom=6pt,
+    before skip=0.15\baselineskip,
+    overlay middle={%
+      \node[anchor=south, fill=white, inner sep=2pt,
+            font=\footnotesize\itshape, text=gray!60!black]
+        at ([yshift=2pt]frame.south)
+        {Listing~\thecodelisting\ continued on next page};%
+    },
+  ]%
+  \lstinputlisting[style=pythonstyle]{#1}%
+  \end{tcolorbox}%
+  \listingcaption{#2}{#3}%
+}
+
+\lstset{style=pythonstyle}
+
+%% Inline code — breakable (xurl), Inconsolata via zi4 ────────────────────────
+\DeclareRobustCommand{\code}[1]{{\small\fontfamily{zi4}\selectfont\nolinkurl{#1}}}
+\DeclareRobustCommand{\texttt}[1]{%
+  \ifmmode
+    {\small\fontfamily{zi4}\selectfont #1}%
+  \else
+    \code{#1}%
+  \fi
+}
+
+%% ─── Miscellaneous ────────────────────────────────────────────────────────────
+\RequirePackage{setspace}
+\onehalfspacing
+
+\RequirePackage{emptypage}

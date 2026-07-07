@@ -1,0 +1,68 @@
+@startuml component_arch
+!include _theme.puml
+top to bottom direction
+scale max 2400 height
+
+package "Agile-SOFL Toolchain" as SOFL {
+  component "Parser" as Parser
+  component "Language Server" as LS
+  component "FSF Extractor" as FSFExtractor
+}
+
+package "HSP-Agile Pipeline" as Pipeline {
+  component "LLM Synthesizer" as Synth
+  component "Formal Checker" as FCheck
+  component "Repair Engine" as Repair
+  component "Pattern Guard" as Guard
+}
+
+package "LLM Backend" as LLMBackend {
+  component "LLM API\n(Qwen2.5-27B)" as LLMAPI
+}
+
+package "SMT Solver" as SMT {
+  component "Z3 Solver" as Z3
+}
+
+package "Benchmark System" as Bench {
+  component "Hard Task Generator" as TaskGen
+  component "Reference Implementations" as RefImpl
+}
+
+package "Experiment Orchestration" as Orch {
+  component "Parallel Runner" as ParRunner
+  component "Progress Monitor" as Monitor
+}
+
+interface "FSF Spec" as IfFSF
+interface "LLM API" as IfLLM
+interface "SMT Queries" as IfSMT
+interface "Tasks" as IfTasks
+interface "Results" as IfResults
+
+SOFL -down- IfFSF
+IfFSF -down-> Pipeline
+
+Pipeline -down- IfLLM
+IfLLM -down-> LLMBackend
+
+FCheck -down- IfSMT
+IfSMT -down-> SMT
+
+Bench -down- IfTasks
+IfTasks -down-> Orch
+
+Orch -up- IfResults
+IfResults -up-> Pipeline
+
+FSFExtractor -[hidden]down- LS
+LS -[hidden]down- Parser
+Synth -[hidden]down- FCheck
+FCheck -[hidden]down- Repair
+Repair -[hidden]down- Guard
+
+note right of Pipeline
+  Synthesize → Check → Repair → Guard
+end note
+
+@enduml

@@ -13,6 +13,8 @@ ROOT = Path(__file__).resolve().parents[3]
 PAPER_ROOT = Path(__file__).resolve().parents[1]
 RAW_DIR = PAPER_ROOT / "data" / "raw"
 PROC_DIR = PAPER_ROOT / "data" / "processed"
+DEFAULT_RUN = ROOT / "artifacts" / "run_hard_full_parallel_v1"
+DEFAULT_PREVENTION = ROOT / "artifacts" / "prevention_eval" / "prevention_full_v1" / "prevention_summary.json"
 
 
 def _latest_run_dir() -> Path:
@@ -31,14 +33,14 @@ def _parse_args() -> argparse.Namespace:
     parser.add_argument(
         "--run-dir",
         type=Path,
-        default=None,
-        help="Explicit experiment run directory (defaults to latest artifacts/run_* with results.jsonl).",
+        default=DEFAULT_RUN,
+        help="Experiment run directory (default: artifacts/run_hard_full_parallel_v1).",
     )
     parser.add_argument(
         "--prevention-summary",
         type=Path,
-        default=None,
-        help="Explicit prevention_summary.json path (defaults to artifacts/prevention_eval/prevention_summary.json).",
+        default=DEFAULT_PREVENTION,
+        help="Prevention summary JSON (default: prevention_full_v1/prevention_summary.json).",
     )
     return parser.parse_args()
 
@@ -48,7 +50,7 @@ def main() -> None:
     RAW_DIR.mkdir(parents=True, exist_ok=True)
     PROC_DIR.mkdir(parents=True, exist_ok=True)
 
-    run_dir = args.run_dir.resolve() if args.run_dir is not None else _latest_run_dir()
+    run_dir = args.run_dir.resolve()
     results_path = run_dir / "results.jsonl"
     if not results_path.exists():
         raise FileNotFoundError(f"Missing {results_path}")

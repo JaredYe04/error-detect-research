@@ -1,0 +1,92 @@
+% Benchmark Construction Pipeline — Ch. 6
+% Fragment: \input{diagrams/tikz/benchmark_pipeline} inside a figure environment.
+% Required TikZ libraries (add to document preamble):
+%   \usetikzlibrary{arrows.meta,shadows,shapes.geometric}
+\usetikzlibrary{arrows.meta,shadows,shapes.geometric}
+
+\begin{tikzpicture}[
+  font=\small\sffamily,
+  >=Stealth,
+  pbox/.style={
+    draw=#1!60!black, fill=#1!10, rounded corners=4pt,
+    minimum width=2.2cm, minimum height=1.3cm,
+    align=center, text width=2.0cm, inner sep=4pt,
+    drop shadow={shadow xshift=0.4ex, shadow yshift=-0.4ex,
+                 shadow opacity=0.30}
+  },
+  ann/.style={font=\scriptsize\sffamily, gray!55!black, align=center}
+]
+
+%----------------------------------------------------------------
+% Top row: source data → base tasks
+%----------------------------------------------------------------
+\node[pbox=blue]   (sofl) at (0,   2.2)
+  {Agile-SOFL\\Examples};
+\node[pbox=green]  (base) at (2.8, 2.2)
+  {Base Tasks\\{\footnotesize $\sim$20 tasks}};
+
+%----------------------------------------------------------------
+% Bottom row: hard generator → hard tasks
+%----------------------------------------------------------------
+\node[pbox=orange] (hgen) at (0,   0)
+  {Hard Synthetic\\Generator};
+\node[pbox=red]    (hard) at (2.8, 0)
+  {Hard Tasks\\{\footnotesize 120 tasks}};
+
+%----------------------------------------------------------------
+% Merge circle
+%----------------------------------------------------------------
+\node[
+  draw=gray!60, fill=white, circle,
+  minimum size=0.6cm, inner sep=0pt,
+  font=\small\sffamily,
+  drop shadow={shadow xshift=0.4ex, shadow yshift=-0.4ex,
+               shadow opacity=0.30}
+] (merge) at (5.3, 1.1) {$+$};
+
+%----------------------------------------------------------------
+% Right pipeline nodes
+%----------------------------------------------------------------
+\node[pbox=purple]  (full) at (7.2, 1.1)
+  {Full\\Benchmark\\{\footnotesize 120 tasks}};
+
+\node[pbox=gray]   (valid) at (10.0, 1.1)
+  {Validation\\{\footnotesize parser check,\\consistency}};
+
+\node[
+  draw=teal!60!black, fill=teal!10, rounded corners=4pt,
+  minimum width=2.2cm, minimum height=1.3cm,
+  align=center, text width=2.0cm, inner sep=4pt,
+  drop shadow={shadow xshift=0.4ex, shadow yshift=-0.4ex,
+               shadow opacity=0.30}
+] (final) at (12.8, 1.1)
+  {Final\\Benchmark\\{\footnotesize 120t$\,{\cdot}\,$7m\\840 runs}};
+
+%----------------------------------------------------------------
+% Arrows
+%----------------------------------------------------------------
+% Top row
+\draw[-latex, thick] (sofl.east)  -- (base.west);
+% Base tasks and Hard tasks both feed into merge (orthogonal connectors)
+\draw[-latex, thick] (base.east)  -| (merge.north);
+
+% Bottom row
+\draw[-latex, thick] (hgen.east)  -- (hard.west);
+\draw[-latex, thick] (hard.east)  -| (merge.south);
+
+% Right pipeline
+\draw[-latex, thick] (merge.east) -- (full.west);
+\draw[-latex, thick] (full.east)  -- (valid.west);
+\draw[-latex, thick] (valid.east) -- (final.west);
+
+%----------------------------------------------------------------
+% Annotations (below bottom-row nodes and under validation)
+%----------------------------------------------------------------
+\node[ann] at (0,   -0.95)
+  {5 inputs, 3 outputs\\$\leq$9 scenarios};
+\node[ann] at (2.8, -0.95)
+  {precedence-sensitive\\patterns};
+\node[ann] at (10.0, 0.28)
+  {scenario\\consistency check};
+
+\end{tikzpicture}

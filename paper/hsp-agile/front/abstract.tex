@@ -1,0 +1,40 @@
+\chapter*{Abstract}
+\addcontentsline{toc}{chapter}{Abstract}
+
+LLM-generated implementations systematically fail to respect the ordered guard semantics of
+formal specifications, producing a class of defects we call \emph{specification-conformance
+defects}.  These defects are missed by existing test-based repair loops because they
+manifest only in the low-measure boundary regions that formal specifications are
+specifically designed to characterise.
+
+We present the \textbf{Specification-guided Defect Prevention Framework} (\textsc{SgDP}),
+a general four-component architecture that grounds defect prevention in specification
+semantics at every stage: a \emph{Specification Oracle} derived directly from the formal
+spec, a \emph{Constraint-guided Witness Generator} using SMT solving to navigate to
+semantically critical boundary regions, a \emph{Scenario-aware Semantic Feedback IR}
+structuring counterexample information at the specification level, and a conjunctive
+\emph{Acceptance Predicate} gating release on both formal conformance and
+specification-derived quality criteria.
+\textbf{HSP-Agile} instantiates \textsc{SgDP} over the SOFL Functional Specification Format
+(FSF).
+
+We prove three formal properties: Scenario-aware Witness Soundness (Theorem~1),
+Acceptance Safety with a finite-case FAR bound (Theorem~2), and Bounded Witness-Coverage
+Monotonicity of the repair loop (Theorem~3).
+We evaluate on a benchmark of 120 precedence-sensitive hard tasks across nine execution
+modes (including Self-Refine and Self-Debug extended baselines), with a five-dimension
+evaluation protocol spanning overall effectiveness (E1), full prevention evaluation (E2),
+specification complexity analysis (E3), boundary density analysis (E4), repair dynamics
+(E5), feedback variant comparison (E6), pattern guard precision/recall (E7), and
+generalisation across Mini-Z and Mini-StateMachine notations (E8).
+
+HSP-Agile achieves 90.4\% mean strict formal conformance (+6.2~pp over one-shot LLM,
++2.4~pp over test-feedback).  Mechanism analysis confirms that the advantage grows with
+specification complexity, that SMT witnesses maintain boundary coverage where random
+sampling fails, and that the Semantic Feedback IR produces faster repair convergence than
+test-only feedback.  Generalisation experiments demonstrate consistent improvement across
+three specification notations with only adapter-level changes.
+
+\paragraph{Keywords.}
+Specification-guided defect prevention; formal specification; LLM synthesis; SOFL;
+counterexample-guided repair; SMT verification; mutation testing.

@@ -123,6 +123,75 @@
   pdfusetitle
 ]{hyperref}
 
+%% ─── Floats: tight placement, minimal vertical glue ───────────────────────────
+\RequirePackage{float}
+\RequirePackage{flafter}
+\RequirePackage{caption}
+\RequirePackage{needspace}
+\RequirePackage{etoolbox}
+
+\floatplacement{figure}{htbp}
+\floatplacement{table}{htbp}
+
+\setlength{\floatsep}{4pt plus 2pt minus 2pt}
+\setlength{\textfloatsep}{6pt plus 2pt minus 4pt}
+\setlength{\intextsep}{4pt plus 2pt minus 2pt}
+\setlength{\dblfloatsep}{4pt plus 2pt minus 2pt}
+\setlength{\dbltextfloatsep}{6pt plus 2pt minus 4pt}
+
+\setlength{\abovecaptionskip}{4pt}
+\setlength{\belowcaptionskip}{2pt}
+\captionsetup{
+  skip=3pt,
+  font=small,
+  labelfont=bf,
+  singlelinecheck=false,
+}
+
+\makeatletter
+\setlength{\@fptop}{0pt plus 1fil}
+\setlength{\@fpsep}{6pt plus 2fil}
+\setlength{\@fpbot}{0pt plus 1fil}
+\makeatother
+
+\BeforeBeginEnvironment{algorithm}{\vspace{-2pt}}
+\AfterEndEnvironment{algorithm}{\vspace{0pt}}
+\BeforeBeginEnvironment{figure}{\vspace{-2pt}}
+\AfterEndEnvironment{figure}{\vspace{0pt}}
+\BeforeBeginEnvironment{table}{\vspace{-2pt}}
+\AfterEndEnvironment{table}{\vspace{0pt}}
+
+%% Short table embedded in text flow (no float page / orphan top placement)
+\newenvironment{inlinetable}[1]{%
+  \par\vspace{2pt}%
+  \refstepcounter{table}%
+  \captionof{table}{#1}%
+  \vspace{2pt}%
+  \small\centering
+}{%
+  \par\vspace{2pt}%
+}
+
+\floatname{table}{Table}
+
+%% Breakable quote / example blocks (avoid overflow from long \texttt in quotes)
+\RequirePackage{quoting}
+\renewenvironment{quote}{%
+  \begin{quoting}%
+  \small\raggedright\sloppy
+}{%
+  \end{quoting}\par
+}
+
+\newenvironment{thesisquote}{%
+  \par\vspace{0.15\baselineskip}%
+  \begin{sloppypar}%
+  \small\raggedright
+  \leftskip=1.2em\rightskip=1.2em
+}{%
+  \end{sloppypar}\vspace{0.15\baselineskip}%
+}
+
 %% ─── Graphics & figures ───────────────────────────────────────────────────────
 \RequirePackage{graphicx}
 \RequirePackage{adjustbox}
@@ -186,7 +255,11 @@
 \newcolumntype{C}{>{\centering\arraybackslash}X}
 
 %% Full-width tables: distribute columns evenly across \linewidth
-\newcommand{\thesistable}[1]{\small\begin{center}#1\end{center}}
+\newcommand{\thesistable}[1]{%
+  \vspace{-2pt}%
+  \small\begin{center}#1\end{center}%
+  \vspace{-2pt}%
+}
 
 %% ─── Units & URLs ─────────────────────────────────────────────────────────────
 \RequirePackage{siunitx}
@@ -252,7 +325,7 @@
 \newcommand{\codelistinglabel}{}
 
 \newcommand{\listingcaption}[2]{%
-  \vspace{0.35\baselineskip}%
+  \vspace{0.15\baselineskip}%
   \noindent\textbf{Listing~\thecodelisting:}~#1\par
   \label{#2}%
 }
@@ -264,7 +337,7 @@
     colback=gray!4, colframe=gray!55!black,
     boxrule=0.55pt, arc=1.5pt,
     left=10pt, right=6pt, top=6pt, bottom=6pt,
-    before skip=0.4\baselineskip,
+    before skip=0.15\baselineskip,
     overlay middle={%
       \node[anchor=south, fill=white, inner sep=2pt,
             font=\footnotesize\itshape, text=gray!60!black]
@@ -284,7 +357,7 @@
     colback=gray!4, colframe=gray!55!black,
     boxrule=0.55pt, arc=1.5pt,
     left=10pt, right=6pt, top=6pt, bottom=6pt,
-    before skip=0.4\baselineskip,
+    before skip=0.15\baselineskip,
     overlay middle={%
       \node[anchor=south, fill=white, inner sep=2pt,
             font=\footnotesize\itshape, text=gray!60!black]

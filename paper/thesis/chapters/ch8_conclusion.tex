@@ -101,7 +101,7 @@ to the unit-test feedback used by B2.
 
 \paragraph{Finding 4: Latency overhead is the primary cost of the pipeline.}
 Mode M incurs a mean latency of \textbf{43{,}659\,ms} per task, compared with
-\textbf{10{,}769\,ms} for B2 â€” a \textbf{4.6$\times$ overhead}.  This overhead is
+\textbf{10{,}769\,ms} for B2 â€?a \textbf{4.6$\times$ overhead}.  This overhead is
 attributable to the increased number of LLM API calls (mean 2.08 per task under M) and
 the Z3 conformance-checking steps.  The overhead is the principal trade-off introduced by
 HSP-Agile relative to simpler baselines, and its practical acceptability depends on the
@@ -131,8 +131,8 @@ constraints expressible as Z3 integer constraints.  Many real Agile-SOFL specifi
 additionally involve temporal properties (e.g.\ ``scenario A must always precede scenario
 B within the same session''), stateful behaviours (e.g.\ modifications to shared database
 tables), and composite output structures.  Extending the formal checker to handle these
-richer specification classes â€” for example, by incorporating linear temporal logic (LTL)
-model checking or relational database constraint solving â€” would substantially broaden the
+richer specification classes â€?for example, by incorporating linear temporal logic (LTL)
+model checking or relational database constraint solving â€?would substantially broaden the
 scope of FSF tasks that HSP-Agile can support.  The challenge is to do so without
 disproportionately increasing latency.
 
@@ -147,9 +147,9 @@ LLM toward correct implementations.
 \paragraph{Adaptive budget allocation.}
 The current pipeline uses a fixed repair budget $K$ for all tasks.  This is suboptimal:
 easy tasks may exhaust the budget on unnecessary iterations, while hard tasks may be
-abandoned just before convergence.  An adaptive budget-allocation strategy â€” for example,
+abandoned just before convergence.  An adaptive budget-allocation strategy â€?for example,
 one that halts early when conformance improvement per iteration falls below a threshold,
-and allocates saved budget to tasks that show consistent improvement â€” could reduce mean
+and allocates saved budget to tasks that show consistent improvement â€?could reduce mean
 latency while maintaining or improving conformance on the hardest tasks.  Reinforcement
 learning over iteration trajectories is a natural framing for this optimisation.
 
@@ -186,5 +186,5 @@ conformance checking and counterexample-guided repair produces measurable and re
 quality improvements in Agile-SOFL code generation.  The pipeline is not a replacement for
 full formal verification, but it provides a practical bridge between informal agile
 development practices and the formal quality standards demanded by downstream verification
-artefacts â€” a bridge built from bounded formal checking, targeted repair, and principled
+artefacts â€?a bridge built from bounded formal checking, targeted repair, and principled
 conjunctive acceptance.

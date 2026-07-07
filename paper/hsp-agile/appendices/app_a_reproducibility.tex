@@ -1,0 +1,219 @@
+\chapter{Reproducibility Package}
+\label{app:reproducibility}
+
+This appendix describes the reproducibility infrastructure supporting the
+experimental claims of this thesis.  All quantitative results reported in
+Chapter~\ref{ch:experiments}---conformance rates, acceptance counts, prevention
+detection rates, latency distributions, and statistical comparisons---are
+derived from a versioned artifact store produced by a fully scripted,
+deterministic pipeline~\citep{ammann2016testing,woodcock2009formalsurvey}.  The design separates \emph{data production} from
+\emph{data presentation} so that each phase can be independently re-executed
+and audited without rerunning costly language-model API calls.
+
+The reproducibility package is organised into four logical \emph{artifact}
+components that mirror the structure of a conventional empirical
+software-engineering study:
+
+\paragraph{Raw execution logs.}
+Append-only records of every pipeline invocation, one entry per
+(task, mode, attempt) tuple.  Each record captures the prompt text
+sent to the language model, the generated candidate source, formal
+conformance scores, counterexample payloads, pattern hit lists with
+severity annotations, acceptance decisions, and wall-clock timing.
+Raw logs are the authoritative source of truth; all downstream
+aggregates are derived from them.
+
+\paragraph{Processed metrics.}
+Deterministically aggregated summary tables at per-task, per-mode, and
+per-run granularity.  Metrics include strict formal conformance,
+binary acceptance, pattern violation counts partitioned by severity,
+prevention detection rates, and latency percentiles.  Recomputing
+processed metrics from identical raw logs yields bit-identical
+outputs.
+
+\paragraph{Figures and tables.}
+Publication-quality visualisations and statistical summary tables
+generated from processed metrics.  Each figure is linked to a manifest
+entry specifying the data slice, filtering criteria, and research
+question it addresses, enabling independent verification that the
+plotted values correspond to the reported statistics.
+
+\paragraph{Manuscript sources.}
+The complete \LaTeX{} source tree for this thesis, including chapter
+files, diagram sources, bibliography, and cross-references to
+generated tables and figures.
+
+This decomposition ensures that a sceptical reader can trace any reported
+number from the manuscript back through processed metrics to the underlying
+raw log entry without ambiguity.
+
+% ---------------------------------------------------------------------------
+\section{Running the Experiments}
+\label{sec:repro:running}
+% ---------------------------------------------------------------------------
+
+Reproduction proceeds through four sequential pipeline stages.  Each stage consumes
+the output of its predecessor and produces artefacts that are independently
+archived.  Stages may be re-run in isolation provided their input artefacts
+are available.
+
+\paragraph{Stage 1: Benchmark construction.}
+A deterministic task generator synthesises the hard benchmark suite
+using a fixed pseudorandom seed.  The generator emits FSF
+specifications with controlled difficulty parameters (input/output
+arity, scenario count, guard overlap structure) and attaches
+auto-generated reference implementations.  A satisfiability validator
+discards tasks whose scenarios are individually unsatisfiable,
+ensuring that every retained task admits at least one correct
+implementation~\citep{demoura2008z3,barrett2018smt}.  The output is a frozen benchmark corpus used
+identically across all experimental modes.
+
+\paragraph{Stage 2: Experiment execution.}
+The evaluation harness runs all compared pipeline modes over the
+frozen benchmark.  For each (task, mode) pair, the harness invokes
+the full synthesis--verification--repair loop (or the ablated variant
+corresponding to the mode configuration), records every intermediate
+result, and serialises the complete audit trace.  A separate prevention
+evaluation protocol injects specification-layer and
+implementation-layer mutants and measures detection rates~\citep{demillo1978mutation,li2023iet}.  This stage
+is the only one that requires external language-model API access;
+all subsequent stages operate on locally stored logs.
+
+\paragraph{Stage 3: Data preparation.}
+An aggregation pass reads raw execution logs and computes per-mode
+summary statistics: mean and distribution of conformance scores,
+acceptance rates, pattern hit frequencies, prevention detection and
+false-accept rates, and paired comparison inputs for statistical
+testing.  The aggregation is idempotent and seed-independent given
+fixed raw logs.  Incomplete or interrupted runs are flagged rather
+than imputed; corresponding table cells are marked \texttt{TBD} in
+the manuscript.
+
+\paragraph{Stage 4: Figure and table generation.}
+Visualization and tabulation components consume processed metrics to
+produce all figures and dynamically updated statistical tables
+referenced in the manuscript.  Plot styling parameters (resolution,
+colour palette, axis labels) are fixed to ensure visual reproducibility.
+Statistical tests (Wilcoxon signed-rank, Mann--Whitney~U) are applied
+at this stage with documented pairing structure and effect-size
+computation.
+
+As summarised in Figure~\ref{fig:repro-pipeline} (below), reproduction proceeds through
+four sequential stages.
+
+\begin{figure}[htbp]
+  \centering
+  \resizebox{\linewidth}{!}{%
+  \begin{tikzpicture}[
+    stage/.style={
+      rectangle, rounded corners=3pt, draw=darkblue, thick,
+      minimum width=2.6cm, minimum height=0.9cm, align=center,
+      fill=blue!5, font=\small
+    },
+    arr/.style={-{Stealth[length=2.5mm]}, thick, darkblue}
+  ]
+    \node[stage] (s1) {Stage 1\\Benchmark construction};
+    \node[stage, right=1.2cm of s1] (s2) {Stage 2\\Experiment execution};
+    \node[stage, right=1.2cm of s2] (s3) {Stage 3\\Data preparation};
+    \node[stage, right=1.2cm of s3] (s4) {Stage 4\\Figures \& tables};
+    \draw[arr] (s1) -- (s2);
+    \draw[arr] (s2) -- (s3);
+    \draw[arr] (s3) -- (s4);
+    \node[below=0.35cm of s1, font=\footnotesize\itshape] {Frozen benchmark};
+    \node[below=0.35cm of s2, font=\footnotesize\itshape] {Raw logs};
+    \node[below=0.35cm of s3, font=\footnotesize\itshape] {Processed metrics};
+    \node[below=0.35cm of s4, font=\footnotesize\itshape] {Manuscript assets};
+  \end{tikzpicture}%
+  }
+  \caption{Four-stage reproducibility pipeline.  Stages~1 and~2 produce
+    primary data; Stages~3 and~4 derive all reported statistics and
+    visualisations deterministically from stored artefacts.}
+  \label{fig:repro-pipeline}
+\end{figure}
+
+\paragraph{Determinism and configuration control.}
+Determinism is enforced at three levels to maximise reproducibility despite
+the inherent stochasticity of language-model generation.
+
+\paragraph{Task-level determinism.}
+Benchmark construction uses a fixed pseudorandom seed, ensuring that every
+replication operates on the identical task set with the same guard thresholds,
+scenario orderings, and reference implementations.
+
+\paragraph{Evaluation-level determinism.}
+The formal conformance checker, SMT-based test-case generator, mutation
+operators, and pattern guard are fully deterministic given a fixed candidate
+and task.  Counterexample generation, branch-count analysis, and pattern
+matching produce identical results across runs on the same hardware and
+software stack.
+
+\paragraph{Statistical-level robustness.}
+Non-parametric statistical tests are employed for all mode comparisons because
+they do not assume normality of conformance score distributions.  This choice
+provides robustness to residual non-determinism in one-shot LLM generation
+calls, where temperature settings above zero introduce sampling variability.
+Repair-phase calls use zero temperature to approximate deterministic behaviour.
+
+All experimental configuration parameters---mode definitions, synthesis budget
+$K$, conformance threshold $\tau$, pattern severity thresholds, API model
+identifier, token limits, and temperature settings---are recorded in a
+machine-readable manifest bundled with the artifact store.  The manifest serves
+as the single source of configuration truth for any replication attempt.
+
+% ---------------------------------------------------------------------------
+\section{Environment and Dependencies}
+\label{sec:repro:env}
+% ---------------------------------------------------------------------------
+
+The experimental stack requires Python~3.10 or later, the Z3 SMT solver
+(version~4.12 or compatible)~\citep{demoura2008z3}, and network access to an OpenAI-compatible
+language-model API endpoint~\citep{openai2023gpt4}.  Core dependencies include abstract syntax tree
+utilities (standard library), YAML parsing for pattern rule definitions, and
+statistical libraries for non-parametric testing.  Optional plotting
+dependencies are required only for Stage~4 figure generation.
+
+Hardware requirements are modest: the formal checker and pattern guard are
+CPU-bound and complete in milliseconds per candidate on a modern workstation.
+The dominant cost is language-model API latency during Stage~2; the full
+evaluation matrix (seven modes across 120 tasks) requires several hours of
+API time but can be parallelised across independent worker processes without
+affecting result validity.
+
+% ---------------------------------------------------------------------------
+\section{Expected Outputs}
+\label{sec:repro:outputs}
+% ---------------------------------------------------------------------------
+
+A complete replication produces the following deliverables:
+
+\begin{itemize}
+  \item A frozen benchmark corpus with validated FSF specifications and
+        reference implementations.
+  \item Raw JSONL execution logs for every (task, mode) run, including
+        prevention evaluation records.
+  \item Processed metric summaries in structured JSON format, partitioned by
+        mode and evaluation type (main experiment, spec-confusion prevention,
+        implementation-screening prevention).
+  \item Publication figures in vector and raster formats at 300\,dpi
+        resolution.
+  \item Updated statistical tables embedded in the manuscript source.
+\end{itemize}
+
+Incomplete runs are never silently extrapolated.  If a replication attempt
+terminates before all tasks are processed, the aggregation stage reports the
+actual completion count and marks pending entries as \texttt{TBD}.  This
+conservative reporting policy prevents optimistic bias in acceptance rates and
+statistical comparisons.
+
+% ---------------------------------------------------------------------------
+\section{Data Availability}
+\label{sec:repro:data}
+% ---------------------------------------------------------------------------
+
+The artifact store, configuration manifest, and dependency specification are
+retained alongside this thesis to enable independent verification of all
+quantitative claims.  Raw execution logs are preserved in append-only form and
+are not modified after initial write.  Processed metrics can be regenerated at
+any time from the raw logs without re-invoking the language model.  Figure and
+table assets are version-controlled together with the manuscript source so that
+each reported statistic can be traced to its originating data slice.

@@ -1,0 +1,454 @@
+%% ch04_method.tex  —  Chapter 4: The SgDP Framework and HSP-Agile Instantiation
+%% HSP-Agile Thesis, East China Normal University, 2026
+
+\chapter{The \textsc{SgDP} Framework and HSP-Agile Instantiation}
+\label{ch:method}
+
+This chapter presents the methodological foundation of HSP-Agile at two levels.
+\textbf{Part~A} (Section~\ref{sec:method:sgdp}) introduces the
+\textbf{Specification-guided Defect Prevention Framework} (\textsc{SgDP}), its
+instantiation interface, three formal theorems, the Semantic Feedback IR, the
+conjunctive acceptance predicate, prevention metrics, and the full algorithm.
+\textbf{Part~B} (Sections~\ref{sec:method:principles}--\ref{sec:method:summary})
+details the four-stage pipeline: design principles P1--P5, per-stage algorithms,
+prompt engineering, and the requirement pattern guard.
+We inherit the notation of Chapter~\ref{ch:formalization}:
+$t = (\mathcal{S}_t, \mathcal{X}_t, \mathcal{Y}_t)$, oracle $g_t$, and
+first-match semantics over $\mathcal{S}_t = \langle s_1,\ldots,s_n\rangle$.
+
+\section{The \textsc{SgDP} Framework}
+\label{sec:method:sgdp}
+
+\subsection{Framework Overview and Instantiation Interface}
+\label{subsec:framework-overview}
+
+The \textbf{Specification-guided Defect Prevention Framework} (\textsc{SgDP})
+prevents specification-conformance defects in LLM-generated implementations via
+four language-independent components:
+\begin{enumerate}
+  \item \textbf{Specification Oracle} ($\mathcal{G}$): executable oracle derived
+    from the formal specification without a reference implementation.
+  \item \textbf{Constraint-guided Witness Generator} ($\mathcal{W}$): SMT-based
+    witnesses targeting boundary regions where conformance defects manifest.
+  \item \textbf{Scenario-aware Semantic Feedback IR} ($\mathcal{F}$): typed
+    failure records carrying specification-level semantics for repair prompts.
+  \item \textbf{Conjunctive Acceptance Predicate} ($\mathcal{A}$): release gate on
+    oracle-grounded conformance and specification-derived quality criteria.
+\end{enumerate}
+
+\begin{figure}[t]
+  \centering
+  \tikzinput{diagrams/tikz/pipeline_architecture}
+  \caption{\textsc{SgDP} framework (outer box) and HSP-Agile instantiation (inner
+    labels).  Shadowed boxes are processing stages; the left arc is the repair loop
+    within budget~$K$.}
+  \label{fig:architecture}
+\end{figure}
+
+An instantiation for language $\mathcal{L}$ provides:
+(i)~parser $\mathcal{L} \to \texttt{TaskSpec}$;
+(ii)~oracle $g_t: \mathcal{X}_t \to \mathcal{Y}_t$;
+(iii)~witness generator $\mathcal{W}(t) \subseteq \mathcal{X}_t$;
+(iv)~feedback renderer $\texttt{SemanticFeedback} \to$ natural language.
+Synthesis loop, repair loop, pattern guard, and acceptance evaluation are shared.
+
+\subsection{HSP-Agile: SOFL/FSF Instantiation}
+\label{subsec:hsp-agile}
+
+HSP-Agile instantiates \textsc{SgDP} over FSF~\cite{liu2014sofl,li2022agilesofl}.
+Each scenario $s_i = (g_i, \phi_i)$ pairs a guard with a postcondition; under
+\emph{first-match semantics} the output for $\mathbf{x}$ is $\phi_i(\mathbf{x})$ where
+$i = \min\{j : g_j(\mathbf{x})\}$.
+The FSF oracle requires no reference implementation:
+\begin{equation}
+  g_t(\mathbf{x}) = \phi_i(\mathbf{x}) \text{ where } i = \min\{j : g_j(\mathbf{x})\}.
+\end{equation}
+
+\subsection{Constraint-guided Witness Generation and Theorem~1}
+\label{subsec:witness-gen}
+
+For scenario $s_i$, the witness generator solves the \emph{priority formula}
+\begin{equation}
+  \label{eq:priority}
+  \Phi_i \;\triangleq\; \hat{g}_i(\mathbf{x}) \;\land\; \bigwedge_{j=1}^{i-1} \lnot\hat{g}_j(\mathbf{x}),
+\end{equation}
+where $\hat{g}_j$ is the Z3 encoding of $g_j$, ensuring activation of $s_i$ under
+first-match semantics.
+The witness set is $\mathcal{D}(t) = \{\mathbf{x}_1^*, \ldots, \mathbf{x}_n^*\}$.
+
+\begin{theorem}[Scenario-aware Witness Soundness]
+\label{thm:witness-soundness}
+If $\hat{g}_i$ soundly encodes $g_i$ and Z3 returns model $\mathbf{x}^*$ satisfying
+$\Phi_i$, then $g_i(\mathbf{x}^*)$ holds and $g_j(\mathbf{x}^*)$ is false for all $j < i$;
+hence $g_t(\mathbf{x}^*) = \phi_i(\mathbf{x}^*)$.
+\end{theorem}
+\begin{proof}[Sketch]
+Z3 soundness and encoding correctness give $g_i(\mathbf{x}^*)$ and $\lnot g_j(\mathbf{x}^*)$
+for $j < i$; first-match semantics yields $i = \min\{j : g_j(\mathbf{x}^*)\}$.
+\end{proof}
+
+\subsection{Scenario-aware Semantic Feedback IR}
+\label{subsec:feedback-ir}
+
+On witness failure, the framework records
+\begin{equation}
+  \mathcal{F}(i, c, t) = \langle \textit{type},\ s_i,\ g_i,\ \mathbf{x}_i^*,
+  \ c(\mathbf{x}_i^*),\ g_t(\mathbf{x}_i^*),\ \textit{reason},\
+  \textit{priority},\ \textit{fix} \rangle,
+\end{equation}
+with \textit{type} $\in \{\text{ordering}, \text{boundary}, \text{arithmetic},
+\text{output}\}$, ranked \textit{priority}, and suggested \textit{fix}.
+A template renders this IR into repair prompts naming the violated scenario, stating
+the guard, and enforcing first-match ordering.
+
+\subsection{Formal Conformance, Acceptance Predicate, and Theorem~2}
+\label{subsec:conformance-acceptance}
+
+\begin{equation}
+  \label{eq:conformance}
+  \mathrm{Conf}(c,t) = \frac{1}{|\mathcal{D}(t)|} \sum_{\mathbf{x} \in \mathcal{D}(t)}
+  \mathbf{1}\bigl[f_c(\mathbf{x}) = g_t(\mathbf{x})\bigr].
+\end{equation}
+Let $\mathcal{P}^H$ be the nine high-severity RF patterns (Table~\ref{tab:patterns}).
+The conjunctive acceptance predicate is:
+\begin{equation}
+  \label{eq:accept}
+  \mathrm{Accept}(c,t) \;\iff\;
+  \mathrm{Conf}(c,t) = 1 \;\land\;
+  \sum_{p \in \mathcal{P}^H} \mathbf{1}[p(c,t)] = 0.
+\end{equation}
+
+\begin{theorem}[Acceptance Safety]
+\label{thm:acceptance-safety}
+If $\mathrm{Accept}(c,t)$, then $c$ passes all witnesses in $\mathcal{D}(t)$ and
+exhibits no high-severity anti-pattern.
+For $|\mathcal{D}(t)| = n$ independent witnesses,
+$\mathrm{FAR} \leq (1-\epsilon)^n$ where $\epsilon$ is the minimum fault-exposure
+probability per witness.
+\end{theorem}
+\begin{proof}[Sketch]
+$\mathrm{Conf}(c,t)=1$ requires agreement with $g_t$ on every witness in $\mathcal{D}(t)$;
+Theorem~\ref{thm:witness-soundness} ensures witnesses are semantically targeted.
+\end{proof}
+
+\subsection{Repair Monotonicity and Theorem~3}
+\label{subsec:repair-monotonicity}
+
+\begin{theorem}[Bounded Witness-Coverage Monotonicity]
+\label{thm:repair-monotonicity}
+Let $\mathrm{Cov}_k$ count witnesses in $\mathcal{D}(t)$ on which iteration-$k$
+candidate output is correct.
+The Semantic Feedback IR includes every iteration-$k$ witness failure in the
+iteration-$(k{+}1)$ prompt; a repair fixing those failures cannot decrease
+$\mathrm{Cov}_{k+1}$ below $\mathrm{Cov}_k$.
+\end{theorem}
+\begin{proof}[Sketch]
+Failing witness inputs are unchanged across iterations; passing them is necessary
+for any accepted repair.
+LLM stochasticity may introduce new failures elsewhere; Theorem~\ref{thm:acceptance-safety}
+bounds the resulting FAR.
+\end{proof}
+
+\subsection{Prevention-Oriented Metrics}
+\label{subsec:metrics}
+
+For mutant set $\mathcal{M}$:
+\begin{equation}
+  \mathrm{PDR} = \frac{|\{m \in \mathcal{M} : \neg\mathrm{Accept}(c_m, t_m)\}|}{|\mathcal{M}|},
+  \qquad
+  \mathrm{FAR} = \frac{|\{m \in \mathcal{M} : \mathrm{Accept}(c_m, t_m) \land \text{faulty}(m)\}|}{|\mathcal{M}|}.
+\end{equation}
+We report PDR, FAR, strict formal conformance, and latency jointly.
+
+\begin{figure}[t]
+  \centering
+  \tikzinput{diagrams/tikz/prevention_protocol}
+  \caption{Two-layer prevention evaluation: specification-confusion and
+    implementation-screening mutant tracks aggregated to PDR and FAR.}
+  \label{fig:prevention-protocol}
+\end{figure}
+
+\subsection{Full Algorithmic Procedure}
+\label{sec:method:algorithm}
+
+\begin{algorithm}[t]
+\caption{HSP-Agile (\textsc{SgDP} instantiation)}
+\label{alg:sgdp}
+\begin{algorithmic}[1]
+\Require task $t$, budget $K$
+\Ensure accepted candidate or best-effort fallback
+\State $\mathcal{D}(t) \leftarrow \mathcal{W}(t)$
+\State $\text{feedback}_0 \leftarrow \emptyset$; $\text{best} \leftarrow \mathtt{null}$
+\For{$k = 1$ to $K$}
+  \State $c_k \leftarrow \Fn{LLM}(t, \text{feedback}_{k-1})$
+  \State $\mathrm{Conf}(c_k,t),\ \text{failures}_k \leftarrow$ eval $c_k$ on $\mathcal{D}(t)$ via $g_t$
+  \State $\text{patterns}_k \leftarrow$ pattern guard on $c_k$
+  \If{$\mathrm{Accept}(c_k, t)$} \Return $c_k$, accepted \EndIf
+  \State $\text{feedback}_k \leftarrow \{\mathcal{F}(i, c_k, t) : \mathbf{x}_i^* \in \text{failures}_k\}$
+  \State $\text{feedback}_k \mathrel{+}= \text{top-}5$ pattern violations from $\text{patterns}_k$
+  \State update $\text{best}$ if $\mathrm{Conf}(c_k,t) > \mathrm{Conf}(\text{best},t)$
+  \State log $\langle k, \mathrm{Conf}(c_k,t), |\text{failures}_k|, |\text{patterns}_k|\rangle$
+\EndFor
+\Return $\text{best}$, not-accepted
+\end{algorithmic}
+\end{algorithm}
+
+Every iteration appends $\langle k, \mathrm{Conf}(c_k,t), |\text{failures}_k|,
+|\text{patterns}_k|\rangle$ to \texttt{attempt\_history} in the output JSONL,
+supporting repair-dynamics (E5) and feedback-quality (E6) analyses.
+
+\input{tables/symbols}
+
+\section{Design Principles}
+\label{sec:method:principles}
+
+Five principles shaped every architectural decision~\citep{woodcock2009formalsurvey, chen2021codex}:
+
+\paragraph{P1 --- Precision over approximation.}
+Conformance is decided by an SMT solver and oracle $g_t$, not learned heuristics
+or hand-annotated expected values.
+
+\paragraph{P2 --- Bounded budget with guaranteed termination.}
+A hard budget $K$ caps synthesis-check iterations ($K = 5$ in experiments).
+
+\paragraph{P3 --- Counterexample specificity.}
+Repair feedback includes failing input $x^*$, oracle output $g_t(x^*)$,
+candidate output $f_c(x^*)$, and the governing FSF scenario index.
+
+\paragraph{P4 --- Conservative acceptance.}
+Release requires both formal conformance and pattern safety
+(equation~\eqref{eq:accept}); neither stage alone suffices.
+
+\paragraph{P5 --- Modularity and ablation transparency.}
+Boolean flags enable or disable Stages~2--4 independently for ablation
+(Chapter~\ref{ch:experiments}).
+
+\section{Pipeline Overview}
+\label{sec:method:overview}
+
+Per-task data flow:
+\begin{equation}
+  \mathcal{S}_t
+  \;\xrightarrow{\text{Stage 1}}\;
+  c_k
+  \;\xrightarrow{\text{Stage 2}}\;
+  (\mathrm{Conf}(c_k,t),\;\mathit{cexs}_k)
+  \;\xrightarrow{\text{Stage 3}}\;
+  \mathit{feedback}_k
+  \;\xrightarrow{\text{Stage 4}}\;
+  \mathrm{Accept}(c_k,t),
+  \label{eq:pipeline-flow}
+\end{equation}
+iterated until $\mathrm{Accept}(c_k, t) = 1$ or $k = K$.
+Figure~\ref{fig:architecture} shows the architecture; Figure~\ref{fig:pipeline-seq}
+the message-level sequence.
+
+\begin{figure}[t]
+  \centering
+  \IfFileExists{diagrams/puml/rendered/pipeline_sequence.pdf}{%
+    \pumlfig{diagrams/puml/rendered/pipeline_sequence}%
+  }{%
+    \IfFileExists{diagrams/puml/rendered/pipeline_sequence.png}{%
+      \pumlfig{diagrams/puml/rendered/pipeline_sequence}%
+    }{%
+      \fbox{\parbox{0.75\textwidth}{\centering\vspace{0.8cm}
+        \textit{[pipeline\_sequence.pdf pending]} \vspace{0.8cm}}}%
+    }%
+  }
+  \caption{Sequence diagram of one HSP-Agile run (repair loop until accept or budget~$K$).}
+  \label{fig:pipeline-seq}
+\end{figure}
+
+\section{Stage 1: LLM-Based Candidate Synthesis}
+\label{sec:method:synthesis}
+
+Stage~1 maps $(t, \mathit{feedback}_{k-1})$ to candidate Python $c_k$; it is the
+only non-deterministic stage.
+
+\subsection{Prompt Structure}
+\label{subsec:method:prompt}
+
+The synthesis prompt $\mathcal{P}(t,k)$ follows the OpenAI chat format~\citep{openai2023gpt4, chen2021codex}:
+a fixed \emph{system} message plus a \emph{user} message carrying $(\mathcal{S}_t,
+\mathit{sig}(t))$ and, when $k > 1$, $(\mathit{cexs}_{k-1}, \mathit{hits}_{k-1})$.
+
+\begin{figure}[t]
+  \centering
+  \tikzinput{diagrams/tikz/synthesis_prompt_chat}
+  \caption{Synthesis prompt transcript: system message enforces top-to-bottom guard
+    evaluation; user messages carry FSF spec and, when $k > 1$, repair feedback
+    (orange accent).}
+  \label{fig:synthesis-prompt-chat}
+\end{figure}
+
+\begin{figure}[t]
+  \centering
+  \tikzinput{diagrams/tikz/prompt_design_cards}
+  \caption{Three prompt-design mechanisms~\citep{li2022agilesofl}: scenario ordering,
+    signature injection, and feedback context.}
+  \label{fig:prompt-design-cards}
+\end{figure}
+
+\subsection{Model Configuration and Parsing}
+\label{subsec:method:model}
+
+We use Qwen2.5-27B-Instruct at $\tau = 0.2$ (max 2048 output tokens).
+The parser extracts one \code{```python} fenced block, compiles it, and on failure
+sets $c_k = \bot$ (conformance 0).
+\begin{equation}
+  c_k \;=\; \mathrm{LLM}\!\left(t,\;\mathit{feedback}_{k-1}\right).
+  \label{eq:synthesis}
+\end{equation}
+
+\section{Stage 2: SMT-Driven Formal Conformance Checking}
+\label{sec:method:checker}
+
+Stage~2 computes $\mathrm{Conf}(c_k, t)$ and counterexamples $\mathit{cexs}_k$
+via four steps~\citep{demoura2008z3, barrett2018smt} (Algorithm~\ref{alg:checker}):
+\textbf{(1)} translate each guard $g_i$ to Z3 $\hat{g}_i$ and form $\Phi_i$
+(equation~\eqref{eq:priority});
+\textbf{(2)} solve $\Phi_i$ per scenario (Listing~\ref{lst:z3-gen});
+\textbf{(3)} compute oracle outputs $y_i^* = g_t(x_i)$ by substituting into $\phi_i$;
+\textbf{(4)} execute $c_k$ in a sandbox and compare field-by-field with type normalisation.
+
+\inputpython{listings/z3_gen.py}{Z3 test-case generation for scenario~$i$.}{lst:z3-gen}
+
+\begin{algorithm}[t]
+\caption{SMT-Driven Formal Conformance Checking}
+\label{alg:checker}
+\begin{algorithmic}[1]
+\Require task $t$, candidate $c$
+\Ensure $\mathrm{Conf}(c,t) \in [0,1]$, counterexample list $\mathit{cexs}$
+\State $\mathcal{D}(t) \leftarrow \emptyset$; $\mathit{cexs} \leftarrow \emptyset$
+\For{$i = 1$ \textbf{to} $n$}
+  \State $\Phi_i \leftarrow \ProcCall{TranslateToZ3}{s_i,\, \{g_j\}_{j<i}}$
+  \If{$\ProcCall{Z3-Solve}{\Phi_i} = \mathit{sat}$}
+    \State $x_i \leftarrow \ProcCall{ExtractModel}{}$; $y_i^* \leftarrow \phi_i(x_i)$
+    \State $\mathcal{D}(t) \leftarrow \mathcal{D}(t) \cup \{(x_i, y_i^*)\}$
+  \EndIf
+\EndFor
+\For{\textbf{each} $(x, y^*) \in \mathcal{D}(t)$}
+  \State $y^c \leftarrow f_c(x)$
+  \If{$y^c \neq y^*$}
+    \State $\mathit{cexs} \leftarrow \mathit{cexs} \cup
+           \{(x, y^*, y^c, \ProcCall{ScenarioOf}{x})\}$
+  \EndIf
+\EndFor
+\State \Return $(|\mathcal{D}(t)| - |\mathit{cexs}|)/|\mathcal{D}(t)|,\, \mathit{cexs})$
+\end{algorithmic}
+\end{algorithm}
+
+\subsection{Why SMT Over Random Testing}
+\label{subsec:method:smt-rationale}
+
+Random or boundary-value sampling rarely hits multi-conjunct guard regions
+\citep{claessen2000quickcheck, zhu1997specification}.
+$\Phi_i$ guarantees each witness lies in scenario $i$'s exclusive first-match
+region, realising Theorem~\ref{thm:witness-soundness} and eliminating oracle ambiguity.
+
+\section{Stage 3: Counterexample-Guided Repair}
+\label{sec:method:repair}
+
+When $\mathrm{Conf}(c_k, t) < 1$ or pattern violations occur, Stage~3 assembles
+$\mathit{fb}_k$ mapping $\mathit{cexs}_k$, $\mathit{hits}_k$, attempt $k$, and
+$\mathrm{Conf}(c_k,t)$~\citep{lynn2024verifierloop, solarlezama2008sketching}.
+Each counterexample $(x^*, y^*, y^c, i^*)$ is verbalised, e.g.:
+
+\begin{quote}
+  \textit{``For inputs $(a{=}15,\; b{=}8,\; c{=}3,\; d{=}0,\; e{=}0)$, your code returned
+  \{\textit{risk}{=}\code{MEDIUM}, \textit{action}{=}\code{REVIEW}\}, but the
+  specification requires
+  \{\textit{risk}{=}\code{HIGH}, \textit{action}{=}\code{ESCALATE}\}.
+  This input satisfies Scenario~S1 ($a > 10$ AND $b > 5$), which should be matched first.''}
+\end{quote}
+
+\begin{figure}[t]
+  \centering
+  \tikzinput{diagrams/tikz/repair_feedback}
+  \caption{Counterexample-guided repair: failed attempts yield structured feedback
+    (counterexamples + pattern violations) for the next synthesis call.}
+  \label{fig:repair-feedback}
+\end{figure}
+
+Stage~3 instantiates CEGIS~\citep{solarlezama2008sketching}: the LLM is the synthesiser,
+the formal checker the verifier, and the Semantic Feedback IR (Section~\ref{subsec:feedback-ir})
+the feedback bridge.
+
+\section{Stage 4: Requirement Pattern Guard}
+\label{sec:method:guard}
+
+Candidates with $\mathrm{Conf}(c, t) = 1$ may still violate structural requirements
+outside $\mathcal{D}(t)$~\citep{hovemeyer2004findbugs, li2023iet}.
+Stage~4 applies 14 RF patterns (Table~\ref{tab:patterns}); nine high-severity patterns
+form $\mathcal{P}^H$ used in equation~\eqref{eq:accept}.
+
+\begin{table}[H]
+  \caption{HSP-Agile Error Pattern Catalog ($|\mathcal{P}| = 14$).
+           \textbf{critical} patterns fail immediately; \textit{high} patterns
+           belong to $\mathcal{P}^H$.}
+  \label{tab:patterns}
+  \centering
+  \thesistable{%
+    \small
+    \setlength{\tabcolsep}{4pt}
+    \begin{tabularx}{\linewidth}{@{}lXll@{}}
+      \toprule
+      ID   & Name                     & Category       & Severity \\
+      \midrule
+      RF01 & Missing precondition check  & requirement    & high \\
+      RF02 & Wrong default branch        & FSF            & high \\
+      RF03 & Hardcoded magic number      & implementation & medium \\
+      RF04 & Missing output field        & interface      & high \\
+      RF05 & Swapped comparison          & logic          & high \\
+      RF06 & No guard for zero input     & boundary       & high \\
+      RF07 & Unconditional success       & logic          & \textbf{critical} \\
+      RF08 & Missing type coercion       & implementation & medium \\
+      RF09 & Incomplete FSF coverage     & FSF            & high \\
+      RF10 & External variable ignored   & SOFL           & medium \\
+      RF11 & Off-by-one boundary         & boundary       & high \\
+      RF12 & Duplicate assignment        & implementation & low \\
+      RF13 & Empty handler               & logic          & high \\
+      RF14 & Spec-comment mismatch       & requirement    & medium \\
+      \bottomrule
+    \end{tabularx}%
+  }
+\end{table}
+
+\subsection{Detection Method}
+\label{subsec:method:detection}
+
+Each pattern $p \in \mathcal{P}$ has detector $\delta_p : \mathcal{C} \times \mathcal{T} \to \{0,1\}$.
+Structural patterns (RF04, RF07, RF09, RF13) use AST analysis;
+surface patterns (RF03, RF08, RF14) use regex;
+guard-comparison patterns (RF01, RF02, RF05, RF06, RF11) cross-reference FSF guards
+with candidate conditionals.
+The hit set is $\mathrm{Hits}(c,t) = \{p \in \mathcal{P} : \delta_p(c,t) = 1\}$.
+Medium/low-severity hits inform feedback but do not block acceptance.
+
+\section{Pipeline Stage Summary}
+\label{sec:method:summary}
+
+Table~\ref{tab:stage-summary} summarises all stages.
+Algorithm~\ref{alg:sgdp} unifies them under the \textsc{SgDP} interface; the conjunctive
+predicate (equation~\eqref{eq:accept}) combines Stages~2 and~4 per Principle~P4.
+
+\begin{inlinetable}{Summary of HSP-Agile pipeline stages.}
+  \label{tab:stage-summary}
+  \footnotesize
+  \setlength{\tabcolsep}{3pt}
+  \begin{tabularx}{\linewidth}{@{}clXXl@{}}
+    \toprule
+    Stage & Name          & Input               & Output                     & Property \\
+    \midrule
+    1     & Synthesis     & $t$, $\mathit{fb}$  & $c_k$                      & stochastic \\
+    2     & Formal Check  & $c_k$, $t$          & $\mathrm{Conf}$, $\mathit{cexs}$ & sound (Thm.~\ref{thm:witness-soundness}) \\
+    3     & Repair        & $\mathit{cexs}$, $\mathit{hits}$ & $\mathit{fb}_k$ & CEGIS bridge \\
+    4     & Pattern Guard & $c_k$, $t$          & $\mathit{hits}$            & finite catalog \\
+    ---   & Accept        & $\mathrm{Conf}$, $\mathit{hits}$ & $\{0,1\}$     & conjunctive (Thm.~\ref{thm:acceptance-safety}) \\
+    \bottomrule
+  \end{tabularx}
+\end{inlinetable}
+
+\enlargethispage{1\baselineskip}
+Chapters~\ref{ch:implementation} and~\ref{ch:experiments} present the
+implementation and experimental evaluation.

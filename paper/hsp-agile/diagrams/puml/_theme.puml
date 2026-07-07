@@ -1,0 +1,98 @@
+' =============================================================================
+' HSP-Agile PlantUML — light palette (TikZ-aligned).  Native shadowing is OFF
+' because Kroki/GraalVM PlantUML crashes on java.awt.image.Kernel (1.2026.x).
+' SVG drop-shadows are injected post-render in render_puml.py.
+' =============================================================================
+
+skinparam shadowing false
+skinparam backgroundColor #FFFFFF
+skinparam roundcorner 8
+skinparam defaultFontName Arial
+skinparam defaultFontSize 21
+skinparam defaultFontStyle bold
+skinparam defaultFontColor #1A202C
+skinparam linetype ortho
+skinparam nodesep 28
+skinparam ranksep 36
+
+skinparam ArrowColor #4A5568
+skinparam ArrowFontColor #4A5568
+skinparam ArrowFontStyle bold
+
+' Class diagrams — soft sage (no blue)
+skinparam class {
+  BackgroundColor #F6FAF6
+  BorderColor #9CAF88
+  FontColor #1A202C
+  FontSize 21
+  FontStyle bold
+  AttributeFontColor #2D3748
+  AttributeFontSize 21
+  AttributeFontStyle bold
+  HeaderBackgroundColor #D4E4D4
+  HeaderFontColor #1A202C
+  HeaderFontSize 24
+  HeaderFontStyle bold
+}
+
+skinparam component {
+  BackgroundColor #EDF2F7
+  BorderColor #4A5568
+  FontColor #1A202C
+  FontStyle bold
+}
+
+skinparam package {
+  BackgroundColor #F7FAFC
+  BorderColor #CBD5E0
+  FontColor #2D3748
+  FontStyle bold
+}
+
+skinparam interface {
+  BackgroundColor #FFFFFF
+  BorderColor #A0AEC0
+  FontStyle bold
+}
+
+skinparam sequence {
+  LifeLineBorderColor #A0AEC0
+  ParticipantBackgroundColor #EDF2F7
+  ParticipantBorderColor #4A5568
+  ParticipantFontColor #1A202C
+  ParticipantFontSize 21
+  ParticipantFontStyle bold
+  BoxBackgroundColor #F7FAFC
+  BoxBorderColor #CBD5E0
+  MessageFontSize 21
+  MessageFontStyle bold
+}
+
+skinparam activity {
+  BackgroundColor #EDF2F7
+  BorderColor #4A5568
+  FontColor #1A202C
+  FontSize 21
+  FontStyle bold
+  StartColor #38A169
+  EndColor #38A169
+  DiamondBackgroundColor #FFFAF0
+  DiamondBorderColor #DD6B20
+}
+
+skinparam state {
+  BackgroundColor #EDF2F7
+  BorderColor #4A5568
+  FontColor #1A202C
+  FontSize 21
+  FontStyle bold
+  StartColor #38A169
+  EndColor #38A169
+}
+
+skinparam note {
+  BackgroundColor #FFFFF0
+  BorderColor #D69E2E
+  FontColor #744210
+  FontStyle bold
+}

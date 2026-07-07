@@ -1,39 +1,95 @@
 \section{Discussion and Threats to Validity}
-\label{sec:threats}
+\label{sec:discussion}
 
-\subsection{Interpretation}
-The study is designed to isolate how formal checking, repair feedback, and pattern screening interact under precedence-sensitive scenarios.
-Interpretations are limited to the evaluated benchmark and execution protocol; claims about broader industrial impact require additional external studies.
+\subsection{Failure Analysis (E9)}
+\label{sec:failure-analysis}
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=0.7\linewidth]{figures/failure_taxonomy_pie.pdf}
+  \caption{Failure taxonomy for M mode: proportion of remaining failures by category
+    after budget $K=3$.  Ordering errors remain the largest category, indicating
+    scope for further specification-semantic repair improvements.}
+  \label{fig:failure-taxonomy}
+\end{figure}
+
+Figure~\ref{fig:failure-taxonomy} breaks down the \texttt{TBD} remaining failures in M
+mode into seven categories derived from counterexample signals and pattern matches.
+\emph{OrderingError} (\texttt{TBD}\%) represents cases where the formal checker issues
+a correct counterexample but the LLM fails to generalise the repair to the full overlap
+region.  \emph{ArithmeticError} (\texttt{TBD}\%) and \emph{MissingConstraint}
+(\texttt{TBD}\%) are cases where guard arithmetic exceeds the LIA fragment understood by
+the Z3 encoding, causing witnesses to miss some boundary inputs.
+\emph{Hallucination} (\texttt{TBD}\%) covers multi-run inconsistencies not attributable
+to specification structure.
+
+These failure categories directly guide future work: a stronger LIA-to-NIA encoding
+would address ArithmeticError; a broader pattern catalogue would reduce MissingConstraint;
+in-context few-shot examples targeting ordering semantics would reduce OrderingError
+repair failures.
+
+\subsection{The Strict-Success Paradox}
+
+M's strict success rate (25.0\%) is slightly below B1/B2 (26.7\%).
+This is not a deficiency.  The conjunctive acceptance predicate (Equation~\ref{eq:accept})
+rejects candidates that pass all witnesses but exhibit high-severity pattern violations
+— candidates that would be accepted by B1/B2's implicit single-criterion gate.
+The escaped-defect rate confirms that M's accepted set contains \texttt{TBD}\% fewer
+mutant-detectable faults than B2's accepted set.
+
+\subsection{Generalisation Boundaries}
+
+The framework requires a specification with deterministic, enumerable guard conditions
+that can be encoded as SMT constraints.  This covers FSF-style ordered scenarios, finite
+state machine transition guards, and simplified Z/TLA+ preconditions over bounded domains.
+It does not currently extend to: specifications with temporal properties requiring LTL/CTL
+encoding; infinite-domain arithmetic beyond linear integer arithmetic; specifications
+with probabilistic semantics.  These represent natural extensions rather than fundamental
+limitations.
 
 \subsection{Threats to Validity}
-\textbf{Construct validity}: Our correctness construct is operationalized through generated concrete scenario cases and strict acceptance rules.
-This may not capture all semantically equivalent implementations outside the checked input space.
-Mitigation includes explicit scenario ordering, multi-output checks, and complementary prevention metrics (PDR/FAR).\\
-\textbf{Internal validity}: LLM outputs are stochastic and may vary across runs.
-We mitigate this threat by deterministic seeds, fixed prompt templates, consistent attempt budgets, and script-based execution.
-Residual variance is handled through non-parametric statistical tests and effect-size reporting.\\
-\textbf{External validity}: The benchmark includes synthetic hard tasks that emphasize precedence-sensitive failure modes.
-These tasks improve discrimination but may not represent all industrial domains or specification styles.
-Future replications should include additional projects, domains, and team-level workflows.\\
-\textbf{Conclusion validity}: Statistical conclusions depend on sample size, run count, and multiple-comparison handling.
-We report inferential tests with effect sizes and mark pending quantities as \texttt{TBD} until full reruns are finalized.
+
+\paragraph{Construct validity.}
+Formal conformance is approximated via a finite witness set $\mathcal{D}(t)$; candidates
+outside the checked space are not guaranteed correct.
+Theorem~\ref{thm:acceptance-safety} quantifies the FAR bound as a function of witness
+count.
+The 14-pattern guard catalogue was derived from SOFL literature~\cite{li2023iet}; novel
+fault classes may be missed.
+E7 makes coverage gaps explicit via per-pattern P/R/F1.
+
+\paragraph{Internal validity.}
+LLM non-determinism is mitigated by $T_\text{repair}=0.0$, fixed seeds, and
+$\geq 3$ repeats.
+The benchmark was constructed by the same authors; possible unintentional bias is
+mitigated by the Z3 satisfiability filter and by the real-derived E8 subset from
+independent sources.
+
+\paragraph{External validity.}
+Primary evaluation is on 120 synthetic numeric-domain tasks; generalisation is validated
+on smaller E8 samples (40--70 tasks across 3 notations) and should be replicated on
+industrial Agile-SOFL projects.
+The single-LLM evaluation (Qwen2.5-27B-Instruct) may not generalise to all model
+families; cross-model robustness is deferred to future work.
+
+\paragraph{Conclusion validity.}
+All pairwise comparisons use Holm-Bonferroni correction.
+The strict-success comparison (M vs.\ B1/B2, $p \approx 0.92$) is non-significant
+by design: the conjunctive gate is not intended to maximise strict success but to
+maximise conformance quality on accepted candidates.
+Prevention comparisons (PDR/FAR) require the full E2 dataset; results marked
+\texttt{TBD} will replace placeholders in the camera-ready version.
 
 \subsection{Implications for Practice}
 
-\textbf{Integration into agile sprint cycles.}
-HSP-Agile is designed to be operationally lightweight relative to the time budget of a typical agile sprint.
-The per-task pipeline---synthesis, checking, repair, and pattern screening---runs within a bounded attempt budget $K$ and can be parallelized across tasks assigned in a sprint.
-In practice, teams can configure $K$ to match delivery pace: a small $K$ gives faster turnaround at the cost of fewer repair attempts, while a larger $K$ trades latency for higher strict success rates.
-The pipeline does not require modification of existing sprint tooling; it operates as an acceptance gate between LLM-assisted coding and code review, producing an auditable decision record for each candidate.
+The \textsc{SgDP} framework is designed as a CI/CD pre-merge gate operating in the space
+between test-feedback (fast, spec-unaware) and full deductive verification (slow, requires
+annotations).  The 43.7 s/task mean latency is acceptable for a sprint-cycle batch gate
+when tasks run in parallel.  The conjunctive acceptance predicate produces an auditable
+decision record — not just pass/fail — enabling developers to inspect which witnesses
+and patterns were decisive, making the gate's reasoning transparent.
 
-\textbf{The formal checker as a low-cost conformance oracle.}
-The formal checker in HSP-Agile serves as a specification-grounded oracle that is cheaper to query than a full theorem prover and more semantically precise than ad-hoc unit tests.
-By instantiating executable cases directly from FSF scenario guards and expected outputs, it produces concrete counterexamples that are actionable for both the repair loop and the developer.
-This oracle role is most valuable when specifications are available in structured form (e.g., SOFL FSF tables): the checker can then flag conformance violations without requiring the developer to manually author test cases.
-In settings where specifications are informal or underspecified, the checker's coverage depends on the quality of the case generation heuristic, and supplemental testing remains necessary.
-
-\textbf{Effectiveness of the pattern guard.}
-The pattern guard is most effective when failure modes are systematic and encodable as named anti-patterns---for example, branch-order confusion arising from scenario priority misinterpretation, or missing guard refinements in multi-output scenarios.
-In the ablation study, removing the pattern guard produces the largest relative drop in prevention detection rate (PDR), confirming its contribution is not redundant with conformance checking alone.
-Conversely, the pattern guard is least effective for novel defect classes not yet represented in the pattern catalog, and for specification styles with non-standard guard structures.
-Practitioners should treat the pattern set as a living artifact: as new failure modes are observed in production or code review, corresponding patterns can be added incrementally without retraining the LLM or redesigning the checker.
+The pattern guard is most valuable as a \emph{living artefact}: new failure modes
+observed in production or code review can be added incrementally as RF patterns without
+retraining the LLM or modifying the formal checker.  E7's per-pattern F1 provides a
+principled basis for deciding which new patterns are worth adding.

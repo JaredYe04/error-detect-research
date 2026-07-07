@@ -1,0 +1,482 @@
+%% ch06_experimental_setup.tex  —  Chapter 6: Experimental Setup
+%% HSP-Agile CCF-B Report, East China Normal University, 2026
+%% Ye Xujun
+
+\chapter{Experimental Setup}
+\label{ch:experiments}
+
+This chapter specifies the empirical evaluation design: five research questions
+(Section~\ref{sec:exp:rq}), hardware and run protocol
+(Sections~\ref{sec:exp:environment}--\ref{sec:exp:protocol}), benchmark construction
+(Section~\ref{sec:exp:benchmark}), compared methods and metrics
+(Sections~\ref{sec:exp:methods}--\ref{sec:exp:metrics}), experiment tracks E1--E9,
+statistical protocol, and a threats-to-validity preview.
+Results are reported in Chapter~\ref{ch:results}.
+
+%=============================================================================
+\section{Research Questions}
+\label{sec:exp:rq}
+%=============================================================================
+
+The evaluation is designed to answer the following five research questions.
+
+\paragraph{RQ1 (Overall Effectiveness).}
+Does specification-guided prevention significantly improve formal correctness over pure
+LLM synthesis?
+Evaluated via strict formal conformance and PDR/FAR on the 120-task hard benchmark
+(E1, E2).
+
+\paragraph{RQ2 (Fault Class Prevention).}
+What specification defect classes does the framework prevent, and which remain outside
+its reach?
+Evaluated via per-operator PDR heatmap (E2), per-pattern P/R/F1 (E7), and failure
+taxonomy (E9).
+
+\paragraph{RQ3 (Component Attribution).}
+How much does each semantic component (formal checker, Semantic Feedback IR, pattern
+guard) contribute independently?
+Evaluated via ablation (A1/A2/A3 vs.\ M, E1), repair dynamics (E5), and feedback
+variant comparison (E6).
+
+\paragraph{RQ4 (Complexity Scaling).}
+How does the framework's advantage scale across specification complexity dimensions?
+Evaluated via overlap density tertiles and guard complexity stratification (E3).
+
+\paragraph{RQ5 (Quality--Overhead Trade-off).}
+What is the quality gain per unit of latency and LLM calls relative to the strongest
+baseline?
+Evaluated via latency analysis and Pareto comparison (E1).
+
+%=============================================================================
+\section{Hardware and Software Environment}
+\label{sec:exp:environment}
+%=============================================================================
+
+All experiments were executed on a desktop workstation running Windows~10
+(build~26220) with a 6-core processor.
+Tasks were dispatched in parallel across all six cores using Python's
+\code{multiprocessing} module, with one worker process per core.
+The Python runtime was version~3.12.
+The Z3 SMT solver version~4.16~\citep{demoura2008z3,barrett2018smt} was invoked via
+the \code{z3-solver} Python binding; all Z3 calls used a per-call timeout of
+10~seconds, after which the solver returned \code{unknown} and the pipeline treated
+the call as a non-constraining outcome.
+
+%=============================================================================
+\section{Language Model Configuration and Run Protocol}
+\label{sec:exp:protocol}
+%=============================================================================
+
+\subsection{Language Model Configuration}
+
+All LLM-based modes (B1, B2, B3, B4, M, A1, A2, A3) used
+Qwen2.5-27B-Instruct (\textsf{Qwen-27B}) accessed through an OpenAI-compatible LLM
+gateway.
+Temperature was set to $T_\text{gen} = 0.7$ for all generation calls and to
+$T_\text{repair} = 0.0$ for all repair calls, following the prompting strategy
+described in Chapter~\ref{ch:method}.
+The maximum token budget per LLM call was 4096 tokens.
+The budget parameter $K = 3$ was fixed for all LLM-based modes: in mode~M, the repair
+loop may invoke the LLM up to three times per task, consuming between 1 and 3 API
+calls depending on when the loop terminates.
+
+\subsection{Experiment Identifier and Scale}
+
+The primary experiment was conducted under the run identifier
+\code{run\_hard\_full\_parallel\_v1}.
+A total of 840 runs were executed: 7 modes $\times$ 120 tasks, each run processed
+independently by a dedicated worker process.
+Run artefacts (prompts, LLM responses, Z3 query logs, evaluation traces, timing
+records) were serialised to disk in JSONL format for
+reproducibility~\citep{ammann2016testing}.
+All random-number generation used fixed seed~42 for task generation and prompt
+construction; the LLM API itself is not seeded, but temperature~0.0 for repair
+calls makes those responses near-deterministic in practice.
+
+The full CCF-B experimental matrix extends this baseline with extended baselines B3
+and B4 and $\geq 3$ repeats per mode for E1, yielding
+$120 \times 9 \text{ modes} \times 3 \text{ repeats} = 3{,}240$ runs under the
+identifier \code{run\_ccf\_b\_main\_v1}.
+
+\subsection{Reproducibility Measures}
+
+Determinism was enforced at three levels: fixed-seed task generation, deterministic
+evaluation harness (Z3 case generation, mutation testing), and non-parametric
+statistical tests robust to residual LLM non-determinism.
+The \code{attempt\_history} field in every result JSONL records per-iteration
+conformance and counterexample counts, enabling E5 repair dynamics analysis without
+re-running experiments.
+Data preparation, aggregation, and plotting are separated into distinct pipeline
+stages (\code{prepare\_paper\_data.py}, \code{prepare\_mechanism\_data.py},
+\code{plot\_mpl\_figures.py}).
+All reported tables and figures are generated from the canonical
+\code{run\_hard\_full\_parallel\_v1} artifact (120 tasks $\times$ 7 modes) and
+\code{prevention\_full\_v1} prevention evaluation.
+Long-running mechanism experiments (E6 feedback variants, E8 generalisation) write
+incremental \code{results.jsonl} and a live \code{progress.json} with completed/total
+counts and ETA; use \code{python -u} for unbuffered console output.
+Full reproduction instructions are provided in Appendix~\ref{app:reproducibility}.
+
+%=============================================================================
+\section{Benchmark Construction}
+\label{sec:exp:benchmark}
+%=============================================================================
+
+\subsection{Design Rationale}
+
+A central challenge in evaluating specification-conformance tools is that
+off-the-shelf software repositories do not contain Agile-SOFL\slash FSF
+specifications; such artefacts must be constructed.
+We required a benchmark with three properties:
+(i)~\emph{discriminative power}---tasks hard enough that baselines fail non-trivially;
+(ii)~\emph{formal validity}---every task satisfiable by at least one correct
+implementation, verifiable by Z3; and
+(iii)~\emph{diversity}---varied input combinations, scenario orderings, and boundary
+conditions to prevent overfitting.
+Existing formal-synthesis benchmarks such as DafnyBench~\citep{loughman2024dafnybench}
+target annotation-heavy verification languages rather than FSF scenario semantics,
+motivating a domain-specific corpus.
+
+The benchmark consists of 120 hard synthetic Agile-SOFL tasks, selected from 180
+generated candidates by a Z3 satisfiability filter that retains only tasks with
+non-empty precedence-sensitive overlap regions (the class where
+specification-conformance defects occur).
+Each task contains five integer input variables, three output variables, and 8 ordered
+FSF scenarios with overlapping guard regions.
+Tasks are annotated with three complexity metadata fields:
+(i)~\emph{overlap density} (fraction of input space where multiple guards are
+simultaneously satisfiable);
+(ii)~\emph{guard complexity label} (Simple/AND/Nested/Arithmetic/Mixed);
+(iii)~\emph{scenario count}.
+The template baseline B0 scores 27.5\% strict success, confirming genuine difficulty.
+
+\subsection{Base Tasks and Hard Synthetic Generation}
+
+We began with 20 base Agile-SOFL tasks extracted by manual inspection from published
+example specifications~\citep{liu2014sofl,li2022agilesofl}.
+Each base task defines a small module with 3--5 inputs, 2--3 outputs, and 5--8 FSF
+scenarios.
+The base tasks were retained as a development set but excluded from primary evaluation
+to avoid information leakage.
+
+The \emph{HardTaskGenerator} produces synthetic FSF tasks with exactly 5 integer
+inputs $(a, b, c, d, e) \in [0, 100]^5$, 3 outputs
+(\textit{risk}, \textit{action}, \textit{score}), and exactly 8 ordered FSF scenarios.
+Difficulty is modulated by two design choices.
+\emph{Precedence-sensitive guard regions:} each scenario's pre-condition guard overlaps
+with at least one other guard, so correct evaluation requires strict priority
+ordering---directly targeting scenario-order violations (SOV) from
+Chapter~\ref{ch:formalization}.
+\emph{Z3 satisfiability filter:} before admission, Z3 verifies that all 8 scenarios are
+individually satisfiable; tasks failing this check are discarded.
+
+Figure~\ref{fig:benchmark-pipeline} illustrates the full construction pipeline.
+
+\begin{figure}[t]
+  \centering
+  \tikzinput{diagrams/tikz/benchmark_pipeline}
+  \caption{Benchmark construction pipeline.
+    Hard synthetic tasks are generated with precedence-sensitive FSF scenarios,
+    validated by Z3 for scenario satisfiability, and assembled into the final
+    120-task benchmark used across all evaluation modes.}
+  \label{fig:benchmark-pipeline}
+\end{figure}
+
+The generator produced 180 candidate tasks, of which 60 were discarded by the Z3
+satisfiability filter, leaving the final benchmark of 120 hard synthetic tasks.
+
+\subsection{Generalisation Subset (E8)}
+
+An additional 20--30 tasks derived from HumanEval and MBPP problems with multi-case
+conditional logic are converted to FSF-style ordered scenarios following a documented
+selection and conversion protocol; these are used in the generalisation study (E8).
+
+\subsection{Illustrative Task Example}
+
+The following illustrative task models a financial risk classifier with inputs
+\code{a}--\code{e} $\in [0,100]$ and outputs \code{risk} $\in \{0,1,2,3\}$,
+\code{action} $\in \{0,1,2\}$, and \code{score} $\in [0,100]$.
+The eight FSF scenarios are ordered from most-specific to least-specific:
+
+\begin{enumerate}
+  \item High credit AND low debt AND low volatility $\Rightarrow$ (risk=0, action=0, score=90)
+  \item High credit AND low debt $\Rightarrow$ (risk=0, action=0, score=75)
+  \item High credit AND moderate debt $\Rightarrow$ (risk=1, action=1, score=60)
+  \item Low credit AND high debt AND high volatility $\Rightarrow$ (risk=3, action=2, score=15)
+  \item Low credit AND high debt $\Rightarrow$ (risk=2, action=2, score=30)
+  \item Low credit $\Rightarrow$ (risk=2, action=1, score=40)
+  \item Moderate credit AND high exposure $\Rightarrow$ (risk=1, action=1, score=55)
+  \item (default) $\Rightarrow$ (risk=1, action=0, score=65)
+\end{enumerate}
+
+Scenario~1 and Scenario~2 have overlapping guards.
+An implementation evaluating guards in reverse order produces \code{score}=75 instead
+of 90 on Scenario~1 inputs---a scenario-order violation detectable by the pattern
+guard and by Z3 witnesses in the overlap region
+(e.g., \code{a=85, b=15, c=10, d=80, e=20}).
+A one-shot LLM may handle 7 of 8 scenarios correctly yet fail on this overlap
+because it did not fully parse priority ordering from the specification
+text~\citep{chen2021codex,dakhel2023copilot}; the CEGIS repair loop can correct this
+in a single iteration given a Z3 boundary input~\citep{solarlezama2008sketching,lynn2024verifierloop}.
+
+\subsection{Benchmark Characteristics}
+
+Table~\ref{tab:benchmark-stats} summarises the 120-task benchmark;
+the mean guard region overlap rate is 1.8 scenarios per input point.
+
+\begin{table}[H]
+  \caption{Summary statistics of the 120-task hard benchmark.}
+  \label{tab:benchmark-stats}
+  \centering
+  \thesistable{%
+    \begin{tabular}{lc}
+      \toprule
+      Property & Value \\
+      \midrule
+      Total tasks & 120 \\
+      Inputs per task & 5 \\
+      Outputs per task & 3 \\
+      Scenarios per task & 8 \\
+      Mean guard-overlap rate (scenarios/point) & 1.8 \\
+      Tasks rejected by Z3 filter & 60 \\
+      Tasks accepted & 120 \\
+      Evaluation cases per task (\code{strict\_eval}) & 64 \\
+      \bottomrule
+    \end{tabular}%
+  }
+\end{table}
+
+%=============================================================================
+\section{Compared Methods}
+\label{sec:exp:methods}
+%=============================================================================
+
+We compare nine evaluation modes spanning the design space from a formal reference
+(B0) through LLM baselines (B1--B4) to the full HSP-Agile pipeline (M) and three
+ablated variants (A1, A2, A3).
+
+\begin{table}[H]
+  \caption{Compared modes.
+    Columns indicate whether each component is active.}
+  \label{tab:modes}
+  \centering
+  \thesistable{%
+    \footnotesize
+    \renewcommand{\arraystretch}{1.15}
+    \begin{tabular*}{\linewidth}{@{\extracolsep{\fill}}l l c c c@{}}
+      \toprule
+      Mode & Description & Formal checker & Pattern guard & Repair loop \\
+      \midrule
+      B0 & Reference (template) & eval only & --- & --- \\
+      B1 & One-shot LLM & --- & --- & --- \\
+      B2 & Test-feedback & --- & --- & \checkmark (tests) \\
+      B3 & Self-Refine & --- & --- & \checkmark (self-critique) \\
+      B4 & Self-Debug & --- & --- & \checkmark (execution trace) \\
+      M  & Full \textsc{SgDP}/HSP-Agile & \checkmark & \checkmark & \checkmark (IR) \\
+      A1 & Ablation: no formal checker & --- & \checkmark & \checkmark (IR) \\
+      A2 & Ablation: no pattern guard & \checkmark & --- & \checkmark (IR) \\
+      A3 & Ablation: no repair loop & \checkmark & \checkmark & --- \\
+      \bottomrule
+    \end{tabular*}%
+  }
+\end{table}
+
+\paragraph{B0 --- Reference Implementation.}
+B0 provides a formal upper-bound reference.
+For each task, a deterministic template renderer encodes each FSF scenario as a guarded
+branch in priority order; no LLM or iterative loop is involved.
+The formal checker is applied \emph{ex post} to compute $\mathit{Conf}(\cdot)$.
+
+\paragraph{B1 --- One-Shot LLM.}
+B1 makes a single LLM API call with the full FSF specification, parses the response,
+and passes it directly to the evaluator with no feedback loop.
+
+\paragraph{B2 --- LLM with Test-Feedback Loop.}
+B2 extends B1 with an iterative test-feedback loop~\citep{zhu1997specification}.
+After each generation, unit tests derived from FSF pre/post-conditions are executed;
+failures are appended to the prompt for the next LLM call until all tests pass or
+$K=3$ is exhausted.
+B2 uses no Z3 and no pattern guard.
+
+\paragraph{B3 --- Self-Refine Baseline.}
+B3 (Self-Refine style~\citep{madaan2023selfrefine}): after each synthesis attempt, the
+same LLM is asked to critique its output and revise without any external checker.
+The critique prompt requests a structured self-assessment but provides no Z3
+counterexamples, pattern-guard signals, or specification-level annotation.
+
+\paragraph{B4 --- Self-Debug Baseline.}
+B4 (Self-Debug style~\citep{chen2023selfdebug}): the candidate is executed on B0
+reference test cases and execution failures are fed back as natural-language without
+specification-level annotation.
+Unlike B2, B4 uses only reference-implementation observable behaviour rather than
+FSF-derived tests.
+Both extended baselines B3 and B4 use the same prompt template family as M and the
+same budget~$K$.
+
+\paragraph{M --- Full HSP-Agile Pipeline.}
+Mode~M runs the complete pipeline (Chapters~\ref{ch:method} and~\ref{ch:implementation}):
+LLM generation, Z3 counterexample inputs, pattern-guard screening, and CEGIS repair
+with Semantic Feedback IR until all checks pass or $K=3$ is reached.
+
+\paragraph{A1 --- Ablation: No Formal Check.}
+A1 replaces Z3-based case generation with the B2 unit-test harness; pattern guard and
+repair loop remain active, isolating Z3-guided feedback.
+
+\paragraph{A2 --- Ablation: No Pattern Guard.}
+A2 disables the pattern guard; candidates are evaluated by Z3 and passed directly to
+the repair loop, isolating structural screening.
+
+\paragraph{A3 --- Ablation: No Repair Loop.}
+A3 calls the LLM exactly once (as B1) but applies Z3 and the pattern guard without
+sending corrective feedback, isolating the CEGIS repair loop.
+
+%=============================================================================
+\section{Mutant Design}
+\label{sec:exp:mutants}
+%=============================================================================
+
+Two mutant tracks:
+\begin{enumerate}
+  \item \textbf{Specification-confusion} (spec layer): SNO (scenario negation/order swap),
+    ORO (output reversal), MCO (missing condition), BCO (boundary condition offset).
+  \item \textbf{Implementation-screening} (impl layer): ICO (incorrect condition),
+    WRO (wrong return order), MBO (missing branch), DRO (dependency reversal).
+\end{enumerate}
+Each mutant is generated by applying one first-order operator to a known-correct
+candidate.
+Invalid (non-compilable) mutants are excluded and reported separately.
+
+%=============================================================================
+\section{Evaluation Metrics}
+\label{sec:exp:metrics}
+%=============================================================================
+
+\subsection{Primary Metrics}
+
+\paragraph{Strict Success Rate.}
+For a task~$t$ and mode~$m$, the run is a \emph{strict success} if the returned
+candidate passes every one of the 64 Z3-generated evaluation cases
+(\code{strict\_eval} set).
+The strict success rate is the fraction of 120 tasks meeting this criterion.
+
+\paragraph{Strict Formal Conformance.}
+The formal conformance $\mathit{Conf}(c, t) \in [0,1]$
+(Definition~\ref{def:conformance}) is the fraction of strict evaluation cases that
+candidate~$c$ satisfies on task~$t$; we report mean $\overline{\mathit{Conf}}$ across
+all 120 tasks.
+
+\paragraph{Mutation Kill Rate.}
+Given candidate~$c$ for task~$t$, we inject $n_\mu$ syntactic mutants and check
+whether the formal checker classifies each as non-conforming.
+The mutation kill rate $\mu_k$ is the fraction killed; it measures checker precision,
+not generator quality.
+
+\paragraph{LLM Call Count and Latency.}
+LLM call count is the mean API calls per task (1.0 for B1; 1--3 for repair modes).
+Latency is wall-clock time from task start to final verdict, including LLM, Z3, pattern
+guard, and orchestration overhead.
+
+\paragraph{PDR and FAR (Prevention Metrics).}
+The Positive Detection Rate (PDR) is the fraction of faulty candidates (mutants)
+correctly rejected; the False Accept Rate (FAR) is the fraction of correct candidates
+incorrectly rejected (Section~\ref{sec:form:metrics}).
+Both are reported per mutant operator in E2 and aggregated in E1.
+
+%=============================================================================
+\section{Evaluation Protocol}
+\label{sec:exp:eval-protocol}
+%=============================================================================
+
+\paragraph{E1 --- Overall Effectiveness.}
+120 tasks $\times$ 9 modes $\times$ $\geq$3 repeats.
+Primary metrics: Conf, PDR, FAR, latency.
+Budget $K=3$, $T_\text{gen}=0.7$, $T_\text{repair}=0.0$.
+
+\paragraph{E2 --- Full Prevention Evaluation.}
+120 tasks $\times$ 6 modes $\times$ 8 mutant operators, measuring PDR/FAR per operator.
+
+\paragraph{E3 --- Specification Complexity.}
+Conf stratified by overlap density tertile and guard complexity label.
+
+\paragraph{E4 --- Boundary Density.}
+Scenario coverage rate of SMT witnesses vs.\ random sampling across 5 case budgets
+(4/8/16/32/64) and 3 density tiers.
+
+\paragraph{E5 --- Repair Dynamics.}
+$\mathrm{Conf}(k)$ trajectory for M vs.\ B2 at $k=1,2,3$ from logged
+\code{attempt\_history}.
+
+\paragraph{E6 --- Feedback Variant Comparison.}
+Final Conf and iterations-to-convergence for feedback variants A (test only),
+B (test + expected), and C (full Semantic Feedback IR).
+
+\paragraph{E7 --- Pattern Guard P/R/F1.}
+Per-category precision, recall, and F1 of the pattern guard on the E2 mutant population.
+
+\paragraph{E8 --- Generalisation.}
+Conf for M, B1, B2 across SOFL/FSF, Mini-Z, and Mini-StateMachine notations.
+
+\paragraph{E9 --- Failure Analysis.}
+Taxonomy of remaining failures in M mode by category.
+
+%=============================================================================
+\section{Statistical Protocol}
+\label{sec:exp:stats}
+%=============================================================================
+
+All pairwise comparisons involving per-task binary outcomes (strict success) use the
+\emph{Wilcoxon signed-rank test}; latency comparisons use the \emph{Mann-Whitney U test}.
+The full statistical protocol comprises:
+
+\begin{itemize}
+  \item Paired Wilcoxon signed-rank test for conformance comparisons.
+  \item Mann-Whitney U test for latency comparisons.
+  \item Holm-Bonferroni correction applied across all pairwise mode comparisons.
+  \item Cliff's $\delta$ as non-parametric effect size.
+  \item Bootstrap 95\% confidence intervals ($n=1000$ resamples).
+  \item Significance threshold $\alpha = 0.05$.
+\end{itemize}
+
+Effect sizes are interpreted as: $|\delta| < 0.147$ negligible,
+$0.147 \le |\delta| < 0.33$ small, $0.33 \le |\delta| < 0.474$ medium,
+$|\delta| \ge 0.474$ large.
+Holm-Bonferroni correction is applied for E1 all-mode comparisons.
+
+%=============================================================================
+\section{Threats to Validity (Preview)}
+\label{sec:exp:threats-preview}
+%=============================================================================
+
+We structure threats using the four-category framework of empirical software
+engineering~\citep{ammann2016testing,woodcock2009formalsurvey}; full discussion appears
+in Chapter~\ref{ch:discussion}.
+
+\paragraph{Construct validity.}
+Formal conformance is approximated via Z3-generated concrete cases, not full theorem
+proving; Theorem~\ref{thm:acceptance-safety} quantifies the FAR bound under finite
+witness budgets.
+The 14-pattern guard catalogue (RF01--RF14) may miss novel fault classes; E7 reports
+per-pattern P/R/F1 to expose gaps.
+PDR uses first-order mutation operators; higher-order and real-world faults may differ.
+
+\paragraph{Internal validity.}
+LLM non-determinism is mitigated by $T_\text{repair}=0.0$, fixed seeds, and
+$\geq 3$ repeats.
+Reference implementations are auto-generated via \code{reference\_gen.py} with
+hand-crafted overrides for core tasks.
+Benchmark construction by the same authors introduces possible tuning bias, mitigated
+by ablation (A1--A3), sensitivity analysis, and the independent E8 subset.
+The Z3 overlap filter selects tasks where SMT-based approaches are advantaged.
+
+\paragraph{External validity.}
+Primary evaluation uses 120 synthetic numeric-domain tasks; E8 validates generalisation
+on Mini-Z, Mini-StateMachine, and real-derived tasks at smaller scale.
+Implementations are Python; results may not transfer to other languages or LLMs.
+
+\paragraph{Conclusion validity.}
+Holm-Bonferroni correction, Cliff's~$\delta$, and bootstrap 95\% CIs are applied
+throughout.
+The strict-success null result (M vs.\ B1/B2, $p \approx 0.92$) reflects the conjunctive
+acceptance gate design, not method equivalence on conformance.
+Preliminary prevention results ($n=40$) are superseded by full E2; the non-monotonic
+B2/M ordering reflects complementary detection mechanisms.

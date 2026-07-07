@@ -1,0 +1,46 @@
+@startuml checker_activity
+!include _theme.puml
+scale max 2700 width
+
+start
+
+:Receive **candidate_code** and **task**;
+
+partition "Case Generation (Z3)" {
+  :Parse FSF scenarios from task;
+  :For each scenario S_i:\nencode guard G_i and precedence\nconstraints into Z3;
+  :Query Z3 for satisfying model;
+  :Build concrete case set D(t);
+}
+
+partition "Conformance Evaluation" {
+  :passed := 0, total := |D(t)|;
+  while (more cases in D(t)?) is (yes)
+    :Execute candidate on case inputs;
+    if (output matches expected?) then (yes)
+      :passed := passed + 1;
+    else (no)
+      :Record counterexample\n(input, expected, actual);
+    endif
+  endwhile (no)
+}
+
+:Compute Conf(c,t) = passed / total;
+
+if (Conf(c,t) >= tau?) then (yes)
+  :strict_formal_passed := true;
+else (no)
+  :strict_formal_passed := false;
+endif
+
+:Return CheckResult(conformance, counterexamples);
+
+stop
+
+note right
+  Counterexamples feed the
+  repair engine in the next
+  synthesis iteration
+end note
+
+@enduml

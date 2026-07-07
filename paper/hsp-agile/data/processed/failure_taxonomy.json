@@ -1,0 +1,24 @@
+{
+  "mode": "M",
+  "total_failed": 90,
+  "total_records": 120,
+  "failure_rate": 0.75,
+  "categories": {
+    "APIMisuse": {
+      "count": 21,
+      "fraction": 0.2333
+    },
+    "BoundaryError": {
+      "count": 1,
+      "fraction": 0.0111
+    },
+    "Other": {
+      "count": 66,
+      "fraction": 0.7333
+    },
+    "SyntaxError": {
+      "count": 2,
+      "fraction": 0.0222
+    }
+  }
+}

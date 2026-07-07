@@ -411,8 +411,7 @@ conformance checking:
 The distinction between $\mu_k$ and PDR is important.  $\mu_k$ measures
 whether the formal case-based check alone is sufficient to detect a given
 mutant (i.e., at least one generated case produces a wrong output).  PDR
-measures whether the \emph{full pipeline} â€” including pattern screening â€”
-correctly rejects the candidate.  A mutant with $\mathrm{Conf}(c_m, t_m) = 1$
+measures whether the \emph{full pipeline} â€?including pattern screening â€?correctly rejects the candidate.  A mutant with $\mathrm{Conf}(c_m, t_m) = 1$
 but a detected pattern violation contributes to PDR but not to $\mu_k$,
 because the conformance check alone would have passed it.  The gap
 $\mathrm{PDR} - \mu_k$ therefore quantifies the additive value of the
@@ -463,7 +462,7 @@ before $g_i$.  Since $g_j(x^*) = 1$, the implementation returns
 $\phi_j(x^*)$.  Because the task is precedence-sensitive (the two scenarios
 cover an overlapping region of the input space), the specification is
 non-trivially ordered, and it need not be the case that $\phi_i(x^*) =
-\phi_j(x^*)$ â€” indeed, if they were always equal on the overlap, the overlap
+\phi_j(x^*)$ â€?indeed, if they were always equal on the overlap, the overlap
 would be semantically irrelevant and the task would not test ordering at all.
 Hence $f_c(x^*) \neq g_t(x^*)$, and $c$ does not strictly succeed.
 \end{proof}
@@ -474,10 +473,9 @@ task} $t^H$ has the following structure:
 \begin{itemize}
   \item \textbf{Input variables}: five non-negative integers
         $a, b, c, d, e \in \mathbb{N}$.
-  \item \textbf{Output variables}: three integer quantities â€”
-        $\mathit{risk} \in \{0,1,2\}$,
+  \item \textbf{Output variables}: three integer quantities â€?        $\mathit{risk} \in \{0,1,2\}$,
         $\mathit{action} \in \{0,1,2\}$, and
-        $\mathit{score} \in [0, 100]$ â€” giving $\mathcal{Y}_t \subseteq
+        $\mathit{score} \in [0, 100]$ â€?giving $\mathcal{Y}_t \subseteq
         \{0,1,2\}^2 \times [0,100]$.
   \item \textbf{Scenario count}: up to $n = 9$ ordered scenarios.
   \item \textbf{Threshold parameters}: seven threshold values
@@ -572,8 +570,8 @@ coverage (Proposition~\ref{prop:coverage}).  We formalised the Bounded
 Acceptance Problem (Definition~\ref{def:bap}), which captures the synthesis-and-repair
 loop as a budget-constrained search, and introduced the hybrid acceptance
 predicate that combines conformance checking with fault-pattern screening
-(Definition~\ref{def:accept}).  Prevention and quality metrics â€” PDR, FAR,
-and mutation kill rate â€” were defined to support empirical evaluation.  The
+(Definition~\ref{def:accept}).  Prevention and quality metrics â€?PDR, FAR,
+and mutation kill rate â€?were defined to support empirical evaluation.  The
 benchmark formalisation demonstrated that every hard task requires strict
 scenario ordering (Proposition~\ref{prop:order-required}), and the
 complexity analysis confirmed that the formal checking overhead is negligible

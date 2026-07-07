@@ -1,0 +1,441 @@
+\chapter{Fault Pattern Catalogue}
+\label{app:patterns}
+
+This appendix documents the fourteen requirement-related fault patterns (RF01--RF14)
+encoded in the HSP-Agile pattern guard.  The catalogue is derived from the
+Agile-SOFL fault taxonomy of \citet{li2023iet} and operationalised as
+static analysis rules over generated Python implementations.  Each pattern is
+task-aware: detectors receive both the candidate source and the FSF task
+artefact (signature, scenario list, external variables) so that structural
+checks can be grounded in specification context rather than generic code
+heuristics alone.
+
+% ---------------------------------------------------------------------------
+\section{Pattern Taxonomy Overview}
+\label{sec:pat:taxonomy}
+% ---------------------------------------------------------------------------
+
+The pattern identifiers RF01--RF14 form a closed taxonomy covering seven
+\emph{category} dimensions that reflect the locus of the fault relative to
+the specification--implementation boundary:
+
+\begin{description}
+  \item[\textbf{requirement}.]
+        Misalignment between stated preconditions or documentation and the
+        guard structure actually implemented (RF01, RF14).
+  \item[\textbf{fsf}.]
+        Violations of FSF-specific structural conventions: default-branch
+        handling and scenario coverage (RF02, RF09).
+  \item[\textbf{interface}.]
+        Omission of declared output variables from return values (RF04).
+  \item[\textbf{logic}.]
+        Incorrect conditional structure, spurious completeness, or vacuous
+        branches (RF05, RF07, RF13).
+  \item[\textbf{boundary}.]
+        Mishandling of zero-valued inputs or off-by-one threshold comparisons
+        (RF06, RF11).
+  \item[\textbf{implementation}.]
+        Coding-quality defects that do not necessarily violate a single guard
+        but indicate unreliable translation from specification to code
+        (RF03, RF08, RF12).
+  \item[\textbf{sofl}.]
+        Neglect of external program variables declared in the SOFL process
+        signature (RF10).
+\end{description}
+
+Each pattern is additionally assigned a \emph{severity} rating on a four-level
+ordinal scale:
+
+\begin{itemize}
+  \item \textbf{critical} (1 pattern): defects that indicate the implementation
+        cannot reflect scenario-dependent behaviour at all; acceptance is
+        blocked unconditionally.
+  \item \textbf{high} (8 patterns): defects with strong correlation to
+        specification non-conformance on boundary or overlap inputs; included
+        in the high-severity acceptance set.
+  \item \textbf{medium} (4 patterns): quality or traceability concerns that are
+        recorded in the audit trace but do not block acceptance.
+  \item \textbf{low} (1 pattern): stylistic redundancy unlikely to cause
+        functional failure in isolation.
+\end{itemize}
+
+The hybrid acceptance predicate of Definition~\ref{def:accept} consults only
+patterns whose severity is \emph{high} or \emph{critical}.  We denote this
+subset the \emph{high-severity set}:
+\begin{equation}
+  \mathcal{P}^H \;=\;
+    \{\text{RF01},\;\text{RF02},\;\text{RF04},\;\text{RF05},\;\text{RF06},\;
+      \text{RF07},\;\text{RF09},\;\text{RF11},\;\text{RF13}\},
+  \label{eq:app:high-sev}
+\end{equation}
+comprising nine patterns.  A candidate $c$ is pattern-safe on task $t$ when
+$\sum_{p \in \mathcal{P}^H} \delta_p(c, t) = 0$.  Medium- and low-severity
+hits are appended to the structured feedback message for the next synthesis
+iteration but do not veto acceptance.  Table~\ref{tab:pat:severity-summary}
+summarises the severity partition.
+
+\begin{table}[htbp]
+  \caption{Severity partition of the pattern catalogue ($|\mathcal{P}| = 14$).}
+  \label{tab:pat:severity-summary}
+  \centering
+  \thesistable{%
+    \small
+    \setlength{\tabcolsep}{4pt}
+    \begin{tabularx}{\linewidth}{@{}lXc@{}}
+      \toprule
+      Severity   & Pattern IDs                          & Count \\
+      \midrule
+      Critical   & RF07                                 & 1 \\
+      High       & RF01, RF02, RF04, RF05, RF06, RF09, RF11, RF13 & 8 \\
+      Medium     & RF03, RF08, RF10, RF14               & 4 \\
+      Low        & RF12                                 & 1 \\
+      \bottomrule
+    \end{tabularx}%
+  }
+\end{table}
+
+Detection is implemented as a hybrid of Python abstract syntax tree (AST)
+traversal and regular-expression matching over source text.  AST-based checks
+are preferred for structural invariants (branch counts, return-key sets,
+else-branch presence); regex checks capture surface-form regularities that are
+expensive to express as tree predicates (magic numeric literals, empty handlers,
+missing docstrings).  When parsing fails, a synthetic \code{SYNTAX} match with
+critical severity is emitted and the candidate is rejected immediately.
+
+% ---------------------------------------------------------------------------
+\section{Complete Pattern Reference}
+\label{sec:pat:reference}
+% ---------------------------------------------------------------------------
+
+Table~\ref{tab:pat:full-catalogue} provides the authoritative reference for
+all fourteen patterns.  The \emph{Detection Method} column indicates the
+primary mechanism employed by the pattern guard; task-context checks (e.g.\
+comparing branch count against the number of FSF scenarios) are noted as
+\emph{AST + task context}.
+
+\footnotesize
+\setlength{\tabcolsep}{3pt}
+\begin{longtable}{@{}p{0.055\linewidth}p{0.13\linewidth}p{0.08\linewidth}p{0.065\linewidth}p{0.27\linewidth}p{0.27\linewidth}@{}}
+  \caption{Complete HSP-Agile fault pattern catalogue (RF01--RF14).}
+  \label{tab:pat:full-catalogue} \\
+  \toprule
+  \textbf{ID} & \textbf{Name} & \textbf{Category} & \textbf{Sev.} &
+  \textbf{Description} & \textbf{Detection Method} \\
+  \midrule
+  \endfirsthead
+
+  \multicolumn{6}{c}{\tablename\ \thetable{} --- \textit{continued from previous page}} \\
+  \toprule
+  \textbf{ID} & \textbf{Name} & \textbf{Category} & \textbf{Sev.} &
+  \textbf{Description} & \textbf{Detection Method} \\
+  \midrule
+  \endhead
+
+  \midrule
+  \multicolumn{6}{r}{\textit{Continued on next page}} \\
+  \endfoot
+
+  \bottomrule
+  \endlastfoot
+
+  RF01 &
+  Missing precondition check &
+  requirement &
+  high &
+  Input validation is absent before the first assignment or return in the
+  function body; guard conjuncts declared in the FSF test predicate are not
+  reflected in a leading conditional. &
+  Regex: function entry without a leading \code{if} guard; spec hint
+  cross-checks FSF test predicates. \\[4pt]
+
+  RF02 &
+  Wrong default branch &
+  fsf &
+  high &
+  The implementation lacks an explicit \code{else} branch to handle the FSF
+  \texttt{others} scenario, causing fall-through or implicit defaults that
+  diverge from the specification. &
+  AST: absence of \code{else}/\code{elif} chain terminus when task declares an
+  \texttt{others} scenario. \\[4pt]
+
+  RF03 &
+  Hardcoded magic number &
+  implementation &
+  medium &
+  A numeric literal appears in a \code{return} statement without derivation
+  from specification constants or input variables; excludes canonical
+  boolean-like values \code{0} and \code{1}. &
+  Regex: \code{return <digit>} with exclusion of \code{return 0/1}. \\[4pt]
+
+  RF04 &
+  Missing output field &
+  interface &
+  high &
+  The return dictionary omits one or more output variables declared in the
+  process signature, yielding incomplete structured outputs. &
+  AST + task context: compare return-dict keys against declared output names. \\[4pt]
+
+  RF05 &
+  Swapped comparison &
+  logic &
+  high &
+  A comparison operator in the implementation is suspected to be reversed
+  relative to the FSF guard (e.g.\ \code{<} where \code{>} is specified). &
+  Regex over assignment/comparison sites; guard extraction from FSF for
+  cross-reference (see Section~\ref{subsec:method:detection}). \\[4pt]
+
+  RF06 &
+  No guard for zero input &
+  boundary &
+  high &
+  Zero-valued inputs that appear as explicit boundaries in FSF guards
+  (\code{eq 0}, \code{gt 0}) are not handled by a dedicated conditional
+  branch. &
+  Regex: function signature present without zero-check branch; spec hint
+  references FSF zero-boundary scenarios. \\[4pt]
+
+  RF07 &
+  Unconditional success &
+  logic &
+  \textbf{critical} &
+  The function returns a fixed success indicator (e.g.\
+  \code{success = 1}) on all paths without evaluating any guard-dependent
+  conditional, indicating spurious completeness. &
+  AST: constant success return with no \code{if} nodes in the function body. \\[4pt]
+
+  RF08 &
+  Missing type coercion &
+  implementation &
+  medium &
+  Return values in dictionary form are not cast to integer type where the
+  signature declares natural-number outputs. &
+  Regex: dictionary return without explicit integer cast. \\[4pt]
+
+  RF09 &
+  Incomplete FSF coverage &
+  fsf &
+  high &
+  The number of conditional branches in the implementation is strictly less
+  than the number of non-default FSF scenarios, indicating omitted scenario
+  handlers. &
+  AST + task context: branch count $<$ scenario count (adjusted for
+  \texttt{others}). \\[4pt]
+
+  RF10 &
+  External variable ignored &
+  sofl &
+  medium &
+  External program variables declared in the SOFL process specification are
+  never referenced in the implementation body. &
+  AST + task context: name-set intersection of \code{ext} declarations and
+  referenced identifiers. \\[4pt]
+
+  RF11 &
+  Off-by-one boundary &
+  boundary &
+  high &
+  A strict inequality (\code{>}) is used where a weak inequality (\code{>=})
+  is required, or vice versa, shifting the effective guard region by one
+  boundary point. &
+  Regex: \code{> 0} pattern; threshold literals cross-referenced against FSF
+  guard constants. \\[4pt]
+
+  RF12 &
+  Duplicate assignment &
+  implementation &
+  low &
+  The same output variable is assigned more than once within a single branch,
+  with the earlier assignment shadowed and therefore dead. &
+  Regex: repeated assignment to the same identifier within a code region. \\[4pt]
+
+  RF13 &
+  Empty handler &
+  logic &
+  high &
+  An \code{else} branch contains only \code{pass}, leaving a scenario handler
+  vacuous and producing no output assignment. &
+  Regex: \code{else: pass} at line end; AST confirmation of empty body. \\[4pt]
+
+  RF14 &
+  Spec-comment mismatch &
+  requirement &
+  medium &
+  The function lacks a docstring referencing the FSF process, reducing
+  traceability between specification text and implementation and indicating
+  possible copy-paste synthesis without spec grounding. &
+  Regex: function definition not followed by a triple-quoted docstring. \\
+
+\end{longtable}
+\normalsize
+
+% ---------------------------------------------------------------------------
+\section{Specification-Confusion Patterns}
+\label{sec:pat:sc}
+% ---------------------------------------------------------------------------
+
+\emph{Specification confusion} denotes a class of faults in which the
+implementer misreads, misorders, or incompletely internalises the FSF
+specification while producing syntactically valid code.  Such faults often
+yield implementations that appear structurally reasonable---complete conditional
+chains, defined outputs on every branch---yet assign incorrect semantics to
+guard regions because scenario priority, boundary thresholds, or default
+behaviour were interpreted incorrectly.
+
+Seven patterns in the catalogue directly target specification-confusion
+failure modes.  Table~\ref{tab:pat:spec-confusion} lists them with their
+principal confusion mechanism and the specification-mutation operators under
+which they are most frequently observed in the prevention evaluation protocol
+(Appendix~\ref{app:benchmark}).
+
+\begin{table}[htbp]
+  \caption{Patterns associated with specification-confusion faults.}
+  \label{tab:pat:spec-confusion}
+  \centering
+  \thesistable{%
+    \footnotesize
+    \setlength{\tabcolsep}{3pt}
+    \begin{tabularx}{\linewidth}{@{}p{0.06\linewidth}p{0.20\linewidth}X X@{}}
+      \toprule
+      \textbf{ID} & \textbf{Confusion mechanism} & \textbf{Typical symptom} &
+      \textbf{Related spec mutants} \\
+    \midrule
+    RF01 &
+    Partial guard extraction &
+    Only a subset of conjuncts in a compound FSF test predicate are
+    implemented &
+    SNO (predicate negation) \\
+    RF02 &
+    Default-scenario misidentification &
+    The \texttt{others} clause outputs are assigned to the wrong branch &
+    DRO (else removal), MCO (scenario drop) \\
+    RF05 &
+    Operator inversion &
+    Relational operators are reversed relative to the specification &
+    ORO (operator swap), ICO (condition inversion) \\
+    RF06 &
+    Zero-boundary neglect &
+    Inputs at zero are not routed to the scenario that explicitly guards
+    \code{eq 0} &
+    BCO (boundary weakening) \\
+    RF09 &
+    Scenario omission &
+    One or more ordered scenarios are not represented as conditional branches &
+    MCO (scenario drop) \\
+    RF11 &
+    Threshold displacement &
+    Strict/weak inequality confusion shifts guard regions by one point &
+    BCO (boundary weakening), MBO (off-by-one) \\
+    RF14 &
+    Documentation--logic divergence &
+    Comments or docstrings describe a scenario condition inconsistent with
+    the implemented guard &
+    SNO, ORO \\
+    \bottomrule
+    \end{tabularx}%
+  }
+\end{table}
+
+All seven patterns except RF14 belong to $\mathcal{P}^H$ and therefore block
+acceptance when detected.  RF14 is recorded as a medium-severity traceability
+warning.  In the prevention evaluation, \emph{spec-confusion} trials inject
+faults at the specification layer (operators SNO, ORO, MCO, BCO) and measure
+whether a formally correct reference implementation is rejected against the
+mutated specification---testing the formal checker's sensitivity to
+specification drift rather than the pattern guard directly.  Nevertheless, the
+patterns above are the static counterparts of the dynamic failures that
+spec-confusion mutants induce: an implementation synthesised from a confused
+reading of the specification will typically trigger one or more of RF01, RF02,
+RF05, RF06, RF09, or RF11 before formal checking completes.
+
+The precedence-sensitive guard structure of the hard benchmark
+(Appendix~\ref{app:benchmark}) is deliberately constructed so that
+specification-confusion faults manifest on overlap inputs: an implementation
+that evaluates guards in reverse order may pass most randomly sampled inputs
+yet fail on boundary witnesses generated by the SMT solver.  Patterns RF09 and
+RF02 provide a complementary static signal when the confusion reduces branch
+count or eliminates the default handler entirely.
+
+% ---------------------------------------------------------------------------
+\section{Implementation-Screening Patterns}
+\label{sec:pat:is}
+% ---------------------------------------------------------------------------
+
+\emph{Implementation screening} targets defects introduced during code
+generation that may not reflect a misunderstanding of the specification text
+but nevertheless produce incorrect or structurally pathological behaviour.
+Such faults include hard-coded outputs, missing return fields, neglected
+external variables, and vacuous branch bodies.  They are evaluated in the
+prevention protocol by injecting faults directly into reference implementations
+(operators ICO, WRO, MBO, DRO) and measuring whether the hybrid acceptance
+predicate rejects the mutated candidate.
+
+Seven patterns serve as implementation-screening rules; four of them belong to
+$\mathcal{P}^H$.  Table~\ref{tab:pat:impl-screening} summarises the mapping.
+
+\begin{table}[htbp]
+  \caption{Patterns associated with implementation-screening faults.}
+  \label{tab:pat:impl-screening}
+  \centering
+  \thesistable{%
+    \footnotesize
+    \setlength{\tabcolsep}{3pt}
+    \begin{tabularx}{\linewidth}{@{}p{0.06\linewidth}p{0.20\linewidth}X X@{}}
+      \toprule
+      \textbf{ID} & \textbf{Screening focus} & \textbf{Typical symptom} &
+      \textbf{Related impl mutants} \\
+    \midrule
+    RF03 &
+    Literal encoding &
+    Magic numbers replace spec-derived expressions in return statements &
+    WRO (wrong return constant) \\
+    RF04 &
+    Output completeness &
+    Required output keys absent from the return dictionary &
+    WRO (wrong return constant) \\
+    RF07 &
+    Spurious completeness &
+    Fixed success value returned without conditional evaluation &
+    WRO (wrong return constant) \\
+    RF08 &
+    Type discipline &
+    Floating-point or untyped values returned where integers are required &
+    --- \\
+    RF10 &
+    SOFL externality &
+    Declared external variables never read or written &
+    --- \\
+    RF12 &
+    Redundant assignment &
+    Duplicate writes to the same output within one branch &
+    --- \\
+    RF13 &
+    Vacuous branch &
+    \code{else: pass} leaves a scenario handler without output assignment &
+    DRO (else removal) \\
+    \bottomrule
+    \end{tabularx}%
+  }
+\end{table}
+
+RF07 is the sole \emph{critical} pattern and represents the most severe
+implementation-screening failure: a candidate that unconditionally returns a
+fixed output passes any finite test suite whose witnesses happen to lie in
+regions where that output is correct, yet violates the specification globally.
+The pattern guard detects this pathology statically by requiring at least one
+conditional branch before any constant success return.
+
+Patterns RF03, RF08, RF10, and RF12 are rated medium or low severity and do
+not participate in $\mathcal{P}^H$.  They are included in the catalogue because
+empirical analysis of LLM-generated Agile-SOFL implementations revealed high
+incidence of these coding defects, and their presence in the audit trace
+provides actionable feedback for the repair loop even when acceptance is not
+blocked.  For example, RF04 and RF07 together cover the two dominant failure
+modes of the WRO mutant (wrong primary output and structurally incomplete
+returns), while RF13 and RF02 jointly detect the structural consequences of
+DRO (removed else branch).
+
+In operational terms, the pattern guard executes only after a candidate
+achieves strict formal conformance ($\mathrm{Conf}(c,t) = 1$), ensuring that
+implementation-screening adds negligible overhead to definitively failing
+candidates while providing a necessary second line of defence against
+pathological implementations that satisfy all SMT-generated witnesses.

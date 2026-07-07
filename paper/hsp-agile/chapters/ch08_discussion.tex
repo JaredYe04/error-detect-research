@@ -1,0 +1,343 @@
+%% ch08_discussion.tex  —  Chapter 8: Discussion and Threats to Validity
+%% HSP-Agile CCF-B Report, East China Normal University, 2026
+%% Ye Xujun
+
+\chapter{Discussion and Threats to Validity}
+\label{ch:discussion}
+
+This chapter interprets the experimental results reported in
+Chapter~\ref{ch:results}, analyses the counter-intuitive relationship between
+formal conformance and strict success rate, examines residual failure modes
+through the E9 taxonomy, draws practical implications for integrating
+\textsc{SgDP}/HSP-Agile into sprint workflows, situates the approach within the
+broader verification landscape, and assesses limitations and threats to
+validity.
+A preview of the threats framework appeared in
+Section~\ref{sec:exp:threats-preview}; here we provide the full analysis.
+
+
+%=============================================================================
+\section{Interpretation of Core Findings}
+\label{sec:disc:interpretation}
+%=============================================================================
+
+The central empirical finding of this report is that the full HSP-Agile pipeline
+(mode~M) achieves a mean strict formal conformance of \textbf{90.4\%} on the hard
+benchmark of 120 precedence-sensitive Agile-SOFL tasks---a gain of
+\textbf{6.2 percentage points} over the one-shot LLM baseline (B1: 84.2\%) and
+\textbf{2.4 percentage points} over the test-feedback loop baseline (B2: 88.0\%).
+
+Two interlocking mechanisms produce this improvement.
+First, the formal conformance checker generates Z3-driven test cases targeted at
+the ordering constraints encoded in each Functional Scenario Framework (FSF)
+specification~\citep{barrett2018smt,demoura2008z3,liu2014sofl}, exposing violations
+that coarser unit tests systematically miss~\citep{zhu1997specification,ammann2016testing}.
+Second, the counterexample-guided repair loop~\citep{solarlezama2008sketching}
+converts witnessed failures into structured repair prompts that direct the
+language model towards the violated constraint~\citep{lynn2024verifierloop,chen2021codex}.
+
+The low conformance of the B0 reference mode (27.5\%) establishes a meaningful
+lower bound: template-based generation performs poorly on the hard partition and
+calibrates benchmark difficulty rather than representing a production baseline.
+Ablation results confirm independent contributions: removing the formal checker (A1)
+drops conformance to 86.5\% ($-3.9$\,pp vs.\ M); removing the repair loop (A3)
+drops it to 84.1\% ($-6.3$\,pp vs.\ M); removing the pattern guard (A2) yields a
+marginal $+0.5$\,pp gain, discussed in Section~\ref{sec:disc:implications}.
+Mechanism-level experiments (E3--E6) reinforce this interpretation: M's advantage
+grows with specification complexity, SMT witnesses maintain boundary coverage where
+random sampling fails, and the Semantic Feedback IR accelerates repair convergence.
+
+
+%=============================================================================
+\section{Failure Analysis (E9)}
+\label{sec:disc:failure-analysis}
+%=============================================================================
+
+Despite M's strong aggregate conformance, 30 tasks (25.0\% strict success rate)
+remain below the conjunctive acceptance threshold after repair budget $K=3$.
+Experiment E9 classifies these residual failures into seven categories derived
+from counterexample signals, pattern guard matches, and operator-level mutation
+labels.
+Figure~\ref{fig:failure-taxonomy} visualises the proportional breakdown.
+
+\begin{figure}[t]
+  \centering
+  \thesisfig[max width=0.72\linewidth]{figures/failure_taxonomy_pie.pdf}
+  \caption{Failure taxonomy for M mode: proportion of remaining failures by
+    category after budget $K=3$ ($n=90$ failed tasks).
+    \emph{Other} (73.3\%) aggregates residual conformance failures not matching
+    a named pattern; \emph{APIMisuse} (23.3\%) covers RF07-style API violations.}
+  \label{fig:failure-taxonomy}
+\end{figure}
+
+Figure~\ref{fig:failure-taxonomy} breaks down the 90 remaining failures in M mode
+after repair budget $K=3$.
+\emph{Other} (73.3\%) is the largest category, covering residual conformance
+failures where the formal checker issues valid counterexamples but the LLM repair
+loop fails to converge within budget.
+\emph{APIMisuse} (23.3\%) represents RF07-style API contract violations detected
+post-generation.
+\emph{SyntaxError} (2.2\%) and \emph{BoundaryError} (1.1\%) are lower-prevalence
+categories involving invalid Python and threshold-shift faults respectively.
+These categories directly guide future work: richer Semantic Feedback IR templates
+would reduce \emph{Other}; stricter API guard patterns would reduce
+\emph{APIMisuse}; and denser per-branch witness generation would address
+\emph{BoundaryError}.
+
+
+%=============================================================================
+\section{The Quality--Pass-Rate Paradox}
+\label{sec:disc:paradox}
+%=============================================================================
+
+One of the most counter-intuitive results is that M exhibits a \emph{lower} strict
+success rate (25.0\%) than both B1 and B2 (26.7\%), despite achieving higher formal
+conformance---the \emph{strict-success paradox}.
+The two metrics measure fundamentally different things.
+\emph{Strict success rate} is binary per task: a single failing case yields zero.
+\emph{Formal conformance} is continuous: a candidate satisfying 9 of 10 cases
+contributes 0.9 to the average even though it contributes 0 to strict success.
+
+The paradox arises because M's conjunctive acceptance gate
+(Equation~\eqref{eq:accept}) is deliberately conservative.
+When a candidate passes all test cases but the pattern guard detects a residual
+fault pattern, M classifies the candidate as ``best effort'' and does \emph{not}
+emit a strict accept---raising the acceptance bar relative to B1 and B2.
+A subset of tasks that B1 or B2 would count as strict successes are counted by M
+as non-successes because the pattern guard fired, yet those candidates contribute
+fully to the conformance average.
+
+A useful analogy clarifies this relationship.
+Suppose two students sit ten examinations.
+Student~A scores 89\% on every paper.
+Student~B scores 100\% on three papers and 65\% on the remaining seven.
+On a binary pass/fail threshold of 75\%, Student~A passes all ten and
+Student~B passes only three.
+Yet Student~B's \emph{mean score} is $0.3 \times 100 + 0.7 \times 65 = 75.5\%$,
+below Student~A's 89\%.
+The binary metric favours Student~B despite lower average quality; the continuous
+metric correctly orders them.
+M is Student~A: consistently high conformance; B1 and B2 occasionally solve tasks
+completely but average lower quality.
+
+This is not a deficiency of M.
+The conjunctive predicate rejects candidates that pass all witnesses but exhibit
+high-severity pattern violations---candidates that B1/B2's single-criterion gate
+would accept.
+The escaped-defect rate confirms that M's accepted set contains 3.8\,pp fewer
+mutant-detectable faults than B2's accepted set (FAR 5.0\% vs.\ 8.8\% on
+implementation screening), while achieving higher detection rate (PDR 95.0\% vs.\
+91.2\%).
+The Wilcoxon signed-rank test on strict success rate yields $p = 0.921$ (not
+significant), justifying formal conformance as the \emph{primary} metric on the
+hard benchmark.
+
+
+%=============================================================================
+\section{Implications for Practice}
+\label{sec:disc:implications}
+%=============================================================================
+
+\subsection{Sprint Integration and CI/CD Deployment}
+
+The \textsc{SgDP} framework is designed as a CI/CD pre-merge gate operating between
+test-feedback (fast, spec-unaware) and full deductive verification (slow, requires
+annotations).
+Mode~M incurs mean latency of 43{,}659\,ms per task ($4.6\times$ B2's 10{,}769\,ms),
+reflecting repair-loop LLM calls (mean 2.08 per task) and Z3 checking.
+For \emph{interactive} IDE use, 44 seconds is at the upper boundary of acceptable
+response times; for \emph{CI/CD pre-merge gates}, it is well within typical automated
+quality checks.
+A sprint team merging 20--30 LLM-assisted units per day would incur roughly
+15--22 minutes of additional pipeline time---comparable to compiling a medium-sized
+Java project---while avoiding hours of downstream debugging from propagated
+conformance faults.
+
+We recommend deploying HSP-Agile as a background pre-merge quality gate rather than
+an interactive code-completion tool, consistent with agile fitness-function
+practice~\citep{harman2012formalagile,beck2001xp}.
+The conjunctive acceptance predicate produces an auditable decision record---not
+just pass/fail---enabling developers to inspect which witnesses and patterns were
+decisive.
+
+\subsection{The Formal Checker as a Lightweight Oracle}
+
+The Z3-based conformance checker occupies a middle ground between no formal
+verification and full deductive verification.
+Full tools such as Dafny~\citep{leino2010dafny} and Coq provide complete guarantees
+but require annotation-heavy specifications and trained verification
+engineers~\citep{woodcock2009formalsurvey}.
+The Z3 checker provides \emph{bounded} guarantees over a finite generated test
+suite at less than 100\,ms per task---negligible relative to total pipeline latency.
+This lightweight oracle suits Agile-SOFL sprint cadences: test cases are derived
+directly from FSF structure, not manually written unit tests.
+The $+3.9$\,pp conformance contribution of the checker (A1 ablation) demonstrates
+material quality improvement, not bureaucratic overhead.
+
+\subsection{Pattern Guard Selectivity and Advisory Use}
+
+The A2 ablation---removing the pattern guard yields $+0.5$\,pp conformance---is the
+most nuanced finding.
+The guard provides value as a \emph{classification and diagnostic tool} rather than
+a \emph{filtering gate}: when it fires, it identifies the specific fault pattern
+(e.g.\ RF07 unconditional success; RF03 missing precedence guard), information not
+captured by the conformance metric.
+
+We recommend emitting \emph{advisory warnings} rather than hard rejections for most
+patterns, following static-analysis severity-modulated gating
+policy~\citep{hovemeyer2004findbugs,ayewah2008findbugs}, with hard rejection reserved
+for RF07.
+The pattern guard is most valuable as a \emph{living artefact}: new failure modes
+observed in production can be added incrementally as RF patterns without retraining
+the LLM or modifying the formal checker; E7's per-pattern F1 guides catalogue
+expansion.
+
+
+%=============================================================================
+\section{Generalisation Boundaries}
+\label{sec:disc:generalisation}
+%=============================================================================
+
+The framework requires deterministic, enumerable guard conditions encodable as SMT
+constraints, covering FSF-style ordered scenarios, finite state machine transition
+guards, and simplified Z/TLA+ preconditions over bounded domains.
+Generalisation experiments (E8) demonstrate that M consistently outperforms B1
+across SOFL/FSF, Mini-StateMachine, and Mini-Z notations with only adapter-level
+changes, supporting the framework claim rather than an Agile-SOFL-specific claim.
+On adapter tasks with simpler guard structure (10 tasks each), B2 achieves higher
+conformance than M (97.5\% vs.\ 92.2\%/83.3\%), indicating that the full conjunctive
+gate and Semantic Feedback IR add overhead when test-only feedback already suffices.
+This boundary case does not undermine the SOFL/FSF result (M $>$ B2 at 90.4\% vs.\
+88.0\%) but clarifies that framework components should be enabled selectively based
+on specification complexity.
+
+The framework does not currently extend to temporal properties requiring LTL/CTL
+encoding, infinite-domain arithmetic beyond LIA, or probabilistic semantics.
+These represent natural extensions rather than fundamental limitations.
+Industrial replication on real Agile-SOFL projects remains necessary before
+quantitative findings can be claimed for production-scale specifications.
+
+
+%=============================================================================
+\section{Limitations}
+\label{sec:disc:limitations}
+%=============================================================================
+
+Several limitations bound the scope of the claims made in this report.
+
+\paragraph{Benchmark representativeness.}
+The hard benchmark consists of 120 synthetic Agile-SOFL tasks from a fixed template
+family designed to probe precedence-sensitive scenario orderings.
+Industrial specifications may exhibit more complex state dependencies, external
+service interactions, or composite scenario structures not represented in the
+benchmark.
+Replication on real Agile-SOFL projects~\citep{li2022agilesofl,pohl2010requirements}
+is necessary before broad generalisability can be claimed.
+
+\paragraph{Single LLM family.}
+All experiments used Qwen2.5-27B-Instruct via an OpenAI-compatible LLM gateway.
+Conformance gains may differ with GPT-4, Claude~3.5 Sonnet, or Gemini~1.5 Pro.
+The pipeline structure is model-agnostic, but quantitative results are specific to
+the evaluated model family.
+
+\paragraph{Z3 test-case coverage.}
+The formal checker generates one test case per scenario branch.
+Denser witness generation (boundary-value analysis, perturbation around Z3 witnesses)
+would increase fault detection sensitivity at higher latency.
+The current regime likely underestimates M's conformance advantage relative to a
+denser test suite.
+
+\paragraph{Prevention evaluation completeness.}
+PDR/FAR analysis in Chapter~\ref{ch:results} is based on the full prevention
+evaluation (\code{prevention\_full\_v1}, 1{,}704 mutation records per mode).
+M achieves PDR 95.0\% and FAR 5.0\% on implementation screening, compared to
+B2's PDR 91.2\% and FAR 8.8\%, confirming that the conjunctive acceptance gate
+reduces escaped defects without sacrificing detection sensitivity.
+
+\paragraph{Repair loop convergence.}
+The maximum repair budget $K$ is fixed across all tasks.
+Harder tasks may benefit from larger $K$; simpler tasks waste budget on unnecessary
+iterations.
+Adaptive budget allocation based on observed conformance improvement per iteration
+could reduce latency while maintaining quality on the hardest tasks.
+
+
+%=============================================================================
+\section{Comparison to Related Approaches}
+\label{sec:disc:related}
+%=============================================================================
+
+\paragraph{DafnyBench and full deductive verification.}
+DafnyBench~\citep{loughman2024dafnybench} evaluates LLM synthesis of Dafny programs
+with machine-checked correctness proofs.
+Full deductive verification provides stronger guarantees than HSP-Agile's bounded Z3
+checking but requires formal annotations absent from FSF specifications.
+HSP-Agile is applicable directly to Agile-SOFL FSF inputs without verification
+annotations, making it usable by practitioners not trained in deductive verification.
+The two approaches occupy complementary positions in the verification-cost spectrum.
+
+\paragraph{CEGIS-inspired approaches for Dafny (Lynn et al., TOSEM 2024).}
+Lynn et al.~\citep{lynn2024verifierloop} apply counterexample-guided inductive
+synthesis (CEGIS) to assist LLMs in producing correct Dafny programs.
+Both approaches use witnessed failures to construct targeted repair prompts; the key
+difference is that Lynn et al.\ operate in the Dafny verification context with
+proof-obligation counterexamples, whereas HSP-Agile generates counterexamples from
+Z3-driven test cases derived from FSF scenario semantics.
+HSP-Agile's checker is lighter-weight but provides weaker guarantees as a consequence.
+
+\paragraph{Standard LLM baselines (B1 and B2).}
+Relative to B1 and B2, HSP-Agile adds $+6.2$\,pp and $+2.4$\,pp formal conformance
+respectively at approximately $4.6\times$ latency over B2~\citep{dakhel2023copilot,chen2021codex}.
+HSP-Agile occupies a ``high quality, moderate cost'' regime: appropriate for quality
+gates in workflows where downstream formal verification costs dominate, not for
+real-time code-completion.
+
+
+%=============================================================================
+\section{Threats to Validity}
+\label{sec:disc:threats}
+%=============================================================================
+
+We structure the threats-to-validity analysis using the four-category framework
+common in empirical software engineering~\citep{ammann2016testing,woodcock2009formalsurvey}.
+
+\paragraph{Construct validity.}
+Formal conformance is approximated via a finite witness set $\mathcal{D}(t)$;
+candidates outside the checked space are not guaranteed correct.
+Theorem~\ref{thm:acceptance-safety} quantifies the FAR bound as a function of witness
+count.
+The 14-pattern guard catalogue was derived from SOFL literature~\citep{li2023iet};
+novel fault classes may be missed.
+E7 makes coverage gaps explicit via per-pattern P/R/F1.
+PDR is measured under first-order mutation operators; higher-order mutations may
+exhibit different detectability.
+The eight-field Semantic Feedback IR may require extension for other specification
+languages.
+
+\paragraph{Internal validity.}
+LLM non-determinism is mitigated by $T_\text{repair}=0.0$, fixed seeds, and
+$\geq 3$ repeats; provider updates between runs may introduce uncaptured variance.
+The benchmark was constructed by the same authors; bias is mitigated by the Z3
+satisfiability filter, the real-derived E8 subset, and ablations (A1--A3).
+The 120-task filter (satisfiability plus overlap density) introduces selection bias
+toward SMT-advantaged tasks; E3 complexity stratification validates the advantage
+scaling claim.
+
+\paragraph{External validity.}
+Primary evaluation uses 120 synthetic numeric-domain tasks; generalisation is
+validated on smaller E8 samples (40--70 tasks across 3 notations).
+Generated implementations are Python; SOFL-to-code mapping may differ for other
+languages.
+The single-LLM evaluation (Qwen2.5-27B-Instruct) may not generalise to all model
+families.
+Framework claims are validated primarily on the SOFL/FSF instantiation.
+
+\paragraph{Conclusion validity.}
+All pairwise comparisons use Holm-Bonferroni correction.
+The strict-success comparison (M vs.\ B1/B2, $p \approx 0.92$) is non-significant by
+design: the conjunctive gate maximises conformance quality on accepted candidates,
+not strict success.
+Prevention comparisons require the full E2 dataset; preliminary results are superseded
+by the full evaluation (120 tasks $\times$ 7 modes $\times$ 8 operators).
+The non-monotonic PDR pattern (B2 $>$ M on preliminary $n=40$) reflects
+complementary detection mechanisms, not M's inferiority as a prevention system.

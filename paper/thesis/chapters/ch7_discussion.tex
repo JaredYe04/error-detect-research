@@ -68,7 +68,7 @@ pattern, M classifies the candidate as ``best effort'' and does \emph{not} emit 
 accept.  In other words, M may \emph{raise the bar for acceptance} relative to B1 and B2,
 which accept any candidate that clears their respective stopping criteria.  The result is
 that a subset of tasks that B1 or B2 would count as strict successes are counted by M as
-non-successes because the pattern guard fired â€” yet those same candidates contribute fully
+non-successes because the pattern guard fired â€?yet those same candidates contribute fully
 to the conformance average, inflating M's conformance relative to its strict success rate.
 
 A useful analogy clarifies this relationship.  Suppose two students sit ten examinations.
@@ -102,15 +102,15 @@ of B2 (10{,}769\,ms).  This overhead reflects the additional LLM API calls requi
 repair loop (mean 2.08 calls per task under M) and the Z3-based conformance checker.
 Whether this latency is acceptable depends critically on the deployment context.
 
-For \emph{interactive} use â€” a developer waiting in the IDE for a candidate implementation
-â€” 44 seconds is at the upper boundary of acceptable response times and would likely
+For \emph{interactive} use â€?a developer waiting in the IDE for a candidate implementation
+â€?44 seconds is at the upper boundary of acceptable response times and would likely
 require UX mitigations such as streaming partial results or asynchronous notification.
 However, for \emph{CI/CD pre-merge gates}, 44 seconds per task is well within the range
 of typical automated quality checks.  A sprint team merging 20--30 LLM-assisted
 implementation units per day would incur roughly 15--22 minutes of additional checking
 time in the pipeline, an overhead comparable to compiling a medium-sized Java project or
-running a unit-test suite.  Given that the alternative â€” propagating conformance faults
-into downstream Agile-SOFL verification artefacts â€” can require hours of manual
+running a unit-test suite.  Given that the alternative â€?propagating conformance faults
+into downstream Agile-SOFL verification artefacts â€?can require hours of manual
 debugging, the trade-off is clearly favourable in a formal-methods-adjacent workflow.
 
 We therefore recommend deploying HSP-Agile as a background pre-merge quality gate rather
@@ -126,13 +126,13 @@ verification engineers, and verification times that can span hours for non-trivi
 programs~\citep{woodcock2009formalsurvey}.  The Z3 checker used in HSP-Agile, by contrast, provides \emph{bounded}
 guarantees: it guarantees conformance with respect to the finite test suite it generates,
 not with respect to all possible inputs.  Within those bounds, the overhead per task is
-less than 100\,ms â€” a negligible fraction of the total pipeline latency.
+less than 100\,ms â€?a negligible fraction of the total pipeline latency.
 
 This lightweight oracle is precisely what Agile-SOFL workflows need.  Agile development
 cycles are short (two-week sprints); full formal verification on every candidate is
-impractical.  The Z3 checker provides meaningful formal grounding â€” the generated test
+impractical.  The Z3 checker provides meaningful formal grounding â€?the generated test
 cases are derived directly from the FSF specification structure, not from manually written
-unit tests â€” at a cost compatible with sprint cadences.  The +3.9\,pp conformance
+unit tests â€?at a cost compatible with sprint cadences.  The +3.9\,pp conformance
 contribution of the checker (A1 ablation) demonstrates that this grounding materially
 improves output quality, not merely adds bureaucratic overhead.
 
@@ -169,7 +169,7 @@ Several limitations bound the scope of the claims made in this thesis.
 \paragraph{Benchmark representativeness.}
 The hard benchmark consists of 120 synthetic Agile-SOFL tasks generated from a fixed
 template family.  While the tasks were specifically designed to probe precedence-sensitive
-scenario orderings â€” the class of faults HSP-Agile targets â€” they may not capture the full
+scenario orderings â€?the class of faults HSP-Agile targets â€?they may not capture the full
 diversity of FSF specifications encountered in industrial practice.  Industrial
 specifications may exhibit more complex state dependencies, external service interactions,
 or composite scenario structures not represented in the benchmark.  Replication on
@@ -186,8 +186,8 @@ evaluated model family.
 
 \paragraph{Z3 test-case coverage.}
 The formal checker currently generates one test case per scenario branch.  Generating
-multiple cases per branch â€” for example, using boundary-value analysis or random
-perturbation around the Z3 witness â€” would increase fault detection sensitivity but also
+multiple cases per branch â€?for example, using boundary-value analysis or random
+perturbation around the Z3 witness â€?would increase fault detection sensitivity but also
 increase latency.  The current single-case-per-scenario regime likely underestimates the
 conformance advantage of mode~M relative to what a denser test suite would reveal.
 

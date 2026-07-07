@@ -1,65 +1,63 @@
-# HSP-Agile Paper Workspace
+# HSP-Agile / SgDP — CCF-B Research Report
 
-This folder contains a modular LaTeX manuscript draft and full data/figure provenance pipeline.
+> **Title:** *A Specification-Guided Defect Prevention Framework for Reliable LLM-Assisted Formal Development*  
+> **Format:** A4 report (`report` class + `thesis.sty`), ~120 pages  
+> **Target:** CCF-B venues (SANER / ICSME / QRS / ICFEM; stretch ASE/TOSEM)
 
-## Structure
+This directory contains the **expanded CCF-B research report**, upgraded from the short acmart conference draft. It reuses the thesis typography, diagrams, listings, and experimental figures while preserving the **SgDP framework narrative** (RQ1–RQ5, C1–C5, Theorems 1–3, E1–E9).
 
-- `main.tex`: manuscript entrypoint (`acmart` format)
-- `sections/`: section-wise modular text
-- `tables/`: reusable table modules (notation, stats)
-- `bib/references.bib`: bibliography database
-- `data/raw/` and `data/processed/`: paper data sources
-- `figures/scripts/`: figure generation code
-- `figures/FIGURE_MANIFEST.json`: figure-to-data-and-command provenance map
-- `scripts/prepare_paper_data.py`: artifact-to-paper ETL
-- `scripts/refresh_paper_assets.py`: one-shot data refresh + figure regeneration
+## Document Structure
 
-## Commands
+| Chapter | File | Content |
+|---------|------|---------|
+| Front | `front/cover.tex`, `front/abstract.tex` | Title page + abstract |
+| Ch 1 | `chapters/ch01_introduction.tex` | SgDP framing, C1–C5, RQ1–5, motivating example |
+| Ch 2 | `chapters/ch02_background.tex` | SOFL/FSF, CEGIS, SMT, mutation + positioning table |
+| Ch 3 | `chapters/ch03_formalization.tex` | Formal task model, BAP, benchmark formalization |
+| Ch 4 | `chapters/ch04_method.tex` | SgDP framework, theorems, pipeline stages |
+| Ch 5 | `chapters/ch05_implementation.tex` | System architecture, modules, orchestration |
+| Ch 6 | `chapters/ch06_experimental_setup.tex` | RQ1–5, E1–9 protocol, benchmark, modes |
+| Ch 7 | `chapters/ch07_results.tex` | Mechanism-first results + all figures |
+| Ch 8 | `chapters/ch08_discussion.tex` | Failure analysis, paradox, threats, implications |
+| Ch 9 | `chapters/ch09_conclusion.tex` | Findings + future work |
+| App A–C | `appendices/app_*.tex` | Reproducibility, benchmark, pattern catalogue |
 
-```bash
-python paper/hsp-agile/scripts/prepare_paper_data.py
-python paper/hsp-agile/figures/scripts/plot_paper_figures.py
-python paper/hsp-agile/scripts/refresh_paper_assets.py
+Legacy short conference sections remain in `sections/` for reference; the **canonical source** is `chapters/`.
+
+## Build
+
+```powershell
+# Full pipeline: refresh data → generate figures → compile PDF
+powershell -File scripts/build.ps1 -Clean
+
+# Output
+# build/main.pdf
 ```
 
-Install plotting/export dependencies:
+Requirements: Python 3.12+, matplotlib, pandas, tectonic (`tools/tectonic/tectonic.exe`).
 
-```bash
-pip install plotly kaleido
-```
+## Figures
 
-If Kaleido cannot start Chrome in your environment, install a compatible bundled browser:
+| Type | Location | Generator |
+|------|----------|-----------|
+| Matplotlib (12+6) | `figures/*.pdf` | `figures/scripts/plot_mpl_figures.py` |
+| TikZ diagrams | `diagrams/tikz/*.tex` | inline via `\tikzinput{}` |
+| PlantUML | `diagrams/puml/rendered/*.pdf` | `scripts/render_puml.py` (Kroki) |
 
-```bash
-choreo_get_chrome
-```
+CCF-B mechanism figures (E3–E9) use proxy data until full experiment runs complete; replace with real CSVs when available.
 
-Regenerate publication-ready figures (interactive HTML + static PNG/PDF) with deterministic settings:
+## Related Artifacts
 
-```bash
-python paper/hsp-agile/figures/scripts/plot_paper_figures.py --static-formats png pdf --dpi 300 --seed 7
-```
+- `artifacts/UPGRADE_ROADMAP.md` — 12-week milestone plan
+- `artifacts/EXPERIMENT_MATRIX.md` — E1–E9 specifications
+- `artifacts/CONTRIBUTION_REFRAME.md` — old vs new C1–C5 mapping
+- `artifacts/PAPER_ASSETS.md` — figure/table checklist
 
-Run one-shot data refresh + figure regeneration:
+## Typography
 
-```bash
-python paper/hsp-agile/scripts/refresh_paper_assets.py --static-formats png pdf --dpi 300 --seed 7
-```
+Formatting matches `paper/thesis/` via shared `thesis.sty`:
 
-If LaTeX is installed:
-
-```bash
-cd paper/hsp-agile
-latexmk -pdf main.tex
-```
-
-## Template Basis
-
-The manuscript follows ACM-style (`acmart`) layout conventions and references the local template source under:
-
-- `paper/template-acmart/`
-
-## Notes
-
-- All figures in the manuscript should be generated from scripts, not manually edited.
-- Statistical values in `tables/stats_summary.tex` should be refreshed after final experiment runs.
+- A4, 12pt, 1.5 line spacing, fancy headers
+- `\widefig{}`, `\tikzinput{}`, `\pumlfig{}` for figures
+- `\inputfsf{}`, `\inputpython{}` for code listings
+- `plainnat` numbered citations

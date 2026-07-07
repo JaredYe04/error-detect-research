@@ -1,0 +1,582 @@
+\chapter{Formal Problem Definition}
+\label{ch:formalization}
+
+This chapter establishes the mathematical foundations of HSP-Agile. We begin by
+defining the structure of an Agile-SOFL task and the semantics of its
+Functional Scenario Framework (FSF) specification. We then formalise the
+conformance checking problem, the acceptance criterion that drives the
+iterative repair loop, and the quality metrics used to evaluate pipeline
+performance. The chapter closes with the formalisation of our benchmark suite
+and a brief analysis of the computational overhead introduced by each pipeline
+stage.
+
+Throughout this chapter we write $\mathbb{N}$ for the non-negative integers,
+$\mathbb{Z}$ for all integers, and $\mathbf{1}[\cdot]$ for the Iverson
+bracket, which equals $1$ when its argument is true and $0$ otherwise.
+
+% ---------------------------------------------------------------------------
+\section{Formal Task Model}
+\label{sec:form:task}
+% ---------------------------------------------------------------------------
+
+An \emph{Agile-SOFL task} encapsulates a single software function whose
+behaviour is described entirely by an ordered FSF specification \citep{li2022agilesofl, liu2014sofl}.
+The task is the basic unit processed by the HSP-Agile pipeline.
+
+\begin{definition}[Agile-SOFL Task]
+\label{def:task}
+An \emph{Agile-SOFL task} is a triple
+\[
+  t \;=\; \bigl(\mathcal{S}_t,\;\mathcal{X}_t,\;\mathcal{Y}_t\bigr),
+\]
+where
+\begin{itemize}
+  \item $\mathcal{S}_t = \langle s_1, s_2, \ldots, s_n \rangle$ is a finite,
+        ordered sequence of $n$ FSF scenarios (the \emph{specification});
+  \item $\mathcal{X}_t \subseteq \mathbb{Z}^d$ is the \emph{input domain},
+        a $d$-dimensional integer vector space; and
+  \item $\mathcal{Y}_t \subseteq \mathbb{Z}^m$ is the \emph{output domain},
+        an $m$-dimensional integer vector space.
+\end{itemize}
+\end{definition}
+
+The separation of input domain from specification is deliberate: it allows the
+same FSF structure to be instantiated over domains of varying dimensionality,
+as is the case in our benchmark tasks where $d = 5$ and $m = 3$.
+
+\begin{definition}[FSF Scenario]
+\label{def:scenario}
+A \emph{Functional Scenario Framework (FSF) scenario} is a pair
+\[
+  s_i \;=\; (g_i,\;\phi_i),
+\]
+where
+\begin{itemize}
+  \item $g_i : \mathcal{X}_t \to \{0, 1\}$ is a Boolean \emph{guard
+        condition} over the input domain; and
+  \item $\phi_i : \mathcal{X}_t \to \mathcal{Y}_t$ is a total
+        \emph{output mapping} that prescribes the correct output for every
+        input satisfying the guard.
+\end{itemize}
+\end{definition}
+
+Guards are expressed as linear arithmetic predicates over the integer
+variables of $\mathcal{X}_t$.  In practice they encode conditions such as
+threshold comparisons ($a > \theta_1$), conjunctions of comparisons, or
+negations thereof.  Output mappings specify concrete assignments to the output
+variables, making each scenario a self-contained input-output contract.
+
+\begin{definition}[Scenario Ordering and Specification Oracle]
+\label{def:oracle}
+Scenario $s_i$ has \emph{higher priority} than $s_j$ whenever $i < j$.
+For any input $x \in \mathcal{X}_t$, the \emph{specification oracle}
+$g_t : \mathcal{X}_t \to \mathcal{Y}_t$ is defined by first-match
+evaluation:
+\[
+  g_t(x) \;=\; \phi_i(x),
+  \qquad \text{where } i = \min\bigl\{j : g_j(x) = 1\bigr\}.
+\]
+The final scenario $s_n$ is the \emph{``others'' case} with guard
+\[
+  g_n(x) \;=\; \neg\,\bigvee_{j=1}^{n-1} g_j(x),
+\]
+ensuring that every input is handled by exactly one scenario.
+\end{definition}
+
+The first-match semantics above is the key property distinguishing FSF from
+a simple case statement \citep{dijkstra1975guarded}: guard evaluation order
+is part of the specification, not an implementation choice.
+A candidate that evaluates $g_2$ before $g_1$ may be correct on most inputs
+(where guards are disjoint) but wrong wherever both guards hold.
+We return to this point in Section~\ref{sec:form:benchmark}.
+
+% ---------------------------------------------------------------------------
+\section{FSF Scenario Semantics}
+\label{sec:form:semantics}
+% ---------------------------------------------------------------------------
+
+The oracle defined in Definition~\ref{def:oracle} is a mathematical object;
+the HSP-Agile pipeline must make it \emph{operational} so that the system can
+generate test cases and check candidate implementations against it.  We now
+define the concrete cases used for evaluation and the procedure by which they
+are generated.
+
+\begin{definition}[Concrete Case]
+\label{def:concrete-case}
+A \emph{concrete case} for task $t$ is a pair
+\[
+  (x,\;y) \;=\; \bigl(x,\;g_t(x)\bigr),
+  \qquad x \in \mathcal{X}_t.
+\]
+The set of all concrete cases is called the \emph{case set} $\mathcal{D}(t)$.
+\end{definition}
+
+In practice $\mathcal{X}_t$ is too large for exhaustive enumeration, so
+$\mathcal{D}(t)$ is constructed by targeted SMT sampling \citep{demoura2008z3, barrett2018smt}:
+one representative input per scenario.
+
+\begin{definition}[SMT-Generated Test Suite]
+\label{def:test-suite}
+The case set $\mathcal{D}(t)$ is generated by the Z3 SMT solver as
+follows.  For each scenario $s_i = (g_i, \phi_i)$, solve the satisfiability
+query
+\[
+  x_i \;\models\; g_i(x) \;\land\; \bigwedge_{j < i} \neg\,g_j(x).
+\]
+If satisfiable, add $\bigl(x_i,\;g_t(x_i)\bigr)$ to $\mathcal{D}(t)$.
+\end{definition}
+
+The conjunct $\bigwedge_{j < i} \neg\,g_j(x)$ enforces strict scenario
+membership: $x_i$ activates $s_i$ \emph{and no higher-priority scenario}.
+This guarantees that the oracle maps $x_i$ through $\phi_i$ and not through
+any $\phi_j$ with $j < i$, making each case a direct witness to the
+prescribed output of exactly one scenario.
+
+The following proposition establishes that the procedure achieves full
+scenario coverage.
+
+\begin{proposition}[Scenario Coverage]
+\label{prop:coverage}
+If the SMT solver finds satisfying inputs for all $n$ scenarios, then
+$\mathcal{D}(t)$ contains at least one representative case per scenario,
+covering the entire precedence ordering $s_1 \succ s_2 \succ \cdots \succ s_n$.
+\end{proposition}
+
+\begin{proof}
+By construction, each $x_i$ satisfies $g_i$ but not $g_1, \ldots, g_{i-1}$.
+Hence $i = \min\{j : g_j(x_i) = 1\}$, so the oracle evaluates
+$g_t(x_i) = \phi_i(x_i)$.  Each distinct scenario $s_i$ therefore
+contributes at least one case whose correct output is determined by
+$\phi_i$, and the precedence ordering is witnessed by all $n$ cases jointly.
+\end{proof}
+
+\begin{figure}[t]
+  \centering
+  \tikzinput{diagrams/tikz/fsf_semantics}
+  \caption{FSF specification structure and evaluation semantics.
+    Left: a three-scenario FSF function definition.
+    Right: the corresponding input-space partitioning with scenario
+    priority $S_1 \succ S_2 \succ S_3$ and the oracle mapping.
+    Dots represent the concrete cases in $\mathcal{D}(t)$, one per
+    strict scenario region.}
+  \label{fig:fsf-semantics}
+\end{figure}
+
+Figure~\ref{fig:fsf-semantics} summarises the FSF text, the induced input-space
+partition, and the oracle mapping; SMT case generation places one witness in
+each strict scenario region.
+
+For the pipeline to communicate \emph{why} a candidate fails, we also need a
+notion of a counterexample that identifies the violated scenario.
+
+\begin{definition}[Strict Scenario Violation]
+\label{def:violation}
+A candidate $c$ \emph{violates scenario $s_i$} on the concrete case
+$(x_i, y_i) \in \mathcal{D}(t)$ if
+\[
+  f_c(x_i) \;\neq\; y_i \;=\; g_t(x_i),
+\]
+where $f_c : \mathcal{X}_t \to \mathcal{Y}_t$ denotes the observable
+behaviour of $c$.  The associated \emph{counterexample} is the triple
+\[
+  (x_i,\;g_t(x_i),\;f_c(x_i)),
+\]
+comprising the failing input, the expected output, and the actual output
+produced by $c$.
+\end{definition}
+
+Counterexamples are the primary feedback signal returned to the LLM.
+They are structured: the pipeline identifies not only that the candidate
+produced a wrong answer, but \emph{which scenario} was active, allowing the
+language model to localise the bug within the FSF specification.
+
+% ---------------------------------------------------------------------------
+\section{The Bounded Acceptance Problem}
+\label{sec:form:acceptance}
+% ---------------------------------------------------------------------------
+
+Armed with the oracle and the case set, we can now define what it means for
+a candidate to be accepted, and state the central computational problem
+that HSP-Agile solves.
+
+\begin{definition}[Candidate Implementation]
+\label{def:candidate}
+A \emph{candidate implementation} for task $t$ is any computable function
+$c : \mathcal{X}_t \to \mathcal{Y}_t$.  We write $f_c$ for its observable
+input-output behaviour, i.e., the function computed when $c$ is executed.
+\end{definition}
+
+\begin{definition}[Strict Formal Conformance]
+\label{def:conformance}
+The \emph{strict formal conformance} of candidate $c$ with respect to
+task $t$ is
+\[
+  \mathrm{Conf}(c,\,t)
+  \;=\;
+  \frac{1}{|\mathcal{D}(t)|}
+  \sum_{(x,\,y)\,\in\,\mathcal{D}(t)}
+  \mathbf{1}\bigl[f_c(x) = y\bigr].
+\]
+$\mathrm{Conf}(c,t) \in [0, 1]$; a value of $1$ indicates that $c$ agrees
+with the oracle on every generated case.
+\end{definition}
+
+\begin{definition}[Strict Success]
+\label{def:strict-success}
+Candidate $c$ \emph{strictly succeeds} on task $t$ if and only if
+\[
+  \mathrm{Conf}(c,\,t) \;\geq\; \tau,
+  \qquad \tau = 1.
+\]
+\end{definition}
+
+The choice $\tau = 1$ (all generated cases must pass) is deliberate.
+A threshold below $1$ would tolerate partial conformance and mask
+scenario-ordering violations: a candidate with wrong guard order may pass
+most cases where overlapping guards prescribe identical outputs, yet fail
+systematically where they disagree \citep{zhu1997specification}.
+We therefore require all $n$ generated cases to pass before declaring
+formal conformance.
+
+Conformance alone is insufficient for acceptance; the pipeline also screens
+candidates for the presence of high-severity requirement fault patterns.
+
+\begin{definition}[High-Severity Pattern Violation]
+\label{def:pattern-violation}
+Let $\mathcal{P}^H$ be the set of high-severity requirement fault patterns
+(as enumerated in Appendix~\ref{app:patterns}).  Candidate $c$ is
+\emph{pattern-safe} with respect to task $t$ if
+\[
+  \forall p \in \mathcal{P}^H : p(c,\,t) = 0.
+\]
+Each pattern checker $p : (c, t) \mapsto \{0, 1\}$ returns $1$ when the
+pattern is detected.
+\end{definition}
+
+The fault pattern set $\mathcal{P}^H$ contains 14 patterns derived from the
+Agile-SOFL fault taxonomy \citep{li2023iet, hovemeyer2004findbugs}, including guard-order
+inversion, missing scenario guard, contradictory output bindings, and
+uncovered ``others'' case.
+Each pattern is encoded as a static analysis rule applied to the candidate source.
+
+\begin{definition}[Hybrid Acceptance Predicate]
+\label{def:accept}
+The \emph{hybrid acceptance predicate} for candidate $c$ and task $t$ is
+\[
+  \mathrm{Accept}(c,\,t)
+  \;=\;
+  \mathbf{1}\!\left[
+    \mathrm{Conf}(c,\,t) \geq 1
+    \;\land\;
+    \forall p \in \mathcal{P}^H : p(c,\,t) = 0
+  \right].
+\]
+$\mathrm{Accept}(c,t) = 1$ is the condition under which HSP-Agile declares
+the synthesis attempt successful.
+\end{definition}
+
+The conjunction of formal conformance and pattern safety reflects the two
+distinct error modes that the system is designed to detect: (i) functional
+errors that cause incorrect outputs on specific inputs, detected by
+case-based testing; and (ii) structural errors in the implementation logic
+that correspond to known requirement fault patterns, detected by static
+analysis.  Neither check alone is sufficient, since a candidate can be
+formally conformant but harbour a latent pattern violation (or vice versa).
+
+We can now state the main computational problem.
+
+\begin{definition}[Bounded Acceptance Problem]
+\label{def:bap}
+Given:
+\begin{itemize}
+  \item a task $t = (\mathcal{S}_t, \mathcal{X}_t, \mathcal{Y}_t)$;
+  \item a budget $K \in \mathbb{N}^+$ bounding the number of LLM calls; and
+  \item a synthesis oracle $\mathrm{LLM}(\cdot)$ that, given a task and a
+        feedback object, generates a candidate implementation;
+\end{itemize}
+the \emph{Bounded Acceptance Problem} (BAP) is to find a candidate
+\[
+  c^* = \mathrm{LLM}\!\bigl(t,\;\mathrm{feedback}_1, \ldots,
+                              \mathrm{feedback}_{k-1}\bigr)
+\]
+with at most $K$ calls to $\mathrm{LLM}$ such that $\mathrm{Accept}(c^*, t) = 1$.
+If no such candidate exists within budget, return the best-effort candidate
+\[
+  c^* \;=\; \arg\max_{c \,\in\, C_K} \mathrm{Conf}(c,\,t),
+\]
+where $C_K = \{c_1, \ldots, c_K\}$ is the set of all candidates generated
+during the $K$ attempts.
+\end{definition}
+
+The feedback object $\mathrm{feedback}_k$ passed to the LLM on attempt $k+1$
+is a structured JSON record containing: (i) the list of counterexamples from
+attempt $k$; (ii) the list of detected pattern violations; and (iii) the
+attempt index $k$.  The structure and content of feedback messages are
+described in detail in Chapter~\ref{ch:method}.
+
+The pipeline is therefore an instance of counterexample-guided inductive
+synthesis (CEGIS) \citep{solarlezama2008sketching, lynn2024verifierloop}, where the verifier is the
+SMT-generated case set and the pattern checker, and the synthesiser is the
+language model.
+Unlike classical CEGIS, however, the synthesiser is stochastic: the same prompt
+may produce different outputs on successive calls, with no guarantee of
+convergence within budget $K$.
+The BAP makes this limitation explicit by specifying a graceful fallback when
+the budget is exhausted.
+
+% ---------------------------------------------------------------------------
+\section{Prevention and Quality Metrics}
+\label{sec:form:metrics}
+% ---------------------------------------------------------------------------
+
+To evaluate how effectively HSP-Agile prevents faulty candidates from being
+accepted, we define population-level metrics over a mutant population
+\citep{demillo1978mutation, ammann2016testing}.
+These metrics are used in the experimental evaluation of
+Chapter~\ref{ch:experiments}.
+
+\begin{definition}[Mutant Population]
+\label{def:mutants}
+A \emph{mutant population} $\mathcal{M}$ is a finite set of pairs
+$(c_m, t_m)$, each consisting of a candidate and a task, where at least
+one of the two has been artificially perturbed.  We distinguish two sub-populations:
+\begin{itemize}
+  \item \emph{Specification-confusion mutants} $\mathcal{M}^S$: the task
+        $t_m$ is a mutated version of a reference task, obtained by
+        modifying scenario guards or output bindings in $\mathcal{S}_t$.
+        The candidate $c_m$ is a correct implementation of the
+        \emph{original} task, so it is faulty with respect to $t_m$.
+  \item \emph{Implementation-screening mutants} $\mathcal{M}^I$: the
+        task $t_m$ is unchanged, but $c_m$ is a deliberately mutated
+        version of a reference implementation, obtained by applying a
+        standard mutation operator (e.g., guard-order swap,
+        boundary-off-by-one).
+\end{itemize}
+A mutant pair $(c_m, t_m)$ is \emph{genuinely faulty}, written
+$\mathrm{Faulty}(m) = 1$, if the reference specification or the reference
+implementation has been perturbed.
+\end{definition}
+
+\begin{definition}[Prevention Detection Rate]
+\label{def:pdr}
+The \emph{Prevention Detection Rate} (PDR) is the fraction of mutants that
+the pipeline correctly rejects:
+\[
+  \mathrm{PDR}
+  \;=\;
+  \frac{\bigl|\bigl\{m \in \mathcal{M} : \neg\,\mathrm{Accept}(c_m,\,t_m)\bigr\}\bigr|}
+       {|\mathcal{M}|}.
+\]
+A higher PDR indicates that more faulty candidates are correctly identified
+and prevented from passing the pipeline.
+\end{definition}
+
+\begin{definition}[False Accept Rate]
+\label{def:far}
+The \emph{False Accept Rate} (FAR) is the fraction of genuinely faulty
+mutants that the pipeline incorrectly accepts:
+\[
+  \mathrm{FAR}
+  \;=\;
+  \frac{\bigl|\bigl\{m \in \mathcal{M} :
+      \mathrm{Accept}(c_m,\,t_m) = 1
+      \;\land\; \mathrm{Faulty}(m) = 1
+    \bigr\}\bigr|}
+       {|\mathcal{M}|}.
+\]
+A lower FAR indicates that fewer genuinely faulty candidates escape detection.
+\end{definition}
+
+We note that PDR and FAR are complementary but not redundant \citep{okun2007mutation}.
+PDR is recall-like over all mutants, including those trivially caught by
+crashes or type mismatches.
+FAR is precision-like: it focuses on genuinely faulty mutants that the pipeline
+incorrectly accepts.
+
+A related metric quantifies the contribution of the formal case-based check
+alone, independent of the pattern screening layer.
+
+\begin{definition}[Mutation Kill Rate]
+\label{def:mkr}
+The \emph{mutation kill rate} is the fraction of mutants detected by formal
+conformance checking:
+\[
+  \mu_k
+  \;=\;
+  \frac{\bigl|\bigl\{m \in \mathcal{M} : \mathrm{Conf}(c_m,\,t_m) < 1\bigr\}\bigr|}
+       {|\mathcal{M}|}.
+\]
+\end{definition}
+
+The distinction between $\mu_k$ and PDR is important.  $\mu_k$ measures
+whether the formal case-based check alone is sufficient to detect a given
+mutant (i.e., at least one generated case produces a wrong output).  PDR
+measures whether the \emph{full pipeline} — including pattern screening —
+correctly rejects the candidate.  A mutant with $\mathrm{Conf}(c_m, t_m) = 1$
+but a detected pattern violation contributes to PDR but not to $\mu_k$,
+because the conformance check alone would have passed it.  The gap
+$\mathrm{PDR} - \mu_k$ therefore quantifies the additive value of the
+pattern-screening layer over pure case-based testing.
+
+% ---------------------------------------------------------------------------
+\section{Benchmark Formalization}
+\label{sec:form:benchmark}
+% ---------------------------------------------------------------------------
+
+Our experimental evaluation is based on a synthetic benchmark of hard tasks
+designed to stress FSF precedence sensitivity \citep{li2023iet}.
+This section formalises benchmark construction and proves that correct
+solutions must respect scenario ordering.
+
+\begin{definition}[Precedence-Sensitive Task]
+\label{def:prec-sensitive}
+A task $t$ is \emph{precedence-sensitive} if there exist two scenarios
+$s_i, s_j$ with $i < j$ such that their guard regions overlap:
+\[
+  \bigl\{x \in \mathcal{X}_t : g_i(x) = 1\bigr\}
+  \;\cap\;
+  \bigl\{x \in \mathcal{X}_t : g_j(x) = 1\bigr\}
+  \;\neq\; \emptyset.
+\]
+\end{definition}
+
+In a precedence-sensitive task, the output on inputs in the overlapping region
+depends entirely on which guard is evaluated first.  An implementation that
+checks $g_j$ before $g_i$ will, on those inputs, return $\phi_j(x)$ rather
+than the correct $\phi_i(x)$.  This is precisely the class of error that
+naive LLM synthesis frequently introduces: the model may faithfully reproduce
+all guard conditions and output mappings from the specification text, while
+inadvertently evaluating them in a different order.
+
+\begin{proposition}
+\label{prop:order-required}
+For any precedence-sensitive task $t^H$, a strictly correct implementation
+must evaluate the scenario guards in the exact order prescribed by
+$\mathcal{S}_{t^H}$.
+\end{proposition}
+
+\begin{proof}
+Let $x^*$ be any input in the overlapping region of $s_i$ and $s_j$
+($i < j$).  By Definition~\ref{def:oracle}, the oracle maps
+$g_t(x^*) = \phi_i(x^*)$.  Suppose an implementation $c$ evaluates $g_j$
+before $g_i$.  Since $g_j(x^*) = 1$, the implementation returns
+$\phi_j(x^*)$.  Because the task is precedence-sensitive (the two scenarios
+cover an overlapping region of the input space), the specification is
+non-trivially ordered, and it need not be the case that $\phi_i(x^*) =
+\phi_j(x^*)$ — indeed, if they were always equal on the overlap, the overlap
+would be semantically irrelevant and the task would not test ordering at all.
+Hence $f_c(x^*) \neq g_t(x^*)$, and $c$ does not strictly succeed.
+\end{proof}
+
+Our benchmark tasks are constructed as follows.  Each \emph{hard synthetic
+task} $t^H$ has the following structure:
+
+\begin{itemize}
+  \item \textbf{Input variables}: five non-negative integers
+        $a, b, c, d, e \in \mathbb{N}$.
+  \item \textbf{Output variables}: three integer quantities —
+        $\mathit{risk} \in \{0,1,2\}$,
+        $\mathit{action} \in \{0,1,2\}$, and
+        $\mathit{score} \in [0, 100]$ — giving $\mathcal{Y}_t \subseteq
+        \{0,1,2\}^2 \times [0,100]$.
+  \item \textbf{Scenario count}: up to $n = 9$ ordered scenarios.
+  \item \textbf{Threshold parameters}: seven threshold values
+        $\theta_1, \ldots, \theta_7$ sampled uniformly at random from
+        $[1, 100] \cap \mathbb{Z}$, used to construct the guard predicates
+        (e.g., $a > \theta_1$, $b \leq \theta_2 \land c > \theta_3$).
+  \item \textbf{Feasibility guarantee}: all scenarios are satisfiable, verified
+        by a Z3 feasibility check during task generation.  Any candidate
+        $\theta$ vector that renders a scenario unsatisfiable is discarded
+        and resampled.
+  \item \textbf{Consistency validation}: the generated task passes a
+        scenario-consistency validator that confirms each generated case
+        belongs to exactly one scenario and that the ``others'' guard
+        correctly covers all remaining inputs.
+\end{itemize}
+
+By Proposition~\ref{prop:order-required}, every hard task in the benchmark
+requires an implementation to evaluate guards in the specified order.  An
+LLM that does not attend to the ordering of scenarios in the prompt will
+therefore produce incorrect implementations, which are caught by the
+SMT-generated test suite.
+
+% ---------------------------------------------------------------------------
+\section{Computational Considerations}
+\label{sec:form:complexity}
+% ---------------------------------------------------------------------------
+
+The HSP-Agile pipeline introduces computational stages beyond LLM synthesis.
+We analyse their cost to confirm that formal checking does not dominate
+overall runtime \citep{demoura2008z3, barrett2018smt}.
+
+\paragraph{Case Generation.}
+For each of the $n$ scenarios, the Z3 solver is invoked with a linear
+arithmetic formula over $d$ integer variables.  Linear integer arithmetic
+(LIA) is decidable, and Z3's LIA solver runs in time that is polynomial in
+the formula size for the types of constraints that arise from threshold-based
+FSF guards.  In practice, with $n \leq 9$ and $d = 5$, each call to Z3
+completes in under $0.1$ seconds, giving a total case generation time of
+$O(n \cdot d^2)$ solver steps in the worst case, or approximately
+$0.5$--$1$ seconds per task.
+
+\paragraph{Conformance Checking.}
+Given the case set $\mathcal{D}(t)$ of size $n$, checking conformance
+requires executing the candidate $c$ on each input $x_i$ and comparing the
+output to $g_t(x_i)$.  This is a simple lookup-and-compare operation with
+cost $O(n)$ function evaluations and $O(n)$ comparisons.  For $n \leq 9$,
+this step is effectively instantaneous.
+
+\paragraph{Pattern Matching.}
+The pattern screening layer applies $|\mathcal{P}^H| = 14$ pattern checkers
+to the source code of candidate $c$.  Each pattern is encoded as a regular
+expression or a simple abstract-syntax-tree traversal.  The cost is $O(L
+\cdot P)$ where $L$ is the length of the candidate source code and $P =
+|\mathcal{P}^H|$.  For typical LLM-generated functions of 30--80 lines,
+this step completes in well under $0.01$ seconds.
+
+\paragraph{Total Pipeline Cost.}
+The dominant cost at every iteration is the LLM API call, which in our
+experiments takes approximately $10$ seconds per attempt.  The Z3 solving
+and conformance checking add less than $1$ second combined.  The pattern
+matching is negligible.  With a budget of $K = 3$ attempts, the expected
+total pipeline runtime is approximately $30$ seconds per task, of which more
+than $97\%$ is attributable to LLM inference.  The formal checking overhead
+is therefore not a bottleneck, and the pipeline could accommodate larger
+case sets or more elaborate pattern libraries without meaningful impact on
+throughput.
+
+\paragraph{Summary.}
+The cost structure can be written as
+\[
+  T_{\mathrm{pipeline}}
+  \;\approx\;
+  K \cdot T_{\mathrm{LLM}}
+  \;+\; O(n \cdot d^2) \cdot T_{\mathrm{Z3}}
+  \;+\; O(n) \cdot T_{\mathrm{exec}}
+  \;+\; O(L \cdot P) \cdot T_{\mathrm{pattern}},
+\]
+where $T_{\mathrm{LLM}} \gg T_{\mathrm{Z3}} \gg T_{\mathrm{exec}} \approx
+T_{\mathrm{pattern}}$, confirming that formal checking adds less overhead
+than a single LLM call.
+
+% ---------------------------------------------------------------------------
+\section*{Chapter Summary}
+% ---------------------------------------------------------------------------
+
+This chapter has established the formal foundations of HSP-Agile.  We
+defined the Agile-SOFL task model (Definition~\ref{def:task}), the FSF
+scenario and its semantics (Definitions \ref{def:scenario}--\ref{def:oracle}),
+and the SMT-based case generation procedure
+(Definition~\ref{def:test-suite}), proving that it achieves full scenario
+coverage (Proposition~\ref{prop:coverage}).  We formalised the Bounded
+Acceptance Problem (Definition~\ref{def:bap}), which captures the synthesis-and-repair
+loop as a budget-constrained search, and introduced the hybrid acceptance
+predicate that combines conformance checking with fault-pattern screening
+(Definition~\ref{def:accept}).  Prevention and quality metrics — PDR, FAR,
+and mutation kill rate — were defined to support empirical evaluation.  The
+benchmark formalisation demonstrated that every hard task requires strict
+scenario ordering (Proposition~\ref{prop:order-required}), and the
+complexity analysis confirmed that the formal checking overhead is negligible
+relative to LLM inference cost.  With these foundations in place, the
+following chapters describe the concrete system design (Chapter~\ref{ch:method})
+and its implementation (Chapter~\ref{ch:implementation}).

@@ -9,6 +9,7 @@ from pathlib import Path
 
 PAPER_ROOT = Path(__file__).resolve().parents[1]
 PREPARE_SCRIPT = PAPER_ROOT / "scripts" / "prepare_paper_data.py"
+MECHANISM_SCRIPT = PAPER_ROOT / "scripts" / "prepare_mechanism_data.py"
 # Prefer the matplotlib-based generator (no Kaleido/Chrome dependency)
 PLOT_SCRIPT = PAPER_ROOT / "figures" / "scripts" / "plot_mpl_figures.py"
 PLOT_SCRIPT_FALLBACK = PAPER_ROOT / "figures" / "scripts" / "plot_paper_figures.py"
@@ -71,6 +72,13 @@ def main() -> None:
         if args.prevention_summary is not None:
             prep_cmd.extend(["--prevention-summary", str(args.prevention_summary)])
         _run(prep_cmd)
+
+        mech_cmd = [python, str(MECHANISM_SCRIPT)]
+        if args.run_dir is not None:
+            mech_cmd.extend(["--run-dir", str(args.run_dir)])
+        if args.prevention_summary is not None:
+            mech_cmd.extend(["--prevention-dir", str(args.prevention_summary)])
+        _run(mech_cmd)
 
     active_plot_script = PLOT_SCRIPT if PLOT_SCRIPT.exists() else PLOT_SCRIPT_FALLBACK
     _run(

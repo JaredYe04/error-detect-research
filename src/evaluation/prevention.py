@@ -117,6 +117,89 @@ def evaluate_prevention(
     return records
 
 
+def compute_pattern_guard_prf1(
+    tasks: list[dict],
+    *,
+    seed: int = 42,
+) -> dict:
+    """Compute per-pattern Precision / Recall / F1 against the impl-layer mutant population.
+
+    For each pattern p and fault category, counts:
+      TP: pattern p fires on a faulty (mutant) implementation
+      FP: pattern p fires on a correct (reference) implementation
+      FN: pattern p does not fire on a faulty implementation
+      TN: pattern p does not fire on a correct implementation
+
+    Returns a nested dict keyed by fault_category → pattern_id → {P, R, F1, TP, FP, FN}.
+    """
+    guard = PatternGuard()
+    # Map mutant operators to semantic fault categories
+    operator_category = {
+        "ICO": "Ordering",
+        "WRO": "Ordering",
+        "MBO": "MissingPrecond",
+        "DRO": "OutputDep",
+        "SNO": "GuardInversion",
+        "ORO": "Ordering",
+        "MCO": "MissingConstraint",
+        "BCO": "Boundary",
+    }
+
+    # Accumulate confusion matrix per pattern
+    pattern_stats: dict[str, dict[str, int]] = {}
+
+    for task in tasks:
+        ref = task.get("referenceCode", "")
+        if not ref:
+            continue
+        mutants = generate_mutants(task, ref, seed=seed, impl_ops=True, spec_ops=True)
+
+        # Reference (correct) implementation
+        ref_matches = {m.pattern_id for m in guard.check(ref, task)}
+
+        for mut in mutants:
+            candidate = mut.payload.get("code", "")
+            if not candidate:
+                continue
+            category = operator_category.get(mut.operator, "Unknown")
+            mut_matches = {m.pattern_id for m in guard.check(candidate, task)}
+
+            for pattern_id in set(ref_matches) | set(mut_matches):
+                key = f"{category}/{pattern_id}"
+                if key not in pattern_stats:
+                    pattern_stats[key] = {"TP": 0, "FP": 0, "FN": 0, "TN": 0}
+                fires_on_faulty = pattern_id in mut_matches
+                fires_on_ref = pattern_id in ref_matches
+                if fires_on_faulty:
+                    pattern_stats[key]["TP"] += 1
+                else:
+                    pattern_stats[key]["FN"] += 1
+                if fires_on_ref:
+                    pattern_stats[key]["FP"] += 1
+                else:
+                    pattern_stats[key]["TN"] += 1
+
+    # Compute P/R/F1
+    results: dict = {}
+    for key, counts in pattern_stats.items():
+        category, pattern_id = key.split("/", 1)
+        tp = counts["TP"]
+        fp = counts["FP"]
+        fn = counts["FN"]
+        precision = tp / (tp + fp) if (tp + fp) > 0 else 0.0
+        recall = tp / (tp + fn) if (tp + fn) > 0 else 0.0
+        f1 = (2 * precision * recall / (precision + recall)) if (precision + recall) > 0 else 0.0
+        results.setdefault(category, {})[pattern_id] = {
+            "precision": round(precision, 4),
+            "recall": round(recall, 4),
+            "f1": round(f1, 4),
+            "TP": tp,
+            "FP": fp,
+            "FN": fn,
+        }
+    return results
+
+
 def save_prevention_report(records: list[PreventionRecord], out_dir: Path) -> Path:
     out_dir.mkdir(parents=True, exist_ok=True)
     path = out_dir / "prevention_eval.jsonl"

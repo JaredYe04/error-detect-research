@@ -1,0 +1,178 @@
+%% diagrams/tikz/algorithm_flowchart.tex
+%% TikZ fragment -- \input{} into main document.
+%% Preamble requirements (loaded by thesis.sty):
+%%   \usetikzlibrary{shapes.geometric,arrows.meta,positioning,shadows,calc}
+
+%% ---- Colour palette -------------------------------------------------------
+\colorlet{FlowBlue}{blue!50!cyan!80!white}
+\colorlet{FlowGray}{black!38}
+\colorlet{FlowOrange}{orange!80!red}
+\colorlet{FlowGreen}{green!50!black}
+
+%% ---- Diagram --------------------------------------------------------------
+\scalebox{0.85}{%
+\begin{tikzpicture}[
+  every node/.style = {font=\small\sffamily},
+  %% Process rectangle with drop shadow
+  proc/.style = {
+    draw          = FlowGray!80!black,
+    fill          = FlowGray!13,
+    rounded corners = 2pt,
+    minimum width  = 5.0cm,
+    minimum height = 0.70cm,
+    align = center,
+    drop shadow={shadow xshift=0.4ex, shadow yshift=-0.4ex, shadow opacity=0.30}
+  },
+  %% Terminal (start/end) oval
+  term/.style = {
+    proc,
+    draw          = FlowGreen!70!black,
+    fill          = FlowGreen!12,
+    rounded corners = 10pt,
+    minimum width  = 2.6cm,
+    minimum height = 0.60cm
+  },
+  %% Decision diamond with drop shadow
+  dec/.style = {
+    draw   = FlowOrange!85!black,
+    fill   = FlowOrange!14,
+    diamond,
+    aspect = 2.4,
+    minimum width  = 5.0cm,
+    minimum height = 0.82cm,
+    align  = center,
+    font   = \small\sffamily,
+    drop shadow={shadow xshift=0.4ex, shadow yshift=-0.4ex, shadow opacity=0.30}
+  },
+  %% Right-column nodes (narrower)
+  rproc/.style = {proc, minimum width=3.6cm, font=\scriptsize\sffamily},
+  rdec/.style  = {dec,  minimum width=3.2cm, font=\scriptsize\sffamily, aspect=2.0},
+  %% Arrows
+  arr/.style   = {-{Stealth[length=5pt,width=3.2pt]}, thick, draw=black!65},
+  %% No-arrowhead line for trunks
+  trunk/.style = {thick, draw=black!65},
+  %% Loop-back arrow (dashed)
+  larr/.style  = {
+    arr,
+    draw      = FlowBlue!75!black,
+    dashed,
+    line width = 0.7pt
+  },
+]
+
+%% ===========================================================================
+%% Main column (x = 0, top-down)
+%% ===========================================================================
+
+\node[term]  (START)  {START};
+
+\node[proc,  below=0.70cm of START] (INIT)
+  {Initialize $k \leftarrow 1$,\; $\mathrm{feedback} \leftarrow \varnothing$};
+
+\node[proc,  below=0.80cm of INIT]  (SYNTH)
+  {Synthesize $c_k \leftarrow \mathrm{LLM}(t,\,\mathrm{feedback}_{k-1})$};
+
+\node[proc,  below=0.80cm of SYNTH] (COMP)
+  {Compute $\mathrm{Conf}(c_k,t)$; extract counterexamples;\\
+   evaluate high-severity patterns on $c_k$};
+
+\node[dec,   below=0.85cm of COMP]  (DCONF)
+  {$\mathrm{Conf}(c_k,t) \geq \tau$\,?};
+
+\node[dec,   below=1.00cm of DCONF] (DPAT)
+  {Pattern violations $= 0$\,?};
+
+\node[proc,  below=0.85cm of DPAT,
+             draw=FlowBlue!80!black,
+             fill=FlowBlue!15] (RETACC)
+  {\textbf{RETURN} Accepted Candidate $c_k$};
+
+\node[term,  below=0.70cm of RETACC] (END1) {END};
+
+%% ===========================================================================
+%% Right column (x = 4.2cm) -- No-branch processing
+%% ===========================================================================
+
+%% Right-column anchor: same y as DCONF, shifted right
+\node[rproc, right=1.4cm of DCONF] (UPDFB1)
+  {Update feedback\\(counterexamples)};
+
+\node[rproc, right=1.4cm of DPAT]  (UPDFB2)
+  {Update feedback\\(pattern hits)};
+
+%% Merge point: below UPDFB2, above budget check
+\coordinate (MERGE) at ($(UPDFB2.south)+(0,-0.55)$);
+
+%% Budget check and terminal
+\node[rdec,  below=0.55cm of UPDFB2]  (KCHECK)
+  {$k > K$\,?};
+
+\node[rproc, below=0.70cm of KCHECK,
+             draw=FlowBlue!80!black,
+             fill=FlowBlue!15] (RETBEST)
+  {\textbf{RETURN} Best Candidate\\(by $\mathrm{Conf}$ score)};
+
+\node[term,  below=0.60cm of RETBEST] (END2)  {END};
+
+%% ===========================================================================
+%% Arrows -- main flow
+%% ===========================================================================
+
+\draw[arr] (START.south) -- (INIT.north);
+\draw[arr] (INIT.south)  -- (SYNTH.north);
+\draw[arr] (SYNTH.south) -- (COMP.north);
+\draw[arr] (COMP.south)  -- (DCONF.north);
+
+%% DCONF Yes -> DPAT
+\draw[arr] (DCONF.south) -- (DPAT.north)
+  node[midway, right=2pt, font=\footnotesize\sffamily] {Yes};
+
+%% DPAT Yes -> RETACC
+\draw[arr] (DPAT.south) -- (RETACC.north)
+  node[midway, right=2pt, font=\footnotesize\sffamily] {Yes};
+
+\draw[arr] (RETACC.south) -- (END1.north);
+
+%% ===========================================================================
+%% Arrows -- No branches (right column)
+%% ===========================================================================
+
+%% DCONF No -> UPDFB1
+\draw[arr] (DCONF.east) -- (UPDFB1.west)
+  node[midway, above=1.5pt, font=\footnotesize\sffamily] {No};
+
+%% DPAT No -> UPDFB2
+\draw[arr] (DPAT.east)  -- (UPDFB2.west)
+  node[midway, above=1.5pt, font=\footnotesize\sffamily] {No};
+
+%% UPDFB1 -> down to KCHECK.north (passing through UPDFB2 y-level)
+\draw[arr, rounded corners=4pt]
+  (UPDFB1.south) -- ++(0,-0.30) -| (KCHECK.north);
+
+%% UPDFB2 -> KCHECK
+\draw[arr] (UPDFB2.south) -- (KCHECK.north);
+
+%% KCHECK Yes -> RETBEST
+\draw[arr] (KCHECK.south) -- (RETBEST.north)
+  node[midway, right=2pt, font=\footnotesize\sffamily] {Yes};
+
+\draw[arr] (RETBEST.south) -- (END2.north);
+
+%% ===========================================================================
+%% Loop-back arrow: KCHECK No -> back to SYNTH (left side)
+%% ===========================================================================
+
+%% Route: KCHECK.west -> far left (outside main col) -> up -> SYNTH.west
+\coordinate (KCLEFT) at ($(KCHECK.west)+(-1.20,0)$);
+\coordinate (SLTOP)  at ($(SYNTH.west)  +(-1.20,0)$);
+
+\draw[larr, rounded corners=5pt]
+  (KCHECK.west) -- (KCLEFT) -- (SLTOP) -- (SYNTH.west);
+
+\node[font=\scriptsize\sffamily, text=FlowBlue!80!black,
+      anchor=east, xshift=-0.2em]
+  at ($(KCLEFT)!0.5!(SLTOP)$)
+  {No\\(next iter.)};
+
+\end{tikzpicture}%
+}

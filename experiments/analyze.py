@@ -45,6 +45,55 @@ def aggregate_by_mode(df: pd.DataFrame) -> pd.DataFrame:
     return agg
 
 
+def _cliffs_delta(x: np.ndarray, y: np.ndarray) -> float:
+    """Compute Cliff's delta (non-parametric effect size) between arrays x and y."""
+    n_x, n_y = len(x), len(y)
+    if n_x == 0 or n_y == 0:
+        return 0.0
+    concordant = sum(1 for xi in x for yi in y if xi > yi)
+    discordant = sum(1 for xi in x for yi in y if xi < yi)
+    return (concordant - discordant) / (n_x * n_y)
+
+
+def _bootstrap_ci(
+    x: np.ndarray,
+    y: np.ndarray,
+    *,
+    n_boot: int = 1000,
+    ci: float = 0.95,
+    seed: int = 42,
+) -> tuple[float, float]:
+    """Bootstrap confidence interval for the mean difference (y - x)."""
+    rng = np.random.default_rng(seed)
+    diffs = []
+    for _ in range(n_boot):
+        xi = rng.choice(x, size=len(x), replace=True)
+        yi = rng.choice(y, size=len(y), replace=True)
+        diffs.append(float(np.mean(yi) - np.mean(xi)))
+    alpha = 1 - ci
+    lo = float(np.percentile(diffs, 100 * alpha / 2))
+    hi = float(np.percentile(diffs, 100 * (1 - alpha / 2)))
+    return lo, hi
+
+
+def holm_bonferroni(p_values: list[float]) -> list[float]:
+    """Apply Holm-Bonferroni correction to a list of p-values.
+
+    Returns corrected p-values in the same order as the input.
+    """
+    n = len(p_values)
+    if n == 0:
+        return []
+    indexed = sorted(enumerate(p_values), key=lambda t: t[1])
+    adjusted = [0.0] * n
+    prev_corrected = 0.0
+    for rank, (orig_idx, p) in enumerate(indexed):
+        corrected = min(1.0, max(prev_corrected, p * (n - rank)))
+        adjusted[orig_idx] = corrected
+        prev_corrected = corrected
+    return adjusted
+
+
 def pairwise_tests(df: pd.DataFrame, baseline: str = "B1", method: str = "M", metric: str = "success") -> dict:
     base = df[df["mode"] == baseline].groupby("task_id")[metric].mean()
     treat = df[df["mode"] == method].groupby("task_id")[metric].mean()
@@ -55,7 +104,6 @@ def pairwise_tests(df: pd.DataFrame, baseline: str = "B1", method: str = "M", me
     t = treat.loc[common].values
     diff = t - b
     if np.all(diff == 0):
-        # All differences are zero: no test can be performed; report trivially
         return {
             "baseline": baseline,
             "method": method,
@@ -66,7 +114,8 @@ def pairwise_tests(df: pd.DataFrame, baseline: str = "B1", method: str = "M", me
             "delta": 0.0,
             "wilcoxon_stat": None,
             "p_value": 1.0,
-            "effect_size_rank_biserial": 0.0,
+            "cliffs_delta": 0.0,
+            "bootstrap_ci_95": [0.0, 0.0],
             "significant_0.05": False,
             "note": "all_differences_zero",
         }
@@ -74,7 +123,11 @@ def pairwise_tests(df: pd.DataFrame, baseline: str = "B1", method: str = "M", me
         stat, p = stats.wilcoxon(t, b, alternative="greater")
     except ValueError:
         stat, p = float("nan"), 1.0
-    # rank-biserial correlation effect size
+    # Cliff's delta (non-parametric effect size)
+    cd = _cliffs_delta(b, t)
+    # Bootstrap 95% CI on mean difference
+    lo, hi = _bootstrap_ci(b, t, n_boot=1000, ci=0.95)
+    # rank-biserial correlation (legacy)
     n = len(diff)
     ranks = stats.rankdata(np.abs(diff))
     pos = np.sum(ranks[diff > 0])
@@ -88,11 +141,41 @@ def pairwise_tests(df: pd.DataFrame, baseline: str = "B1", method: str = "M", me
         "baseline_mean": float(np.mean(b)),
         "method_mean": float(np.mean(t)),
         "delta": float(np.mean(t) - np.mean(b)),
-        "wilcoxon_stat": float(stat),
+        "wilcoxon_stat": float(stat) if not np.isnan(stat) else None,
         "p_value": float(p),
+        "cliffs_delta": float(cd),
         "effect_size_rank_biserial": float(rbc),
+        "bootstrap_ci_95": [lo, hi],
         "significant_0.05": bool(p < 0.05),
     }
+
+
+def all_pairwise_tests_with_holm(
+    df: pd.DataFrame,
+    modes: list[str] | None = None,
+    metric: str = "success",
+) -> dict:
+    """Run all pairwise comparisons and apply Holm-Bonferroni correction."""
+    modes = modes or ["B1", "B2", "M", "A1", "A2", "A3"]
+    modes = [m for m in modes if m in df["mode"].unique()]
+    pairs = [(a, b) for i, a in enumerate(modes) for b in modes[i + 1:]]
+
+    raw_results = {}
+    p_values = []
+    pair_keys = []
+    for baseline, method in pairs:
+        key = f"{method}_vs_{baseline}"
+        r = pairwise_tests(df, baseline, method, metric)
+        raw_results[key] = r
+        p_values.append(r.get("p_value", 1.0))
+        pair_keys.append(key)
+
+    corrected = holm_bonferroni(p_values)
+    for key, adj_p in zip(pair_keys, corrected):
+        raw_results[key]["p_value_holm"] = adj_p
+        raw_results[key]["significant_holm_0.05"] = adj_p < 0.05
+
+    return raw_results
 
 
 def ablation_analysis(df: pd.DataFrame) -> pd.DataFrame:
@@ -198,11 +281,17 @@ def analyze(run_dir: Path) -> Path:
     summary = aggregate_by_mode(df)
     summary.to_csv(report_dir / "summary_by_mode.csv", index=False)
 
+    # Upgraded stats: all pairwise with Holm correction + Cliff's delta + bootstrap CI
+    all_modes = df["mode"].unique().tolist()
+    pairwise_all = all_pairwise_tests_with_holm(df, modes=all_modes, metric="strict_success")
+    pairwise_conf = all_pairwise_tests_with_holm(df, modes=all_modes, metric="formal_conformance")
     tests = {
+        "pairwise_strict_success_holm": pairwise_all,
+        "pairwise_conformance_holm": pairwise_conf,
+        "latency_M_vs_B2": latency_comparison(df),
+        # Keep primary comparisons at top level for backward compatibility
         "M_vs_B1": pairwise_tests(df, "B1", "M", metric="strict_success"),
         "M_vs_B2": pairwise_tests(df, "B2", "M", metric="strict_success"),
-        "B2_vs_B1": pairwise_tests(df, "B1", "B2", metric="strict_success"),
-        "latency_M_vs_B2": latency_comparison(df),
     }
     (report_dir / "significance_tests.json").write_text(
         json.dumps(tests, indent=2), encoding="utf-8"
