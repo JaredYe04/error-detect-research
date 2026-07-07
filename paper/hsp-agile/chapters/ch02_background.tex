@@ -115,22 +115,11 @@ An implementation testing $a > 5$ before $a > 10 \wedge b > 5$ would
 incorrectly return \texttt{"MEDIUM"}---a \emph{scenario-order violation}
 invisible to techniques treating guards as a flat Boolean formula.
 
-Figure~\ref{fig:fsf-semantics} illustrates the input-space partition:
+Figure~\ref{fig:fsf-semantics} (Chapter~\ref{ch:formalization}) illustrates the input-space partition:
 $S_1$ (red) is a strict subset of $S_2$'s guard region (orange); $S_3$
 (green) covers the remainder.
 The precedence relation $S_1 \succ S_2 \succ S_3$ is structural, not derived
 from the guards alone.
-
-\begin{figure}[t]
-  \centering
-  \tikzinput{diagrams/tikz/fsf_semantics}
-  \caption{FSF specification structure and evaluation semantics.
-    Left: a three-scenario FSF function definition.
-    Right: the corresponding input-space partitioning with scenario
-    priority $S_1 \succ S_2 \succ S_3$ and the oracle mapping.
-    Dots represent concrete test cases, one per strict scenario region.}
-  \label{fig:fsf-semantics}
-\end{figure}
 
 \subsection{Formal Notation}
 
@@ -499,21 +488,33 @@ post-processing alone addresses.
 Table~\ref{tab:related-positioning} positions \textsc{SgDP} on dimensions
 critical for specification-conformance defect prevention.
 
+\Needspace{3\baselineskip}
+\paragraph{Agent-based code generation.}
+Recent coding agent frameworks---OpenHands~\citep{wang2024opendevin},
+SWE-agent~\citep{yang2024sweagent}, Codex CLI, and Claude Code---combine LLM
+synthesis with tool use to resolve repository tasks.  They address a different
+problem from \textsc{SgDP}: (i)~no specification oracle $g_t$;
+(ii)~no prevention metrics (PDR/FAR); (iii)~orthogonal to our contribution---a
+stronger model could serve as Stage~1 synthesis backbone.
+B5 (Reflexion-lite) captures the verbal-memory dimension most relevant to repair.
+Full agent-oracle comparison is future work.
+
 \begin{inlinetable}{Positioning \textsc{SgDP} against related approaches.  A tick indicates
   the property is satisfied; a dash indicates it is not a design goal.}
   \label{tab:related-positioning}
-  \begin{tabular}{lcccc}
+  \begin{tabular}{lccccc}
     \toprule
-    & Spec-aware & Structured & Prevention & General \\
-    Approach & witnesses & feedback IR & protocol & framework \\
+    & Spec-aware & Unified & Structured & Prevention & General \\
+    Approach & witnesses & SpecIR & feedback IR & protocol & framework \\
     \midrule
-    CEGIS (Solar-Lezama)          & ---  & --- & ---  & \checkmark \\
-    DafnyBench~\citep{dafnybench2024}     & \checkmark & --- & --- & --- \\
-    Self-Refine~\citep{madaan2023selfrefine}   & --- & --- & --- & \checkmark \\
-    Self-Debug~\citep{chen2023selfdebug}    & --- & --- & --- & \checkmark \\
-    Reflexion~\citep{shinn2023reflexion} (B5) & --- & --- & --- & \checkmark \\
-    CodeT~\citep{chen2022codet}           & --- & --- & --- & --- \\
-    \textsc{SgDP} (this report)    & \checkmark & \checkmark & \checkmark & \checkmark \\
+    CEGIS (Solar-Lezama)          & ---  & --- & --- & ---  & \checkmark \\
+    DafnyBench~\citep{dafnybench2024}     & \checkmark & --- & --- & --- & --- \\
+    Self-Refine~\citep{madaan2023selfrefine}   & --- & --- & --- & --- & \checkmark \\
+    Self-Debug~\citep{chen2023selfdebug}    & --- & --- & --- & --- & \checkmark \\
+    Reflexion~\citep{shinn2023reflexion} (B5) & --- & --- & --- & --- & \checkmark \\
+    CodeT~\citep{chen2022codet}           & --- & --- & --- & --- & --- \\
+    OpenHands / SWE-agent       & --- & --- & --- & --- & \checkmark \\
+    \textsc{SgDP} (this report)    & \checkmark & \checkmark & \checkmark & \checkmark & \checkmark \\
     \bottomrule
   \end{tabular}
 \end{inlinetable}

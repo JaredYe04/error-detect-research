@@ -6,7 +6,7 @@ import time
 
 RUNS = [
     ("E1-ext (B3/B4/B5)", "artifacts/run_ccf_b_extended_v1/progress.json"),
-    ("E6 (feedback variants)", "artifacts/run_feedback_v1/feedback_variants/progress.json"),
+    ("E6 (feedback variants)", "artifacts/run_feedback_v2/feedback_variants/progress.json"),
     ("Real-derived (E8c)", "artifacts/run_real_derived_v1/progress.json"),
     ("Generalisation v2", "artifacts/run_generalisation_v2/progress.json"),
 ]

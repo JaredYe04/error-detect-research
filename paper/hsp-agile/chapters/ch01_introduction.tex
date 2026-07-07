@@ -16,7 +16,8 @@ This report asks: \emph{is there a general framework that can prevent
 specification-conformance defects in LLM-generated code, using the specification itself
 as the primary evidence source, without requiring full deductive verification?}
 We answer affirmatively and present the \textbf{Specification-guided Defect Prevention
-Framework} (\textsc{SgDP}), instantiated for Agile-SOFL as \textbf{HSP-Agile}.
+Framework} (\textsc{SgDP}), with \textbf{HSP-Agile} as its primary instantiation over
+ordered guard-based formal specifications (SOFL/FSF in our benchmark).
 
 
 \section{Context and Motivation}
@@ -36,7 +37,8 @@ precedence-sensitive boundary faults that standard test suites miss
 \section{Problem Statement}
 \label{sec:intro:problem}
 
-The central problem is a bounded acceptance decision over the Agile-SOFL lifecycle.
+The central problem is a bounded acceptance decision over the formal
+specification lifecycle.
 Given task~$t$ with ordered scenarios $\mathcal{S}_t = (S_1,\ldots,S_n)$ and synthesis
 budget~$K$, determine whether any candidate~$c$ satisfies
 \begin{equation}
@@ -100,9 +102,8 @@ conjunctive \emph{Acceptance Predicate} gating release on formal conformance and
 specification-derived quality criteria.  \textbf{HSP-Agile} instantiates this architecture
 over SOFL/FSF in a four-stage pipeline (synthesis, formal checking, counterexample-guided
 repair, pattern guard).  Chapter~\ref{ch:method} presents the framework formally, including
-three correctness theorems; Chapter~\ref{ch:results} (Section~\ref{ch:generalization})
-demonstrates additional instantiations beyond SOFL/FSF.
-notation instantiations beyond SOFL.
+three correctness theorems; Chapter~\ref{ch:results} demonstrates additional notation
+instantiations beyond SOFL/FSF via the SpecIR adapter layer.
 
 \begin{figure}[h]
   \centering
@@ -125,15 +126,17 @@ This report makes five concrete contributions (Figure~\ref{fig:contribution-map}
 \begin{figure}[t]
   \centering
   \tikzinput{diagrams/tikz/contribution_map}
-  \caption{Overview of HSP-Agile research contributions.  The five contributions form an integrated framework from pipeline design through empirical validation.}
+  \caption{Overview of \textsc{SgDP} research contributions.  The five contributions form an integrated framework from pipeline design through empirical validation.}
   \label{fig:contribution-map}
 \end{figure}
 
 \begin{enumerate}
   \item[\textbf{C1.}] \textbf{Specification-guided Defect Prevention Framework (\textsc{SgDP}).}
-    Fault-class identification and four-component architecture; HSP-Agile as SOFL/FSF instantiation.
+    Canonical SpecIR layer with pluggable adapters (SOFL/FSF, Mini-Z, Mini-SM) and
+    HSP-Agile FSF lowerer; four-component prevention architecture.
   \item[\textbf{C2.}] \textbf{Strict Acceptance Predicate and Semantic Feedback IR.}
-    Definition of $\mathrm{Accept}(c,t)$ and typed counterexample decomposition for repair prompting.
+    Definition of $\mathrm{Accept}(c,t)$; nine-field JSON IR
+    (\texttt{schemas/semantic\_feedback.schema.json}) with renderer-separated repair prompts.
   \item[\textbf{C3.}] \textbf{Precedence-Sensitive Hard Benchmark.}
     120 synthetic tasks with overlapping guards, plus real-derived and multi-notation subsets.
   \item[\textbf{C4.}] \textbf{Two-Layer Prevention Evaluation Protocol.}

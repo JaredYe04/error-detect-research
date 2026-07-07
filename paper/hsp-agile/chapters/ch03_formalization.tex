@@ -1,9 +1,9 @@
 \chapter{Formal Problem Definition}
 \label{ch:formalization}
 
-This chapter establishes the mathematical foundations of HSP-Agile. We begin by
-defining the structure of an Agile-SOFL task and the semantics of its
-Functional Scenario Framework (FSF) specification. We then formalise the
+This chapter establishes the mathematical foundations of \textsc{SgDP}. We begin by
+defining the structure of a \emph{formal specification task} and the semantics of its
+ordered guard-case specification (instantiated as FSF in HSP-Agile). We then formalise the
 conformance checking problem, the acceptance criterion that drives the
 iterative repair loop, and the quality metrics used to evaluate pipeline
 performance. The chapter closes with the formalisation of our benchmark suite
@@ -19,13 +19,14 @@ bracket, which equals $1$ when its argument is true and $0$ otherwise.
 \label{sec:form:task}
 % ---------------------------------------------------------------------------
 
-An \emph{Agile-SOFL task} encapsulates a single software function whose
-behaviour is described entirely by an ordered FSF specification \citep{li2022agilesofl, liu2014sofl}.
-The task is the basic unit processed by the HSP-Agile pipeline.
+A \emph{formal specification task} encapsulates a single software function whose
+behaviour is described entirely by an ordered scenario specification.
+HSP-Agile instantiates this model over SOFL/FSF~\citep{li2022agilesofl,liu2014sofl};
+the task is the basic unit processed by the shared \textsc{SgDP} pipeline.
 
-\begin{definition}[Agile-SOFL Task]
+\begin{definition}[Formal Specification Task]
 \label{def:task}
-An \emph{Agile-SOFL task} is a triple
+A \emph{formal specification task} is a triple
 \[
   t \;=\; \bigl(\mathcal{S}_t,\;\mathcal{X}_t,\;\mathcal{Y}_t\bigr),
 \]
@@ -43,6 +44,34 @@ where
 The separation of input domain from specification is deliberate: it allows the
 same FSF structure to be instantiated over domains of varying dimensionality,
 as is the case in our benchmark tasks where $d = 5$ and $m = 3$.
+
+% ---------------------------------------------------------------------------
+\section{Specification Intermediate Representation (SpecIR)}
+\label{sec:form:specir}
+% ---------------------------------------------------------------------------
+
+To support multiple specification notations without rewriting the prevention
+pipeline, we introduce a notation-agnostic \textbf{Specification Intermediate
+Representation} (\textbf{SpecIR}).
+
+\begin{definition}[Specification Intermediate Representation]
+\label{def:specir}
+For task $t$, $\text{SpecIR}(t) = (\Sigma_t,\; \Gamma_t,\; C_t,\; M_t)$, where
+$\Sigma_t$ is the typed I/O signature, $\Gamma_t$ the variable domain,
+$C_t = \langle c_1,\ldots,c_n\rangle$ an ordered list of guarded cases
+(first-match semantics), and $M_t$ notation-specific metadata.
+\end{definition}
+
+\begin{definition}[Specification Adapter]
+\label{def:spec-adapter}
+A \emph{Specification Adapter} is $\text{Adapt}_L : \text{Text}_L \longrightarrow \text{SpecIR}$.
+\end{definition}
+
+\begin{definition}[FSF Lowering (HSP-Agile Instantiation)]
+\label{def:fsf-lowering}
+$\text{Lower}_{\text{FSF}} : \text{SpecIR} \longrightarrow \text{TaskSpec}_{\text{FSF}}$
+projects SpecIR onto the FSF view; the pipeline core depends only on SpecIR.
+\end{definition}
 
 \begin{definition}[FSF Scenario]
 \label{def:scenario}
@@ -148,6 +177,54 @@ Hence $i = \min\{j : g_j(x_i) = 1\}$, so the oracle evaluates
 $g_t(x_i) = \phi_i(x_i)$.  Each distinct scenario $s_i$ therefore
 contributes at least one case whose correct output is determined by
 $\phi_i$, and the precedence ordering is witnessed by all $n$ cases jointly.
+\end{proof}
+
+\begin{definition}[Boundary Region]
+\label{def:boundary-region}
+For margin $\varepsilon > 0$, the \emph{boundary region} is
+$\mathcal{B}_\varepsilon(t) = \{\mathbf{x} \in \mathcal{X}_t :
+  \exists i,\; \partial g_i(\mathbf{x}) < \varepsilon\}$.
+\end{definition}
+
+\begin{definition}[Per-witness Fault-Exposure Probability]
+\label{def:fault-exposure}
+For faulty candidate $c$, $\varepsilon_c =
+\Pr_{\mathbf{x} \sim \mathcal{D}(t)}[\,f_c(\mathbf{x}) \neq g_t(\mathbf{x})\,]$;
+$\varepsilon = \min_{c \in \mathcal{C}\setminus\{g_t\}} \varepsilon_c > 0$.
+\end{definition}
+
+\begin{proposition}[SMT Boundary Coverage Advantage]
+\label{prop:smt-advantage}
+Each SMT witness $\mathbf{x}_i^*$ lies on (or within numeric precision of) the
+boundary of $g_i$.  Uniform random sampling satisfies
+$\Pr[\mathbf{x} \in \mathcal{B}_\varepsilon(t)] =
+\mu(\mathcal{B}_\varepsilon(t))/\mu(\mathcal{X}_t)$, typically small for dense
+guard overlap; SMT achieves targeted boundary coverage deterministically.
+\end{proposition}
+
+\begin{corollary}[Random vs.\ SMT Fault-Exposure Hit Rate]
+\label{cor:random-vs-smt}
+Let $\varepsilon = \mu(\mathcal{B}_\varepsilon(t))/\mu(\mathcal{X}_t)$ denote the
+measure of the boundary region relative to the input domain.
+For a faulty candidate $c$ with per-witness fault-exposure probability
+$\varepsilon_c \geq \varepsilon$ (Definition~\ref{def:fault-exposure}),
+a single uniform random sample detects the fault with probability at most
+$\varepsilon_c$.
+The Constraint-guided Witness Generator produces one witness per strict
+scenario region via $\Phi_i$ (Equation~\eqref{eq:priority}); under sound
+encoding, each such witness activates scenario~$i$ with probability~$1$
+(Theorem~\ref{thm:witness-soundness}), yielding deterministic coverage of
+precedence-critical regions that random sampling reaches with probability
+$\mathcal{O}(\varepsilon)$.
+\end{corollary}
+
+\begin{proof}[Sketch]
+Random sampling: $\Pr[f_c(\mathbf{x}) \neq g_t(\mathbf{x})] \leq
+\Pr[\mathbf{x} \in \mathcal{B}_\varepsilon(t)] = \varepsilon$ when faults
+manifest only on boundary inputs.
+SMT: satisfiability of $\Phi_i$ guarantees $g_i(\mathbf{x}_i^*) \land
+\bigwedge_{j<i}\neg g_j(\mathbf{x}_i^*)$, so the witness lies in the
+exclusive first-match region of~$s_i$.
 \end{proof}
 
 \begin{figure}[t]
@@ -562,8 +639,9 @@ than a single LLM call.
 \section*{Chapter Summary}
 % ---------------------------------------------------------------------------
 
-This chapter has established the formal foundations of HSP-Agile.  We
-defined the Agile-SOFL task model (Definition~\ref{def:task}), the FSF
+This chapter has established the formal foundations of \textsc{SgDP}.  We
+defined the formal specification task model (Definition~\ref{def:task}), the SpecIR
+adapter layer (Definitions~\ref{def:specir}--\ref{def:fsf-lowering}), the FSF
 scenario and its semantics (Definitions \ref{def:scenario}--\ref{def:oracle}),
 and the SMT-based case generation procedure
 (Definition~\ref{def:test-suite}), proving that it achieves full scenario

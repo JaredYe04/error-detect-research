@@ -1,13 +1,18 @@
-"""Scenario-aware Semantic Feedback IR for counterexample-guided repair.
+"""Semantic Feedback Intermediate Representation.
 
-This module implements Contribution C2 of the SgDP framework:
-a typed eight-field intermediate representation that decomposes a conformance
-failure at the specification level rather than the test-case level.
+SemanticFeedback is a machine-readable IR for specification-level conformance
+violations.  It is constructed once by the formal checker and can be serialised
+to/from JSON (schema: schemas/semantic_feedback.schema.json).
 
-The IR enables controlled ablation (E6) by selectively rendering subsets of fields:
-  - Variant A (test_only):     inputs + observed
-  - Variant B (test_expected): inputs + observed + expected
-  - Variant C (semantic_ir):   all eight fields (default for mode M)
+Three rendering variants project the IR onto natural-language repair prompts:
+  - 'test_only':     inputs + observed output only  (ablation B2)
+  - 'test_expected': inputs + observed + expected    (ablation A1/A2)
+  - 'semantic_ir':   full 9-field IR                (mode M, default)
+
+FeedbackRenderer is kept separate from SemanticFeedbackIR to prove that the IR
+is a genuine machine-readable artifact, not merely a prompt template.
+SemanticFeedbackIR.render() delegates to FeedbackRenderer internally so that
+existing call sites (e.g. runner.py) continue to work without modification.
 """
 
 from __future__ import annotations
@@ -16,41 +21,34 @@ from dataclasses import dataclass, field
 from typing import Any
 
 
-# Violation types in order of semantic severity (highest priority first)
-VIOLATION_TYPES = ("ordering", "boundary", "arithmetic", "output", "unknown")
-
-_ORDERING_KEYWORDS = ("scenario", "order", "preceden", "priority", "guard")
-_BOUNDARY_KEYWORDS = ("boundary", "border", "edge", "adjacent", "overlap")
-_ARITHMETIC_KEYWORDS = ("arith", "sum", "mul", "div", "overflow", "underflow")
-
+# ---------------------------------------------------------------------------
+# Core IR dataclass
+# ---------------------------------------------------------------------------
 
 @dataclass
 class SemanticFeedback:
-    """One specification-level violation record.
+    """One specification-level conformance violation.
 
-    Fields map directly to the IR defined in the paper (Section 3.4):
-      violation_type  : classification of the defect
-      scenario_index  : the violated FSF scenario (1-indexed)
-      constraint_text : the guard predicate as human-readable text
-      inputs          : concrete witness inputs that expose the fault
-      expected        : oracle output for those inputs
-      observed        : candidate's actual output
-      reason          : inferred natural-language root cause
-      priority        : numeric severity (1 = highest)
-      suggested_fix   : structural code change category (may be None)
+    Fields correspond 1-to-1 with schemas/semantic_feedback.schema.json.
     """
-    violation_type: str
-    scenario_index: int
-    constraint_text: str
-    inputs: dict[str, int]
-    expected: dict[str, int]
-    observed: dict[str, int]
-    reason: str
-    priority: int
-    suggested_fix: str | None = None
 
-    def to_dict(self) -> dict[str, Any]:
-        return {
+    violation_type: str          # "ordering" | "boundary" | "arithmetic" | "output" | "unknown"
+    scenario_index: int          # 1-indexed FSF scenario
+    constraint_text: str         # guard predicate as human-readable text
+    inputs: dict[str, Any]       # concrete witness inputs
+    expected: dict[str, Any]     # oracle output
+    observed: dict[str, Any]     # candidate actual output
+    reason: str                  # inferred natural-language root cause
+    priority: int                # severity rank (1 = highest)
+    suggested_fix: str | None = field(default=None)  # optional structural hint
+
+    # ------------------------------------------------------------------
+    # JSON serialisation
+    # ------------------------------------------------------------------
+
+    def to_json(self) -> dict[str, Any]:
+        """Return a schema-compliant dict (schemas/semantic_feedback.schema.json)."""
+        d: dict[str, Any] = {
             "violation_type": self.violation_type,
             "scenario_index": self.scenario_index,
             "constraint_text": self.constraint_text,
@@ -59,211 +57,230 @@ class SemanticFeedback:
             "observed": self.observed,
             "reason": self.reason,
             "priority": self.priority,
-            "suggested_fix": self.suggested_fix,
         }
+        if self.suggested_fix is not None:
+            d["suggested_fix"] = self.suggested_fix
+        try:
+            from src.ir.schema_validate import validate_semantic_feedback
+            validate_semantic_feedback(d)
+        except ImportError:
+            pass
+        return d
 
-    def render_test_only(self) -> str:
-        """Variant A: inputs + observed only."""
-        return (
-            f"Scenario {self.scenario_index} failed. "
-            f"Inputs: {self.inputs}. "
-            f"Your output: {self.observed}."
+    @classmethod
+    def from_json(cls, d: dict[str, Any]) -> SemanticFeedback:
+        """Reconstruct a SemanticFeedback from a schema-compliant dict."""
+        return cls(
+            violation_type=d["violation_type"],
+            scenario_index=d["scenario_index"],
+            constraint_text=d["constraint_text"],
+            inputs=d["inputs"],
+            expected=d["expected"],
+            observed=d["observed"],
+            reason=d["reason"],
+            priority=d["priority"],
+            suggested_fix=d.get("suggested_fix"),
         )
 
-    def render_test_expected(self) -> str:
-        """Variant B: inputs + observed + expected."""
-        return (
-            f"Scenario {self.scenario_index} failed. "
-            f"Inputs: {self.inputs}. "
-            f"Expected: {self.expected}. "
-            f"Your output: {self.observed}."
-        )
 
-    def render_semantic_ir(self) -> str:
-        """Variant C: full Semantic Feedback IR."""
-        lines = [
-            f"[{self.violation_type.upper()} VIOLATION] Scenario {self.scenario_index} "
-            f"(priority rank: {self.priority})",
-            f"  Guard condition: {self.constraint_text}",
-            f"  Witness inputs:  {self.inputs}",
-            f"  Expected output: {self.expected}",
-            f"  Observed output: {self.observed}",
-            f"  Root cause:      {self.reason}",
-        ]
-        if self.suggested_fix:
-            lines.append(f"  Suggested fix:   {self.suggested_fix}")
+# ---------------------------------------------------------------------------
+# Renderer (separated from IR — proves IR is machine-readable, not a template)
+# ---------------------------------------------------------------------------
+
+class FeedbackRenderer:
+    """Renders a list of SemanticFeedback records to a repair prompt string.
+
+    The IR (SemanticFeedback) is constructed once; the renderer projects it onto
+    different natural-language surfaces depending on the ablation variant:
+      - 'test_only':     inputs + observed output only
+      - 'test_expected': inputs + observed + expected
+      - 'semantic_ir':   full 9-field IR (default for mode M)
+
+    This separation proves that the Semantic Feedback IR is a machine-readable
+    intermediate representation, not merely a prompt template.
+    """
+
+    VARIANTS = ("test_only", "test_expected", "semantic_ir")
+
+    @staticmethod
+    def render(records: list[SemanticFeedback], variant: str = "semantic_ir") -> str:
+        """Render IR records to a repair prompt string."""
+        if variant == "test_only":
+            return FeedbackRenderer._render_test_only(records)
+        elif variant == "test_expected":
+            return FeedbackRenderer._render_test_expected(records)
+        else:
+            return FeedbackRenderer._render_full(records)
+
+    @staticmethod
+    def _render_test_only(records: list[SemanticFeedback]) -> str:
+        lines = ["Counterexamples:"]
+        for r in records:
+            lines.append(f"  inputs={r.inputs} → observed={r.observed}")
         return "\n".join(lines)
+
+    @staticmethod
+    def _render_test_expected(records: list[SemanticFeedback]) -> str:
+        lines = ["Counterexamples:"]
+        for r in records:
+            lines.append(f"  inputs={r.inputs} → observed={r.observed}, expected={r.expected}")
+        return "\n".join(lines)
+
+    @staticmethod
+    def _render_full(records: list[SemanticFeedback]) -> str:
+        lines = ["Specification-level violations (Semantic Feedback IR):"]
+        for r in records:
+            lines.append(f"  [{r.violation_type}] Scenario {r.scenario_index}: {r.constraint_text}")
+            lines.append(f"    inputs={r.inputs}")
+            lines.append(f"    expected={r.expected}, observed={r.observed}")
+            lines.append(f"    reason: {r.reason}")
+            if r.suggested_fix:
+                lines.append(f"    fix hint: {r.suggested_fix}")
+        return "\n".join(lines)
+
+
+# ---------------------------------------------------------------------------
+# Aggregate IR container (preserves existing API surface)
+# ---------------------------------------------------------------------------
+
+class SemanticFeedbackIR:
+    """Container for a list of SemanticFeedback records for one repair iteration.
+
+    Delegates rendering to FeedbackRenderer so that call sites using
+    ``ir.render(variant=...)`` continue to work unchanged.
+    """
+
+    def __init__(self, records: list[SemanticFeedback]) -> None:
+        self.records = records
+
+    # ------------------------------------------------------------------
+    # Existing API — kept for backwards compatibility with runner.py
+    # ------------------------------------------------------------------
+
+    def render(self, variant: str = "semantic_ir") -> str:
+        """Render to repair prompt string (delegates to FeedbackRenderer)."""
+        return FeedbackRenderer.render(self.records, variant=variant)
+
+    # ------------------------------------------------------------------
+    # Convenience constructors
+    # ------------------------------------------------------------------
+
+    @classmethod
+    def from_counterexamples(
+        cls,
+        counterexamples: list[Any],
+        *,
+        task: dict[str, Any] | None = None,
+        violation_type: str | None = None,
+        constraint_text: str = "",
+        reason: str | None = None,
+    ) -> SemanticFeedbackIR:
+        """Build a SemanticFeedbackIR from checker Counterexample objects or dicts."""
+        records: list[SemanticFeedback] = []
+        for idx, cx in enumerate(counterexamples, start=1):
+            if hasattr(cx, "scenario_index"):
+                scenario_index = cx.scenario_index
+                inputs = cx.inputs
+                expected = cx.expected
+                observed = cx.actual
+                message = cx.message
+            else:
+                scenario_index = cx.get("scenario_index", idx)
+                inputs = cx.get("inputs", {})
+                expected = cx.get("expected", {})
+                observed = cx.get("actual", cx.get("observed", {}))
+                message = cx.get("message", "")
+
+            guard_text = constraint_text
+            if task and not guard_text:
+                scenarios = task.get("fsfScenarios", [])
+                if 1 <= scenario_index <= len(scenarios):
+                    guard_text = scenarios[scenario_index - 1].get("test", "")
+
+            vtype, inferred_reason, fix = _classify_violation(
+                message=message,
+                expected=expected,
+                observed=observed,
+                scenario_index=scenario_index,
+            )
+            records.append(
+                SemanticFeedback(
+                    violation_type=violation_type or vtype,
+                    scenario_index=scenario_index,
+                    constraint_text=guard_text or message,
+                    inputs=inputs,
+                    expected=expected,
+                    observed=observed,
+                    reason=reason or inferred_reason,
+                    priority=idx,
+                    suggested_fix=fix,
+                )
+            )
+        return cls(records)
+
+    # ------------------------------------------------------------------
+    # Serialisation helpers
+    # ------------------------------------------------------------------
+
+    def to_json_list(self) -> list[dict[str, Any]]:
+        """Return a list of schema-compliant dicts (one per record)."""
+        return [r.to_json() for r in self.records]
+
+    @classmethod
+    def from_json_list(cls, data: list[dict[str, Any]]) -> SemanticFeedbackIR:
+        """Reconstruct from a list of schema-compliant dicts."""
+        return cls([SemanticFeedback.from_json(d) for d in data])
 
 
 def _classify_violation(
+    *,
+    message: str,
+    expected: dict[str, Any],
+    observed: dict[str, Any],
     scenario_index: int,
-    guard_text: str,
-    inputs: dict[str, int],
-    expected: dict[str, int],
-    observed: dict[str, int],
-    all_scenarios: list[dict[str, Any]],
 ) -> tuple[str, str, str | None]:
-    """Infer violation type, reason, and suggested fix from counterexample context.
-
-    Returns (violation_type, reason, suggested_fix).
-    """
-    # Check if this looks like an ordering violation: another scenario's output matched
-    obs_vals = set(observed.values()) if observed else set()
-    for i, sc in enumerate(all_scenarios):
-        if i == scenario_index - 1 or sc.get("kind") == "others":
-            continue
-        # If observed output matches what another scenario would produce, likely ordering
-        def_str = sc.get("def", "")
-        for out_key, out_val in expected.items():
-            if str(out_val) in def_str and obs_vals:
-                pass  # inconclusive without executing
-
-    # Heuristic: if guard text contains overlapping conditions likely ordering issue
-    g = guard_text.lower()
-    if any(kw in g for kw in _ORDERING_KEYWORDS):
-        vtype = "ordering"
-        reason = (
-            f"The implementation evaluated scenario {scenario_index}'s guard in the wrong "
-            f"order. Under FSF first-match semantics, higher-priority scenarios must be "
-            f"evaluated before scenario {scenario_index}."
+    """Heuristic violation classifier for Semantic Feedback IR records."""
+    msg = (message or "").lower()
+    if "ordering" in msg or "precedence" in msg or "first-match" in msg:
+        return (
+            "ordering",
+            f"Scenario {scenario_index} violated under first-match guard precedence.",
+            "reorder guard evaluation to match specification precedence",
         )
-        fix = "Ensure all higher-priority scenario guards are checked before this scenario's guard."
-        return vtype, reason, fix
-
-    # Check if it could be a boundary issue (observed differs by small amount from expected)
-    if expected and observed:
-        for k in expected:
-            if k in observed:
-                diff = abs(expected[k] - observed.get(k, 0))
-                if 0 < diff <= 2:
-                    vtype = "boundary"
-                    reason = (
-                        f"Output '{k}' is off by {diff} from expected. "
-                        f"This suggests a boundary condition error in the guard for scenario {scenario_index}."
-                    )
-                    fix = f"Check the boundary condition in scenario {scenario_index}'s guard predicate."
-                    return vtype, reason, fix
-
-    # Check arithmetic pattern
-    any_arith = any(op in guard_text for op in ("+", "-", "*", "/", "%"))
-    if any_arith:
-        vtype = "arithmetic"
-        reason = (
-            f"Arithmetic in scenario {scenario_index}'s guard may be evaluated incorrectly. "
-            f"Check integer division, overflow, or operator precedence."
+    if "boundary" in msg or "threshold" in msg or "off-by" in msg:
+        return (
+            "boundary",
+            f"Boundary witness for scenario {scenario_index} exposed a threshold mismatch.",
+            "adjust boundary comparison to match guard threshold",
         )
-        fix = "Verify arithmetic expressions in guard match the FSF specification precisely."
-        return vtype, reason, fix
-
-    # Default: output mismatch
-    vtype = "output"
-    reason = (
-        f"Scenario {scenario_index} postcondition not satisfied: "
-        f"expected {expected} but got {observed}."
-    )
-    fix = "Review the output assignment logic for this scenario."
-    return vtype, reason, fix
-
-
-class SemanticFeedbackIR:
-    """Constructs Semantic Feedback IR records from formal checker counterexamples.
-
-    Usage:
-        ir = SemanticFeedbackIR(task)
-        prompt_text = ir.render(counterexamples)  # uses full semantic_ir variant
-        prompt_text = ir.render(counterexamples, variant="test_expected")
-    """
-
-    def __init__(self, task: dict[str, Any]) -> None:
-        self.task = task
-        self._scenarios = task.get("fsfScenarios", [])
-        self._scenario_map = {
-            sc["index"]: sc for sc in self._scenarios if sc.get("kind") != "others"
-        }
-
-    def _get_guard_text(self, scenario_index: int) -> str:
-        sc = self._scenario_map.get(scenario_index)
-        if sc:
-            return sc.get("test", f"scenario_{scenario_index}_guard")
-        return f"scenario_{scenario_index}_guard"
-
-    def _get_priority(self, violation_type: str) -> int:
-        """Higher priority (lower number) for more semantically severe violations."""
-        return VIOLATION_TYPES.index(violation_type) + 1
-
-    def build(self, counterexamples: list[Any]) -> list[SemanticFeedback]:
-        """Convert raw Counterexample objects or dicts to SemanticFeedback records."""
-        records: list[SemanticFeedback] = []
-        for cx in counterexamples[:5]:  # limit to top 5
-            if isinstance(cx, dict):
-                idx = cx.get("scenario_index", 0)
-                inputs = cx.get("inputs", {})
-                expected = cx.get("expected", {})
-                observed = cx.get("actual", {})
-            else:
-                idx = getattr(cx, "scenario_index", 0)
-                inputs = getattr(cx, "inputs", {})
-                expected = getattr(cx, "expected", {})
-                observed = getattr(cx, "actual", {})
-
-            guard_text = self._get_guard_text(idx)
-            vtype, reason, fix = _classify_violation(
-                idx, guard_text, inputs, expected, observed, self._scenarios
+    if expected and observed and expected != observed:
+        exp_keys = set(expected.keys())
+        obs_keys = set(observed.keys())
+        if exp_keys != obs_keys:
+            return (
+                "output",
+                f"Scenario {scenario_index}: output field mismatch ({obs_keys} vs {exp_keys}).",
+                "return all required output fields for the active scenario",
             )
-            records.append(SemanticFeedback(
-                violation_type=vtype,
-                scenario_index=idx,
-                constraint_text=guard_text,
-                inputs=inputs,
-                expected=expected,
-                observed=observed,
-                reason=reason,
-                priority=self._get_priority(vtype),
-                suggested_fix=fix,
-            ))
-        # Sort by priority (ordering errors first)
-        records.sort(key=lambda r: r.priority)
-        return records
-
-    def render(
-        self,
-        counterexamples: list[Any],
-        variant: str = "semantic_ir",
-    ) -> str:
-        """Render counterexamples as a repair prompt string.
-
-        variant: "test_only" | "test_expected" | "semantic_ir"
-        """
-        if not counterexamples:
-            return "Implementation incorrect. Retry with attention to all FSF scenarios."
-
-        records = self.build(counterexamples)
-        if not records:
-            return "Implementation incorrect. Retry."
-
-        header_map = {
-            "test_only": "The following inputs caused incorrect output:",
-            "test_expected": "The following counterexamples were found:",
-            "semantic_ir": (
-                "Specification-level violations detected. "
-                "Fix the implementation to respect FSF first-match ordering:"
-            ),
-        }
-        header = header_map.get(variant, header_map["semantic_ir"])
-        lines = [header, ""]
-
-        for rec in records:
-            if variant == "test_only":
-                lines.append(rec.render_test_only())
-            elif variant == "test_expected":
-                lines.append(rec.render_test_expected())
-            else:
-                lines.append(rec.render_semantic_ir())
-            lines.append("")
-
-        lines.append(
-            "Remember: FSF scenarios must be evaluated in listed order. "
-            "Scenario guards are mutually exclusive through priority ordering — "
-            "a scenario is active only when all higher-priority guards have failed."
+        numeric_delta = any(
+            isinstance(expected.get(k), (int, float))
+            and isinstance(observed.get(k), (int, float))
+            and abs(float(expected[k]) - float(observed[k])) > 1
+            for k in exp_keys
         )
-        return "\n".join(lines)
+        if numeric_delta:
+            return (
+                "arithmetic",
+                f"Scenario {scenario_index}: arithmetic expression inconsistent with oracle.",
+                "correct the output expression for the active scenario",
+            )
+        return (
+            "output",
+            f"Scenario {scenario_index}: observed output differs from oracle.",
+            "align output assignment with the active scenario postcondition",
+        )
+    return (
+        "unknown",
+        "Formal conformance violation detected by SMT-generated witness.",
+        None,
+    )

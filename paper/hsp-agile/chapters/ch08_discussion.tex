@@ -23,7 +23,7 @@ Section~\ref{sec:exp:threats-preview}; here we provide the full analysis.
 
 The central empirical finding of this report is that the full HSP-Agile pipeline
 (mode~M) achieves a mean strict formal conformance of \textbf{90.4\%} on the hard
-benchmark of 120 precedence-sensitive Agile-SOFL tasks---a gain of
+benchmark of 120 precedence-sensitive formal specification tasks---a gain of
 \textbf{6.2 percentage points} over the one-shot LLM baseline (B1: 84.2\%) and
 \textbf{2.4 percentage points} over the test-feedback loop baseline (B2: 88.0\%).
 
@@ -45,7 +45,8 @@ drops it to 84.1\% ($-6.3$\,pp vs.\ M); removing the pattern guard (A2) yields a
 marginal $+0.5$\,pp gain, discussed in Section~\ref{sec:disc:implications}.
 Mechanism-level experiments (E3--E6) reinforce this interpretation: M's advantage
 grows with specification complexity, SMT witnesses maintain boundary coverage where
-random sampling fails, and the Semantic Feedback IR accelerates repair convergence.
+random sampling fails, and E6 isolates a \textbf{+7.7\,pp} Semantic Feedback IR
+advantage over test-only repair prompts.
 
 
 %=============================================================================
@@ -163,6 +164,63 @@ attempts.
 A dedicated RF07-triggered repair template that injects the legal API surface into
 the repair prompt would break this cycle.
 
+\subsection{Failure Trace: Scenario Ordering}
+\label{subsec:failure-trace-ordering}
+
+Listing~\ref{lst:llm-incorrect} shows the \code{classify\_signal} LLM candidate from
+Section~\ref{sec:intro:problem} that evaluates Scenario~2 before Scenario~1.
+Witness $\mathbf{x}^*=(\texttt{level}{=}{-3},\,\texttt{threshold}{=}{-10})$
+activates $S_1$ under first-match semantics; the checker emits:
+
+\begin{lstlisting}[language={},caption={Semantic Feedback IR (iteration 1).},
+  label=lst:classify-signal-ir]
+{
+  "violation_type": "ordering",
+  "scenario_index": 1,
+  "constraint_text": "threshold lt 0",
+  "inputs": {"level": -3, "threshold": -10},
+  "expected": {"status": "Error"},
+  "observed": {"status": "Critical"},
+  "reason": "Scenario 1 violated under first-match guard precedence.",
+  "priority": 1,
+  "suggested_fix": "reorder guard evaluation to match specification precedence"
+}
+\end{lstlisting}
+
+\texttt{FeedbackRenderer} projects this JSON record into the repair prompt;
+at $k=2$ the candidate fixes the negative-threshold branch but re-introduces
+an ordering error on a different overlap region---illustrating why E9
+\emph{OrderingError} remains the largest residual category despite structured IR.
+
+\subsection{Failure Trace: Boundary Reasoning}
+\label{subsec:failure-trace}
+
+Task \texttt{HardCase036} specifies five scenarios with overlapping boundary
+guards.  At repair iteration $k=2$, witness $\mathbf{x}^*=(a=2,b=6,c=3)$
+activates Scenario~1 under first-match semantics.  The Semantic Feedback IR is:
+
+\begin{lstlisting}[language={},caption={Semantic Feedback IR (iteration 2).},
+  label=lst:failure-ir]
+{
+  "violation_type": "ordering",
+  "scenario_index": 1,
+  "constraint_text": "a le 3 && b gt 5",
+  "inputs": {"a": 2, "b": 6, "c": 3},
+  "expected": {"risk": 2, "action": 1},
+  "observed": {"risk": 1, "action": 3},
+  "reason": "guard evaluated out of order",
+  "priority": 1,
+  "suggested_fix": "reorder"
+}
+\end{lstlisting}
+
+Despite structured IR at $k=2$, repair at $k=3$ introduces a new ordering
+violation, illustrating \emph{long-range dependency} beyond single-step repair.
+
+\paragraph{Guard-graph pattern matching (future).}
+Representing SpecIR cases as a guard dependency graph enables reachability-based
+detection of shadow guards and unreachable paths beyond the 14-rule catalog.
+
 
 %=============================================================================
 \section{The Quality--Pass-Rate Paradox}
@@ -248,8 +306,8 @@ but require annotation-heavy specifications and trained verification
 engineers~\citep{woodcock2009formalsurvey}.
 The Z3 checker provides \emph{bounded} guarantees over a finite generated test
 suite at less than 100\,ms per task---negligible relative to total pipeline latency.
-This lightweight oracle suits Agile-SOFL sprint cadences: test cases are derived
-directly from FSF structure, not manually written unit tests.
+This lightweight oracle suits iterative formal development workflows: test cases are derived
+directly from specification structure, not manually written unit tests.
 The $+3.9$\,pp conformance contribution of the checker (A1 ablation) demonstrates
 material quality improvement, not bureaucratic overhead.
 
@@ -282,7 +340,7 @@ constraints, covering FSF-style ordered scenarios, finite state machine transiti
 guards, and simplified Z/TLA+ preconditions over bounded domains.
 Generalisation experiments (E8) demonstrate that M consistently outperforms B1
 across SOFL/FSF, Mini-StateMachine, and Mini-Z notations with only adapter-level
-changes, supporting the framework claim rather than an Agile-SOFL-specific claim.
+changes, supporting the framework claim rather than a single-notation-specific claim.
 On adapter tasks with simpler guard structure (10 tasks each), B2 achieves higher
 conformance than M (97.5\% vs.\ 92.2\%/83.3\%), indicating that the full conjunctive
 gate and Semantic Feedback IR add overhead when test-only feedback already suffices.
@@ -293,7 +351,7 @@ on specification complexity.
 The framework does not currently extend to temporal properties requiring LTL/CTL
 encoding, infinite-domain arithmetic beyond LIA, or probabilistic semantics.
 These represent natural extensions rather than fundamental limitations.
-Industrial replication on real Agile-SOFL projects remains necessary before
+Industrial replication on practitioner SOFL/FSF projects remains necessary before
 quantitative findings can be claimed for production-scale specifications.
 
 
@@ -305,12 +363,13 @@ quantitative findings can be claimed for production-scale specifications.
 Several limitations bound the scope of the claims made in this report.
 
 \paragraph{Benchmark representativeness.}
-The hard benchmark consists of 120 synthetic Agile-SOFL tasks from a fixed template
-family designed to probe precedence-sensitive scenario orderings.
+The hard benchmark consists of 120 synthetic formal specification tasks (SOFL/FSF
+instantiation) from a fixed template family designed to probe precedence-sensitive
+scenario orderings.
 Industrial specifications may exhibit more complex state dependencies, external
 service interactions, or composite scenario structures not represented in the
 benchmark.
-Replication on real Agile-SOFL projects~\citep{li2022agilesofl,pohl2010requirements}
+Replication on practitioner SOFL/FSF projects~\citep{li2022agilesofl,pohl2010requirements}
 is necessary before broad generalisability can be claimed.
 
 \paragraph{Single LLM family.}
@@ -351,7 +410,7 @@ DafnyBench~\citep{loughman2024dafnybench} evaluates LLM synthesis of Dafny progr
 with machine-checked correctness proofs.
 Full deductive verification provides stronger guarantees than HSP-Agile's bounded Z3
 checking but requires formal annotations absent from FSF specifications.
-HSP-Agile is applicable directly to Agile-SOFL FSF inputs without verification
+HSP-Agile is applicable directly to SOFL/FSF inputs without verification
 annotations, making it usable by practitioners not trained in deductive verification.
 The two approaches occupy complementary positions in the verification-cost spectrum.
 
@@ -390,7 +449,7 @@ novel fault classes may be missed.
 E7 makes coverage gaps explicit via per-pattern P/R/F1.
 PDR is measured under first-order mutation operators; higher-order mutations may
 exhibit different detectability.
-The eight-field Semantic Feedback IR may require extension for other specification
+The nine-field Semantic Feedback IR may require extension for other specification
 languages.
 
 \paragraph{Internal validity.}

@@ -28,9 +28,11 @@ equation~\eqref{eq:accept}.
 % ---------------------------------------------------------------------------
 
 HSP-Agile is organised as a \emph{layered architecture} with three principal
-tiers.  The \textbf{specification ingestion layer} transforms Agile-SOFL
-source artefacts into structured task objects suitable for downstream
-processing.  The \textbf{pipeline orchestration layer} coordinates the
+tiers.  The \textbf{specification ingestion layer} applies a pluggable
+\texttt{SpecAdapter} registry (Chapter~\ref{ch:method}, Figure~\ref{fig:specir-arch})
+to translate surface specifications into the canonical \texttt{SpecIR}
+representation, then lowers to FSF-shaped \texttt{TaskSpec} records for the
+SOFL instantiation.  The \textbf{pipeline orchestration layer} coordinates the
 four-stage synthesis--check--repair--guard loop within a bounded budget~$K$.
 The \textbf{external services layer} hosts stateless backends---an
 OpenAI-compatible large language model endpoint and the Z3 SMT
@@ -39,9 +41,11 @@ through thin adapter interfaces.
 
 As illustrated in Figure~\ref{fig:component-arch}, the component-level
 decomposition separates ingestion, orchestration, and external services.
-The Agile-SOFL toolchain supplies parsed FSF specifications; the HSP-Agile
-pipeline consumes these as \texttt{TaskSpec} records and emits evaluation
-results.  The formal checker and repair engine communicate exclusively through
+For the primary SOFL/FSF benchmark, the Agile-SOFL toolchain supplies parsed
+specifications; for E8 generalisation, Mini-Z and Mini-StateMachine adapters
+parse alternative notations into the same \texttt{SpecIR} before lowering.
+The pipeline consumes \texttt{TaskSpec} records (or raw \texttt{SpecIR} via
+\texttt{task\_input.py}) and emits evaluation results.  The formal checker and repair engine communicate exclusively through
 well-typed result objects (\texttt{CheckResult}, \texttt{PipelineResult}),
 ensuring that each stage can be unit-tested or ablated independently, as
 exploited in Chapter~\ref{ch:experiments}.
@@ -91,9 +95,12 @@ reproducibility and post-hoc analysis.
 \end{figure}
 
 \paragraph{Module responsibilities.}
-The \emph{specification bridge} invokes the Agile-SOFL parser and normalises
-its output into Python-native dictionaries keyed by task identifier, function
-signature, and ordered scenario list.  The \emph{pipeline runner} implements
+The \emph{adapter registry} (\path{src/adapters/}) exposes
+\texttt{SoflAdapter}, \texttt{MiniZAdapter}, and \texttt{StateMachineAdapter},
+each implementing \texttt{SpecAdapter.parse() $\to$ SpecIR} and delegating
+lowering to \texttt{FSFLowerer} (\path{src/ir/lowerers/fsf_lowerer.py}).
+The \emph{specification bridge} (SOFL path) invokes the Agile-SOFL parser and
+normalises its output into \texttt{SpecIR} before FSF lowering.  The \emph{pipeline runner} implements
 the control logic of Algorithm~\ref{alg:pipeline} from
 Chapter~\ref{ch:method}, including early termination on
 $\mathrm{Accept}(c_k,t)=1$ and best-effort fallback when $k > K$.
@@ -110,15 +117,44 @@ live progress monitor.
 \label{sec:impl:ingestion}
 % ---------------------------------------------------------------------------
 
-Before any LLM call or Z3 query can be issued, the raw Agile-SOFL
-specification must be parsed into the structured representation assumed by
-the formal definitions of Chapter~\ref{ch:formalization}.  The ingestion
-layer performs this transformation in two phases: syntactic parsing via the
-Agile-SOFL toolchain~\citep{li2022agilesofl,liu2014sofl}, followed by
-semantic normalisation into \texttt{TaskSpec} and \texttt{FSFScenario}
-records, following refinement-calculus principles of structured specification
-translation~\citep{back1998refinement}.  Figure~\ref{fig:fsf-parser-class}
-(below) shows the parser-side class structure and downstream translation flow.
+Before any LLM call or Z3 query can be issued, a surface specification must
+be parsed into the \texttt{SpecIR} representation of
+Chapter~\ref{ch:formalization} and then lowered to the FSF-shaped
+\texttt{TaskSpec} dict consumed by the checker and repair engine.
+The ingestion layer performs this transformation in three phases:
+(i)~notation-specific parsing via a registered \texttt{SpecAdapter};
+(ii)~canonicalisation into \texttt{SpecIR} with ordered \texttt{GuardedCase}
+records and JSON serialisation (\path{schemas/spec_ir.schema.json});
+(iii)~lowering via \texttt{FSFLowerer} into \texttt{TaskSpec} and
+\texttt{FSFScenario} records.
+For the primary SOFL benchmark, phase~(i) uses the Agile-SOFL
+toolchain~\citep{li2022agilesofl,liu2014sofl}; for E8, Mini-Z and
+Mini-StateMachine adapters bypass SOFL syntax entirely while producing
+identical \texttt{SpecIR} structure.
+Figure~\ref{fig:fsf-parser-class} shows the SOFL-side class structure and
+downstream translation flow.
+
+\subsection{SpecIR Adapter Registry}
+\label{sec:impl:specir-adapters}
+
+The adapter registry (\path{src/adapters/__init__.py}) maps notation names to
+concrete \texttt{SpecAdapter} subclasses.
+Each adapter implements \texttt{parse(spec\_text, task\_id) $\to$ SpecIR},
+populating \texttt{GuardedCase} objects with normalised \texttt{GuardAtom}
+predicates, postconditions, and surface-text fields for prompting.
+\texttt{SpecIR.to\_dict()} and \texttt{SpecIR.from\_dict()} round-trip through
+\path{schemas/spec_ir.schema.json}, enabling audit logging and cross-notation
+benchmark interchange.
+
+\texttt{FSFLowerer.lower(spec)} projects \texttt{SpecIR} onto the legacy
+\texttt{TaskSpec} schema: ordered scenario list, I/O signatures, prompt text,
+and metadata required by the pattern guard.
+\texttt{PipelineRunner.run()} accepts either a \texttt{TaskSpec} dict or a
+\texttt{SpecIR} instance (\path{src/pipeline/task_input.py}), normalising
+through the lowerer when needed.
+This separation keeps oracle construction, witness generation, and repair
+feedback notation-agnostic while preserving backward compatibility with the
+120-task FSF benchmark and existing experiment scripts.
 
 \begin{figure}[t]
   \centering
@@ -294,30 +330,35 @@ reflects the asymmetry between \emph{exploration} (first attempt) and
 \emph{exploitation} (targeted repair): the formal checker provides the
 deterministic acceptance verdict regardless of LLM stochasticity.
 
-\subsection{Structured Repair Feedback Format}
+\subsection{Semantic Feedback IR and Two-Layer Repair Prompting}
+\label{sec:impl:repair-feedback}
 
-When iteration $k$ fails either formal checking or pattern screening, the
-pipeline assembles a feedback string for iteration $k{+}1$.  Each
-counterexample is rendered as a single line containing four fields aligned
-with Definition~\ref{def:feedback}:
+When iteration $k$ fails formal checking or pattern screening, the repair engine
+constructs a \texttt{SemanticFeedbackIR} (\path{src/repair/feedback_ir.py})
+from checker counterexamples and the active \texttt{TaskSpec}.
+Each record serialises to JSON per
+\texttt{schemas/semantic\_feedback.schema.json} \emph{before} any natural-language
+rendering, establishing a machine-readable intermediate layer distinct from the
+repair prompt:
 \begin{enumerate}
-  \item \textbf{Scenario index} $i^*$ --- the FSF scenario whose
-        priority-constrained region contains the failing input;
-  \item \textbf{Witness input} $x^*$ --- concrete integer values for all
-        input parameters;
-  \item \textbf{Expected output} $g_t(x^*)$ --- oracle values computed from
-        the scenario's output mapping~$\phi_{i^*}$;
-  \item \textbf{Actual output} $f_c(x^*)$ --- values returned by the
-        candidate, or a runtime-error annotation if execution raised an
-        exception.
+  \item \textbf{IR construction} --- nine typed fields (\texttt{violation\_type},
+        \texttt{scenario\_index}, \texttt{constraint\_text}, \texttt{inputs},
+        \texttt{expected}, \texttt{observed}, \texttt{reason}, \texttt{priority},
+        \texttt{suggested\_fix}) populated from witness and scenario metadata;
+  \item \textbf{JSON serialisation} --- \texttt{SemanticFeedbackIR.to\_json\_list()}
+        emits schema-compliant records logged in \texttt{PipelineResult.semantic\_feedback};
+  \item \textbf{Prompt projection} --- \texttt{FeedbackRenderer.render()} maps the
+        same IR to one of three surfaces: \texttt{test\_only} (mode~B2 / E6-A),
+        \texttt{test\_expected} (E6-B), or \texttt{semantic\_ir} (mode~M / E6-C).
 \end{enumerate}
 
 Pattern violations are appended as a semicolon-separated list of
-\texttt{pattern\_id:name} pairs, capped at five entries to remain within
-the token budget.  The complete feedback block is injected into the user
-message under a \emph{``Previous attempt failed''} header, preserving the
-original specification context so the model can perform targeted correction
-rather than blind regeneration.
+\texttt{pattern\_id:name} pairs (capped at five entries).
+The complete feedback block is injected into the user message under a
+\emph{``Previous attempt failed''} header.
+This IR$\to$JSON$\to$Prompt pipeline proves that Semantic Feedback is a genuine
+intermediate representation, not merely a prompt template; E6 varies only the
+renderer while holding IR construction fixed.
 
 \subsection{Output Parsing}
 

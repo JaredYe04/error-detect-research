@@ -125,8 +125,8 @@ Full reproduction instructions are provided in Appendix~\ref{app:reproducibility
 \subsection{Design Rationale}
 
 A central challenge in evaluating specification-conformance tools is that
-off-the-shelf software repositories do not contain Agile-SOFL\slash FSF
-specifications; such artefacts must be constructed.
+off-the-shelf software repositories rarely contain ordered guard-case formal
+specifications in machine-readable form; such artefacts must be constructed.
 We required a benchmark with three properties:
 (i)~\emph{discriminative power}---tasks hard enough that baselines fail non-trivially;
 (ii)~\emph{formal validity}---every task satisfiable by at least one correct
@@ -137,8 +137,8 @@ Existing formal-synthesis benchmarks such as DafnyBench~\citep{loughman2024dafny
 target annotation-heavy verification languages rather than FSF scenario semantics,
 motivating a domain-specific corpus.
 
-The benchmark consists of 120 hard synthetic Agile-SOFL tasks, selected from 180
-generated candidates by a Z3 satisfiability filter that retains only tasks with
+The benchmark consists of 120 hard synthetic formal specification tasks (SOFL/FSF
+instantiation), selected from 180 generated candidates by a Z3 satisfiability filter that retains only tasks with
 non-empty precedence-sensitive overlap regions (the class where
 specification-conformance defects occur).
 Each task contains five integer input variables, three output variables, and 8 ordered
@@ -152,7 +152,7 @@ The template baseline B0 scores 27.5\% strict success, confirming genuine diffic
 
 \subsection{Base Tasks and Hard Synthetic Generation}
 
-We began with 20 base Agile-SOFL tasks extracted by manual inspection from published
+We began with 20 base SOFL/FSF tasks extracted by manual inspection from published
 example specifications~\citep{liu2014sofl,li2022agilesofl}.
 Each base task defines a small module with 3--5 inputs, 2--3 outputs, and 5--8 FSF
 scenarios.
@@ -417,14 +417,22 @@ $\mathrm{Conf}(k)$ trajectory for M vs.\ B2 at $k=1,2,3$ from logged
 \code{attempt\_history}.
 
 \paragraph{E6 --- Feedback Variant Comparison.}
-Final Conf and iterations-to-convergence for feedback variants A (test only),
-B (test + expected), and C (full Semantic Feedback IR).
+120 hard tasks $\times$ 3 feedback variants (A/B/C) under mode~M with
+\texttt{feedback\_variant} wired to \texttt{FeedbackRenderer}
+(\path{src/repair/feedback_ir.py}); 10 parallel workers;
+results in \path{artifacts/run_feedback_v2/feedback_variants/}.
+Variants: A (test only), B (test + expected), C (full Semantic Feedback IR JSON
+$\to$ prompt).
 
 \paragraph{E7 --- Pattern Guard P/R/F1.}
 Per-category precision, recall, and F1 of the pattern guard on the E2 mutant population.
 
 \paragraph{E8 --- Generalisation.}
 Conf for M, B1, B2 across SOFL/FSF, Mini-Z, and Mini-StateMachine notations.
+Each non-SOFL benchmark task is ingested via its \texttt{SpecAdapter}
+(\path{src/adapters/}) into \texttt{SpecIR} and lowered to FSF-shaped
+\texttt{TaskSpec} before entering the shared pipeline, isolating adapter
+cost from core framework behaviour.
 
 \paragraph{E9 --- Failure Analysis.}
 Taxonomy of remaining failures in M mode by category.

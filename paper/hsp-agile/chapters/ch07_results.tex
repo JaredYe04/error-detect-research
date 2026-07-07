@@ -88,12 +88,30 @@ diminishing returns on this benchmark.
   \label{fig:feedback-variant}
 \end{figure}
 
-Figure~\ref{fig:feedback-variant} shows that each additional layer of specification
-structure in the feedback IR yields measurable improvement: Conf(C) $>$ Conf(B) $>$
-Conf(A).
-Iterations-to-convergence follows the reverse ordering: variant~C requires fewest
-iterations on average, confirming that structured counterexample feedback accelerates
-repair rather than merely increasing prompt length.
+Figure~\ref{fig:feedback-variant} shows the isolated effect of feedback surface
+under identical mode~M pipeline settings ($n=120$ tasks per variant, dedicated E6
+protocol; Table~\ref{tab:feedback-e6}).
+Variant~C (full Semantic Feedback IR) achieves mean Conf\,=\,86.9\%, a gain of
+\textbf{+7.7\,pp} over variant~A (test only, 79.1\%) and \textbf{+8.0\,pp} over
+variant~B (test\,+\,expected, 78.9\%).
+Variants~A and~B are statistically indistinguishable on conformance ($\Delta < 0.3$\,pp),
+confirming that adding expected outputs alone does not substitute for
+specification-level structure (scenario index, guard text, violation type).
+The Semantic Feedback IR therefore accounts for the repair benefit attributed to
+mode~M in E5, not merely longer prompts.
+
+\begin{inlinetable}{E6 feedback variant summary (dedicated protocol, $n=120$ per variant).}
+  \label{tab:feedback-e6}
+  \begin{tabular}{lccc}
+    \toprule
+    Variant & Feedback surface & Mean Conf & Mean iterations \\
+    \midrule
+    A & test only           & 79.1\% & 2.98 \\
+    B & test + expected     & 78.9\% & 2.97 \\
+    C & full Semantic IR    & 86.9\% & 2.99 \\
+    \bottomrule
+  \end{tabular}
+\end{inlinetable}
 
 \subsection{Ablation Study (E1/RQ3)}
 
@@ -143,8 +161,8 @@ The pattern guard's contribution is positive in terms of structural quality assu
 but slightly negative in terms of measured conformance at the current budget level.
 
 \paragraph{Answer to RQ3.}
-The Semantic Feedback IR (E5/E6) and the formal checker (ablation A1/A3) are the
-dominant contributing components.
+The Semantic Feedback IR (E6: +7.7\,pp over test-only feedback) and the formal
+checker (ablation A1/A3) are the dominant contributing components.
 The pattern guard's contribution is best measured via PDR rather than conformance
 alone.
 

@@ -1,0 +1,31 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://sgdp-framework/schemas/spec_ir.schema.json",
+  "title": "SgDP Specification Intermediate Representation",
+  "description": "Canonical notation-agnostic representation produced by language-specific Adapters and consumed by the SgDP pipeline. HSP-Agile uses FSFLowerer to project SpecIR onto FSF TaskSpec format.",
+  "type": "object",
+  "required": ["task_id", "notation", "name", "inputs", "outputs", "cases", "surface_prompt"],
+  "properties": {
+    "task_id": {"type": "string"},
+    "notation": {"type": "string", "enum": ["sofl", "mini_z", "mini_statemachine", "real_derived"]},
+    "name": {"type": "string"},
+    "inputs": {"type": "array", "items": {"type": "object", "required": ["name", "type"]}},
+    "outputs": {"type": "array", "items": {"type": "object", "required": ["name", "type"]}},
+    "cases": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["index", "guard", "postcondition"],
+        "properties": {
+          "index": {"type": "integer", "minimum": 1},
+          "guard": {"type": "array", "items": {"type": "object", "required": ["var", "op"]}},
+          "postcondition": {"type": "object"},
+          "guard_text": {"type": "string"},
+          "post_text": {"type": "string"}
+        }
+      }
+    },
+    "surface_prompt": {"type": "string"},
+    "metadata": {"type": "object"}
+  }
+}

@@ -14,12 +14,23 @@ The reproducibility package is organised into four logical \emph{artifact}
 components that mirror the structure of a conventional empirical
 software-engineering study:
 
+\paragraph{Machine-readable schemas.}
+The artifact releases \texttt{schemas/spec\_ir.schema.json} (canonical SpecIR)
+and \texttt{schemas/semantic\_feedback.schema.json} (nine-field Semantic
+Feedback IR).  The adapter registry (\texttt{src/adapters/\_\_init\_\_.py}) and
+FSF lowerer (\texttt{src/ir/lowerers/fsf\_lowerer.py}) support round-trip
+validation from SpecIR to legacy TaskSpec format.
+\texttt{src/ir/schema\_validate.py} validates both schemas at test time via
+\texttt{jsonschema} (see \texttt{tests/test\_schema\_validate.py}).
+
 \paragraph{Raw execution logs.}
 Append-only records of every pipeline invocation, one entry per
 (task, mode, attempt) tuple.  Each record captures the prompt text
 sent to the language model, the generated candidate source, formal
-conformance scores, counterexample payloads, pattern hit lists with
-severity annotations, acceptance decisions, and wall-clock timing.
+conformance scores, JSON-serialised Semantic Feedback IR payloads
+(\texttt{semantic\_feedback} field), \texttt{attempt\_history} trajectories,
+pattern hit lists with severity annotations, acceptance decisions, and
+wall-clock timing.
 Raw logs are the authoritative source of truth; all downstream
 aggregates are derived from them.
 

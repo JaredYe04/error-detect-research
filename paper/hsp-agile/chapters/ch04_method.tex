@@ -46,11 +46,22 @@ four language-independent components:
 \end{figure}
 
 An instantiation for language $\mathcal{L}$ provides:
-(i)~parser $\mathcal{L} \to \texttt{TaskSpec}$;
-(ii)~oracle $g_t: \mathcal{X}_t \to \mathcal{Y}_t$;
-(iii)~witness generator $\mathcal{W}(t) \subseteq \mathcal{X}_t$;
-(iv)~feedback renderer $\texttt{SemanticFeedback} \to$ natural language.
-Synthesis loop, repair loop, pattern guard, and acceptance evaluation are shared.
+(i)~Specification Adapter $\text{Adapt}_L : \text{Text}_L \to \text{SpecIR}$;
+(ii)~oracle $g_t$ derived from $\text{SpecIR}(t).\text{cases}$ under first-match;
+(iii)~witness generator $\mathcal{W}(t)$ from SpecIR guard formulas;
+(iv)~optional lowerer $\text{Lower}_{\text{FSF}}$ (HSP-Agile) $\to$ FSF TaskSpec;
+(v)~Semantic Feedback IR per \texttt{schemas/semantic\_feedback.schema.json},
+    rendered by $\rho : \mathcal{F} \to \text{Prompt}$.
+Synthesis, repair, pattern guard, and acceptance are shared core components.
+
+\begin{figure}[t]
+  \centering
+  \tikzinput{diagrams/tikz/sgdp_specir_architecture}
+  \caption{SpecIR-centric \textsc{SgDP} architecture.
+    Adapters unify SOFL/FSF, Mini-Z, and Mini-StateMachine; HSP-Agile applies
+    $\text{Lower}_{\text{FSF}}$ for pattern-guard screening.}
+  \label{fig:specir-arch}
+\end{figure}
 
 \subsection{HSP-Agile: SOFL/FSF Instantiation}
 \label{subsec:hsp-agile}
@@ -100,6 +111,10 @@ with \textit{type} $\in \{\text{ordering}, \text{boundary}, \text{arithmetic},
 \text{output}\}$, ranked \textit{priority}, and suggested \textit{fix}.
 A template renders this IR into repair prompts naming the violated scenario, stating
 the guard, and enforcing first-match ordering.
+The IR serialises to JSON per \texttt{schemas/semantic\_feedback.schema.json};
+\texttt{FeedbackRenderer} (\texttt{src/repair/feedback\_ir.py}) projects the same
+IR onto E6 render variants (test-only, test+expected, full semantic IR), demonstrating
+IR--prompt separation rather than ad-hoc prompt engineering.
 
 \subsection{Formal Conformance, Acceptance Predicate, and Proposition~2}
 \label{subsec:conformance-acceptance}
@@ -136,7 +151,8 @@ Independence of witnesses gives $P(\text{all pass} \mid \text{faulty}) \leq
 (Theorem~\ref{thm:witness-soundness}) ensures each witness $\mathbf{x} \in
 \mathcal{D}(t)$ exercises a non-trivial guard boundary, making $\varepsilon$
 bounded away from zero for the fault classes in the mutation operators
-(Table~\ref{tab:operators}).
+(Table~\ref{tab:operators}); boundary placement
+(Proposition~\ref{prop:smt-advantage}) strengthens this argument.
 \end{proof}
 
 \subsection{Structured Feedback and Hypothesis~3}
@@ -202,6 +218,24 @@ For mutant set $\mathcal{M}$:
 \end{equation}
 We report PDR, FAR, strict formal conformance, and latency jointly.
 
+\subsection{Pipeline Complexity Cost Model}
+\label{subsec:complexity-cost}
+
+Let $n = |\mathcal{S}_t|$ denote the number of ordered scenarios in
+$\text{SpecIR}(t)$ and $K$ the repair budget.
+Witness generation solves $n$ priority formulas $\Phi_i$, each a conjunction of
+$O(i)$ guard literals, giving per-task witness cost
+$\mathcal{O}\bigl(\sum_{i=1}^{n} T_{\text{SMT}}(|\Phi_i|)\bigr)$ where
+$T_{\text{SMT}}$ is solver time on linear integer arithmetic.
+Formal checking executes $|\mathcal{D}(t)| \leq n$ concrete cases per
+candidate; repair multiplies LLM and checker cost by up to~$K$.
+The dominant term in mode~M is therefore
+$\mathcal{O}(K \cdot (T_{\text{LLM}} + n \cdot T_{\text{exec}}))$ with
+$T_{\text{SMT}}$ amortised once per task.
+E3--E4 empirically confirm that this cost scales sub-linearly in conformance
+gain: overlap density increases $n$ and tightens $\mathcal{B}_\varepsilon(t)$,
+widening the random-vs.-SMT hit-rate gap of Corollary~\ref{cor:random-vs-smt}.
+
 \begin{figure}[t]
   \centering
   \tikzinput{diagrams/tikz/prevention_protocol}
@@ -226,7 +260,10 @@ We report PDR, FAR, strict formal conformance, and latency jointly.
   \State $\mathrm{Conf}(c_k,t),\ \text{failures}_k \leftarrow$ eval $c_k$ on $\mathcal{D}(t)$ via $g_t$
   \State $\text{patterns}_k \leftarrow$ pattern guard on $c_k$
   \If{$\mathrm{Accept}(c_k, t)$} \Return $c_k$, accepted \EndIf
-  \State $\text{feedback}_k \leftarrow \{\mathcal{F}(i, c_k, t) : \mathbf{x}_i^* \in \text{failures}_k\}$
+  \State $\mathcal{J}_k \leftarrow \textsc{ToJson}(\mathcal{F}(\text{failures}_k))$
+        \Comment{schema: \texttt{semantic\_feedback.schema.json}}
+  \State $\text{feedback}_k \leftarrow \rho(\mathcal{J}_k)$
+        \Comment{\texttt{FeedbackRenderer} projection (E6 variants)}
   \State $\text{feedback}_k \mathrel{+}= \text{top-}5$ pattern violations from $\text{patterns}_k$
   \State update $\text{best}$ if $\mathrm{Conf}(c_k,t) > \mathrm{Conf}(\text{best},t)$
   \State log $\langle k, \mathrm{Conf}(c_k,t), |\text{failures}_k|, |\text{patterns}_k|\rangle$
@@ -253,9 +290,12 @@ or hand-annotated expected values.
 \paragraph{P2 --- Bounded budget with guaranteed termination.}
 A hard budget $K$ caps synthesis-check iterations ($K = 5$ in experiments).
 
-\paragraph{P3 --- Counterexample specificity.}
-Repair feedback includes failing input $x^*$, oracle output $g_t(x^*)$,
-candidate output $f_c(x^*)$, and the governing FSF scenario index.
+\paragraph{P3 --- Counterexample specificity via Semantic Feedback IR.}
+Repair feedback is constructed as JSON-serialised Semantic Feedback records
+(\texttt{schemas/semantic\_feedback.schema.json}) and \emph{then} projected to
+natural language; each record carries failing input~$\mathbf{x}^*$, oracle output
+$g_t(\mathbf{x}^*)$, candidate output $f_c(\mathbf{x}^*)$, violated scenario index,
+guard text, violation type, and optional fix hint.
 
 \paragraph{P4 --- Conservative acceptance.}
 Release requires both formal conformance and pattern safety

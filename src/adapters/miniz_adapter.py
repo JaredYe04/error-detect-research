@@ -4,8 +4,8 @@ Mini-Z is a simplified subset of Z notation that captures the essential
 spec-guided ordering structure relevant to specification-conformance defects:
 ordered precondition cases with deterministic output assignments.
 
-This adapter translates Mini-Z schemas into FSF-compatible TaskSpec dicts
-so the shared pipeline runs without modification.
+This adapter translates Mini-Z schemas into SpecIR so the shared pipeline
+runs without modification via FSFLowerer.
 
 Mini-Z spec format (simplified, not full ISO Z):
     SCHEMA  SchemaName
@@ -19,120 +19,196 @@ Mini-Z spec format (simplified, not full ISO Z):
 Since standard Z notation uses Unicode, we accept both Unicode and ASCII
 equivalents (e.g. x ≤ 5 or x le 5, x ≠ y or x ne y).
 """
-
 from __future__ import annotations
-
 import re
 from typing import Any
 
 from src.adapters.base import SpecAdapter
+from src.ir.spec_ir import GuardAtom, GuardedCase, Param, SpecIR
 
-_UNICODE_MAP = {
-    "≤": " le ", "≥": " ge ", "≠": " ne ", "=": " eq ",
-    "∧": " && ", "∨": " || ", "¬": "not ",
-    "⟹": "=>", "→": "=>",
-    "ℤ": "int", "ℕ": "nat",
+# Unicode → ASCII equivalents for normalisation
+_UNICODE_MAP: dict[str, str] = {
+    "≤": " le ",
+    "≥": " ge ",
+    "≠": " ne ",
+    "=": " eq ",
+    "∧": " && ",
+    "∨": " || ",
+    "¬": "not ",
+    "⟹": "=>",
+    "→": "=>",
+    "ℤ": "int",
+    "ℕ": "nat",
 }
 
 
 def _normalise(text: str) -> str:
+    """Normalise Unicode Z-notation symbols to ASCII equivalents."""
+    # Protect the arrow sentinel before doing '=' substitution
     text = text.replace("=>", "\x00ARROW\x00")
     for uni, asc in _UNICODE_MAP.items():
         if uni == "=":
-            continue  # handled after arrow protection
+            continue  # handle standalone '=' last
         text = text.replace(uni, asc)
     text = text.replace("=", " eq ")
     text = text.replace("\x00ARROW\x00", "=>")
     return text
 
 
+def _parse_guard_atoms(guard_text: str) -> list[GuardAtom]:
+    """Parse a guard string like 'price ge 100 && loyalty ge 5' into GuardAtoms."""
+    atoms = []
+    for part in re.split(r"\s*&&\s*", guard_text.strip()):
+        part = part.strip()
+        if not part:
+            continue
+        m = re.match(r"^(\w+)\s+(eq|ne|lt|le|gt|ge)\s+(.+)$", part)
+        if m:
+            var, op, thr = m.groups()
+            thr = thr.strip()
+            try:
+                threshold: int | float | str = int(thr)
+            except ValueError:
+                try:
+                    threshold = float(thr)
+                except ValueError:
+                    threshold = thr
+            atoms.append(GuardAtom(var=var, op=op, threshold=threshold))
+        else:
+            atoms.append(GuardAtom(var=part, op="eq", threshold=None))
+    return atoms or [GuardAtom(var="", op="others")]
+
+
+def _parse_post_dict(post_text: str) -> dict[str, Any]:
+    """Parse postcondition 'a eq 1 && b eq 2' into dict (best-effort, literals only)."""
+    result: dict[str, Any] = {}
+    for part in re.split(r"\s*&&\s*", post_text.strip()):
+        m = re.match(r"^(\w+)\s+eq\s+(.+)$", part.strip())
+        if m:
+            var, val = m.groups()
+            val = val.strip()
+            try:
+                result[var] = int(val)
+            except ValueError:
+                try:
+                    result[var] = float(val)
+                except ValueError:
+                    result[var] = val
+    return result
+
+
 class MiniZAdapter(SpecAdapter):
-    """Adapter: Mini-Z schema → FSF-style TaskSpec."""
+    """Adapter: Mini-Z schema → SpecIR → FSF-style TaskSpec."""
 
     @property
     def notation_name(self) -> str:
         return "mini_z"
 
-    def parse(self, spec_text: str, task_id: str) -> dict[str, Any]:
+    def parse(self, spec_text: str, task_id: str) -> SpecIR:
+        """Parse a Mini-Z SCHEMA spec into SpecIR."""
         spec_text = _normalise(spec_text)
-        lines = [ln.strip() for ln in spec_text.splitlines() if ln.strip() and not ln.strip().startswith("--")]
-        inputs: list[dict] = []
-        outputs: list[dict] = []
-        cases: list[tuple[str, str]] = []  # (guard, def)
-        default_def = ""
+        lines = [
+            ln.strip()
+            for ln in spec_text.splitlines()
+            if ln.strip() and not ln.strip().startswith("--")
+        ]
+
+        inputs: list[dict[str, str]] = []
+        outputs: list[dict[str, str]] = []
+        raw_cases: list[tuple[str, str]] = []  # (guard_text, post_text)
+        default_def: str | None = None
         schema_name = task_id.replace("-", "_").replace(".", "_")
 
-        i = 0
-        while i < len(lines):
-            line = lines[i]
-            if line.upper().startswith("SCHEMA"):
-                schema_name = line.split(None, 1)[1].strip() if " " in line else schema_name
-            elif line.upper().startswith("INPUTS:"):
-                for var_spec in line.split(":", 1)[1].split(","):
+        for line in lines:
+            up = line.upper()
+            if up.startswith("SCHEMA"):
+                parts = line.split(None, 1)
+                if len(parts) > 1:
+                    schema_name = parts[1].strip()
+            elif up.startswith("INPUTS:"):
+                rest = line[len("INPUTS:"):].strip()
+                for var_spec in rest.split(","):
                     m = re.match(r"\s*(\w+)\s*:\s*\w+", var_spec)
                     if m:
                         inputs.append({"name": m.group(1), "type": "nat"})
-            elif line.upper().startswith("OUTPUTS:"):
-                for var_spec in line.split(":", 1)[1].split(","):
+            elif up.startswith("OUTPUTS:"):
+                rest = line[len("OUTPUTS:"):].strip()
+                for var_spec in rest.split(","):
                     m = re.match(r"\s*(\w+)\s*:\s*\w+", var_spec)
                     if m:
                         outputs.append({"name": m.group(1), "type": "nat"})
-            elif line.upper().startswith("CASE"):
+            elif up.startswith("CASE"):
                 rest = line[4:].strip()
                 if "=>" in rest:
                     guard, definition = rest.split("=>", 1)
-                    cases.append((guard.strip(), definition.strip()))
-            elif line.upper().startswith("DEFAULT"):
-                rest = line[7:].strip()
-                default_def = rest.lstrip("=>").strip()
-            i += 1
+                    raw_cases.append((guard.strip(), definition.strip()))
+            elif up.startswith("DEFAULT"):
+                default_def = line[len("DEFAULT"):].strip()
 
+        # Fallback vars if no signature found
         if not inputs:
             inputs = [{"name": "x", "type": "nat"}, {"name": "y", "type": "nat"}]
         if not outputs:
             outputs = [{"name": "result", "type": "nat"}]
 
-        scenarios: list[dict[str, Any]] = []
-        for idx, (guard, definition) in enumerate(cases, start=1):
-            scenarios.append({"index": idx, "kind": "scenario", "test": guard, "def": definition})
-        scenarios.append({
-            "index": len(scenarios) + 1,
-            "kind": "others",
-            "test": "others",
-            "def": default_def or f"{outputs[0]['name']} eq 0",
-        })
+        # Build GuardedCase list
+        cases: list[GuardedCase] = []
+        for idx, (guard_text, post_text) in enumerate(raw_cases, 1):
+            guard_atoms = _parse_guard_atoms(guard_text)
+            post_dict = _parse_post_dict(post_text)
+            cases.append(GuardedCase(
+                index=idx,
+                guard=guard_atoms,
+                postcondition=post_dict,
+                guard_text=guard_text,
+                post_text=post_text,
+            ))
 
-        in_str = ", ".join(f"{p['name']}: int" for p in inputs)
-        out_names = [p["name"] for p in outputs]
+        # Add DEFAULT as "others" case
+        if default_def is not None:
+            post_dict = _parse_post_dict(default_def)
+            cases.append(GuardedCase(
+                index=len(cases) + 1,
+                guard=[GuardAtom(var="", op="others")],
+                postcondition=post_dict,
+                guard_text="others",
+                post_text=default_def,
+            ))
+
+        # Build surface prompt
+        in_str = ", ".join(p["name"] for p in inputs)
+        out_names = ", ".join(p["name"] for p in outputs)
         prompt_lines = [
-            f"Process {schema_name}({in_str}) → ({', '.join(out_names)})",
-            "",
+            f"Process {schema_name}({in_str}) \u2192 ({out_names})",
             "Z-notation ordered cases (first matching case wins):",
         ]
-        for sc in scenarios:
-            if sc["kind"] == "others":
-                prompt_lines.append(f"default: {sc['def']}")
+        for c in cases:
+            if c.guard and c.guard[0].op == "others":
+                prompt_lines.append(f"  default: {c.post_text}")
             else:
-                prompt_lines.append(f"  CASE ({sc['test']}) ⟹ {sc['def']}")
+                prompt_lines.append(f"  CASE ({c.guard_text}) \u27f9 {c.post_text}")
         prompt_lines.append("\nIMPORTANT: evaluate cases in the listed order.")
+        surface_prompt = "\n".join(prompt_lines)
 
-        return {
-            "taskId": f"MiniZ.{task_id}",
-            "kind": "process",
-            "sourceFile": f"mini_z://{task_id}",
-            "module": "MiniZ",
-            "name": schema_name,
-            "signature": {"inputs": inputs, "outputs": outputs},
-            "fsfScenarios": scenarios,
-            "ext": [],
-            "promptSpec": "\n".join(prompt_lines),
-            "sourceBasename": task_id,
-            "notation": "mini_z",
-        }
+        return SpecIR(
+            task_id=task_id,
+            notation="mini_z",
+            name=f"MiniZ.{schema_name}",
+            inputs=[Param(p["name"], p["type"]) for p in inputs],
+            outputs=[Param(p["name"], p["type"]) for p in outputs],
+            cases=cases,
+            surface_prompt=surface_prompt,
+            metadata={
+                "module": "MiniZ",
+                "source_basename": "mini_z-derived",
+                "source_file": f"mini_z://{schema_name}",
+            },
+        )
 
 
-BUILTIN_MINIZ_TASKS_SPEC = [
-    # MZ001: discount calculator
+# ── Built-in Mini-Z task corpus (18 schemas) ──────────────────────────────────
+
+BUILTIN_MINIZ_TASKS_SPEC: list[str] = [
     """\
 SCHEMA DiscountCalc
 INPUTS: price: int, loyalty: int, coupon: int
@@ -145,7 +221,6 @@ CASE price ge 50 && loyalty ge 3                => discount eq 10 && final eq pr
 CASE price ge 50                                => discount eq 5  && final eq price - 5
 DEFAULT discount eq 0 && final eq price
 """,
-    # MZ002: grade classifier
     """\
 SCHEMA GradeClass
 INPUTS: score: int, bonus: int, late: int
@@ -160,7 +235,6 @@ CASE score ge 70                                 => grade eq 2 && gpa eq 2
 CASE score ge 60                                 => grade eq 1 && gpa eq 1
 DEFAULT grade eq 0 && gpa eq 0
 """,
-    # MZ003: shipping cost
     """\
 SCHEMA ShipCost
 INPUTS: weight: int, distance: int, express: int
@@ -174,7 +248,6 @@ CASE weight gt 20                                => cost eq 15 && eta eq 3
 CASE distance gt 100                             => cost eq 20 && eta eq 4
 DEFAULT cost eq 10 && eta eq 2
 """,
-    # MZ004: insurance premium
     """\
 SCHEMA InsurancePremium
 INPUTS: age: int, risk: int, history: int
@@ -188,7 +261,6 @@ CASE age ge 65                                   => premium eq 40 && tier eq 2
 CASE risk ge 3                                   => premium eq 45 && tier eq 2
 DEFAULT premium eq 20 && tier eq 1
 """,
-    # MZ005: power management
     """\
 SCHEMA PowerMgmt
 INPUTS: load: int, solar: int, battery: int
@@ -201,7 +273,6 @@ CASE load gt 0 && battery ge 20                  => source eq 3 && export eq 0 &
 CASE load gt 0 && solar gt 0                     => source eq 1 && export eq 0 && charge eq 0
 DEFAULT source eq 0 && export eq 0 && charge eq 0
 """,
-    # MZ006: request throttler
     """\
 SCHEMA ReqThrottle
 INPUTS: rate: int, burst: int, priority: int
@@ -214,7 +285,6 @@ CASE rate gt 500 && priority ge 5                => allow eq 1 && delay eq 100 &
 CASE rate gt 500                                 => allow eq 1 && delay eq 200 && code eq 200
 DEFAULT allow eq 1 && delay eq 0 && code eq 200
 """,
-    # MZ007: cache policy
     """\
 SCHEMA CachePolicy
 INPUTS: hits: int, size: int, ttl: int
@@ -227,7 +297,6 @@ CASE hits ge 10                                  => evict eq 0 && refresh eq 0 &
 CASE size gt 50                                  => evict eq 1 && refresh eq 0 && priority eq 0
 DEFAULT evict eq 0 && refresh eq 0 && priority eq 1
 """,
-    # MZ008: salary calculator
     """\
 SCHEMA SalaryCalc
 INPUTS: base: int, years: int, performance: int
@@ -240,7 +309,6 @@ CASE performance ge 3                            => bonus eq 5  && raise eq 3  &
 CASE years ge 15                                 => bonus eq 8  && raise eq 5  && total eq base + 13
 DEFAULT bonus eq 0 && raise eq 0 && total eq base
 """,
-    # MZ009: resource scheduler
     """\
 SCHEMA ResourceScheduler
 INPUTS: cpu: int, mem: int, deadline: int
@@ -253,7 +321,6 @@ CASE deadline le 1                               => assigned eq 1 && preempt eq 
 CASE mem gt 80                                   => assigned eq 1 && preempt eq 0 && queue eq 1
 DEFAULT assigned eq 1 && preempt eq 0 && queue eq 0
 """,
-    # MZ010: fraud detection
     """\
 SCHEMA FraudDetect
 INPUTS: amount: int, velocity: int, country: int
@@ -266,7 +333,6 @@ CASE velocity gt 10                              => block eq 0 && review eq 1 &&
 CASE amount gt 200                               => block eq 0 && review eq 1 && score eq 40
 DEFAULT block eq 0 && review eq 0 && score eq 0
 """,
-    # MZ011: file access control (user role × file type → permission level)
     """\
 SCHEMA FileAccess
 INPUTS: role: int, file_type: int, classification: int
@@ -279,7 +345,6 @@ CASE role ge 3 && file_type gt 2                 => permission eq 1 && audit eq 
 CASE role ge 2 && file_type le 1                 => permission eq 1 && audit eq 0 && allowed eq 1
 DEFAULT permission eq 0 && audit eq 0 && allowed eq 0
 """,
-    # MZ012: network packet routing (protocol × port × priority → route/action)
     """\
 SCHEMA PacketRoute
 INPUTS: protocol: int, port: int, priority: int
@@ -292,7 +357,6 @@ CASE protocol eq 2 && priority ge 5              => route eq 3 && action eq 1 &&
 CASE port gt 1024 && priority lt 3               => route eq 4 && action eq 0 && queue eq 2
 DEFAULT route eq 2 && action eq 0 && queue eq 1
 """,
-    # MZ013: insurance premium calculation (age × risk_factor → rate)
     """\
 SCHEMA InsureRate
 INPUTS: age: int, risk_factor: int, claims: int
@@ -307,7 +371,6 @@ CASE risk_factor ge 4                            => rate eq 60 && surcharge eq 1
 CASE risk_factor ge 2                            => rate eq 40 && surcharge eq 5  && tier eq 2
 DEFAULT rate eq 25 && surcharge eq 0 && tier eq 1
 """,
-    # MZ014: library book loan rules (membership × book_type → loan_days)
     """\
 SCHEMA LibraryLoan
 INPUTS: membership: int, book_type: int, overdue: int
@@ -321,7 +384,6 @@ CASE membership ge 2                             => loan_days eq 14 && renewable
 CASE book_type ge 3                              => loan_days eq 7  && renewable eq 0 && fee eq 2
 DEFAULT loan_days eq 14 && renewable eq 0 && fee eq 0
 """,
-    # MZ015: inventory reorder logic (stock_level × demand_forecast → order_qty)
     """\
 SCHEMA InvReorder
 INPUTS: stock: int, demand: int, lead_time: int
@@ -334,7 +396,6 @@ CASE stock le 30 && demand ge 30                 => order_qty eq 40  && urgent e
 CASE stock le 50 && demand ge 20                 => order_qty eq 20  && urgent eq 0 && status eq 1
 DEFAULT order_qty eq 0 && urgent eq 0 && status eq 0
 """,
-    # MZ016: event ticket pricing (event_type × seat_zone × early_bird → price_tier)
     """\
 SCHEMA TicketPrice
 INPUTS: event_type: int, seat_zone: int, early_bird: int
@@ -348,7 +409,6 @@ CASE event_type ge 2 && early_bird eq 1          => price_tier eq 2 && discount 
 CASE seat_zone ge 2                              => price_tier eq 2 && discount eq 0 && vip eq 0
 DEFAULT price_tier eq 1 && discount eq 0 && vip eq 0
 """,
-    # MZ017: student enrollment eligibility (credits × gpa × status → eligibility)
     """\
 SCHEMA EnrollEligible
 INPUTS: credits: int, gpa: int, status: int
@@ -361,7 +421,6 @@ CASE credits ge 30 && gpa ge 25                  => eligibility eq 1 && units eq
 CASE gpa lt 20                                   => eligibility eq 0 && units eq 0 && flag eq 1
 DEFAULT eligibility eq 1 && units eq 9 && flag eq 0
 """,
-    # MZ018: medication dosage (weight × age × condition → dose_level)
     """\
 SCHEMA MedDosage
 INPUTS: weight: int, age: int, condition: int
@@ -380,12 +439,14 @@ DEFAULT dose_level eq 2 && frequency eq 2 && warning eq 0
 
 def load_builtin_miniz_tasks() -> list[dict[str, Any]]:
     """Return the 18 built-in Mini-Z tasks as TaskSpec dicts."""
+    from src.ir.lowerers.fsf_lowerer import FSFLowerer
     adapter = MiniZAdapter()
     tasks = []
     for i, spec_text in enumerate(BUILTIN_MINIZ_TASKS_SPEC, start=1):
         task_id = f"MZ{i:03d}"
         try:
-            task = adapter.parse(spec_text, task_id)
+            spec_ir = adapter.parse(spec_text, task_id)
+            task = FSFLowerer.lower(spec_ir)
             from src.benchmarks.reference_gen import generate_reference_code
             task["referenceCode"] = generate_reference_code(task)
             tasks.append(task)

@@ -32,7 +32,7 @@ PROC_DIR = PAPER_ROOT / "data" / "processed"
 
 DEFAULT_RUN = ROOT / "artifacts" / "run_hard_full_parallel_v1"
 DEFAULT_PREVENTION = ROOT / "artifacts" / "prevention_eval" / "prevention_full_v1" / "prevention_summary.json"
-DEFAULT_FEEDBACK_RUN = ROOT / "artifacts" / "run_feedback_v1" / "feedback_variants"
+DEFAULT_FEEDBACK_RUN = ROOT / "artifacts" / "run_feedback_v2" / "feedback_variants"
 DEFAULT_GENERALISATION_RUN = ROOT / "artifacts" / "run_generalisation_v1"
 HARD_TASKS = ROOT / "benchmarks" / "hard_tasks.json"
 

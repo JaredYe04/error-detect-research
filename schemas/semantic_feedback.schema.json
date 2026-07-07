@@ -1,0 +1,53 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://sgdp-framework/schemas/semantic_feedback.schema.json",
+  "title": "SgDP Semantic Feedback IR",
+  "description": "Machine-readable intermediate representation of a specification-level conformance violation, produced by the SgDP framework's formal checker and consumed by the LLM repair stage. Three rendering variants (test_only, test_expected, semantic_ir) project this IR onto natural-language repair prompts.",
+  "type": "object",
+  "required": ["violation_type", "scenario_index", "constraint_text", "inputs", "expected", "observed", "reason", "priority"],
+  "properties": {
+    "violation_type": {
+      "type": "string",
+      "enum": ["ordering", "boundary", "arithmetic", "output", "unknown"],
+      "description": "Semantic classification of the defect relative to the specification"
+    },
+    "scenario_index": {
+      "type": "integer",
+      "minimum": 1,
+      "description": "1-indexed FSF scenario that the witness activates"
+    },
+    "constraint_text": {
+      "type": "string",
+      "description": "The guard predicate of the violated scenario as human-readable text"
+    },
+    "inputs": {
+      "type": "object",
+      "additionalProperties": {"type": ["integer", "number", "string", "boolean"]},
+      "description": "Concrete witness inputs that expose the fault"
+    },
+    "expected": {
+      "type": "object",
+      "additionalProperties": {"type": ["integer", "number", "string", "boolean"]},
+      "description": "Oracle output for the witness inputs (from SpecIR postcondition)"
+    },
+    "observed": {
+      "type": "object",
+      "additionalProperties": {"type": ["integer", "number", "string", "boolean"]},
+      "description": "Candidate implementation's actual output"
+    },
+    "reason": {
+      "type": "string",
+      "description": "Inferred natural-language root cause of the violation"
+    },
+    "priority": {
+      "type": "integer",
+      "minimum": 1,
+      "description": "Severity rank (1 = highest priority for repair)"
+    },
+    "suggested_fix": {
+      "type": ["string", "null"],
+      "description": "Structural code change category hint for the repair stage"
+    }
+  },
+  "additionalProperties": false
+}
