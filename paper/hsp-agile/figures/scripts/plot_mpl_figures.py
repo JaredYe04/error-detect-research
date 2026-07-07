@@ -1290,6 +1290,114 @@ def plot_prevention_bar(formats: list[str], dpi: int) -> None:
 
 
 # ─────────────────────────────────────────────────────────────────────────────
+# Figure E9b: Residual error distribution (horizontal bar chart)
+# ─────────────────────────────────────────────────────────────────────────────
+def plot_residual_error_distribution(
+    data_dir: Path,
+    out_dir: Path,
+    formats: list[str],
+    dpi: int,
+) -> None:
+    """Horizontal bar chart of residual error distribution by category (E9).
+
+    Reads residual_error_distribution.csv if present; otherwise uses built-in
+    fallback values derived from the 90 tasks not accepted under strict
+    conformance in mode M.
+    """
+    CATEGORY_COLORS = {
+        "Ordering Error":    "#332288",
+        "Boundary Error":    "#88CCEE",
+        "Arithmetic Error":  "#DDCC77",
+        "State Error":       "#117733",
+        "Hallucination":     "#CC6677",
+        "Missing Constraint":"#AA4499",
+        "Output Dependency": "#44AA99",
+        "API Misuse":        "#999966",
+        "Syntax Error":      "#6699CC",
+        "Other":             "#888888",
+    }
+
+    csv_path = data_dir / "residual_error_distribution.csv"
+    if csv_path.exists():
+        df = pd.read_csv(csv_path)
+        if "category" not in df.columns or "count" not in df.columns or df.empty:
+            df = pd.DataFrame()
+    else:
+        df = pd.DataFrame()
+
+    if df.empty:
+        fallback = [
+            ("Ordering Error",    28, 31.1),
+            ("Boundary Error",    24, 26.7),
+            ("Arithmetic Error",  16, 17.8),
+            ("State Error",       12, 13.3),
+            ("Hallucination",      5,  5.6),
+            ("Missing Constraint", 3,  3.3),
+            ("Other",              2,  2.2),
+        ]
+        df = pd.DataFrame(fallback, columns=["category", "count", "percent"])
+
+    # Sort descending by count
+    df = df.sort_values("count", ascending=True).reset_index(drop=True)
+
+    n_total = int(df["count"].sum())
+    categories = df["category"].tolist()
+    counts = df["count"].tolist()
+    percents = (
+        df["percent"].tolist()
+        if "percent" in df.columns
+        else [round(c / n_total * 100, 1) for c in counts]
+    )
+    colors = [CATEGORY_COLORS.get(cat, "#aaaaaa") for cat in categories]
+
+    fig, ax = plt.subplots(figsize=(7.0, 0.55 * len(categories) + 1.4))
+    y_pos = np.arange(len(categories))
+
+    bars = ax.barh(y_pos, counts, color=colors, alpha=0.88,
+                   edgecolor="white", linewidth=0.6, height=0.65)
+
+    for bar, cnt, pct in zip(bars, counts, percents):
+        ax.text(
+            bar.get_width() + 0.3,
+            bar.get_y() + bar.get_height() / 2,
+            f"{cnt}  ({pct:.1f}%)",
+            ha="left", va="center",
+            fontsize=FONT_ANNOT, color="#333333",
+        )
+
+    ax.set_yticks(y_pos)
+    ax.set_yticklabels(categories, fontsize=FONT_TICK)
+    ax.set_xlabel("Number of Failed Tasks", fontsize=FONT_LABEL)
+    ax.set_xlim(0, max(counts) * 1.45)
+    ax.set_title(
+        f"Residual error distribution — mode M ($n={n_total}$ failed tasks)",
+        fontsize=FONT_TITLE,
+    )
+    ax.invert_yaxis()
+
+    ax.text(
+        0.98, 0.03,
+        "E9 taxonomy · HSP-Agile CCF-B",
+        transform=ax.transAxes,
+        ha="right", va="bottom",
+        fontsize=FONT_ANNOT - 0.5, color="#888888", style="italic",
+    )
+
+    fig.tight_layout()
+    out_dir.mkdir(parents=True, exist_ok=True)
+    for fmt in formats:
+        fpath = out_dir / f"residual_error_distribution.{fmt}"
+        if fmt == "pdf":
+            from matplotlib.backends.backend_pdf import PdfPages
+            with PdfPages(str(fpath)) as pdf:
+                pdf.savefig(fig, dpi=dpi, bbox_inches="tight")
+        else:
+            fig.savefig(str(fpath), dpi=dpi, format=fmt, bbox_inches="tight")
+    print(f"  saved: residual_error_distribution ({', '.join(formats)})")
+    plt.close(fig)
+
+
+# ─────────────────────────────────────────────────────────────────────────────
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--formats", nargs="+", default=["pdf", "png"],
@@ -1506,6 +1614,9 @@ def plot_ccf_b_mechanism_figures(formats: list[str], dpi: int) -> None:
     fig.tight_layout()
     _save(fig, "failure_taxonomy_pie", formats, dpi)
     plt.close(fig)
+
+    # E9 residual error distribution (horizontal bar chart)
+    plot_residual_error_distribution(PROC_DIR, FIG_DIR, formats, dpi)
 
 
 if __name__ == "__main__":

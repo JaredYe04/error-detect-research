@@ -136,7 +136,7 @@ def analyze_failure_taxonomy(
             "failure_rate": round(len(failed) / max(len(mode_records), 1), 4),
             "categories": {cat: {"count": cats.get(cat, 0),
                                   "fraction": round(cats.get(cat, 0) / len(failed), 4)}
-                           for cat in FAILURE_CATEGORIES if cats.get(cat, 0) > 0},
+                           for cat in FAILURE_CATEGORIES},
         }
 
     out_dir.mkdir(parents=True, exist_ok=True)

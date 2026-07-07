@@ -1,0 +1,6 @@
+subset,n,m_conf_pct,m_strict_pct
+Synthetic hard (E1),120,90.4,25.0
+HumanEval-FSF (E8c),20,93.8,70.0
+MBPP-FSF (E8c),20,95.0,85.0
+Mini-Z (E8a),10,94.2,
+Mini-StateMachine (E8b),10,92.2,

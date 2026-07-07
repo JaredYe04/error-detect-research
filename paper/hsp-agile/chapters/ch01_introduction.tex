@@ -104,6 +104,18 @@ three correctness theorems; Chapter~\ref{ch:results} (Section~\ref{ch:generaliza
 demonstrates additional instantiations beyond SOFL/FSF.
 notation instantiations beyond SOFL.
 
+\begin{figure}[h]
+  \centering
+  \resizebox{\linewidth}{!}{\input{diagrams/tikz/sgdp_overview}}
+  \caption{The Specification-guided Defect Prevention (\textsc{SgDP}) framework.
+    A formal specification drives SMT-based witness generation to produce
+    boundary-focused test cases; violations yield structured Semantic IR feedback
+    guiding counterexample-driven LLM repair; after at most $K$ iterations the
+    conjunctive acceptance predicate $\mathrm{Conf}(c,t)=1\wedge P^H(c)=0$
+    determines whether to accept the candidate.}
+  \label{fig:sgdp-overview}
+\end{figure}
+
 
 \section{Contributions}
 \label{sec:intro:contributions}

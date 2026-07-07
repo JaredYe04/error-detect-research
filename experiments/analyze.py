@@ -269,6 +269,101 @@ def plot_figures(df: pd.DataFrame, out_dir: Path) -> None:
         plt.close()
 
 
+def compute_far_bound_validation(
+    results_path: Path,
+    prevention_path: Path | None = None,
+    *,
+    epsilon: float = 0.05,
+    out_dir: Path | None = None,
+) -> pd.DataFrame:
+    """Compute empirical FAR vs. theoretical (1-ε)^n bound (C5 validation).
+
+    For each mode, the theoretical bound is (1 - epsilon)^n_witnesses, where
+    n_witnesses = average number of formal test cases (witnesses) exercised and
+    epsilon = 0.05 (conservative per-witness fault-activation probability).
+
+    Args:
+        results_path: Path to results.jsonl (main E1 run or prevention run).
+        prevention_path: Optional path to a separate prevention results.jsonl.
+            If None, uses results_path for both empirical FAR and witness count.
+        epsilon: Per-witness fault-activation probability (default 0.05).
+        out_dir: Directory to write far_bound_validation.csv. Defaults to
+            the parent of results_path / "analysis".
+
+    Returns:
+        DataFrame with columns: mode, empirical_far, theoretical_bound, n_witnesses.
+    """
+    rows_main = [
+        json.loads(line)
+        for line in results_path.read_text(encoding="utf-8").splitlines()
+        if line.strip()
+    ]
+    df_main = pd.DataFrame(rows_main)
+
+    if prevention_path is not None and prevention_path.exists():
+        rows_prev = [
+            json.loads(line)
+            for line in prevention_path.read_text(encoding="utf-8").splitlines()
+            if line.strip()
+        ]
+        df_prev = pd.DataFrame(rows_prev)
+    else:
+        df_prev = df_main.copy()
+
+    records = []
+    for mode in sorted(df_main["mode"].unique()):
+        mode_main = df_main[df_main["mode"] == mode]
+        mode_prev = df_prev[df_prev["mode"] == mode] if "mode" in df_prev.columns else df_prev
+
+        # Empirical FAR: fraction of clean implementations that still have formal failures
+        # (i.e., strict_formal_passed == False) — proxy for false-acceptance rate
+        if "strict_formal_passed" in mode_prev.columns:
+            passed_col = "strict_formal_passed"
+        elif "formal_passed" in mode_prev.columns:
+            passed_col = "formal_passed"
+        else:
+            passed_col = "success"
+        empirical_far = float(1.0 - mode_prev[passed_col].mean()) if not mode_prev.empty else float("nan")
+
+        # Average witness count: use strict_failures (= counterexample count at eval) as proxy
+        # for how many witnesses the checker produced during strict evaluation
+        if "strict_failures" in mode_main.columns:
+            n_witnesses = float(mode_main["strict_failures"].mean())
+        elif "counterexamples" in mode_main.columns:
+            n_witnesses = float(
+                mode_main["counterexamples"].apply(
+                    lambda v: len(v) if isinstance(v, list) else 0
+                ).mean()
+            )
+        else:
+            n_witnesses = float("nan")
+
+        # Theoretical FAR upper bound: (1 - ε)^n  (probability all n witnesses miss the fault)
+        if not np.isnan(n_witnesses) and n_witnesses >= 0:
+            theoretical_bound = float((1.0 - epsilon) ** n_witnesses)
+        else:
+            theoretical_bound = float("nan")
+
+        records.append(
+            {
+                "mode": mode,
+                "empirical_far": round(empirical_far, 4),
+                "theoretical_bound": round(theoretical_bound, 4) if not np.isnan(theoretical_bound) else None,
+                "n_witnesses": round(n_witnesses, 2) if not np.isnan(n_witnesses) else None,
+                "epsilon": epsilon,
+            }
+        )
+
+    result_df = pd.DataFrame(records)
+
+    save_dir = out_dir or (results_path.parent / "analysis")
+    save_dir.mkdir(parents=True, exist_ok=True)
+    csv_path = save_dir / "far_bound_validation.csv"
+    result_df.to_csv(csv_path, index=False)
+    print(f"[FAR] Bound validation written to {csv_path}")
+    return result_df
+
+
 def analyze(run_dir: Path) -> Path:
     df = load_results(run_dir)
     if "strict_formal_passed" in df.columns:

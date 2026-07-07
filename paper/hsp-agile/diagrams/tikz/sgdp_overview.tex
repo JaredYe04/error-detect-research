@@ -1,0 +1,122 @@
+%% diagrams/tikz/sgdp_overview.tex
+%% TikZ fragment -- \input{} into main document.
+%% Preamble requirements (loaded by thesis.sty):
+%%   \usetikzlibrary{shapes.geometric,arrows.meta,positioning,shadows,calc}
+%%   \usepackage{xcolor}
+
+%% ---- Colour palette (reuse from pipeline_architecture) -----------------------
+\colorlet{SgBlue}{blue!55!cyan!85!white}
+\colorlet{SgGray}{black!38}
+\colorlet{SgGreen}{green!60!black}
+\colorlet{SgOrange}{orange!80!red}
+
+%% ---- Diagram -----------------------------------------------------------------
+\begin{tikzpicture}[
+  every node/.style = {font=\small\sffamily},
+  %% Main pipeline box
+  pipe/.style = {
+    draw       = SgGray!80!black,
+    fill       = SgGray!12,
+    rounded corners = 4pt,
+    minimum width  = 2.55cm,
+    minimum height = 1.05cm,
+    align      = center,
+    text width  = 2.4cm,
+    inner sep  = 4pt,
+    drop shadow = {shadow xshift=0.35ex, shadow yshift=-0.35ex,
+                   shadow opacity=0.28}
+  },
+  %% Input node (blue)
+  innode/.style = {
+    pipe,
+    draw = SgBlue!80!black,
+    fill = SgBlue!16
+  },
+  %% Accept node (green)
+  accnode/.style = {
+    pipe,
+    draw = SgGreen!80!black,
+    fill = SgGreen!12
+  },
+  %% Standard forward arrow
+  arr/.style  = {-{Stealth[length=5pt,width=3pt]}, thick, draw=black!65},
+  %% Loop-back dashed orange arrow
+  looparr/.style = {
+    -{Stealth[length=5pt,width=3pt]},
+    thick, dashed,
+    draw = SgOrange!80!black,
+    line width = 0.72pt
+  },
+]
+
+%% ===========================================================================
+%% Pipeline nodes (left to right, 3.1 cm spacing)
+%% ===========================================================================
+
+\node[innode] (N1) at (0,0) {%
+  \textbf{Formal Spec}\\[2pt]
+  {\scriptsize\sffamily SOFL / Z / TLA+}};
+
+\node[pipe] (N2) at (3.1,0) {%
+  \textbf{SMT Witness}\\[2pt]
+  {\scriptsize\sffamily Generator}};
+
+\node[pipe] (N3) at (6.2,0) {%
+  \textbf{Semantic IR}\\[2pt]
+  {\scriptsize\sffamily (Feedback)}};
+
+\node[pipe] (N4) at (9.3,0) {%
+  \textbf{LLM Repair}\\[2pt]
+  {\scriptsize\sffamily (CEGIS loop)}};
+
+\node[accnode] (N5) at (12.4,0) {%
+  \textbf{Accept}\\[2pt]
+  {\scriptsize\sffamily $\mathrm{Conf}\wedge P^H{=}0$}};
+
+%% ===========================================================================
+%% Sub-labels below each box
+%% ===========================================================================
+
+\node[font=\scriptsize\sffamily, text=SgGray!80!black,
+      below=0.18cm of N1, align=center]
+  {specification\\oracle};
+
+\node[font=\scriptsize\sffamily, text=SgGray!80!black,
+      below=0.18cm of N2, align=center]
+  {boundary-focused\\cases};
+
+\node[font=\scriptsize\sffamily, text=SgGray!80!black,
+      below=0.18cm of N3, align=center]
+  {scenario-aware\\feedback};
+
+\node[font=\scriptsize\sffamily, text=SgGray!80!black,
+      below=0.18cm of N4, align=center]
+  {counterexample-\\guided};
+
+\node[font=\scriptsize\sffamily, text=SgGreen!70!black,
+      below=0.18cm of N5, align=center]
+  {$\mathrm{Conf}(c,t){=}1$\\$\wedge\;P^H(c){=}0$};
+
+%% ===========================================================================
+%% Forward arrows
+%% ===========================================================================
+
+\draw[arr] (N1.east) -- (N2.west);
+\draw[arr] (N2.east) -- (N3.west);
+\draw[arr] (N3.east) -- (N4.west);
+\draw[arr] (N4.east) -- (N5.west);
+
+%% ===========================================================================
+%% K-iteration loop-back: Accept -> LLM Repair (above the boxes)
+%% ===========================================================================
+
+\draw[looparr, rounded corners=5pt]
+  (N5.north) -- ++(0, 0.70) coordinate (topR)
+  -- ($(N4.north)+(0, 0.70)$) coordinate (topL)
+  -- (N4.north);
+
+\node[font=\scriptsize\sffamily, text=SgOrange!85!black,
+      above=0.72cm of N4, xshift=1.55cm, align=center]
+  {$K$-iteration\\repair loop};
+
+\end{tikzpicture}

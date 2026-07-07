@@ -636,7 +636,7 @@ def main() -> None:
     parser.add_argument(
         "--parallelism",
         type=int,
-        default=6,
+        default=10,
         help="Parallel workers for LLM experiments (E3/E6). Default: 6.",
     )
     args = parser.parse_args()

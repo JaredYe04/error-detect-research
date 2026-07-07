@@ -10,6 +10,19 @@ from typing import Any
 
 import yaml
 
+from src.patterns.guard_extract import (
+    detect_off_by_one,
+    detect_swapped_comparisons,
+    extract_code_conditions,
+    extract_fsf_guards,
+)
+from src.patterns.cfg import (
+    all_paths_define_outputs,
+    build_cfg,
+    has_empty_branch_bodies,
+    has_unreachable_returns,
+)
+
 
 @dataclass
 class PatternMatch:
@@ -87,12 +100,36 @@ class PatternGuard:
             ]
 
         output_names = [p["name"] for p in task.get("signature", {}).get("outputs", [])]
-        scenario_count = len([s for s in task.get("fsfScenarios", []) if s.get("kind") != "others"])
-        has_others = any(s.get("kind") == "others" for s in task.get("fsfScenarios", []))
+        scenarios = task.get("fsfScenarios", [])
+        scenario_count = len([s for s in scenarios if s.get("kind") != "others"])
+        has_others = any(s.get("kind") == "others" for s in scenarios)
         ext_names = [e["name"] for e in task.get("ext", [])]
         ref_names = _referenced_names(tree)
         branch_count = _count_branches(tree)
         return_keys = _return_keys(tree)
+
+        # Pre-compute guard / condition data once for all RF05/RF06/RF11 rules
+        _fsf_guards: list[tuple[str, str, str]] | None = None
+        _code_conditions: list[tuple[str, str, str]] | None = None
+        _cfg: dict | None = None
+
+        def _get_fsf_guards() -> list[tuple[str, str, str]]:
+            nonlocal _fsf_guards
+            if _fsf_guards is None:
+                _fsf_guards = extract_fsf_guards(scenarios)
+            return _fsf_guards
+
+        def _get_code_conditions() -> list[tuple[str, str, str]]:
+            nonlocal _code_conditions
+            if _code_conditions is None:
+                _code_conditions = extract_code_conditions(code)
+            return _code_conditions
+
+        def _get_cfg() -> dict:
+            nonlocal _cfg
+            if _cfg is None:
+                _cfg = build_cfg(code)
+            return _cfg
 
         for rule in self.rules:
             rid = rule["id"]
@@ -105,6 +142,10 @@ class PatternGuard:
                 if missing:
                     matched = True
                     evidence = f"missing outputs: {missing}"
+                # Path-sensitive enhancement: verify all return paths include outputs
+                elif output_names and not all_paths_define_outputs(code, output_names):
+                    matched = True
+                    evidence = f"some return paths omit outputs: {output_names}"
 
             elif check == "branch_count_lt_scenarios" and scenario_count > 1:
                 needed = scenario_count if has_others else max(1, scenario_count - 1)
@@ -122,15 +163,59 @@ class PatternGuard:
                 matched = True
                 evidence = "no else branch for others scenario"
 
-            elif rid == "RF07" and _returns_constant_success(tree):
-                matched = True
-                evidence = "unconditional success return"
+            elif rid == "RF05":
+                fsf_g = _get_fsf_guards()
+                code_c = _get_code_conditions()
+                violations = detect_swapped_comparisons(fsf_g, code_c)
+                if violations:
+                    matched = True
+                    evidence = f"swapped comparisons: {violations[:3]}"
 
-            elif rid == "RF13" and re.search(r"else:\s*pass\s*$", code, re.MULTILINE):
-                matched = True
-                evidence = "empty else branch"
+            elif rid == "RF06":
+                fsf_g = _get_fsf_guards()
+                # Look for FSF atoms that test equality-to-zero (x eq 0, x == 0)
+                # or None, indicating a special zero/null case must be guarded
+                zero_guards = [
+                    (v, op, t) for v, op, t in fsf_g
+                    if t in ("0", "None") and op in ("==", "<=", "is")
+                ]
+                if zero_guards:
+                    code_c = _get_code_conditions()
+                    # "handles zero" means the code explicitly compares to 0/None
+                    # with an operator that catches the exact zero case
+                    code_zero = [
+                        (v, op, t) for v, op, t in code_c
+                        if t in ("0", "None") and op in ("==", "<=", "<", "is", "is not")
+                    ]
+                    if not code_zero:
+                        matched = True
+                        evidence = (
+                            f"FSF requires zero/None guard {zero_guards[:2]} "
+                            "but code has no matching condition"
+                        )
 
-            elif "code_regex" in rule and check is None and rid not in {"RF02", "RF05", "RF07", "RF11"}:
+            elif rid == "RF07":
+                if _returns_constant_success(tree):
+                    matched = True
+                    evidence = "unconditional success return"
+                elif has_unreachable_returns(_get_cfg()):
+                    matched = True
+                    evidence = "unreachable return path detected"
+
+            elif rid == "RF11":
+                fsf_g = _get_fsf_guards()
+                code_c = _get_code_conditions()
+                violations = detect_off_by_one(fsf_g, code_c)
+                if violations:
+                    matched = True
+                    evidence = f"off-by-one boundary: {violations[:3]}"
+
+            elif rid == "RF13":
+                if re.search(r"else:\s*pass\s*$", code, re.MULTILINE) or has_empty_branch_bodies(code):
+                    matched = True
+                    evidence = "empty else/elif branch body"
+
+            elif "code_regex" in rule and check is None and rid not in {"RF02", "RF06", "RF07", "RF13"}:
                 pat = rule["code_regex"]
                 ex = rule.get("exclude_regex")
                 if re.search(pat, code, re.MULTILINE):

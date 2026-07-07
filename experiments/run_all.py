@@ -22,7 +22,7 @@ from src.llm.ecnu_client import ECNUClient
 from src.mutation.injectors import apply_mutant_to_task, generate_mutants
 from src.pipeline.runner import ErrorPreventionPipeline, config_for_mode
 
-MODES = ["B0", "B1", "B2", "M", "A1", "A2", "A3"]
+MODES = ["B0", "B1", "B2", "B3", "B4", "B5", "M", "A1", "A2", "A3"]
 SENSITIVITY_GRID = [
     {"temperature": 0.0, "max_attempts": 1},
     {"temperature": 0.2, "max_attempts": 3},
@@ -293,7 +293,7 @@ def run_experiment(
 
 def main() -> None:
     parser = argparse.ArgumentParser(description="Run Agile-SOFL error prevention experiments")
-    parser.add_argument("--modes", nargs="+", default=["B0", "B1", "B2", "M", "A1", "A2", "A3"])
+    parser.add_argument("--modes", nargs="+", default=["B0", "B1", "B2", "B3", "B4", "B5", "M", "A1", "A2", "A3"])
     parser.add_argument("--repeats", type=int, default=3)
     parser.add_argument("--task-limit", type=int, default=None)
     parser.add_argument("--output", type=Path, default=ROOT / "artifacts")
@@ -301,7 +301,7 @@ def main() -> None:
     parser.add_argument("--sensitivity", action="store_true")
     parser.add_argument("--quick", action="store_true", help="Fast smoke: B0,B1,M only, 1 repeat")
     parser.add_argument("--run-name", type=str, default=None, help="Reuse/append named run directory")
-    parser.add_argument("--parallelism", type=int, default=1, help="Number of parallel workers")
+    parser.add_argument("--parallelism", type=int, default=10, help="Number of parallel workers")
     args = parser.parse_args()
 
     modes = args.modes

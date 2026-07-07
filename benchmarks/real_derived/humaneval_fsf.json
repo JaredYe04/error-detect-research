@@ -1,0 +1,1282 @@
+[
+  {
+    "taskId": "HumanEval.HE081.grade_score",
+    "kind": "process",
+    "sourceFile": "humaneval://HumanEval/81",
+    "module": "HumanEval",
+    "name": "grade_score",
+    "signature": {
+      "inputs": [
+        {
+          "name": "score",
+          "type": "nat"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "grade",
+          "type": "nat"
+        }
+      ]
+    },
+    "fsfScenarios": [
+      {
+        "index": 1,
+        "kind": "scenario",
+        "test": "score ge 90",
+        "def": "grade eq 4"
+      },
+      {
+        "index": 2,
+        "kind": "scenario",
+        "test": "score ge 80",
+        "def": "grade eq 3"
+      },
+      {
+        "index": 3,
+        "kind": "scenario",
+        "test": "score ge 70",
+        "def": "grade eq 2"
+      },
+      {
+        "index": 4,
+        "kind": "scenario",
+        "test": "score ge 60",
+        "def": "grade eq 1"
+      },
+      {
+        "index": 5,
+        "kind": "others",
+        "test": "others",
+        "def": "grade eq 0"
+      }
+    ],
+    "ext": [],
+    "sourceBasename": "humaneval-derived",
+    "promptSpec": "Process grade_score(score) -> (grade)\n\nFSF specification:\nif (score ge 90) => grade eq 4\nif (score ge 80) => grade eq 3\nif (score ge 70) => grade eq 2\nif (score ge 60) => grade eq 1\nothers => grade eq 0\n\nImportant: evaluate conditions in listed order (top-down precedence).",
+    "referenceCode": "def grade_score(score: int) -> dict:\n    \"\"\"Reference implementation auto-generated from FSF.\"\"\"\n    if score >= 90:\n        return {\"grade\": 4}\n    elif score >= 80:\n        return {\"grade\": 3}\n    elif score >= 70:\n        return {\"grade\": 2}\n    elif score >= 60:\n        return {\"grade\": 1}\n    else:\n        return {\"grade\": 0}\n",
+    "complexity": {
+      "scenario_count": 4,
+      "guard_complexity": "AND",
+      "overlap_rate": 0.0,
+      "has_external_vars": false,
+      "overlap_density_tier": "low"
+    }
+  },
+  {
+    "taskId": "HumanEval.HE045.triangle_type",
+    "kind": "process",
+    "sourceFile": "humaneval://HumanEval/45",
+    "module": "HumanEval",
+    "name": "triangle_type",
+    "signature": {
+      "inputs": [
+        {
+          "name": "a",
+          "type": "nat"
+        },
+        {
+          "name": "b",
+          "type": "nat"
+        },
+        {
+          "name": "c",
+          "type": "nat"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "tri_type",
+          "type": "nat"
+        }
+      ]
+    },
+    "fsfScenarios": [
+      {
+        "index": 1,
+        "kind": "scenario",
+        "test": "a eq b && b eq c && a gt 0",
+        "def": "tri_type eq 3"
+      },
+      {
+        "index": 2,
+        "kind": "scenario",
+        "test": "a eq b && b ne c && a gt 0 && c gt 0",
+        "def": "tri_type eq 2"
+      },
+      {
+        "index": 3,
+        "kind": "scenario",
+        "test": "b eq c && a ne b && a gt 0 && b gt 0",
+        "def": "tri_type eq 2"
+      },
+      {
+        "index": 4,
+        "kind": "scenario",
+        "test": "a eq c && b ne a && a gt 0 && b gt 0",
+        "def": "tri_type eq 2"
+      },
+      {
+        "index": 5,
+        "kind": "scenario",
+        "test": "a gt 0 && b gt 0 && c gt 0",
+        "def": "tri_type eq 1"
+      },
+      {
+        "index": 6,
+        "kind": "others",
+        "test": "others",
+        "def": "tri_type eq 0"
+      }
+    ],
+    "ext": [],
+    "sourceBasename": "humaneval-derived",
+    "promptSpec": "Process triangle_type(a,b,c) -> (tri_type)\n\nFSF specification:\nif (a eq b && b eq c && a gt 0) => tri_type eq 3\nif (a eq b && b ne c && a gt 0 && c gt 0) => tri_type eq 2\nif (b eq c && a ne b && a gt 0 && b gt 0) => tri_type eq 2\nif (a eq c && b ne a && a gt 0 && b gt 0) => tri_type eq 2\nif (a gt 0 && b gt 0 && c gt 0) => tri_type eq 1\nothers => tri_type eq 0\n\nImportant: evaluate conditions in listed order (top-down precedence).",
+    "referenceCode": "def triangle_type(a: int, b: int, c: int) -> dict:\n    \"\"\"Reference implementation auto-generated from FSF.\"\"\"\n    if a == b  and  b == c  and  a > 0:\n        return {\"tri_type\": 3}\n    elif a == b  and  b != c  and  a > 0  and  c > 0:\n        return {\"tri_type\": 2}\n    elif b == c  and  a != b  and  a > 0  and  b > 0:\n        return {\"tri_type\": 2}\n    elif a == c  and  b != a  and  a > 0  and  b > 0:\n        return {\"tri_type\": 2}\n    elif a > 0  and  b > 0  and  c > 0:\n        return {\"tri_type\": 1}\n    else:\n        return {\"tri_type\": 0}\n",
+    "complexity": {
+      "scenario_count": 5,
+      "guard_complexity": "Nested",
+      "overlap_rate": 1.5,
+      "has_external_vars": false,
+      "overlap_density_tier": "high"
+    }
+  },
+  {
+    "taskId": "HumanEval.HE020.age_group",
+    "kind": "process",
+    "sourceFile": "humaneval://HumanEval/20",
+    "module": "HumanEval",
+    "name": "age_group",
+    "signature": {
+      "inputs": [
+        {
+          "name": "age",
+          "type": "nat"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "group",
+          "type": "nat"
+        }
+      ]
+    },
+    "fsfScenarios": [
+      {
+        "index": 1,
+        "kind": "scenario",
+        "test": "age ge 65",
+        "def": "group eq 3"
+      },
+      {
+        "index": 2,
+        "kind": "scenario",
+        "test": "age ge 18",
+        "def": "group eq 2"
+      },
+      {
+        "index": 3,
+        "kind": "scenario",
+        "test": "age ge 13",
+        "def": "group eq 1"
+      },
+      {
+        "index": 4,
+        "kind": "others",
+        "test": "others",
+        "def": "group eq 0"
+      }
+    ],
+    "ext": [],
+    "sourceBasename": "humaneval-derived",
+    "promptSpec": "Process age_group(age) -> (group)\n\nFSF specification:\nif (age ge 65) => group eq 3\nif (age ge 18) => group eq 2\nif (age ge 13) => group eq 1\nothers => group eq 0\n\nImportant: evaluate conditions in listed order (top-down precedence).",
+    "referenceCode": "def age_group(age: int) -> dict:\n    \"\"\"Reference implementation auto-generated from FSF.\"\"\"\n    if age >= 65:\n        return {\"group\": 3}\n    elif age >= 18:\n        return {\"group\": 2}\n    elif age >= 13:\n        return {\"group\": 1}\n    else:\n        return {\"group\": 0}\n",
+    "complexity": {
+      "scenario_count": 3,
+      "guard_complexity": "Simple",
+      "overlap_rate": 1.0,
+      "has_external_vars": false,
+      "overlap_density_tier": "medium"
+    }
+  },
+  {
+    "taskId": "HumanEval.HE093.season_month",
+    "kind": "process",
+    "sourceFile": "humaneval://HumanEval/93",
+    "module": "HumanEval",
+    "name": "season_month",
+    "signature": {
+      "inputs": [
+        {
+          "name": "month",
+          "type": "nat"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "season",
+          "type": "nat"
+        }
+      ]
+    },
+    "fsfScenarios": [
+      {
+        "index": 1,
+        "kind": "scenario",
+        "test": "month ge 3 && month le 5",
+        "def": "season eq 1"
+      },
+      {
+        "index": 2,
+        "kind": "scenario",
+        "test": "month ge 6 && month le 8",
+        "def": "season eq 2"
+      },
+      {
+        "index": 3,
+        "kind": "scenario",
+        "test": "month ge 9 && month le 11",
+        "def": "season eq 3"
+      },
+      {
+        "index": 4,
+        "kind": "scenario",
+        "test": "month eq 12",
+        "def": "season eq 4"
+      },
+      {
+        "index": 5,
+        "kind": "scenario",
+        "test": "month le 2",
+        "def": "season eq 4"
+      },
+      {
+        "index": 6,
+        "kind": "others",
+        "test": "others",
+        "def": "season eq 0"
+      }
+    ],
+    "ext": [],
+    "sourceBasename": "humaneval-derived",
+    "promptSpec": "Process season_month(month) -> (season)\n\nFSF specification:\nif (month ge 3 && month le 5) => season eq 1\nif (month ge 6 && month le 8) => season eq 2\nif (month ge 9 && month le 11) => season eq 3\nif (month eq 12) => season eq 4\nif (month le 2) => season eq 4\nothers => season eq 0\n\nImportant: evaluate conditions in listed order (top-down precedence).",
+    "referenceCode": "def season_month(month: int) -> dict:\n    \"\"\"Reference implementation auto-generated from FSF.\"\"\"\n    if month >= 3  and  month <= 5:\n        return {\"season\": 1}\n    elif month >= 6  and  month <= 8:\n        return {\"season\": 2}\n    elif month >= 9  and  month <= 11:\n        return {\"season\": 3}\n    elif month == 12:\n        return {\"season\": 4}\n    elif month <= 2:\n        return {\"season\": 4}\n    else:\n        return {\"season\": 0}\n",
+    "complexity": {
+      "scenario_count": 5,
+      "guard_complexity": "AND",
+      "overlap_rate": 1.0,
+      "has_external_vars": false,
+      "overlap_density_tier": "medium"
+    }
+  },
+  {
+    "taskId": "HumanEval.HE100.day_period",
+    "kind": "process",
+    "sourceFile": "humaneval://HumanEval/100",
+    "module": "HumanEval",
+    "name": "day_period",
+    "signature": {
+      "inputs": [
+        {
+          "name": "hour",
+          "type": "nat"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "period",
+          "type": "nat"
+        }
+      ]
+    },
+    "fsfScenarios": [
+      {
+        "index": 1,
+        "kind": "scenario",
+        "test": "hour le 5",
+        "def": "period eq 0"
+      },
+      {
+        "index": 2,
+        "kind": "scenario",
+        "test": "hour le 11",
+        "def": "period eq 1"
+      },
+      {
+        "index": 3,
+        "kind": "scenario",
+        "test": "hour le 17",
+        "def": "period eq 2"
+      },
+      {
+        "index": 4,
+        "kind": "others",
+        "test": "others",
+        "def": "period eq 3"
+      }
+    ],
+    "ext": [],
+    "sourceBasename": "humaneval-derived",
+    "promptSpec": "Process day_period(hour) -> (period)\n\nFSF specification:\nif (hour le 5) => period eq 0\nif (hour le 11) => period eq 1\nif (hour le 17) => period eq 2\nothers => period eq 3\n\nImportant: evaluate conditions in listed order (top-down precedence).",
+    "referenceCode": "def day_period(hour: int) -> dict:\n    \"\"\"Reference implementation auto-generated from FSF.\"\"\"\n    if hour <= 5:\n        return {\"period\": 0}\n    elif hour <= 11:\n        return {\"period\": 1}\n    elif hour <= 17:\n        return {\"period\": 2}\n    else:\n        return {\"period\": 3}\n",
+    "complexity": {
+      "scenario_count": 3,
+      "guard_complexity": "Simple",
+      "overlap_rate": 2.25,
+      "has_external_vars": false,
+      "overlap_density_tier": "high"
+    }
+  },
+  {
+    "taskId": "HumanEval.HE043.bmi_category",
+    "kind": "process",
+    "sourceFile": "humaneval://HumanEval/43",
+    "module": "HumanEval",
+    "name": "bmi_category",
+    "signature": {
+      "inputs": [
+        {
+          "name": "bmi100",
+          "type": "nat"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "category",
+          "type": "nat"
+        }
+      ]
+    },
+    "fsfScenarios": [
+      {
+        "index": 1,
+        "kind": "scenario",
+        "test": "bmi100 ge 3000",
+        "def": "category eq 3"
+      },
+      {
+        "index": 2,
+        "kind": "scenario",
+        "test": "bmi100 ge 2500",
+        "def": "category eq 2"
+      },
+      {
+        "index": 3,
+        "kind": "scenario",
+        "test": "bmi100 ge 1850",
+        "def": "category eq 1"
+      },
+      {
+        "index": 4,
+        "kind": "others",
+        "test": "others",
+        "def": "category eq 0"
+      }
+    ],
+    "ext": [],
+    "sourceBasename": "humaneval-derived",
+    "promptSpec": "Process bmi_category(bmi100) -> (category)\n\nFSF specification:\nif (bmi100 ge 3000) => category eq 3\nif (bmi100 ge 2500) => category eq 2\nif (bmi100 ge 1850) => category eq 1\nothers => category eq 0\n\nImportant: evaluate conditions in listed order (top-down precedence).",
+    "referenceCode": "def bmi_category(bmi100: int) -> dict:\n    \"\"\"Reference implementation auto-generated from FSF.\"\"\"\n    if bmi100 >= 3000:\n        return {\"category\": 3}\n    elif bmi100 >= 2500:\n        return {\"category\": 2}\n    elif bmi100 >= 1850:\n        return {\"category\": 1}\n    else:\n        return {\"category\": 0}\n",
+    "complexity": {
+      "scenario_count": 3,
+      "guard_complexity": "Simple",
+      "overlap_rate": 0.0,
+      "has_external_vars": false,
+      "overlap_density_tier": "low"
+    }
+  },
+  {
+    "taskId": "HumanEval.HE109.leap_year_type",
+    "kind": "process",
+    "sourceFile": "humaneval://HumanEval/109",
+    "module": "HumanEval",
+    "name": "leap_year_type",
+    "signature": {
+      "inputs": [
+        {
+          "name": "mod4",
+          "type": "nat"
+        },
+        {
+          "name": "mod100",
+          "type": "nat"
+        },
+        {
+          "name": "mod400",
+          "type": "nat"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "year_type",
+          "type": "nat"
+        }
+      ]
+    },
+    "fsfScenarios": [
+      {
+        "index": 1,
+        "kind": "scenario",
+        "test": "mod400 eq 0",
+        "def": "year_type eq 3"
+      },
+      {
+        "index": 2,
+        "kind": "scenario",
+        "test": "mod100 eq 0",
+        "def": "year_type eq 2"
+      },
+      {
+        "index": 3,
+        "kind": "scenario",
+        "test": "mod4 eq 0",
+        "def": "year_type eq 1"
+      },
+      {
+        "index": 4,
+        "kind": "others",
+        "test": "others",
+        "def": "year_type eq 0"
+      }
+    ],
+    "ext": [],
+    "sourceBasename": "humaneval-derived",
+    "promptSpec": "Process leap_year_type(mod4,mod100,mod400) -> (year_type)\n\nFSF specification:\nif (mod400 eq 0) => year_type eq 3\nif (mod100 eq 0) => year_type eq 2\nif (mod4 eq 0) => year_type eq 1\nothers => year_type eq 0\n\nImportant: evaluate conditions in listed order (top-down precedence).",
+    "referenceCode": "def leap_year_type(mod4: int, mod100: int, mod400: int) -> dict:\n    \"\"\"Reference implementation auto-generated from FSF.\"\"\"\n    if mod400 == 0:\n        return {\"year_type\": 3}\n    elif mod100 == 0:\n        return {\"year_type\": 2}\n    elif mod4 == 0:\n        return {\"year_type\": 1}\n    else:\n        return {\"year_type\": 0}\n",
+    "complexity": {
+      "scenario_count": 3,
+      "guard_complexity": "Arithmetic",
+      "overlap_rate": 1.25,
+      "has_external_vars": false,
+      "overlap_density_tier": "high"
+    }
+  },
+  {
+    "taskId": "HumanEval.HE036.fizzbuzz_code",
+    "kind": "process",
+    "sourceFile": "humaneval://HumanEval/36",
+    "module": "HumanEval",
+    "name": "fizzbuzz_code",
+    "signature": {
+      "inputs": [
+        {
+          "name": "mod3",
+          "type": "nat"
+        },
+        {
+          "name": "mod5",
+          "type": "nat"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "code",
+          "type": "nat"
+        }
+      ]
+    },
+    "fsfScenarios": [
+      {
+        "index": 1,
+        "kind": "scenario",
+        "test": "mod3 eq 0 && mod5 eq 0",
+        "def": "code eq 3"
+      },
+      {
+        "index": 2,
+        "kind": "scenario",
+        "test": "mod3 eq 0",
+        "def": "code eq 1"
+      },
+      {
+        "index": 3,
+        "kind": "scenario",
+        "test": "mod5 eq 0",
+        "def": "code eq 2"
+      },
+      {
+        "index": 4,
+        "kind": "others",
+        "test": "others",
+        "def": "code eq 0"
+      }
+    ],
+    "ext": [],
+    "sourceBasename": "humaneval-derived",
+    "promptSpec": "Process fizzbuzz_code(mod3,mod5) -> (code)\n\nFSF specification:\nif (mod3 eq 0 && mod5 eq 0) => code eq 3\nif (mod3 eq 0) => code eq 1\nif (mod5 eq 0) => code eq 2\nothers => code eq 0\n\nImportant: evaluate conditions in listed order (top-down precedence).",
+    "referenceCode": "def fizzbuzz_code(mod3: int, mod5: int) -> dict:\n    \"\"\"Reference implementation auto-generated from FSF.\"\"\"\n    if mod3 == 0  and  mod5 == 0:\n        return {\"code\": 3}\n    elif mod3 == 0:\n        return {\"code\": 1}\n    elif mod5 == 0:\n        return {\"code\": 2}\n    else:\n        return {\"code\": 0}\n",
+    "complexity": {
+      "scenario_count": 3,
+      "guard_complexity": "Mixed",
+      "overlap_rate": 1.5,
+      "has_external_vars": false,
+      "overlap_density_tier": "high"
+    }
+  },
+  {
+    "taskId": "HumanEval.HE003.balance_check",
+    "kind": "process",
+    "sourceFile": "humaneval://HumanEval/3",
+    "module": "HumanEval",
+    "name": "balance_check",
+    "signature": {
+      "inputs": [
+        {
+          "name": "balance",
+          "type": "nat"
+        },
+        {
+          "name": "withdrawal",
+          "type": "nat"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "status",
+          "type": "nat"
+        }
+      ]
+    },
+    "fsfScenarios": [
+      {
+        "index": 1,
+        "kind": "scenario",
+        "test": "withdrawal gt balance",
+        "def": "status eq 3"
+      },
+      {
+        "index": 2,
+        "kind": "scenario",
+        "test": "withdrawal le balance && balance le 500",
+        "def": "status eq 2"
+      },
+      {
+        "index": 3,
+        "kind": "scenario",
+        "test": "withdrawal le balance && balance le 1500",
+        "def": "status eq 1"
+      },
+      {
+        "index": 4,
+        "kind": "others",
+        "test": "others",
+        "def": "status eq 0"
+      }
+    ],
+    "ext": [],
+    "sourceBasename": "humaneval-derived",
+    "promptSpec": "Process balance_check(balance,withdrawal) -> (status)\n\nFSF specification:\nif (withdrawal gt balance) => status eq 3\nif (withdrawal le balance && balance le 500) => status eq 2\nif (withdrawal le balance && balance le 1500) => status eq 1\nothers => status eq 0\n\nImportant: evaluate conditions in listed order (top-down precedence).",
+    "referenceCode": "def balance_check(balance: int, withdrawal: int) -> dict:\n    \"\"\"Reference implementation auto-generated from FSF.\"\"\"\n    if withdrawal > balance:\n        return {\"status\": 3}\n    elif withdrawal <= balance  and  balance <= 500:\n        return {\"status\": 2}\n    elif withdrawal <= balance  and  balance <= 1500:\n        return {\"status\": 1}\n    else:\n        return {\"status\": 0}\n",
+    "complexity": {
+      "scenario_count": 3,
+      "guard_complexity": "AND",
+      "overlap_rate": 1.667,
+      "has_external_vars": false,
+      "overlap_density_tier": "high"
+    }
+  },
+  {
+    "taskId": "HumanEval.HE060.credit_tier",
+    "kind": "process",
+    "sourceFile": "humaneval://HumanEval/60",
+    "module": "HumanEval",
+    "name": "credit_tier",
+    "signature": {
+      "inputs": [
+        {
+          "name": "score",
+          "type": "nat"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "tier",
+          "type": "nat"
+        }
+      ]
+    },
+    "fsfScenarios": [
+      {
+        "index": 1,
+        "kind": "scenario",
+        "test": "score ge 800",
+        "def": "tier eq 4"
+      },
+      {
+        "index": 2,
+        "kind": "scenario",
+        "test": "score ge 740",
+        "def": "tier eq 3"
+      },
+      {
+        "index": 3,
+        "kind": "scenario",
+        "test": "score ge 670",
+        "def": "tier eq 2"
+      },
+      {
+        "index": 4,
+        "kind": "scenario",
+        "test": "score ge 580",
+        "def": "tier eq 1"
+      },
+      {
+        "index": 5,
+        "kind": "others",
+        "test": "others",
+        "def": "tier eq 0"
+      }
+    ],
+    "ext": [],
+    "sourceBasename": "humaneval-derived",
+    "promptSpec": "Process credit_tier(score) -> (tier)\n\nFSF specification:\nif (score ge 800) => tier eq 4\nif (score ge 740) => tier eq 3\nif (score ge 670) => tier eq 2\nif (score ge 580) => tier eq 1\nothers => tier eq 0\n\nImportant: evaluate conditions in listed order (top-down precedence).",
+    "referenceCode": "def credit_tier(score: int) -> dict:\n    \"\"\"Reference implementation auto-generated from FSF.\"\"\"\n    if score >= 800:\n        return {\"tier\": 4}\n    elif score >= 740:\n        return {\"tier\": 3}\n    elif score >= 670:\n        return {\"tier\": 2}\n    elif score >= 580:\n        return {\"tier\": 1}\n    else:\n        return {\"tier\": 0}\n",
+    "complexity": {
+      "scenario_count": 4,
+      "guard_complexity": "AND",
+      "overlap_rate": 0.0,
+      "has_external_vars": false,
+      "overlap_density_tier": "low"
+    }
+  },
+  {
+    "taskId": "HumanEval.HE143.temp_zone",
+    "kind": "process",
+    "sourceFile": "humaneval://HumanEval/143",
+    "module": "HumanEval",
+    "name": "temp_zone",
+    "signature": {
+      "inputs": [
+        {
+          "name": "temp_f",
+          "type": "nat"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "zone",
+          "type": "nat"
+        }
+      ]
+    },
+    "fsfScenarios": [
+      {
+        "index": 1,
+        "kind": "scenario",
+        "test": "temp_f ge 90",
+        "def": "zone eq 4"
+      },
+      {
+        "index": 2,
+        "kind": "scenario",
+        "test": "temp_f ge 70",
+        "def": "zone eq 3"
+      },
+      {
+        "index": 3,
+        "kind": "scenario",
+        "test": "temp_f ge 50",
+        "def": "zone eq 2"
+      },
+      {
+        "index": 4,
+        "kind": "scenario",
+        "test": "temp_f ge 32",
+        "def": "zone eq 1"
+      },
+      {
+        "index": 5,
+        "kind": "others",
+        "test": "others",
+        "def": "zone eq 0"
+      }
+    ],
+    "ext": [],
+    "sourceBasename": "humaneval-derived",
+    "promptSpec": "Process temp_zone(temp_f) -> (zone)\n\nFSF specification:\nif (temp_f ge 90) => zone eq 4\nif (temp_f ge 70) => zone eq 3\nif (temp_f ge 50) => zone eq 2\nif (temp_f ge 32) => zone eq 1\nothers => zone eq 0\n\nImportant: evaluate conditions in listed order (top-down precedence).",
+    "referenceCode": "def temp_zone(temp_f: int) -> dict:\n    \"\"\"Reference implementation auto-generated from FSF.\"\"\"\n    if temp_f >= 90:\n        return {\"zone\": 4}\n    elif temp_f >= 70:\n        return {\"zone\": 3}\n    elif temp_f >= 50:\n        return {\"zone\": 2}\n    elif temp_f >= 32:\n        return {\"zone\": 1}\n    else:\n        return {\"zone\": 0}\n",
+    "complexity": {
+      "scenario_count": 4,
+      "guard_complexity": "Simple",
+      "overlap_rate": 0.0,
+      "has_external_vars": false,
+      "overlap_density_tier": "low"
+    }
+  },
+  {
+    "taskId": "HumanEval.HE056.wind_category",
+    "kind": "process",
+    "sourceFile": "humaneval://HumanEval/56",
+    "module": "HumanEval",
+    "name": "wind_category",
+    "signature": {
+      "inputs": [
+        {
+          "name": "wind_kmh",
+          "type": "nat"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "beaufort",
+          "type": "nat"
+        }
+      ]
+    },
+    "fsfScenarios": [
+      {
+        "index": 1,
+        "kind": "scenario",
+        "test": "wind_kmh ge 89",
+        "def": "beaufort eq 4"
+      },
+      {
+        "index": 2,
+        "kind": "scenario",
+        "test": "wind_kmh ge 50",
+        "def": "beaufort eq 3"
+      },
+      {
+        "index": 3,
+        "kind": "scenario",
+        "test": "wind_kmh ge 20",
+        "def": "beaufort eq 2"
+      },
+      {
+        "index": 4,
+        "kind": "scenario",
+        "test": "wind_kmh ge 2",
+        "def": "beaufort eq 1"
+      },
+      {
+        "index": 5,
+        "kind": "others",
+        "test": "others",
+        "def": "beaufort eq 0"
+      }
+    ],
+    "ext": [],
+    "sourceBasename": "humaneval-derived",
+    "promptSpec": "Process wind_category(wind_kmh) -> (beaufort)\n\nFSF specification:\nif (wind_kmh ge 89) => beaufort eq 4\nif (wind_kmh ge 50) => beaufort eq 3\nif (wind_kmh ge 20) => beaufort eq 2\nif (wind_kmh ge 2) => beaufort eq 1\nothers => beaufort eq 0\n\nImportant: evaluate conditions in listed order (top-down precedence).",
+    "referenceCode": "def wind_category(wind_kmh: int) -> dict:\n    \"\"\"Reference implementation auto-generated from FSF.\"\"\"\n    if wind_kmh >= 89:\n        return {\"beaufort\": 4}\n    elif wind_kmh >= 50:\n        return {\"beaufort\": 3}\n    elif wind_kmh >= 20:\n        return {\"beaufort\": 2}\n    elif wind_kmh >= 2:\n        return {\"beaufort\": 1}\n    else:\n        return {\"beaufort\": 0}\n",
+    "complexity": {
+      "scenario_count": 4,
+      "guard_complexity": "Simple",
+      "overlap_rate": 1.0,
+      "has_external_vars": false,
+      "overlap_density_tier": "medium"
+    }
+  },
+  {
+    "taskId": "HumanEval.HE062.blood_pressure_cat",
+    "kind": "process",
+    "sourceFile": "humaneval://HumanEval/62",
+    "module": "HumanEval",
+    "name": "blood_pressure_cat",
+    "signature": {
+      "inputs": [
+        {
+          "name": "systolic",
+          "type": "nat"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "bp_cat",
+          "type": "nat"
+        }
+      ]
+    },
+    "fsfScenarios": [
+      {
+        "index": 1,
+        "kind": "scenario",
+        "test": "systolic ge 140",
+        "def": "bp_cat eq 4"
+      },
+      {
+        "index": 2,
+        "kind": "scenario",
+        "test": "systolic ge 130",
+        "def": "bp_cat eq 3"
+      },
+      {
+        "index": 3,
+        "kind": "scenario",
+        "test": "systolic ge 120",
+        "def": "bp_cat eq 2"
+      },
+      {
+        "index": 4,
+        "kind": "scenario",
+        "test": "systolic ge 90",
+        "def": "bp_cat eq 1"
+      },
+      {
+        "index": 5,
+        "kind": "others",
+        "test": "others",
+        "def": "bp_cat eq 0"
+      }
+    ],
+    "ext": [],
+    "sourceBasename": "humaneval-derived",
+    "promptSpec": "Process blood_pressure_cat(systolic) -> (bp_cat)\n\nFSF specification:\nif (systolic ge 140) => bp_cat eq 4\nif (systolic ge 130) => bp_cat eq 3\nif (systolic ge 120) => bp_cat eq 2\nif (systolic ge 90) => bp_cat eq 1\nothers => bp_cat eq 0\n\nImportant: evaluate conditions in listed order (top-down precedence).",
+    "referenceCode": "def blood_pressure_cat(systolic: int) -> dict:\n    \"\"\"Reference implementation auto-generated from FSF.\"\"\"\n    if systolic >= 140:\n        return {\"bp_cat\": 4}\n    elif systolic >= 130:\n        return {\"bp_cat\": 3}\n    elif systolic >= 120:\n        return {\"bp_cat\": 2}\n    elif systolic >= 90:\n        return {\"bp_cat\": 1}\n    else:\n        return {\"bp_cat\": 0}\n",
+    "complexity": {
+      "scenario_count": 4,
+      "guard_complexity": "Simple",
+      "overlap_rate": 0.0,
+      "has_external_vars": false,
+      "overlap_density_tier": "low"
+    }
+  },
+  {
+    "taskId": "HumanEval.HE004.aqi_health",
+    "kind": "process",
+    "sourceFile": "humaneval://HumanEval/4",
+    "module": "HumanEval",
+    "name": "aqi_health",
+    "signature": {
+      "inputs": [
+        {
+          "name": "aqi",
+          "type": "nat"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "health_cat",
+          "type": "nat"
+        }
+      ]
+    },
+    "fsfScenarios": [
+      {
+        "index": 1,
+        "kind": "scenario",
+        "test": "aqi ge 201",
+        "def": "health_cat eq 4"
+      },
+      {
+        "index": 2,
+        "kind": "scenario",
+        "test": "aqi ge 151",
+        "def": "health_cat eq 3"
+      },
+      {
+        "index": 3,
+        "kind": "scenario",
+        "test": "aqi ge 101",
+        "def": "health_cat eq 2"
+      },
+      {
+        "index": 4,
+        "kind": "scenario",
+        "test": "aqi ge 51",
+        "def": "health_cat eq 1"
+      },
+      {
+        "index": 5,
+        "kind": "others",
+        "test": "others",
+        "def": "health_cat eq 0"
+      }
+    ],
+    "ext": [],
+    "sourceBasename": "humaneval-derived",
+    "promptSpec": "Process aqi_health(aqi) -> (health_cat)\n\nFSF specification:\nif (aqi ge 201) => health_cat eq 4\nif (aqi ge 151) => health_cat eq 3\nif (aqi ge 101) => health_cat eq 2\nif (aqi ge 51) => health_cat eq 1\nothers => health_cat eq 0\n\nImportant: evaluate conditions in listed order (top-down precedence).",
+    "referenceCode": "def aqi_health(aqi: int) -> dict:\n    \"\"\"Reference implementation auto-generated from FSF.\"\"\"\n    if aqi >= 201:\n        return {\"health_cat\": 4}\n    elif aqi >= 151:\n        return {\"health_cat\": 3}\n    elif aqi >= 101:\n        return {\"health_cat\": 2}\n    elif aqi >= 51:\n        return {\"health_cat\": 1}\n    else:\n        return {\"health_cat\": 0}\n",
+    "complexity": {
+      "scenario_count": 4,
+      "guard_complexity": "Simple",
+      "overlap_rate": 0.0,
+      "has_external_vars": false,
+      "overlap_density_tier": "low"
+    }
+  },
+  {
+    "taskId": "HumanEval.HE025.earthquake_scale",
+    "kind": "process",
+    "sourceFile": "humaneval://HumanEval/25",
+    "module": "HumanEval",
+    "name": "earthquake_scale",
+    "signature": {
+      "inputs": [
+        {
+          "name": "magnitude100",
+          "type": "nat"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "scale_cat",
+          "type": "nat"
+        }
+      ]
+    },
+    "fsfScenarios": [
+      {
+        "index": 1,
+        "kind": "scenario",
+        "test": "magnitude100 ge 600",
+        "def": "scale_cat eq 4"
+      },
+      {
+        "index": 2,
+        "kind": "scenario",
+        "test": "magnitude100 ge 500",
+        "def": "scale_cat eq 3"
+      },
+      {
+        "index": 3,
+        "kind": "scenario",
+        "test": "magnitude100 ge 400",
+        "def": "scale_cat eq 2"
+      },
+      {
+        "index": 4,
+        "kind": "scenario",
+        "test": "magnitude100 ge 200",
+        "def": "scale_cat eq 1"
+      },
+      {
+        "index": 5,
+        "kind": "others",
+        "test": "others",
+        "def": "scale_cat eq 0"
+      }
+    ],
+    "ext": [],
+    "sourceBasename": "humaneval-derived",
+    "promptSpec": "Process earthquake_scale(magnitude100) -> (scale_cat)\n\nFSF specification:\nif (magnitude100 ge 600) => scale_cat eq 4\nif (magnitude100 ge 500) => scale_cat eq 3\nif (magnitude100 ge 400) => scale_cat eq 2\nif (magnitude100 ge 200) => scale_cat eq 1\nothers => scale_cat eq 0\n\nImportant: evaluate conditions in listed order (top-down precedence).",
+    "referenceCode": "def earthquake_scale(magnitude100: int) -> dict:\n    \"\"\"Reference implementation auto-generated from FSF.\"\"\"\n    if magnitude100 >= 600:\n        return {\"scale_cat\": 4}\n    elif magnitude100 >= 500:\n        return {\"scale_cat\": 3}\n    elif magnitude100 >= 400:\n        return {\"scale_cat\": 2}\n    elif magnitude100 >= 200:\n        return {\"scale_cat\": 1}\n    else:\n        return {\"scale_cat\": 0}\n",
+    "complexity": {
+      "scenario_count": 4,
+      "guard_complexity": "Simple",
+      "overlap_rate": 0.0,
+      "has_external_vars": false,
+      "overlap_density_tier": "low"
+    }
+  },
+  {
+    "taskId": "HumanEval.HE009.speed_zone",
+    "kind": "process",
+    "sourceFile": "humaneval://HumanEval/9",
+    "module": "HumanEval",
+    "name": "speed_zone",
+    "signature": {
+      "inputs": [
+        {
+          "name": "speed_kmh",
+          "type": "nat"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "zone",
+          "type": "nat"
+        }
+      ]
+    },
+    "fsfScenarios": [
+      {
+        "index": 1,
+        "kind": "scenario",
+        "test": "speed_kmh ge 131",
+        "def": "zone eq 4"
+      },
+      {
+        "index": 2,
+        "kind": "scenario",
+        "test": "speed_kmh ge 101",
+        "def": "zone eq 3"
+      },
+      {
+        "index": 3,
+        "kind": "scenario",
+        "test": "speed_kmh ge 61",
+        "def": "zone eq 2"
+      },
+      {
+        "index": 4,
+        "kind": "scenario",
+        "test": "speed_kmh ge 31",
+        "def": "zone eq 1"
+      },
+      {
+        "index": 5,
+        "kind": "others",
+        "test": "others",
+        "def": "zone eq 0"
+      }
+    ],
+    "ext": [],
+    "sourceBasename": "humaneval-derived",
+    "promptSpec": "Process speed_zone(speed_kmh) -> (zone)\n\nFSF specification:\nif (speed_kmh ge 131) => zone eq 4\nif (speed_kmh ge 101) => zone eq 3\nif (speed_kmh ge 61) => zone eq 2\nif (speed_kmh ge 31) => zone eq 1\nothers => zone eq 0\n\nImportant: evaluate conditions in listed order (top-down precedence).",
+    "referenceCode": "def speed_zone(speed_kmh: int) -> dict:\n    \"\"\"Reference implementation auto-generated from FSF.\"\"\"\n    if speed_kmh >= 131:\n        return {\"zone\": 4}\n    elif speed_kmh >= 101:\n        return {\"zone\": 3}\n    elif speed_kmh >= 61:\n        return {\"zone\": 2}\n    elif speed_kmh >= 31:\n        return {\"zone\": 1}\n    else:\n        return {\"zone\": 0}\n",
+    "complexity": {
+      "scenario_count": 4,
+      "guard_complexity": "Simple",
+      "overlap_rate": 0.0,
+      "has_external_vars": false,
+      "overlap_density_tier": "low"
+    }
+  },
+  {
+    "taskId": "HumanEval.HE007.water_depth_zone",
+    "kind": "process",
+    "sourceFile": "humaneval://HumanEval/7",
+    "module": "HumanEval",
+    "name": "water_depth_zone",
+    "signature": {
+      "inputs": [
+        {
+          "name": "depth_cm",
+          "type": "nat"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "depth_cat",
+          "type": "nat"
+        }
+      ]
+    },
+    "fsfScenarios": [
+      {
+        "index": 1,
+        "kind": "scenario",
+        "test": "depth_cm ge 201",
+        "def": "depth_cat eq 4"
+      },
+      {
+        "index": 2,
+        "kind": "scenario",
+        "test": "depth_cm ge 151",
+        "def": "depth_cat eq 3"
+      },
+      {
+        "index": 3,
+        "kind": "scenario",
+        "test": "depth_cm ge 101",
+        "def": "depth_cat eq 2"
+      },
+      {
+        "index": 4,
+        "kind": "scenario",
+        "test": "depth_cm ge 51",
+        "def": "depth_cat eq 1"
+      },
+      {
+        "index": 5,
+        "kind": "others",
+        "test": "others",
+        "def": "depth_cat eq 0"
+      }
+    ],
+    "ext": [],
+    "sourceBasename": "humaneval-derived",
+    "promptSpec": "Process water_depth_zone(depth_cm) -> (depth_cat)\n\nFSF specification:\nif (depth_cm ge 201) => depth_cat eq 4\nif (depth_cm ge 151) => depth_cat eq 3\nif (depth_cm ge 101) => depth_cat eq 2\nif (depth_cm ge 51) => depth_cat eq 1\nothers => depth_cat eq 0\n\nImportant: evaluate conditions in listed order (top-down precedence).",
+    "referenceCode": "def water_depth_zone(depth_cm: int) -> dict:\n    \"\"\"Reference implementation auto-generated from FSF.\"\"\"\n    if depth_cm >= 201:\n        return {\"depth_cat\": 4}\n    elif depth_cm >= 151:\n        return {\"depth_cat\": 3}\n    elif depth_cm >= 101:\n        return {\"depth_cat\": 2}\n    elif depth_cm >= 51:\n        return {\"depth_cat\": 1}\n    else:\n        return {\"depth_cat\": 0}\n",
+    "complexity": {
+      "scenario_count": 4,
+      "guard_complexity": "Simple",
+      "overlap_rate": 0.0,
+      "has_external_vars": false,
+      "overlap_density_tier": "low"
+    }
+  },
+  {
+    "taskId": "HumanEval.HE053.percentile_band",
+    "kind": "process",
+    "sourceFile": "humaneval://HumanEval/53",
+    "module": "HumanEval",
+    "name": "percentile_band",
+    "signature": {
+      "inputs": [
+        {
+          "name": "score",
+          "type": "nat"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "band",
+          "type": "nat"
+        }
+      ]
+    },
+    "fsfScenarios": [
+      {
+        "index": 1,
+        "kind": "scenario",
+        "test": "score ge 90",
+        "def": "band eq 4"
+      },
+      {
+        "index": 2,
+        "kind": "scenario",
+        "test": "score ge 75",
+        "def": "band eq 3"
+      },
+      {
+        "index": 3,
+        "kind": "scenario",
+        "test": "score ge 50",
+        "def": "band eq 2"
+      },
+      {
+        "index": 4,
+        "kind": "scenario",
+        "test": "score ge 25",
+        "def": "band eq 1"
+      },
+      {
+        "index": 5,
+        "kind": "others",
+        "test": "others",
+        "def": "band eq 0"
+      }
+    ],
+    "ext": [],
+    "sourceBasename": "humaneval-derived",
+    "promptSpec": "Process percentile_band(score) -> (band)\n\nFSF specification:\nif (score ge 90) => band eq 4\nif (score ge 75) => band eq 3\nif (score ge 50) => band eq 2\nif (score ge 25) => band eq 1\nothers => band eq 0\n\nImportant: evaluate conditions in listed order (top-down precedence).",
+    "referenceCode": "def percentile_band(score: int) -> dict:\n    \"\"\"Reference implementation auto-generated from FSF.\"\"\"\n    if score >= 90:\n        return {\"band\": 4}\n    elif score >= 75:\n        return {\"band\": 3}\n    elif score >= 50:\n        return {\"band\": 2}\n    elif score >= 25:\n        return {\"band\": 1}\n    else:\n        return {\"band\": 0}\n",
+    "complexity": {
+      "scenario_count": 4,
+      "guard_complexity": "AND",
+      "overlap_rate": 0.0,
+      "has_external_vars": false,
+      "overlap_density_tier": "low"
+    }
+  },
+  {
+    "taskId": "HumanEval.HE026.magnitude_diff",
+    "kind": "process",
+    "sourceFile": "humaneval://HumanEval/26",
+    "module": "HumanEval",
+    "name": "magnitude_diff",
+    "signature": {
+      "inputs": [
+        {
+          "name": "diff",
+          "type": "nat"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "disparity",
+          "type": "nat"
+        }
+      ]
+    },
+    "fsfScenarios": [
+      {
+        "index": 1,
+        "kind": "scenario",
+        "test": "diff eq 0",
+        "def": "disparity eq 0"
+      },
+      {
+        "index": 2,
+        "kind": "scenario",
+        "test": "diff le 10",
+        "def": "disparity eq 1"
+      },
+      {
+        "index": 3,
+        "kind": "scenario",
+        "test": "diff le 50",
+        "def": "disparity eq 2"
+      },
+      {
+        "index": 4,
+        "kind": "scenario",
+        "test": "diff le 100",
+        "def": "disparity eq 3"
+      },
+      {
+        "index": 5,
+        "kind": "others",
+        "test": "others",
+        "def": "disparity eq 4"
+      }
+    ],
+    "ext": [],
+    "sourceBasename": "humaneval-derived",
+    "promptSpec": "Process magnitude_diff(diff) -> (disparity)\n\nFSF specification:\nif (diff eq 0) => disparity eq 0\nif (diff le 10) => disparity eq 1\nif (diff le 50) => disparity eq 2\nif (diff le 100) => disparity eq 3\nothers => disparity eq 4\n\nImportant: evaluate conditions in listed order (top-down precedence).",
+    "referenceCode": "def magnitude_diff(diff: int) -> dict:\n    \"\"\"Reference implementation auto-generated from FSF.\"\"\"\n    if diff == 0:\n        return {\"disparity\": 0}\n    elif diff <= 10:\n        return {\"disparity\": 1}\n    elif diff <= 50:\n        return {\"disparity\": 2}\n    elif diff <= 100:\n        return {\"disparity\": 3}\n    else:\n        return {\"disparity\": 4}\n",
+    "complexity": {
+      "scenario_count": 4,
+      "guard_complexity": "Simple",
+      "overlap_rate": 3.083,
+      "has_external_vars": false,
+      "overlap_density_tier": "high"
+    }
+  },
+  {
+    "taskId": "HumanEval.HE000.numeric_range_cat",
+    "kind": "process",
+    "sourceFile": "humaneval://HumanEval/0",
+    "module": "HumanEval",
+    "name": "numeric_range_cat",
+    "signature": {
+      "inputs": [
+        {
+          "name": "n",
+          "type": "nat"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "range_cat",
+          "type": "nat"
+        }
+      ]
+    },
+    "fsfScenarios": [
+      {
+        "index": 1,
+        "kind": "scenario",
+        "test": "n ge 10000",
+        "def": "range_cat eq 4"
+      },
+      {
+        "index": 2,
+        "kind": "scenario",
+        "test": "n ge 1000",
+        "def": "range_cat eq 3"
+      },
+      {
+        "index": 3,
+        "kind": "scenario",
+        "test": "n ge 100",
+        "def": "range_cat eq 2"
+      },
+      {
+        "index": 4,
+        "kind": "scenario",
+        "test": "n ge 10",
+        "def": "range_cat eq 1"
+      },
+      {
+        "index": 5,
+        "kind": "others",
+        "test": "others",
+        "def": "range_cat eq 0"
+      }
+    ],
+    "ext": [],
+    "sourceBasename": "humaneval-derived",
+    "promptSpec": "Process numeric_range_cat(n) -> (range_cat)\n\nFSF specification:\nif (n ge 10000) => range_cat eq 4\nif (n ge 1000) => range_cat eq 3\nif (n ge 100) => range_cat eq 2\nif (n ge 10) => range_cat eq 1\nothers => range_cat eq 0\n\nImportant: evaluate conditions in listed order (top-down precedence).",
+    "referenceCode": "def numeric_range_cat(n: int) -> dict:\n    \"\"\"Reference implementation auto-generated from FSF.\"\"\"\n    if n >= 10000:\n        return {\"range_cat\": 4}\n    elif n >= 1000:\n        return {\"range_cat\": 3}\n    elif n >= 100:\n        return {\"range_cat\": 2}\n    elif n >= 10:\n        return {\"range_cat\": 1}\n    else:\n        return {\"range_cat\": 0}\n",
+    "complexity": {
+      "scenario_count": 4,
+      "guard_complexity": "Simple",
+      "overlap_rate": 0.5,
+      "has_external_vars": false,
+      "overlap_density_tier": "medium"
+    }
+  }
+]

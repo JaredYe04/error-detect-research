@@ -247,11 +247,130 @@ red → green    IF emergency eq 1                                DO green eq 1 
 red → yellow   IF queue le 5 && cycle lt 30                    DO green eq 0 && yellow eq 1 && red eq 0
 others                                                          DO green eq 0 && yellow eq 0 && red eq 1
 """,
+    # Task SM011: elevator state machine (floor × direction × request → next_state)
+    """\
+INPUTS: floor: int, direction: int, request: int
+OUTPUTS: next_floor: int, door: int, moving: int
+STATES: idle, moving_up, moving_down, door_open
+INITIAL: idle
+
+idle → door_open     IF floor eq request && direction eq 0     DO next_floor eq floor && door eq 1 && moving eq 0
+idle → moving_up     IF request gt floor                        DO next_floor eq floor + 1 && door eq 0 && moving eq 1
+idle → moving_down   IF request lt floor                        DO next_floor eq floor - 1 && door eq 0 && moving eq 1
+moving_up → door_open IF floor eq request                       DO next_floor eq floor && door eq 1 && moving eq 0
+moving_up → moving_up IF request gt floor                       DO next_floor eq floor + 1 && door eq 0 && moving eq 1
+moving_down → door_open IF floor eq request                     DO next_floor eq floor && door eq 1 && moving eq 0
+moving_down → moving_down IF request lt floor                   DO next_floor eq floor - 1 && door eq 0 && moving eq 1
+others                                                          DO next_floor eq floor && door eq 0 && moving eq 0
+""",
+    # Task SM012: ATM transaction FSM (card_present × pin_ok × balance × amount → state)
+    """\
+INPUTS: card_present: int, pin_ok: int, balance: int, amount: int
+OUTPUTS: state: int, dispensed: int, error: int
+STATES: idle, card_inserted, authenticated, dispensing, error
+INITIAL: idle
+
+idle → error         IF card_present eq 0 && amount gt 0       DO state eq 4 && dispensed eq 0 && error eq 1
+idle → card_inserted IF card_present eq 1 && pin_ok eq 0        DO state eq 1 && dispensed eq 0 && error eq 0
+idle → authenticated IF card_present eq 1 && pin_ok eq 1 && balance ge amount DO state eq 2 && dispensed eq 0 && error eq 0
+idle → error         IF card_present eq 1 && pin_ok eq 1 && balance lt amount DO state eq 4 && dispensed eq 0 && error eq 2
+authenticated → dispensing IF amount gt 0                        DO state eq 3 && dispensed eq amount && error eq 0
+others                                                            DO state eq 0 && dispensed eq 0 && error eq 0
+""",
+    # Task SM013: document approval workflow (stage × decision → next_stage)
+    """\
+INPUTS: stage: int, decision: int, priority: int
+OUTPUTS: next_stage: int, notify: int, escalate: int
+STATES: draft, review, approval, published, rejected
+INITIAL: draft
+
+draft → review       IF stage eq 0 && decision eq 1             DO next_stage eq 1 && notify eq 1 && escalate eq 0
+review → approval    IF stage eq 1 && decision eq 1             DO next_stage eq 2 && notify eq 1 && escalate eq 0
+review → draft       IF stage eq 1 && decision eq 0             DO next_stage eq 0 && notify eq 1 && escalate eq 0
+approval → published IF stage eq 2 && decision eq 1             DO next_stage eq 3 && notify eq 1 && escalate eq 0
+approval → rejected  IF stage eq 2 && decision eq 2             DO next_stage eq 4 && notify eq 1 && escalate eq 0
+review → approval    IF stage eq 1 && priority ge 3             DO next_stage eq 2 && notify eq 1 && escalate eq 1
+others                                                           DO next_stage eq 0 && notify eq 0 && escalate eq 0
+""",
+    # Task SM014: VPN connection FSM (authenticated × tunnel_ok × timeout → conn_state)
+    """\
+INPUTS: authenticated: int, tunnel_ok: int, timeout: int
+OUTPUTS: conn_state: int, reconnect: int, alert: int
+STATES: disconnected, connecting, connected, error
+INITIAL: disconnected
+
+disconnected → connecting   IF authenticated eq 1 && timeout eq 0 DO conn_state eq 1 && reconnect eq 0 && alert eq 0
+connecting → connected      IF tunnel_ok eq 1 && timeout eq 0      DO conn_state eq 2 && reconnect eq 0 && alert eq 0
+connecting → error          IF tunnel_ok eq 0 && timeout ge 30     DO conn_state eq 3 && reconnect eq 1 && alert eq 1
+connected → disconnected    IF timeout ge 60                        DO conn_state eq 0 && reconnect eq 0 && alert eq 1
+connected → connecting      IF tunnel_ok eq 0 && timeout lt 60     DO conn_state eq 1 && reconnect eq 1 && alert eq 0
+error → connecting          IF authenticated eq 1 && reconnect eq 1 DO conn_state eq 1 && reconnect eq 0 && alert eq 0
+others                                                              DO conn_state eq 0 && reconnect eq 0 && alert eq 0
+""",
+    # Task SM015: microwave oven FSM (door_closed × time × power → run_state)
+    """\
+INPUTS: door_closed: int, time: int, power: int
+OUTPUTS: run_state: int, lamp: int, turntable: int
+STATES: idle, running, paused, done
+INITIAL: idle
+
+idle → running    IF door_closed eq 1 && time gt 0 && power gt 0  DO run_state eq 1 && lamp eq 1 && turntable eq 1
+idle → idle       IF door_closed eq 0                              DO run_state eq 0 && lamp eq 1 && turntable eq 0
+running → paused  IF door_closed eq 0 && time gt 0                DO run_state eq 2 && lamp eq 1 && turntable eq 0
+running → done    IF time le 0                                     DO run_state eq 3 && lamp eq 1 && turntable eq 0
+paused → running  IF door_closed eq 1 && time gt 0                DO run_state eq 1 && lamp eq 1 && turntable eq 1
+paused → idle     IF time le 0                                     DO run_state eq 0 && lamp eq 0 && turntable eq 0
+others                                                              DO run_state eq 0 && lamp eq 0 && turntable eq 0
+""",
+    # Task SM016: payment processing FSM (authorized × captured × settled → status)
+    """\
+INPUTS: authorized: int, captured: int, settled: int
+OUTPUTS: status: int, action: int, refund: int
+STATES: pending, authorized, captured, settled, failed
+INITIAL: pending
+
+pending → failed     IF authorized eq 0                           DO status eq 4 && action eq 0 && refund eq 0
+pending → authorized IF authorized eq 1 && captured eq 0         DO status eq 1 && action eq 1 && refund eq 0
+authorized → captured IF captured eq 1 && settled eq 0           DO status eq 2 && action eq 2 && refund eq 0
+authorized → failed  IF captured eq 0 && authorized eq 0         DO status eq 4 && action eq 3 && refund eq 1
+captured → settled   IF settled eq 1                              DO status eq 3 && action eq 0 && refund eq 0
+captured → failed    IF settled eq 0 && captured eq 0            DO status eq 4 && action eq 3 && refund eq 1
+others                                                            DO status eq 0 && action eq 0 && refund eq 0
+""",
+    # Task SM017: battery charging FSM (charge_level × temp × voltage → charge_mode)
+    """\
+INPUTS: charge_level: int, temp: int, voltage: int
+OUTPUTS: charge_mode: int, rate: int, safe: int
+STATES: idle, trickle, bulk, absorption, full, fault
+INITIAL: idle
+
+idle → fault        IF temp gt 45 || temp lt 0                    DO charge_mode eq 5 && rate eq 0 && safe eq 0
+idle → trickle      IF charge_level lt 10 && voltage lt 36        DO charge_mode eq 1 && rate eq 1 && safe eq 1
+idle → bulk         IF charge_level lt 80 && voltage ge 36        DO charge_mode eq 2 && rate eq 3 && safe eq 1
+bulk → absorption   IF charge_level ge 80 && voltage ge 36        DO charge_mode eq 3 && rate eq 2 && safe eq 1
+absorption → full   IF charge_level ge 98                         DO charge_mode eq 4 && rate eq 0 && safe eq 1
+full → idle         IF charge_level ge 100                        DO charge_mode eq 0 && rate eq 0 && safe eq 1
+others                                                             DO charge_mode eq 2 && rate eq 2 && safe eq 1
+""",
+    # Task SM018: order fulfillment FSM (paid × picked × shipped × delivered → order_state)
+    """\
+INPUTS: paid: int, picked: int, shipped: int, delivered: int
+OUTPUTS: order_state: int, notify: int, action: int
+STATES: placed, processing, shipped, delivered, cancelled
+INITIAL: placed
+
+placed → cancelled   IF paid eq 0 && picked eq 0 && shipped eq 0  DO order_state eq 4 && notify eq 1 && action eq 0
+placed → processing  IF paid eq 1 && picked eq 0                   DO order_state eq 1 && notify eq 1 && action eq 1
+processing → shipped IF picked eq 1 && shipped eq 0                DO order_state eq 2 && notify eq 1 && action eq 2
+shipped → delivered  IF shipped eq 1 && delivered eq 1             DO order_state eq 3 && notify eq 1 && action eq 3
+shipped → shipped    IF shipped eq 1 && delivered eq 0             DO order_state eq 2 && notify eq 0 && action eq 0
+others                                                              DO order_state eq 0 && notify eq 0 && action eq 0
+""",
 ]
 
 
 def load_builtin_statemachine_tasks() -> list[dict[str, Any]]:
-    """Return the 10 built-in Mini-StateMachine tasks as TaskSpec dicts."""
+    """Return the 18 built-in Mini-StateMachine tasks as TaskSpec dicts."""
     adapter = StateMachineAdapter()
     tasks = []
     for i, spec_text in enumerate(BUILTIN_STATEMACHINE_TASKS_SPEC, start=1):

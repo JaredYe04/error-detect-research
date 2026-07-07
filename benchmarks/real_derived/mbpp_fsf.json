@@ -1,0 +1,1296 @@
+[
+  {
+    "taskId": "MBPP.MBPP002.price_discount",
+    "kind": "process",
+    "sourceFile": "mbpp://MBPP/2",
+    "module": "MBPP",
+    "name": "price_discount",
+    "signature": {
+      "inputs": [
+        {
+          "name": "price",
+          "type": "nat"
+        },
+        {
+          "name": "quantity",
+          "type": "nat"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "discount_pct",
+          "type": "nat"
+        }
+      ]
+    },
+    "fsfScenarios": [
+      {
+        "index": 1,
+        "kind": "scenario",
+        "test": "quantity ge 100",
+        "def": "discount_pct eq 20"
+      },
+      {
+        "index": 2,
+        "kind": "scenario",
+        "test": "quantity ge 50",
+        "def": "discount_pct eq 15"
+      },
+      {
+        "index": 3,
+        "kind": "scenario",
+        "test": "quantity ge 20",
+        "def": "discount_pct eq 10"
+      },
+      {
+        "index": 4,
+        "kind": "scenario",
+        "test": "quantity ge 10",
+        "def": "discount_pct eq 5"
+      },
+      {
+        "index": 5,
+        "kind": "others",
+        "test": "others",
+        "def": "discount_pct eq 0"
+      }
+    ],
+    "ext": [],
+    "sourceBasename": "mbpp-derived",
+    "promptSpec": "Process price_discount(price,quantity) -> (discount_pct)\n\nFSF specification:\nif (quantity ge 100) => discount_pct eq 20\nif (quantity ge 50) => discount_pct eq 15\nif (quantity ge 20) => discount_pct eq 10\nif (quantity ge 10) => discount_pct eq 5\nothers => discount_pct eq 0\n\nImportant: evaluate conditions in listed order (top-down precedence).",
+    "referenceCode": "def price_discount(price: int, quantity: int) -> dict:\n    \"\"\"Reference implementation auto-generated from FSF.\"\"\"\n    if quantity >= 100:\n        return {\"discount_pct\": 20}\n    elif quantity >= 50:\n        return {\"discount_pct\": 15}\n    elif quantity >= 20:\n        return {\"discount_pct\": 10}\n    elif quantity >= 10:\n        return {\"discount_pct\": 5}\n    else:\n        return {\"discount_pct\": 0}\n",
+    "complexity": {
+      "scenario_count": 4,
+      "guard_complexity": "Simple",
+      "overlap_rate": 1.0,
+      "has_external_vars": false,
+      "overlap_density_tier": "high"
+    }
+  },
+  {
+    "taskId": "MBPP.MBPP038.tax_bracket",
+    "kind": "process",
+    "sourceFile": "mbpp://MBPP/38",
+    "module": "MBPP",
+    "name": "tax_bracket",
+    "signature": {
+      "inputs": [
+        {
+          "name": "income",
+          "type": "nat"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "bracket",
+          "type": "nat"
+        }
+      ]
+    },
+    "fsfScenarios": [
+      {
+        "index": 1,
+        "kind": "scenario",
+        "test": "income ge 539",
+        "def": "bracket eq 32"
+      },
+      {
+        "index": 2,
+        "kind": "scenario",
+        "test": "income ge 215",
+        "def": "bracket eq 24"
+      },
+      {
+        "index": 3,
+        "kind": "scenario",
+        "test": "income ge 90",
+        "def": "bracket eq 22"
+      },
+      {
+        "index": 4,
+        "kind": "scenario",
+        "test": "income ge 11",
+        "def": "bracket eq 10"
+      },
+      {
+        "index": 5,
+        "kind": "others",
+        "test": "others",
+        "def": "bracket eq 0"
+      }
+    ],
+    "ext": [],
+    "sourceBasename": "mbpp-derived",
+    "promptSpec": "Process tax_bracket(income) -> (bracket)\n\nFSF specification:\nif (income ge 539) => bracket eq 32\nif (income ge 215) => bracket eq 24\nif (income ge 90) => bracket eq 22\nif (income ge 11) => bracket eq 10\nothers => bracket eq 0\n\nImportant: evaluate conditions in listed order (top-down precedence).",
+    "referenceCode": "def tax_bracket(income: int) -> dict:\n    \"\"\"Reference implementation auto-generated from FSF.\"\"\"\n    if income >= 539:\n        return {\"bracket\": 32}\n    elif income >= 215:\n        return {\"bracket\": 24}\n    elif income >= 90:\n        return {\"bracket\": 22}\n    elif income >= 11:\n        return {\"bracket\": 10}\n    else:\n        return {\"bracket\": 0}\n",
+    "complexity": {
+      "scenario_count": 4,
+      "guard_complexity": "Simple",
+      "overlap_rate": 0.5,
+      "has_external_vars": false,
+      "overlap_density_tier": "medium"
+    }
+  },
+  {
+    "taskId": "MBPP.MBPP068.angle_type",
+    "kind": "process",
+    "sourceFile": "mbpp://MBPP/68",
+    "module": "MBPP",
+    "name": "angle_type",
+    "signature": {
+      "inputs": [
+        {
+          "name": "angle",
+          "type": "nat"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "angle_type",
+          "type": "nat"
+        }
+      ]
+    },
+    "fsfScenarios": [
+      {
+        "index": 1,
+        "kind": "scenario",
+        "test": "angle eq 90",
+        "def": "angle_type eq 2"
+      },
+      {
+        "index": 2,
+        "kind": "scenario",
+        "test": "angle gt 0 && angle lt 90",
+        "def": "angle_type eq 1"
+      },
+      {
+        "index": 3,
+        "kind": "scenario",
+        "test": "angle gt 90 && angle lt 180",
+        "def": "angle_type eq 3"
+      },
+      {
+        "index": 4,
+        "kind": "scenario",
+        "test": "angle ge 180 && angle le 360",
+        "def": "angle_type eq 4"
+      },
+      {
+        "index": 5,
+        "kind": "others",
+        "test": "others",
+        "def": "angle_type eq 0"
+      }
+    ],
+    "ext": [],
+    "sourceBasename": "mbpp-derived",
+    "promptSpec": "Process angle_type(angle) -> (angle_type)\n\nFSF specification:\nif (angle eq 90) => angle_type eq 2\nif (angle gt 0 && angle lt 90) => angle_type eq 1\nif (angle gt 90 && angle lt 180) => angle_type eq 3\nif (angle ge 180 && angle le 360) => angle_type eq 4\nothers => angle_type eq 0\n\nImportant: evaluate conditions in listed order (top-down precedence).",
+    "referenceCode": "def angle_type(angle: int) -> dict:\n    \"\"\"Reference implementation auto-generated from FSF.\"\"\"\n    if angle == 90:\n        return {\"angle_type\": 2}\n    elif angle > 0  and  angle < 90:\n        return {\"angle_type\": 1}\n    elif angle > 90  and  angle < 180:\n        return {\"angle_type\": 3}\n    elif angle >= 180  and  angle <= 360:\n        return {\"angle_type\": 4}\n    else:\n        return {\"angle_type\": 0}\n",
+    "complexity": {
+      "scenario_count": 4,
+      "guard_complexity": "AND",
+      "overlap_rate": 0.5,
+      "has_external_vars": false,
+      "overlap_density_tier": "medium"
+    }
+  },
+  {
+    "taskId": "MBPP.MBPP072.polygon_type",
+    "kind": "process",
+    "sourceFile": "mbpp://MBPP/72",
+    "module": "MBPP",
+    "name": "polygon_type",
+    "signature": {
+      "inputs": [
+        {
+          "name": "n_sides",
+          "type": "nat"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "poly_type",
+          "type": "nat"
+        }
+      ]
+    },
+    "fsfScenarios": [
+      {
+        "index": 1,
+        "kind": "scenario",
+        "test": "n_sides eq 3",
+        "def": "poly_type eq 1"
+      },
+      {
+        "index": 2,
+        "kind": "scenario",
+        "test": "n_sides eq 4",
+        "def": "poly_type eq 2"
+      },
+      {
+        "index": 3,
+        "kind": "scenario",
+        "test": "n_sides eq 5",
+        "def": "poly_type eq 3"
+      },
+      {
+        "index": 4,
+        "kind": "scenario",
+        "test": "n_sides ge 6",
+        "def": "poly_type eq 4"
+      },
+      {
+        "index": 5,
+        "kind": "others",
+        "test": "others",
+        "def": "poly_type eq 0"
+      }
+    ],
+    "ext": [],
+    "sourceBasename": "mbpp-derived",
+    "promptSpec": "Process polygon_type(n_sides) -> (poly_type)\n\nFSF specification:\nif (n_sides eq 3) => poly_type eq 1\nif (n_sides eq 4) => poly_type eq 2\nif (n_sides eq 5) => poly_type eq 3\nif (n_sides ge 6) => poly_type eq 4\nothers => poly_type eq 0\n\nImportant: evaluate conditions in listed order (top-down precedence).",
+    "referenceCode": "def polygon_type(n_sides: int) -> dict:\n    \"\"\"Reference implementation auto-generated from FSF.\"\"\"\n    if n_sides == 3:\n        return {\"poly_type\": 1}\n    elif n_sides == 4:\n        return {\"poly_type\": 2}\n    elif n_sides == 5:\n        return {\"poly_type\": 3}\n    elif n_sides >= 6:\n        return {\"poly_type\": 4}\n    else:\n        return {\"poly_type\": 0}\n",
+    "complexity": {
+      "scenario_count": 4,
+      "guard_complexity": "Simple",
+      "overlap_rate": 0.8,
+      "has_external_vars": false,
+      "overlap_density_tier": "high"
+    }
+  },
+  {
+    "taskId": "MBPP.MBPP015.month_days",
+    "kind": "process",
+    "sourceFile": "mbpp://MBPP/15",
+    "module": "MBPP",
+    "name": "month_days",
+    "signature": {
+      "inputs": [
+        {
+          "name": "month",
+          "type": "nat"
+        },
+        {
+          "name": "is_leap",
+          "type": "nat"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "days",
+          "type": "nat"
+        }
+      ]
+    },
+    "fsfScenarios": [
+      {
+        "index": 1,
+        "kind": "scenario",
+        "test": "month eq 2 && is_leap eq 1",
+        "def": "days eq 29"
+      },
+      {
+        "index": 2,
+        "kind": "scenario",
+        "test": "month eq 2",
+        "def": "days eq 28"
+      },
+      {
+        "index": 3,
+        "kind": "scenario",
+        "test": "month eq 4",
+        "def": "days eq 30"
+      },
+      {
+        "index": 4,
+        "kind": "scenario",
+        "test": "month eq 6",
+        "def": "days eq 30"
+      },
+      {
+        "index": 5,
+        "kind": "scenario",
+        "test": "month eq 9",
+        "def": "days eq 30"
+      },
+      {
+        "index": 6,
+        "kind": "scenario",
+        "test": "month eq 11",
+        "def": "days eq 30"
+      },
+      {
+        "index": 7,
+        "kind": "others",
+        "test": "others",
+        "def": "days eq 31"
+      }
+    ],
+    "ext": [],
+    "sourceBasename": "mbpp-derived",
+    "promptSpec": "Process month_days(month,is_leap) -> (days)\n\nFSF specification:\nif (month eq 2 && is_leap eq 1) => days eq 29\nif (month eq 2) => days eq 28\nif (month eq 4) => days eq 30\nif (month eq 6) => days eq 30\nif (month eq 9) => days eq 30\nif (month eq 11) => days eq 30\nothers => days eq 31\n\nImportant: evaluate conditions in listed order (top-down precedence).",
+    "referenceCode": "def month_days(month: int, is_leap: int) -> dict:\n    \"\"\"Reference implementation auto-generated from FSF.\"\"\"\n    if month == 2  and  is_leap == 1:\n        return {\"days\": 29}\n    elif month == 2:\n        return {\"days\": 28}\n    elif month == 4:\n        return {\"days\": 30}\n    elif month == 6:\n        return {\"days\": 30}\n    elif month == 9:\n        return {\"days\": 30}\n    elif month == 11:\n        return {\"days\": 30}\n    else:\n        return {\"days\": 31}\n",
+    "complexity": {
+      "scenario_count": 6,
+      "guard_complexity": "AND",
+      "overlap_rate": 1.0,
+      "has_external_vars": false,
+      "overlap_density_tier": "high"
+    }
+  },
+  {
+    "taskId": "MBPP.MBPP007.employee_grade",
+    "kind": "process",
+    "sourceFile": "mbpp://MBPP/7",
+    "module": "MBPP",
+    "name": "employee_grade",
+    "signature": {
+      "inputs": [
+        {
+          "name": "years_exp",
+          "type": "nat"
+        },
+        {
+          "name": "perf_score",
+          "type": "nat"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "grade",
+          "type": "nat"
+        }
+      ]
+    },
+    "fsfScenarios": [
+      {
+        "index": 1,
+        "kind": "scenario",
+        "test": "years_exp ge 15 && perf_score ge 80",
+        "def": "grade eq 4"
+      },
+      {
+        "index": 2,
+        "kind": "scenario",
+        "test": "years_exp ge 8 && perf_score ge 70",
+        "def": "grade eq 3"
+      },
+      {
+        "index": 3,
+        "kind": "scenario",
+        "test": "years_exp ge 4 && perf_score ge 60",
+        "def": "grade eq 2"
+      },
+      {
+        "index": 4,
+        "kind": "scenario",
+        "test": "years_exp ge 2",
+        "def": "grade eq 1"
+      },
+      {
+        "index": 5,
+        "kind": "others",
+        "test": "others",
+        "def": "grade eq 0"
+      }
+    ],
+    "ext": [],
+    "sourceBasename": "mbpp-derived",
+    "promptSpec": "Process employee_grade(years_exp,perf_score) -> (grade)\n\nFSF specification:\nif (years_exp ge 15 && perf_score ge 80) => grade eq 4\nif (years_exp ge 8 && perf_score ge 70) => grade eq 3\nif (years_exp ge 4 && perf_score ge 60) => grade eq 2\nif (years_exp ge 2) => grade eq 1\nothers => grade eq 0\n\nImportant: evaluate conditions in listed order (top-down precedence).",
+    "referenceCode": "def employee_grade(years_exp: int, perf_score: int) -> dict:\n    \"\"\"Reference implementation auto-generated from FSF.\"\"\"\n    if years_exp >= 15  and  perf_score >= 80:\n        return {\"grade\": 4}\n    elif years_exp >= 8  and  perf_score >= 70:\n        return {\"grade\": 3}\n    elif years_exp >= 4  and  perf_score >= 60:\n        return {\"grade\": 2}\n    elif years_exp >= 2:\n        return {\"grade\": 1}\n    else:\n        return {\"grade\": 0}\n",
+    "complexity": {
+      "scenario_count": 4,
+      "guard_complexity": "Nested",
+      "overlap_rate": 0.5,
+      "has_external_vars": false,
+      "overlap_density_tier": "medium"
+    }
+  },
+  {
+    "taskId": "MBPP.MBPP043.body_temp_status",
+    "kind": "process",
+    "sourceFile": "mbpp://MBPP/43",
+    "module": "MBPP",
+    "name": "body_temp_status",
+    "signature": {
+      "inputs": [
+        {
+          "name": "temp100",
+          "type": "nat"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "status",
+          "type": "nat"
+        }
+      ]
+    },
+    "fsfScenarios": [
+      {
+        "index": 1,
+        "kind": "scenario",
+        "test": "temp100 ge 4000",
+        "def": "status eq 4"
+      },
+      {
+        "index": 2,
+        "kind": "scenario",
+        "test": "temp100 ge 3751",
+        "def": "status eq 3"
+      },
+      {
+        "index": 3,
+        "kind": "scenario",
+        "test": "temp100 ge 3650",
+        "def": "status eq 2"
+      },
+      {
+        "index": 4,
+        "kind": "scenario",
+        "test": "temp100 ge 3500",
+        "def": "status eq 1"
+      },
+      {
+        "index": 5,
+        "kind": "others",
+        "test": "others",
+        "def": "status eq 0"
+      }
+    ],
+    "ext": [],
+    "sourceBasename": "mbpp-derived",
+    "promptSpec": "Process body_temp_status(temp100) -> (status)\n\nFSF specification:\nif (temp100 ge 4000) => status eq 4\nif (temp100 ge 3751) => status eq 3\nif (temp100 ge 3650) => status eq 2\nif (temp100 ge 3500) => status eq 1\nothers => status eq 0\n\nImportant: evaluate conditions in listed order (top-down precedence).",
+    "referenceCode": "def body_temp_status(temp100: int) -> dict:\n    \"\"\"Reference implementation auto-generated from FSF.\"\"\"\n    if temp100 >= 4000:\n        return {\"status\": 4}\n    elif temp100 >= 3751:\n        return {\"status\": 3}\n    elif temp100 >= 3650:\n        return {\"status\": 2}\n    elif temp100 >= 3500:\n        return {\"status\": 1}\n    else:\n        return {\"status\": 0}\n",
+    "complexity": {
+      "scenario_count": 4,
+      "guard_complexity": "Simple",
+      "overlap_rate": 0.0,
+      "has_external_vars": false,
+      "overlap_density_tier": "low"
+    }
+  },
+  {
+    "taskId": "MBPP.MBPP057.voltage_level",
+    "kind": "process",
+    "sourceFile": "mbpp://MBPP/57",
+    "module": "MBPP",
+    "name": "voltage_level",
+    "signature": {
+      "inputs": [
+        {
+          "name": "voltage",
+          "type": "nat"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "level",
+          "type": "nat"
+        }
+      ]
+    },
+    "fsfScenarios": [
+      {
+        "index": 1,
+        "kind": "scenario",
+        "test": "voltage ge 481",
+        "def": "level eq 4"
+      },
+      {
+        "index": 2,
+        "kind": "scenario",
+        "test": "voltage ge 221",
+        "def": "level eq 3"
+      },
+      {
+        "index": 3,
+        "kind": "scenario",
+        "test": "voltage ge 131",
+        "def": "level eq 2"
+      },
+      {
+        "index": 4,
+        "kind": "scenario",
+        "test": "voltage ge 110",
+        "def": "level eq 1"
+      },
+      {
+        "index": 5,
+        "kind": "others",
+        "test": "others",
+        "def": "level eq 0"
+      }
+    ],
+    "ext": [],
+    "sourceBasename": "mbpp-derived",
+    "promptSpec": "Process voltage_level(voltage) -> (level)\n\nFSF specification:\nif (voltage ge 481) => level eq 4\nif (voltage ge 221) => level eq 3\nif (voltage ge 131) => level eq 2\nif (voltage ge 110) => level eq 1\nothers => level eq 0\n\nImportant: evaluate conditions in listed order (top-down precedence).",
+    "referenceCode": "def voltage_level(voltage: int) -> dict:\n    \"\"\"Reference implementation auto-generated from FSF.\"\"\"\n    if voltage >= 481:\n        return {\"level\": 4}\n    elif voltage >= 221:\n        return {\"level\": 3}\n    elif voltage >= 131:\n        return {\"level\": 2}\n    elif voltage >= 110:\n        return {\"level\": 1}\n    else:\n        return {\"level\": 0}\n",
+    "complexity": {
+      "scenario_count": 4,
+      "guard_complexity": "Simple",
+      "overlap_rate": 0.0,
+      "has_external_vars": false,
+      "overlap_density_tier": "low"
+    }
+  },
+  {
+    "taskId": "MBPP.MBPP062.water_ph_cat",
+    "kind": "process",
+    "sourceFile": "mbpp://MBPP/62",
+    "module": "MBPP",
+    "name": "water_ph_cat",
+    "signature": {
+      "inputs": [
+        {
+          "name": "ph10",
+          "type": "nat"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "category",
+          "type": "nat"
+        }
+      ]
+    },
+    "fsfScenarios": [
+      {
+        "index": 1,
+        "kind": "scenario",
+        "test": "ph10 ge 91",
+        "def": "category eq 4"
+      },
+      {
+        "index": 2,
+        "kind": "scenario",
+        "test": "ph10 ge 81",
+        "def": "category eq 3"
+      },
+      {
+        "index": 3,
+        "kind": "scenario",
+        "test": "ph10 ge 60",
+        "def": "category eq 2"
+      },
+      {
+        "index": 4,
+        "kind": "scenario",
+        "test": "ph10 ge 36",
+        "def": "category eq 1"
+      },
+      {
+        "index": 5,
+        "kind": "others",
+        "test": "others",
+        "def": "category eq 0"
+      }
+    ],
+    "ext": [],
+    "sourceBasename": "mbpp-derived",
+    "promptSpec": "Process water_ph_cat(ph10) -> (category)\n\nFSF specification:\nif (ph10 ge 91) => category eq 4\nif (ph10 ge 81) => category eq 3\nif (ph10 ge 60) => category eq 2\nif (ph10 ge 36) => category eq 1\nothers => category eq 0\n\nImportant: evaluate conditions in listed order (top-down precedence).",
+    "referenceCode": "def water_ph_cat(ph10: int) -> dict:\n    \"\"\"Reference implementation auto-generated from FSF.\"\"\"\n    if ph10 >= 91:\n        return {\"category\": 4}\n    elif ph10 >= 81:\n        return {\"category\": 3}\n    elif ph10 >= 60:\n        return {\"category\": 2}\n    elif ph10 >= 36:\n        return {\"category\": 1}\n    else:\n        return {\"category\": 0}\n",
+    "complexity": {
+      "scenario_count": 4,
+      "guard_complexity": "Simple",
+      "overlap_rate": 0.0,
+      "has_external_vars": false,
+      "overlap_density_tier": "low"
+    }
+  },
+  {
+    "taskId": "MBPP.MBPP099.noise_level",
+    "kind": "process",
+    "sourceFile": "mbpp://MBPP/99",
+    "module": "MBPP",
+    "name": "noise_level",
+    "signature": {
+      "inputs": [
+        {
+          "name": "decibels",
+          "type": "nat"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "noise_cat",
+          "type": "nat"
+        }
+      ]
+    },
+    "fsfScenarios": [
+      {
+        "index": 1,
+        "kind": "scenario",
+        "test": "decibels ge 101",
+        "def": "noise_cat eq 4"
+      },
+      {
+        "index": 2,
+        "kind": "scenario",
+        "test": "decibels ge 86",
+        "def": "noise_cat eq 3"
+      },
+      {
+        "index": 3,
+        "kind": "scenario",
+        "test": "decibels ge 71",
+        "def": "noise_cat eq 2"
+      },
+      {
+        "index": 4,
+        "kind": "scenario",
+        "test": "decibels ge 41",
+        "def": "noise_cat eq 1"
+      },
+      {
+        "index": 5,
+        "kind": "others",
+        "test": "others",
+        "def": "noise_cat eq 0"
+      }
+    ],
+    "ext": [],
+    "sourceBasename": "mbpp-derived",
+    "promptSpec": "Process noise_level(decibels) -> (noise_cat)\n\nFSF specification:\nif (decibels ge 101) => noise_cat eq 4\nif (decibels ge 86) => noise_cat eq 3\nif (decibels ge 71) => noise_cat eq 2\nif (decibels ge 41) => noise_cat eq 1\nothers => noise_cat eq 0\n\nImportant: evaluate conditions in listed order (top-down precedence).",
+    "referenceCode": "def noise_level(decibels: int) -> dict:\n    \"\"\"Reference implementation auto-generated from FSF.\"\"\"\n    if decibels >= 101:\n        return {\"noise_cat\": 4}\n    elif decibels >= 86:\n        return {\"noise_cat\": 3}\n    elif decibels >= 71:\n        return {\"noise_cat\": 2}\n    elif decibels >= 41:\n        return {\"noise_cat\": 1}\n    else:\n        return {\"noise_cat\": 0}\n",
+    "complexity": {
+      "scenario_count": 4,
+      "guard_complexity": "Simple",
+      "overlap_rate": 0.0,
+      "has_external_vars": false,
+      "overlap_density_tier": "low"
+    }
+  },
+  {
+    "taskId": "MBPP.MBPP115.soil_fertility",
+    "kind": "process",
+    "sourceFile": "mbpp://MBPP/115",
+    "module": "MBPP",
+    "name": "soil_fertility",
+    "signature": {
+      "inputs": [
+        {
+          "name": "nitrogen",
+          "type": "nat"
+        },
+        {
+          "name": "phosphorus",
+          "type": "nat"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "fertility",
+          "type": "nat"
+        }
+      ]
+    },
+    "fsfScenarios": [
+      {
+        "index": 1,
+        "kind": "scenario",
+        "test": "nitrogen ge 80 && phosphorus ge 80",
+        "def": "fertility eq 4"
+      },
+      {
+        "index": 2,
+        "kind": "scenario",
+        "test": "nitrogen ge 60 && phosphorus ge 60",
+        "def": "fertility eq 3"
+      },
+      {
+        "index": 3,
+        "kind": "scenario",
+        "test": "nitrogen ge 40 && phosphorus ge 40",
+        "def": "fertility eq 2"
+      },
+      {
+        "index": 4,
+        "kind": "scenario",
+        "test": "nitrogen ge 20 && phosphorus ge 20",
+        "def": "fertility eq 1"
+      },
+      {
+        "index": 5,
+        "kind": "others",
+        "test": "others",
+        "def": "fertility eq 0"
+      }
+    ],
+    "ext": [],
+    "sourceBasename": "mbpp-derived",
+    "promptSpec": "Process soil_fertility(nitrogen,phosphorus) -> (fertility)\n\nFSF specification:\nif (nitrogen ge 80 && phosphorus ge 80) => fertility eq 4\nif (nitrogen ge 60 && phosphorus ge 60) => fertility eq 3\nif (nitrogen ge 40 && phosphorus ge 40) => fertility eq 2\nif (nitrogen ge 20 && phosphorus ge 20) => fertility eq 1\nothers => fertility eq 0\n\nImportant: evaluate conditions in listed order (top-down precedence).",
+    "referenceCode": "def soil_fertility(nitrogen: int, phosphorus: int) -> dict:\n    \"\"\"Reference implementation auto-generated from FSF.\"\"\"\n    if nitrogen >= 80  and  phosphorus >= 80:\n        return {\"fertility\": 4}\n    elif nitrogen >= 60  and  phosphorus >= 60:\n        return {\"fertility\": 3}\n    elif nitrogen >= 40  and  phosphorus >= 40:\n        return {\"fertility\": 2}\n    elif nitrogen >= 20  and  phosphorus >= 20:\n        return {\"fertility\": 1}\n    else:\n        return {\"fertility\": 0}\n",
+    "complexity": {
+      "scenario_count": 4,
+      "guard_complexity": "Nested",
+      "overlap_rate": 0.5,
+      "has_external_vars": false,
+      "overlap_density_tier": "medium"
+    }
+  },
+  {
+    "taskId": "MBPP.MBPP131.heart_rate_zone",
+    "kind": "process",
+    "sourceFile": "mbpp://MBPP/131",
+    "module": "MBPP",
+    "name": "heart_rate_zone",
+    "signature": {
+      "inputs": [
+        {
+          "name": "bpm",
+          "type": "nat"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "zone",
+          "type": "nat"
+        }
+      ]
+    },
+    "fsfScenarios": [
+      {
+        "index": 1,
+        "kind": "scenario",
+        "test": "bpm ge 141",
+        "def": "zone eq 3"
+      },
+      {
+        "index": 2,
+        "kind": "scenario",
+        "test": "bpm ge 101",
+        "def": "zone eq 2"
+      },
+      {
+        "index": 3,
+        "kind": "scenario",
+        "test": "bpm ge 61",
+        "def": "zone eq 1"
+      },
+      {
+        "index": 4,
+        "kind": "others",
+        "test": "others",
+        "def": "zone eq 0"
+      }
+    ],
+    "ext": [],
+    "sourceBasename": "mbpp-derived",
+    "promptSpec": "Process heart_rate_zone(bpm) -> (zone)\n\nFSF specification:\nif (bpm ge 141) => zone eq 3\nif (bpm ge 101) => zone eq 2\nif (bpm ge 61) => zone eq 1\nothers => zone eq 0\n\nImportant: evaluate conditions in listed order (top-down precedence).",
+    "referenceCode": "def heart_rate_zone(bpm: int) -> dict:\n    \"\"\"Reference implementation auto-generated from FSF.\"\"\"\n    if bpm >= 141:\n        return {\"zone\": 3}\n    elif bpm >= 101:\n        return {\"zone\": 2}\n    elif bpm >= 61:\n        return {\"zone\": 1}\n    else:\n        return {\"zone\": 0}\n",
+    "complexity": {
+      "scenario_count": 3,
+      "guard_complexity": "Simple",
+      "overlap_rate": 0.0,
+      "has_external_vars": false,
+      "overlap_density_tier": "low"
+    }
+  },
+  {
+    "taskId": "MBPP.MBPP142.soil_moisture_status",
+    "kind": "process",
+    "sourceFile": "mbpp://MBPP/142",
+    "module": "MBPP",
+    "name": "soil_moisture_status",
+    "signature": {
+      "inputs": [
+        {
+          "name": "moisture_pct",
+          "type": "nat"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "status",
+          "type": "nat"
+        }
+      ]
+    },
+    "fsfScenarios": [
+      {
+        "index": 1,
+        "kind": "scenario",
+        "test": "moisture_pct ge 76",
+        "def": "status eq 3"
+      },
+      {
+        "index": 2,
+        "kind": "scenario",
+        "test": "moisture_pct ge 51",
+        "def": "status eq 2"
+      },
+      {
+        "index": 3,
+        "kind": "scenario",
+        "test": "moisture_pct ge 26",
+        "def": "status eq 1"
+      },
+      {
+        "index": 4,
+        "kind": "others",
+        "test": "others",
+        "def": "status eq 0"
+      }
+    ],
+    "ext": [],
+    "sourceBasename": "mbpp-derived",
+    "promptSpec": "Process soil_moisture_status(moisture_pct) -> (status)\n\nFSF specification:\nif (moisture_pct ge 76) => status eq 3\nif (moisture_pct ge 51) => status eq 2\nif (moisture_pct ge 26) => status eq 1\nothers => status eq 0\n\nImportant: evaluate conditions in listed order (top-down precedence).",
+    "referenceCode": "def soil_moisture_status(moisture_pct: int) -> dict:\n    \"\"\"Reference implementation auto-generated from FSF.\"\"\"\n    if moisture_pct >= 76:\n        return {\"status\": 3}\n    elif moisture_pct >= 51:\n        return {\"status\": 2}\n    elif moisture_pct >= 26:\n        return {\"status\": 1}\n    else:\n        return {\"status\": 0}\n",
+    "complexity": {
+      "scenario_count": 3,
+      "guard_complexity": "Simple",
+      "overlap_rate": 0.0,
+      "has_external_vars": false,
+      "overlap_density_tier": "low"
+    }
+  },
+  {
+    "taskId": "MBPP.MBPP158.calorie_category",
+    "kind": "process",
+    "sourceFile": "mbpp://MBPP/158",
+    "module": "MBPP",
+    "name": "calorie_category",
+    "signature": {
+      "inputs": [
+        {
+          "name": "calories",
+          "type": "nat"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "cat",
+          "type": "nat"
+        }
+      ]
+    },
+    "fsfScenarios": [
+      {
+        "index": 1,
+        "kind": "scenario",
+        "test": "calories ge 2501",
+        "def": "cat eq 4"
+      },
+      {
+        "index": 2,
+        "kind": "scenario",
+        "test": "calories ge 2001",
+        "def": "cat eq 3"
+      },
+      {
+        "index": 3,
+        "kind": "scenario",
+        "test": "calories ge 1500",
+        "def": "cat eq 2"
+      },
+      {
+        "index": 4,
+        "kind": "scenario",
+        "test": "calories ge 1000",
+        "def": "cat eq 1"
+      },
+      {
+        "index": 5,
+        "kind": "others",
+        "test": "others",
+        "def": "cat eq 0"
+      }
+    ],
+    "ext": [],
+    "sourceBasename": "mbpp-derived",
+    "promptSpec": "Process calorie_category(calories) -> (cat)\n\nFSF specification:\nif (calories ge 2501) => cat eq 4\nif (calories ge 2001) => cat eq 3\nif (calories ge 1500) => cat eq 2\nif (calories ge 1000) => cat eq 1\nothers => cat eq 0\n\nImportant: evaluate conditions in listed order (top-down precedence).",
+    "referenceCode": "def calorie_category(calories: int) -> dict:\n    \"\"\"Reference implementation auto-generated from FSF.\"\"\"\n    if calories >= 2501:\n        return {\"cat\": 4}\n    elif calories >= 2001:\n        return {\"cat\": 3}\n    elif calories >= 1500:\n        return {\"cat\": 2}\n    elif calories >= 1000:\n        return {\"cat\": 1}\n    else:\n        return {\"cat\": 0}\n",
+    "complexity": {
+      "scenario_count": 4,
+      "guard_complexity": "AND",
+      "overlap_rate": 0.0,
+      "has_external_vars": false,
+      "overlap_density_tier": "low"
+    }
+  },
+  {
+    "taskId": "MBPP.MBPP172.sleep_quality",
+    "kind": "process",
+    "sourceFile": "mbpp://MBPP/172",
+    "module": "MBPP",
+    "name": "sleep_quality",
+    "signature": {
+      "inputs": [
+        {
+          "name": "hours",
+          "type": "nat"
+        },
+        {
+          "name": "interruptions",
+          "type": "nat"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "quality",
+          "type": "nat"
+        }
+      ]
+    },
+    "fsfScenarios": [
+      {
+        "index": 1,
+        "kind": "scenario",
+        "test": "hours ge 8 && interruptions eq 0",
+        "def": "quality eq 3"
+      },
+      {
+        "index": 2,
+        "kind": "scenario",
+        "test": "hours ge 7 && interruptions le 1",
+        "def": "quality eq 2"
+      },
+      {
+        "index": 3,
+        "kind": "scenario",
+        "test": "hours ge 6 && interruptions le 3",
+        "def": "quality eq 1"
+      },
+      {
+        "index": 4,
+        "kind": "others",
+        "test": "others",
+        "def": "quality eq 0"
+      }
+    ],
+    "ext": [],
+    "sourceBasename": "mbpp-derived",
+    "promptSpec": "Process sleep_quality(hours,interruptions) -> (quality)\n\nFSF specification:\nif (hours ge 8 && interruptions eq 0) => quality eq 3\nif (hours ge 7 && interruptions le 1) => quality eq 2\nif (hours ge 6 && interruptions le 3) => quality eq 1\nothers => quality eq 0\n\nImportant: evaluate conditions in listed order (top-down precedence).",
+    "referenceCode": "def sleep_quality(hours: int, interruptions: int) -> dict:\n    \"\"\"Reference implementation auto-generated from FSF.\"\"\"\n    if hours >= 8  and  interruptions == 0:\n        return {\"quality\": 3}\n    elif hours >= 7  and  interruptions <= 1:\n        return {\"quality\": 2}\n    elif hours >= 6  and  interruptions <= 3:\n        return {\"quality\": 1}\n    else:\n        return {\"quality\": 0}\n",
+    "complexity": {
+      "scenario_count": 3,
+      "guard_complexity": "AND",
+      "overlap_rate": 1.5,
+      "has_external_vars": false,
+      "overlap_density_tier": "high"
+    }
+  },
+  {
+    "taskId": "MBPP.MBPP191.vehicle_category",
+    "kind": "process",
+    "sourceFile": "mbpp://MBPP/191",
+    "module": "MBPP",
+    "name": "vehicle_category",
+    "signature": {
+      "inputs": [
+        {
+          "name": "engine_cc",
+          "type": "nat"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "cat",
+          "type": "nat"
+        }
+      ]
+    },
+    "fsfScenarios": [
+      {
+        "index": 1,
+        "kind": "scenario",
+        "test": "engine_cc ge 3001",
+        "def": "cat eq 4"
+      },
+      {
+        "index": 2,
+        "kind": "scenario",
+        "test": "engine_cc ge 1801",
+        "def": "cat eq 3"
+      },
+      {
+        "index": 3,
+        "kind": "scenario",
+        "test": "engine_cc ge 1201",
+        "def": "cat eq 2"
+      },
+      {
+        "index": 4,
+        "kind": "scenario",
+        "test": "engine_cc ge 661",
+        "def": "cat eq 1"
+      },
+      {
+        "index": 5,
+        "kind": "others",
+        "test": "others",
+        "def": "cat eq 0"
+      }
+    ],
+    "ext": [],
+    "sourceBasename": "mbpp-derived",
+    "promptSpec": "Process vehicle_category(engine_cc) -> (cat)\n\nFSF specification:\nif (engine_cc ge 3001) => cat eq 4\nif (engine_cc ge 1801) => cat eq 3\nif (engine_cc ge 1201) => cat eq 2\nif (engine_cc ge 661) => cat eq 1\nothers => cat eq 0\n\nImportant: evaluate conditions in listed order (top-down precedence).",
+    "referenceCode": "def vehicle_category(engine_cc: int) -> dict:\n    \"\"\"Reference implementation auto-generated from FSF.\"\"\"\n    if engine_cc >= 3001:\n        return {\"cat\": 4}\n    elif engine_cc >= 1801:\n        return {\"cat\": 3}\n    elif engine_cc >= 1201:\n        return {\"cat\": 2}\n    elif engine_cc >= 661:\n        return {\"cat\": 1}\n    else:\n        return {\"cat\": 0}\n",
+    "complexity": {
+      "scenario_count": 4,
+      "guard_complexity": "Simple",
+      "overlap_rate": 0.0,
+      "has_external_vars": false,
+      "overlap_density_tier": "low"
+    }
+  },
+  {
+    "taskId": "MBPP.MBPP200.shipping_tier",
+    "kind": "process",
+    "sourceFile": "mbpp://MBPP/200",
+    "module": "MBPP",
+    "name": "shipping_tier",
+    "signature": {
+      "inputs": [
+        {
+          "name": "weight_g",
+          "type": "nat"
+        },
+        {
+          "name": "distance_km",
+          "type": "nat"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "tier",
+          "type": "nat"
+        }
+      ]
+    },
+    "fsfScenarios": [
+      {
+        "index": 1,
+        "kind": "scenario",
+        "test": "weight_g le 500 && distance_km le 100",
+        "def": "tier eq 0"
+      },
+      {
+        "index": 2,
+        "kind": "scenario",
+        "test": "weight_g le 2000 && distance_km le 500",
+        "def": "tier eq 1"
+      },
+      {
+        "index": 3,
+        "kind": "scenario",
+        "test": "weight_g le 10000 && distance_km le 2000",
+        "def": "tier eq 2"
+      },
+      {
+        "index": 4,
+        "kind": "others",
+        "test": "others",
+        "def": "tier eq 3"
+      }
+    ],
+    "ext": [],
+    "sourceBasename": "mbpp-derived",
+    "promptSpec": "Process shipping_tier(weight_g,distance_km) -> (tier)\n\nFSF specification:\nif (weight_g le 500 && distance_km le 100) => tier eq 0\nif (weight_g le 2000 && distance_km le 500) => tier eq 1\nif (weight_g le 10000 && distance_km le 2000) => tier eq 2\nothers => tier eq 3\n\nImportant: evaluate conditions in listed order (top-down precedence).",
+    "referenceCode": "def shipping_tier(weight_g: int, distance_km: int) -> dict:\n    \"\"\"Reference implementation auto-generated from FSF.\"\"\"\n    if weight_g <= 500  and  distance_km <= 100:\n        return {\"tier\": 0}\n    elif weight_g <= 2000  and  distance_km <= 500:\n        return {\"tier\": 1}\n    elif weight_g <= 10000  and  distance_km <= 2000:\n        return {\"tier\": 2}\n    else:\n        return {\"tier\": 3}\n",
+    "complexity": {
+      "scenario_count": 3,
+      "guard_complexity": "AND",
+      "overlap_rate": 3.0,
+      "has_external_vars": false,
+      "overlap_density_tier": "high"
+    }
+  },
+  {
+    "taskId": "MBPP.MBPP215.server_load_level",
+    "kind": "process",
+    "sourceFile": "mbpp://MBPP/215",
+    "module": "MBPP",
+    "name": "server_load_level",
+    "signature": {
+      "inputs": [
+        {
+          "name": "cpu_pct",
+          "type": "nat"
+        },
+        {
+          "name": "mem_pct",
+          "type": "nat"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "load_level",
+          "type": "nat"
+        }
+      ]
+    },
+    "fsfScenarios": [
+      {
+        "index": 1,
+        "kind": "scenario",
+        "test": "cpu_pct ge 90",
+        "def": "load_level eq 3"
+      },
+      {
+        "index": 2,
+        "kind": "scenario",
+        "test": "mem_pct ge 90",
+        "def": "load_level eq 3"
+      },
+      {
+        "index": 3,
+        "kind": "scenario",
+        "test": "cpu_pct ge 70 && mem_pct ge 70",
+        "def": "load_level eq 2"
+      },
+      {
+        "index": 4,
+        "kind": "scenario",
+        "test": "cpu_pct ge 30 && mem_pct ge 30",
+        "def": "load_level eq 1"
+      },
+      {
+        "index": 5,
+        "kind": "others",
+        "test": "others",
+        "def": "load_level eq 0"
+      }
+    ],
+    "ext": [],
+    "sourceBasename": "mbpp-derived",
+    "promptSpec": "Process server_load_level(cpu_pct,mem_pct) -> (load_level)\n\nFSF specification:\nif (cpu_pct ge 90) => load_level eq 3\nif (mem_pct ge 90) => load_level eq 3\nif (cpu_pct ge 70 && mem_pct ge 70) => load_level eq 2\nif (cpu_pct ge 30 && mem_pct ge 30) => load_level eq 1\nothers => load_level eq 0\n\nImportant: evaluate conditions in listed order (top-down precedence).",
+    "referenceCode": "def server_load_level(cpu_pct: int, mem_pct: int) -> dict:\n    \"\"\"Reference implementation auto-generated from FSF.\"\"\"\n    if cpu_pct >= 90:\n        return {\"load_level\": 3}\n    elif mem_pct >= 90:\n        return {\"load_level\": 3}\n    elif cpu_pct >= 70  and  mem_pct >= 70:\n        return {\"load_level\": 2}\n    elif cpu_pct >= 30  and  mem_pct >= 30:\n        return {\"load_level\": 1}\n    else:\n        return {\"load_level\": 0}\n",
+    "complexity": {
+      "scenario_count": 4,
+      "guard_complexity": "AND",
+      "overlap_rate": 0.0,
+      "has_external_vars": false,
+      "overlap_density_tier": "low"
+    }
+  },
+  {
+    "taskId": "MBPP.MBPP228.loan_risk",
+    "kind": "process",
+    "sourceFile": "mbpp://MBPP/228",
+    "module": "MBPP",
+    "name": "loan_risk",
+    "signature": {
+      "inputs": [
+        {
+          "name": "credit_score",
+          "type": "nat"
+        },
+        {
+          "name": "debt_ratio_pct",
+          "type": "nat"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "risk",
+          "type": "nat"
+        }
+      ]
+    },
+    "fsfScenarios": [
+      {
+        "index": 1,
+        "kind": "scenario",
+        "test": "credit_score lt 580 && debt_ratio_pct ge 50",
+        "def": "risk eq 3"
+      },
+      {
+        "index": 2,
+        "kind": "scenario",
+        "test": "credit_score lt 670 && debt_ratio_pct ge 43",
+        "def": "risk eq 2"
+      },
+      {
+        "index": 3,
+        "kind": "scenario",
+        "test": "credit_score lt 740",
+        "def": "risk eq 1"
+      },
+      {
+        "index": 4,
+        "kind": "others",
+        "test": "others",
+        "def": "risk eq 0"
+      }
+    ],
+    "ext": [],
+    "sourceBasename": "mbpp-derived",
+    "promptSpec": "Process loan_risk(credit_score,debt_ratio_pct) -> (risk)\n\nFSF specification:\nif (credit_score lt 580 && debt_ratio_pct ge 50) => risk eq 3\nif (credit_score lt 670 && debt_ratio_pct ge 43) => risk eq 2\nif (credit_score lt 740) => risk eq 1\nothers => risk eq 0\n\nImportant: evaluate conditions in listed order (top-down precedence).",
+    "referenceCode": "def loan_risk(credit_score: int, debt_ratio_pct: int) -> dict:\n    \"\"\"Reference implementation auto-generated from FSF.\"\"\"\n    if credit_score < 580  and  debt_ratio_pct >= 50:\n        return {\"risk\": 3}\n    elif credit_score < 670  and  debt_ratio_pct >= 43:\n        return {\"risk\": 2}\n    elif credit_score < 740:\n        return {\"risk\": 1}\n    else:\n        return {\"risk\": 0}\n",
+    "complexity": {
+      "scenario_count": 3,
+      "guard_complexity": "Nested",
+      "overlap_rate": 1.0,
+      "has_external_vars": false,
+      "overlap_density_tier": "high"
+    }
+  },
+  {
+    "taskId": "MBPP.MBPP244.light_level_cat",
+    "kind": "process",
+    "sourceFile": "mbpp://MBPP/244",
+    "module": "MBPP",
+    "name": "light_level_cat",
+    "signature": {
+      "inputs": [
+        {
+          "name": "lux",
+          "type": "nat"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "cat",
+          "type": "nat"
+        }
+      ]
+    },
+    "fsfScenarios": [
+      {
+        "index": 1,
+        "kind": "scenario",
+        "test": "lux ge 2001",
+        "def": "cat eq 4"
+      },
+      {
+        "index": 2,
+        "kind": "scenario",
+        "test": "lux ge 501",
+        "def": "cat eq 3"
+      },
+      {
+        "index": 3,
+        "kind": "scenario",
+        "test": "lux ge 101",
+        "def": "cat eq 2"
+      },
+      {
+        "index": 4,
+        "kind": "scenario",
+        "test": "lux ge 11",
+        "def": "cat eq 1"
+      },
+      {
+        "index": 5,
+        "kind": "others",
+        "test": "others",
+        "def": "cat eq 0"
+      }
+    ],
+    "ext": [],
+    "sourceBasename": "mbpp-derived",
+    "promptSpec": "Process light_level_cat(lux) -> (cat)\n\nFSF specification:\nif (lux ge 2001) => cat eq 4\nif (lux ge 501) => cat eq 3\nif (lux ge 101) => cat eq 2\nif (lux ge 11) => cat eq 1\nothers => cat eq 0\n\nImportant: evaluate conditions in listed order (top-down precedence).",
+    "referenceCode": "def light_level_cat(lux: int) -> dict:\n    \"\"\"Reference implementation auto-generated from FSF.\"\"\"\n    if lux >= 2001:\n        return {\"cat\": 4}\n    elif lux >= 501:\n        return {\"cat\": 3}\n    elif lux >= 101:\n        return {\"cat\": 2}\n    elif lux >= 11:\n        return {\"cat\": 1}\n    else:\n        return {\"cat\": 0}\n",
+    "complexity": {
+      "scenario_count": 4,
+      "guard_complexity": "Simple",
+      "overlap_rate": 0.5,
+      "has_external_vars": false,
+      "overlap_density_tier": "medium"
+    }
+  }
+]

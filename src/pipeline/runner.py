@@ -106,6 +106,15 @@ def config_for_mode(mode: str) -> PipelineConfig:
         cfg.feedback_variant = "test_only"
         cfg.max_attempts = 3
         cfg.formal_max_cases = 8
+    elif mode == "B5":
+        # Reflexion-lite (Shinn et al. 2023): verbal RL via accumulated reflection memory
+        # Key difference from B3 (Self-Refine): maintains a rolling reflection log across
+        # iterations so each repair prompt includes ALL prior reflections, not just the last.
+        cfg.enable_formal = False
+        cfg.enable_patterns = False
+        cfg.enable_repair = True
+        cfg.feedback_variant = "reflexion_lite"
+        cfg.max_attempts = 3
     elif mode == "A1":
         cfg.enable_formal = False
         cfg.enable_patterns = True
@@ -161,6 +170,7 @@ def _build_repair_feedback(
     variant: str,
     task: dict[str, Any],
     attempt: int,
+    reflection_memory: list[str] | None = None,
 ) -> str:
     """Build repair feedback string according to the requested feedback variant.
 
@@ -169,6 +179,7 @@ def _build_repair_feedback(
       test_expected  — counterexample inputs + observed + expected (B2-style)
       semantic_ir    — full Semantic Feedback IR with scenario context (M-style)
       self_refine    — ask LLM to critique its own output (B3-style)
+      reflexion_lite — verbal reflection accumulated across attempts (B5-style)
     """
     if variant == "self_refine":
         return (
@@ -176,6 +187,20 @@ def _build_repair_feedback(
             "Review the FSF specification carefully. Identify any logical errors, "
             "especially around scenario ordering and guard conditions, then produce a corrected implementation."
         )
+
+    if variant == "reflexion_lite":
+        reflection = (
+            f"Reflect on attempt {attempt}: review the FSF specification carefully. "
+            "Identify exactly what logical error caused the failure — focus on scenario "
+            "guard ordering, boundary conditions, and 'others' case coverage."
+        )
+        parts: list[str] = []
+        if reflection_memory:
+            mem_lines = "\n".join(f"  [{i+1}] {r}" for i, r in enumerate(reflection_memory))
+            parts.append(f"Previous reflections:\n{mem_lines}")
+        parts.append(reflection)
+        parts.append("Using the above reflections as memory, produce a corrected implementation.")
+        return "\n\n".join(parts)
 
     cxs = test_result.counterexamples if test_result else []
     parts: list[str] = []
@@ -250,6 +275,8 @@ class ErrorPreventionPipeline:
         last_formal = None
         last_patterns: list = []
         attempt_history: list[dict[str, Any]] = []
+        # B5 Reflexion-lite: rolling verbal memory (last 3 reflections max)
+        reflection_memory: list[str] = []
 
         for attempt in range(1, cfg.max_attempts + 1):
             # Use gen_temperature on first attempt, repair_temperature on subsequent
@@ -295,14 +322,25 @@ class ErrorPreventionPipeline:
             if formal_ok and pattern_ok:
                 break
 
-            if not cfg.enable_repair and cfg.mode not in ("B2", "B3", "B4"):
+            if not cfg.enable_repair and cfg.mode not in ("B2", "B3", "B4", "B5"):
                 break
-            if cfg.mode in ("B2", "B3", "B4") and attempt >= cfg.max_attempts:
+            if cfg.mode in ("B2", "B3", "B4", "B5") and attempt >= cfg.max_attempts:
                 break
 
             feedback = _build_repair_feedback(
-                test_result, last_patterns, cfg.feedback_variant, task, attempt
+                test_result, last_patterns, cfg.feedback_variant, task, attempt,
+                reflection_memory=reflection_memory if cfg.feedback_variant == "reflexion_lite" else None,
             )
+            # B5 Reflexion-lite: accumulate this reflection into rolling memory (cap at 3)
+            if cfg.feedback_variant == "reflexion_lite":
+                new_reflection = (
+                    f"Attempt {attempt} failed "
+                    f"(conformance={test_result.conformance_rate:.2f}, "
+                    f"failures={len(test_result.counterexamples)}). "
+                    "Review scenario guards and boundary conditions."
+                )
+                reflection_memory.append(new_reflection)
+                reflection_memory = reflection_memory[-3:]
 
         formal_result = last_formal or run_formal_check(code, task, max_cases=cfg.formal_max_cases)
         if cfg.mode in ("B2", "B4"):

@@ -266,11 +266,120 @@ CASE velocity gt 10                              => block eq 0 && review eq 1 &&
 CASE amount gt 200                               => block eq 0 && review eq 1 && score eq 40
 DEFAULT block eq 0 && review eq 0 && score eq 0
 """,
+    # MZ011: file access control (user role × file type → permission level)
+    """\
+SCHEMA FileAccess
+INPUTS: role: int, file_type: int, classification: int
+OUTPUTS: permission: int, audit: int, allowed: int
+
+CASE classification ge 3 && role lt 3           => permission eq 0 && audit eq 1 && allowed eq 0
+CASE role ge 5 && classification ge 2            => permission eq 3 && audit eq 1 && allowed eq 1
+CASE role ge 3 && file_type le 2                 => permission eq 2 && audit eq 1 && allowed eq 1
+CASE role ge 3 && file_type gt 2                 => permission eq 1 && audit eq 0 && allowed eq 1
+CASE role ge 2 && file_type le 1                 => permission eq 1 && audit eq 0 && allowed eq 1
+DEFAULT permission eq 0 && audit eq 0 && allowed eq 0
+""",
+    # MZ012: network packet routing (protocol × port × priority → route/action)
+    """\
+SCHEMA PacketRoute
+INPUTS: protocol: int, port: int, priority: int
+OUTPUTS: route: int, action: int, queue: int
+
+CASE protocol eq 0                               => route eq 0 && action eq 3 && queue eq 0
+CASE priority ge 8 && protocol eq 1              => route eq 1 && action eq 2 && queue eq 0
+CASE protocol eq 1 && port le 1024               => route eq 2 && action eq 1 && queue eq 1
+CASE protocol eq 2 && priority ge 5              => route eq 3 && action eq 1 && queue eq 1
+CASE port gt 1024 && priority lt 3               => route eq 4 && action eq 0 && queue eq 2
+DEFAULT route eq 2 && action eq 0 && queue eq 1
+""",
+    # MZ013: insurance premium calculation (age × risk_factor → rate)
+    """\
+SCHEMA InsureRate
+INPUTS: age: int, risk_factor: int, claims: int
+OUTPUTS: rate: int, surcharge: int, tier: int
+
+CASE claims ge 5                                 => rate eq 0 && surcharge eq 0 && tier eq 0
+CASE age lt 25 && risk_factor ge 4               => rate eq 90 && surcharge eq 30 && tier eq 4
+CASE age lt 25 && risk_factor ge 2               => rate eq 70 && surcharge eq 15 && tier eq 3
+CASE age ge 70 && risk_factor ge 3               => rate eq 75 && surcharge eq 20 && tier eq 3
+CASE age ge 70                                   => rate eq 55 && surcharge eq 10 && tier eq 2
+CASE risk_factor ge 4                            => rate eq 60 && surcharge eq 15 && tier eq 3
+CASE risk_factor ge 2                            => rate eq 40 && surcharge eq 5  && tier eq 2
+DEFAULT rate eq 25 && surcharge eq 0 && tier eq 1
+""",
+    # MZ014: library book loan rules (membership × book_type → loan_days)
+    """\
+SCHEMA LibraryLoan
+INPUTS: membership: int, book_type: int, overdue: int
+OUTPUTS: loan_days: int, renewable: int, fee: int
+
+CASE overdue ge 3                                => loan_days eq 0 && renewable eq 0 && fee eq 10
+CASE membership ge 3 && book_type le 1           => loan_days eq 28 && renewable eq 1 && fee eq 0
+CASE membership ge 3 && book_type eq 2           => loan_days eq 14 && renewable eq 1 && fee eq 0
+CASE membership ge 2 && book_type le 1           => loan_days eq 21 && renewable eq 1 && fee eq 0
+CASE membership ge 2                             => loan_days eq 14 && renewable eq 0 && fee eq 0
+CASE book_type ge 3                              => loan_days eq 7  && renewable eq 0 && fee eq 2
+DEFAULT loan_days eq 14 && renewable eq 0 && fee eq 0
+""",
+    # MZ015: inventory reorder logic (stock_level × demand_forecast → order_qty)
+    """\
+SCHEMA InvReorder
+INPUTS: stock: int, demand: int, lead_time: int
+OUTPUTS: order_qty: int, urgent: int, status: int
+
+CASE stock le 0 && demand gt 0                   => order_qty eq 100 && urgent eq 1 && status eq 3
+CASE stock le 10 && demand ge 50                 => order_qty eq 80  && urgent eq 1 && status eq 2
+CASE stock le 10 && lead_time le 2               => order_qty eq 60  && urgent eq 1 && status eq 2
+CASE stock le 30 && demand ge 30                 => order_qty eq 40  && urgent eq 0 && status eq 1
+CASE stock le 50 && demand ge 20                 => order_qty eq 20  && urgent eq 0 && status eq 1
+DEFAULT order_qty eq 0 && urgent eq 0 && status eq 0
+""",
+    # MZ016: event ticket pricing (event_type × seat_zone × early_bird → price_tier)
+    """\
+SCHEMA TicketPrice
+INPUTS: event_type: int, seat_zone: int, early_bird: int
+OUTPUTS: price_tier: int, discount: int, vip: int
+
+CASE event_type ge 3 && seat_zone ge 3 && early_bird eq 1 => price_tier eq 5 && discount eq 20 && vip eq 1
+CASE event_type ge 3 && seat_zone ge 3           => price_tier eq 5 && discount eq 0 && vip eq 1
+CASE event_type ge 3 && early_bird eq 1          => price_tier eq 4 && discount eq 15 && vip eq 0
+CASE event_type ge 2 && seat_zone ge 3           => price_tier eq 3 && discount eq 10 && vip eq 0
+CASE event_type ge 2 && early_bird eq 1          => price_tier eq 2 && discount eq 10 && vip eq 0
+CASE seat_zone ge 2                              => price_tier eq 2 && discount eq 0 && vip eq 0
+DEFAULT price_tier eq 1 && discount eq 0 && vip eq 0
+""",
+    # MZ017: student enrollment eligibility (credits × gpa × status → eligibility)
+    """\
+SCHEMA EnrollEligible
+INPUTS: credits: int, gpa: int, status: int
+OUTPUTS: eligibility: int, units: int, flag: int
+
+CASE status eq 0                                 => eligibility eq 0 && units eq 0 && flag eq 2
+CASE credits ge 90 && gpa ge 35                  => eligibility eq 3 && units eq 18 && flag eq 0
+CASE credits ge 60 && gpa ge 30                  => eligibility eq 2 && units eq 15 && flag eq 0
+CASE credits ge 30 && gpa ge 25                  => eligibility eq 1 && units eq 12 && flag eq 0
+CASE gpa lt 20                                   => eligibility eq 0 && units eq 0 && flag eq 1
+DEFAULT eligibility eq 1 && units eq 9 && flag eq 0
+""",
+    # MZ018: medication dosage (weight × age × condition → dose_level)
+    """\
+SCHEMA MedDosage
+INPUTS: weight: int, age: int, condition: int
+OUTPUTS: dose_level: int, frequency: int, warning: int
+
+CASE condition ge 3 && age lt 12                 => dose_level eq 0 && frequency eq 0 && warning eq 2
+CASE age lt 12 && weight lt 20                   => dose_level eq 1 && frequency eq 2 && warning eq 1
+CASE age lt 12                                   => dose_level eq 2 && frequency eq 3 && warning eq 1
+CASE age ge 75 && condition ge 2                 => dose_level eq 2 && frequency eq 2 && warning eq 1
+CASE weight ge 100 && condition ge 2             => dose_level eq 4 && frequency eq 3 && warning eq 0
+CASE weight ge 70                                => dose_level eq 3 && frequency eq 3 && warning eq 0
+DEFAULT dose_level eq 2 && frequency eq 2 && warning eq 0
+""",
 ]
 
 
 def load_builtin_miniz_tasks() -> list[dict[str, Any]]:
-    """Return the 10 built-in Mini-Z tasks as TaskSpec dicts."""
+    """Return the 18 built-in Mini-Z tasks as TaskSpec dicts."""
     adapter = MiniZAdapter()
     tasks = []
     for i, spec_text in enumerate(BUILTIN_MINIZ_TASKS_SPEC, start=1):

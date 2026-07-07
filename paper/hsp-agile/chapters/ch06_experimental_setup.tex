@@ -187,9 +187,19 @@ satisfiability filter, leaving the final benchmark of 120 hard synthetic tasks.
 
 \subsection{Generalisation Subset (E8)}
 
-An additional 20--30 tasks derived from HumanEval and MBPP problems with multi-case
-conditional logic are converted to FSF-style ordered scenarios following a documented
-selection and conversion protocol; these are used in the generalisation study (E8).
+\paragraph{Real-derived benchmark subset.}
+To validate external validity, we additionally evaluate on 40 tasks derived from
+publicly available coding benchmarks: 20 from HumanEval~\citep{chen2021codex}
+and 20 from MBPP~\citep{austin2021mbpp}.
+Problems were selected using the following protocol: (i)~the reference solution
+contains 3--6 ordered conditional branches; (ii)~each branch maps naturally to an
+FSF scenario with a guard predicate involving linear inequalities or equalities;
+(iii)~no external library imports or recursive depth~$>2$.
+Reference implementations were manually converted to FSF format and cross-checked
+against the original test suites.
+The conversion script (\texttt{scripts/convert\_humaneval\_mbpp.py}) and
+the selection protocol (\texttt{artifacts/BENCHMARK\_SELECTION\_PROTOCOL.md})
+are released with the artifact package.
 
 \subsection{Illustrative Task Example}
 

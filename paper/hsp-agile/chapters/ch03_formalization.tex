@@ -253,10 +253,9 @@ Each pattern checker $p : (c, t) \mapsto \{0, 1\}$ returns $1$ when the
 pattern is detected.
 \end{definition}
 
-The fault pattern set $\mathcal{P}^H$ contains 14 patterns derived from the
-Agile-SOFL fault taxonomy \citep{li2023iet, hovemeyer2004findbugs}, including guard-order
-inversion, missing scenario guard, contradictory output bindings, and
-uncovered ``others'' case.
+$\mathcal{P}^H$ contains the \textbf{nine} high-severity patterns (severity = high or
+critical in Table~\ref{tab:patterns}); the remaining five patterns carry medium or low
+severity and inform repair feedback without blocking acceptance.
 Each pattern is encoded as a static analysis rule applied to the candidate source.
 
 \begin{definition}[Hybrid Acceptance Predicate]

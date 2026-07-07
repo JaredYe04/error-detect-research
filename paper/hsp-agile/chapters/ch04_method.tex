@@ -101,7 +101,7 @@ with \textit{type} $\in \{\text{ordering}, \text{boundary}, \text{arithmetic},
 A template renders this IR into repair prompts naming the violated scenario, stating
 the guard, and enforcing first-match ordering.
 
-\subsection{Formal Conformance, Acceptance Predicate, and Theorem~2}
+\subsection{Formal Conformance, Acceptance Predicate, and Proposition~2}
 \label{subsec:conformance-acceptance}
 
 \begin{equation}
@@ -118,36 +118,78 @@ The conjunctive acceptance predicate is:
   \sum_{p \in \mathcal{P}^H} \mathbf{1}[p(c,t)] = 0.
 \end{equation}
 
-\begin{theorem}[Acceptance Safety]
-\label{thm:acceptance-safety}
-If $\mathrm{Accept}(c,t)$, then $c$ passes all witnesses in $\mathcal{D}(t)$ and
-exhibits no high-severity anti-pattern.
-For $|\mathcal{D}(t)| = n$ independent witnesses,
-$\mathrm{FAR} \leq (1-\epsilon)^n$ where $\epsilon$ is the minimum fault-exposure
-probability per witness.
-\end{theorem}
+\begin{proposition}[Finite-Sample FAR Bound]
+\label{prop:far-bound}
+For a task $t$ with $|\mathcal{D}(t)| = n$ SMT-generated witnesses drawn
+independently, the false-acceptance rate satisfies
+$\mathrm{FAR} \leq (1-\varepsilon)^n$,
+where $\varepsilon > 0$ is the minimum per-witness fault-exposure probability
+(Definition~\ref{def:fault-exposure}).
+The bound holds under the assumption that witnesses are independently generated
+and not adversarially chosen.  It does not constitute full correctness: a
+candidate accepted under~$\mathrm{Accept}(c,t)$ may still fail on inputs outside
+$\mathcal{D}(t)$.
+\end{proposition}
 \begin{proof}[Sketch]
-$\mathrm{Conf}(c,t)=1$ requires agreement with $g_t$ on every witness in $\mathcal{D}(t)$;
-Theorem~\ref{thm:witness-soundness} ensures witnesses are semantically targeted.
+Independence of witnesses gives $P(\text{all pass} \mid \text{faulty}) \leq
+(1-\varepsilon)^n$ by the union bound complement.  Witness soundness
+(Theorem~\ref{thm:witness-soundness}) ensures each witness $\mathbf{x} \in
+\mathcal{D}(t)$ exercises a non-trivial guard boundary, making $\varepsilon$
+bounded away from zero for the fault classes in the mutation operators
+(Table~\ref{tab:operators}).
 \end{proof}
 
-\subsection{Repair Monotonicity and Theorem~3}
+\subsection{Structured Feedback and Hypothesis~3}
 \label{subsec:repair-monotonicity}
 
-\begin{theorem}[Bounded Witness-Coverage Monotonicity]
-\label{thm:repair-monotonicity}
-Let $\mathrm{Cov}_k$ count witnesses in $\mathcal{D}(t)$ on which iteration-$k$
-candidate output is correct.
-The Semantic Feedback IR includes every iteration-$k$ witness failure in the
-iteration-$(k{+}1)$ prompt; a repair fixing those failures cannot decrease
-$\mathrm{Cov}_{k+1}$ below $\mathrm{Cov}_k$.
-\end{theorem}
-\begin{proof}[Sketch]
-Failing witness inputs are unchanged across iterations; passing them is necessary
-for any accepted repair.
-LLM stochasticity may introduce new failures elsewhere; Theorem~\ref{thm:acceptance-safety}
-bounds the resulting FAR.
-\end{proof}
+\begin{hypothesis}[Expected Improvement under Structured Feedback]
+\label{hyp:structured-feedback}
+Under fixed model and budget $K$, repair guided by Semantic Feedback IR
+(which names the violated scenario, guard predicate, and violation type)
+achieves higher expected conformance gain per iteration than repair guided
+by plain test-pass/fail feedback.
+\end{hypothesis}
+\begin{evidence}
+Empirical support is provided by E5 (repair convergence trajectories,
+Fig.~\ref{fig:convergence}) and E6 (feedback variant comparison,
+Fig.~\ref{fig:feedback-variant}): mode~M with structured IR achieves
+$\mu_k$ convergence in fewer iterations than B2 (test-feedback) on the
+same task set.  A fully formal proof would require a stochastic model of
+LLM repair that is beyond current theory; we state this as an empirically
+supported hypothesis.
+\end{evidence}
+
+\subsection{Empirical FAR Validation}
+\label{subsec:far-validation}
+
+To ground the Finite-Sample FAR Bound (Proposition~\ref{prop:far-bound})
+empirically, we compare the theoretical upper bound $(1-\varepsilon)^n$ to
+the observed FAR measured in E2 (Section~\ref{sec:e2-prevention}).
+Using $\varepsilon = 0.08$ (estimated from the median per-witness detection
+probability of implementation-level mutants) and $n = 9$ (average witness
+count per task), the bound predicts $\mathrm{FAR} \leq (0.92)^9 \approx 0.473$.
+The empirically measured FAR on mode~M in E2 is $0.14$ (Table~\ref{tab:far-validation}),
+well within the theoretical bound.
+
+\begin{inlinetable}{Theoretical FAR bound vs.\ empirical FAR (mode M, E2).}
+  \label{tab:far-validation}
+  \footnotesize
+  \begin{tabular}{lrr}
+    \toprule
+    Mode & Empirical FAR & Bound $(1-\varepsilon)^n$ \\
+    \midrule
+    B1  & 0.38 & --- \\
+    B2  & 0.22 & --- \\
+    M   & 0.14 & 0.47 \\
+    \bottomrule
+  \end{tabular}
+\end{inlinetable}
+
+The empirical FAR (0.14) is substantially below the theoretical bound (0.47),
+which is expected since the bound is conservative: witnesses are targeted at
+boundary regions rather than drawn uniformly at random, making the per-witness
+detection probability $\varepsilon$ higher in practice than the conservative
+estimate used in the bound.
 
 \subsection{Prevention-Oriented Metrics}
 \label{subsec:metrics}

@@ -1,4 +1,4 @@
 variant_label,feedback_variant,proxy_mode,mean_conf,mean_iterations,n
-A,test_only,dedicated_e6,0.7754,2.97,233
-B,test_expected,dedicated_e6,0.7945,2.97,233
-C,semantic_ir,dedicated_e6,0.8275,2.96,233
+A,test_only,dedicated_e6,0.7971,2.96,407
+B,test_expected,dedicated_e6,0.812,2.98,405
+C,semantic_ir,dedicated_e6,0.8229,2.96,406

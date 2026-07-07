@@ -53,36 +53,115 @@ random sampling fails, and the Semantic Feedback IR accelerates repair convergen
 \label{sec:disc:failure-analysis}
 %=============================================================================
 
-Despite M's strong aggregate conformance, 30 tasks (25.0\% strict success rate)
-remain below the conjunctive acceptance threshold after repair budget $K=3$.
-Experiment E9 classifies these residual failures into seven categories derived
-from counterexample signals, pattern guard matches, and operator-level mutation
-labels.
-Figure~\ref{fig:failure-taxonomy} visualises the proportional breakdown.
+Despite M's strong aggregate conformance, \textbf{90 tasks (75.0\%)} do not
+reach the conjunctive acceptance threshold after repair budget $K=3$---that is,
+only 30 tasks (25.0\% strict success rate) are fully accepted.
+Experiment E9 classifies these 90 residual failures into \textbf{nine categories}
+derived from counterexample signals, pattern guard matches, and operator-level
+mutation labels.
+Figures~\ref{fig:failure-taxonomy} and~\ref{fig:residual-error-dist} visualise
+the proportional breakdown.
 
 \begin{figure}[t]
   \centering
   \thesisfig[max width=0.72\linewidth]{figures/failure_taxonomy_pie.pdf}
   \caption{Failure taxonomy for M mode: proportion of remaining failures by
     category after budget $K=3$ ($n=90$ failed tasks).
-    \emph{Other} (73.3\%) aggregates residual conformance failures not matching
-    a named pattern; \emph{APIMisuse} (23.3\%) covers RF07-style API violations.}
+    \emph{OrderingError} dominates, followed by \emph{BoundaryError} and
+    \emph{ArithmeticError}; \emph{APIMisuse} covers RF07-style API violations.}
   \label{fig:failure-taxonomy}
 \end{figure}
 
-Figure~\ref{fig:failure-taxonomy} breaks down the 90 remaining failures in M mode
-after repair budget $K=3$.
-\emph{Other} (73.3\%) is the largest category, covering residual conformance
-failures where the formal checker issues valid counterexamples but the LLM repair
-loop fails to converge within budget.
-\emph{APIMisuse} (23.3\%) represents RF07-style API contract violations detected
-post-generation.
-\emph{SyntaxError} (2.2\%) and \emph{BoundaryError} (1.1\%) are lower-prevalence
-categories involving invalid Python and threshold-shift faults respectively.
-These categories directly guide future work: richer Semantic Feedback IR templates
-would reduce \emph{Other}; stricter API guard patterns would reduce
-\emph{APIMisuse}; and denser per-branch witness generation would address
-\emph{BoundaryError}.
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.85\linewidth]{figures/residual_error_distribution}
+  \caption{Residual error distribution across the 90 tasks not accepted by
+    HSP-Agile under strict conformance ($n=90$).  Ordering errors dominate,
+    followed by boundary reasoning failures; hallucination and state-update errors
+    account for a smaller but consistent share.}
+  \label{fig:residual-error-dist}
+\end{figure}
+
+Figure~\ref{fig:residual-error-dist} breaks down the 90 remaining failures in
+M mode after repair budget $K=3$ by the nine E9 taxonomy categories.
+\emph{OrderingError} (31.1\%, $n=28$) is the single largest category: these tasks
+expose scenario-ordering violations that the repair loop cannot resolve because
+the LLM re-introduces the same ordering assumption after each witness.
+\emph{BoundaryError} (26.7\%, $n=24$) covers threshold-shift faults where the
+generated code deviates by at most one unit on a boundary condition---violations
+difficult to synthesise without dense boundary-value witnesses.
+\emph{ArithmeticError} (17.8\%, $n=16$) captures tasks where the LLM generates
+an arithmetically inconsistent computation (e.g.\ an off-by-factor-of-ten
+calculation) that passes structural guards but fails numerical witnesses.
+\emph{StateError} (13.3\%, $n=12$) arises when the generated function mismanages
+accumulated state across multiple scenario invocations, yielding correct
+individual-step outputs but incorrect cumulative results.
+\emph{Hallucination} (5.6\%, $n=5$) covers candidates that call non-existent
+library functions or assert preconditions that do not appear in the FSF---errors
+undetectable by the formal witness set but caught by static pattern guard RF07.
+\emph{MissingConstraint} (3.3\%, $n=3$) and \emph{Other} (2.2\%, $n=2$)
+collect residual cases not covered by the named patterns.
+
+These categories directly guide future work: richer Semantic Feedback IR
+templates targeting ordering and arithmetic violations would reduce the combined
+49\%-point majority; denser per-branch witness generation would address
+\emph{BoundaryError}; and state-tracking auxiliary context in the repair prompt
+would reduce \emph{StateError}.
+
+%-----------------------------------------------------------------------------
+\subsection{Named Failure Patterns}
+\label{sec:disc:failure-patterns}
+%-----------------------------------------------------------------------------
+
+Five recurring failure patterns account for the bulk of the 90 residual errors.
+
+\paragraph{Arithmetic reasoning failure.}
+The LLM produces a formula that is structurally correct (correct branches,
+correct variable references) but arithmetically wrong---for example, computing a
+weighted sum with the wrong denominator or using integer division where float
+division is required.
+HSP-Agile misses these because Z3 witnesses are generated from guard predicates,
+not from output expressions; the formal checker therefore cannot witness an
+expression-level arithmetic fault unless it happens to coincide with a guard
+boundary.
+
+\paragraph{Long-range dependency.}
+Some FSF specifications require the output of scenario~$i$ to depend on the
+\emph{cumulative} effect of scenarios $1, \ldots, i-1$ (e.g.\ a running total or
+a sequence-sensitive state machine transition).
+The repair loop issues one witness per scenario in isolation; it cannot construct
+a multi-step witness that would expose the accumulated-state fault.
+This structural limitation of the E9 formal checker (single-scenario witnesses)
+is the primary driver of \emph{OrderingError} and \emph{StateError} failures.
+
+\paragraph{State update confusion.}
+When two or more FSF scenarios modify the same output variable, the LLM
+occasionally generates code in which later scenarios overwrite rather than
+accumulate the earlier value.
+The counterexample-guided repair prompt identifies the violated scenario but does
+not explicitly communicate the accumulation invariant, so the LLM corrects the
+reported case while re-introducing the error in an adjacent scenario.
+Extending the Semantic Feedback IR with an explicit \texttt{accumulation\_mode}
+field would address this pattern.
+
+\paragraph{Unsatisfiable guard (Unsat guard).}
+A small number of FSF specifications contain scenario guards that Z3 proves
+mutually satisfiable but that the LLM interprets as mutually exclusive---producing
+dead branches or guard conditions that can never be simultaneously true.
+Because the implementation is syntactically valid and passes individual-scenario
+witnesses, the formal checker does not flag the dead branch; only a path-coverage
+oracle (not currently part of the pipeline) would detect it.
+
+\paragraph{Hallucinated API call.}
+The LLM occasionally calls a library function that does not exist in the
+permitted API surface defined by the FSF signature---for example, calling
+\texttt{math.log\_base(x, b)} instead of \texttt{math.log(x) / math.log(b)}.
+Pattern guard RF07 catches this post-generation, but the repair loop does not
+receive a structured signal about the illegal call; it receives only a generic
+runtime error counterexample, leading to repeated hallucinations across repair
+attempts.
+A dedicated RF07-triggered repair template that injects the legal API surface into
+the repair prompt would break this cycle.
 
 
 %=============================================================================

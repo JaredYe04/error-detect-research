@@ -18,15 +18,16 @@ specification-derived quality criteria.
 \textbf{HSP-Agile} instantiates \textsc{SgDP} over the SOFL Functional Specification Format
 (FSF).
 
-We prove three formal properties: Scenario-aware Witness Soundness (Theorem~1),
-Acceptance Safety with a finite-case FAR bound (Theorem~2), and Bounded Witness-Coverage
-Monotonicity of the repair loop (Theorem~3).
-We evaluate on a benchmark of 120 precedence-sensitive hard tasks across nine execution
+We establish three formal results: Scenario-aware Witness Soundness (Theorem~1),
+a Finite-Sample FAR Bound (Proposition~2), and an empirically supported hypothesis of
+improvement under structured feedback (Hypothesis~3).
+We evaluate on a benchmark of 120 precedence-sensitive hard tasks (plus 40 real-derived
+tasks from HumanEval/MBPP converted to FSF-style ordered scenarios) across nine execution
 modes (including Self-Refine and Self-Debug extended baselines), with a five-dimension
 evaluation protocol spanning overall effectiveness (E1), full prevention evaluation (E2),
 specification complexity analysis (E3), boundary density analysis (E4), repair dynamics
 (E5), feedback variant comparison (E6), pattern guard precision/recall (E7), and
-generalisation across Mini-Z and Mini-StateMachine notations (E8).
+generalisation across 18-task Mini-Z and Mini-StateMachine notations (E8).
 
 HSP-Agile achieves 90.4\% mean strict formal conformance (+6.2~pp over one-shot LLM,
 +2.4~pp over test-feedback).  Mechanism analysis confirms that the advantage grows with
