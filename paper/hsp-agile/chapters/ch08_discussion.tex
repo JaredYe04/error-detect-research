@@ -21,6 +21,14 @@ Section~\ref{sec:exp:threats-preview}; here we provide the full analysis.
 \label{sec:disc:interpretation}
 %=============================================================================
 
+\paragraph{Practical takeaway.}
+When ordered guard specifications are already available, an SMT-backed
+prevention loop is worth the latency: mean conformance exceeds one-shot and
+test-feedback repair, and the gain is largest where guards overlap.
+Not every task clears the conjunctive acceptance gate in three attempts;
+acceptance is best treated as a CI quality bar, with conformance as the
+primary quality signal.
+
 The central empirical finding is that the full HSP-Agile pipeline (mode~M)
 achieves \textbf{90.4\%} mean strict formal conformance on the 120-task hard
 benchmark---a gain of \textbf{6.2 percentage points} over one-shot LLM (B1:
@@ -58,30 +66,21 @@ only 30 tasks (25.0\% strict success rate) are fully accepted.
 Experiment E9 classifies these 90 residual failures into \textbf{nine categories}
 derived from counterexample signals, pattern guard matches, and operator-level
 mutation labels.
-Figures~\ref{fig:failure-taxonomy} and~\ref{fig:residual-error-dist} visualise
-the proportional breakdown.
+Figure~\ref{fig:failure-taxonomy} summarises the breakdown.
 
 \begin{figure}[t]
   \centering
   \thesisfig[max width=0.72\linewidth]{figures/failure_taxonomy_pie.pdf}
-  \caption{Failure taxonomy for M mode: proportion of remaining failures by
-    category after budget $K=3$ ($n=90$ failed tasks).
-    \emph{OrderingError} dominates, followed by \emph{BoundaryError} and
-    \emph{ArithmeticError}; \emph{APIMisuse} covers RF07-style API violations.}
+  \caption{\textbf{Claim:} residual failures after $K=3$ are dominated by
+    ordering and boundary errors, not random noise.
+    \textbf{How to read:} slices are shares of $n=90$ non-accepted tasks under
+    mode~M.  \emph{OrderingError} is the largest slice; together with
+    \emph{BoundaryError} and \emph{ArithmeticError} it accounts for most of the
+    mass.}
   \label{fig:failure-taxonomy}
 \end{figure}
 
-\begin{figure}[H]
-  \centering
-  \includegraphics[width=0.85\linewidth]{figures/residual_error_distribution}
-  \caption{Residual error distribution across the 90 tasks not accepted by
-    HSP-Agile under strict conformance ($n=90$).  Ordering errors dominate,
-    followed by boundary reasoning failures; hallucination and state-update errors
-    account for a smaller but consistent share.}
-  \label{fig:residual-error-dist}
-\end{figure}
-
-Figure~\ref{fig:residual-error-dist} breaks down the 90 remaining failures in
+Figure~\ref{fig:failure-taxonomy} breaks down the 90 remaining failures in
 M mode after repair budget $K=3$ by the nine E9 taxonomy categories.
 \emph{OrderingError} (31.1\%, $n=28$) is the single largest category: these tasks
 expose scenario-ordering violations that the repair loop cannot resolve because
@@ -440,43 +439,28 @@ common in empirical software engineering~\citep{ammann2016testing,woodcock2009fo
 \paragraph{Construct validity.}
 Formal conformance is approximated via a finite witness set $\mathcal{D}(t)$;
 candidates outside the checked space are not guaranteed correct.
-Theorem~\ref{thm:far-bound} quantifies the FAR bound as a function of witness
-count.
-The 14-pattern guard catalogue was derived from SOFL literature~\citep{li2023iet};
-novel fault classes may be missed.
-E7 makes coverage gaps explicit via per-pattern P/R/F1.
-PDR is measured under first-order mutation operators; higher-order mutations may
-exhibit different detectability.
-The nine-field Semantic Feedback IR may require extension for other specification
-languages.
+\emph{Mitigation:} Theorem~\ref{thm:far-bound} quantifies the FAR bound, and E7
+reports per-pattern P/R/F1 so catalogue gaps are explicit.
+PDR uses first-order mutants; higher-order mutations may differ.
 
 \paragraph{Internal validity.}
-LLM non-determinism is mitigated by $T_\text{repair}=0.0$, fixed seeds, and
-$\geq 3$ repeats; provider updates between runs may introduce uncaptured variance.
-The benchmark was constructed by the same authors; bias is mitigated by the Z3
-satisfiability filter, the real-derived E8 subset, and ablations (A1--A3).
-The 120-task filter (satisfiability plus overlap density) introduces selection bias
-toward SMT-advantaged tasks; E3 complexity stratification validates the advantage
-scaling claim.
+LLM non-determinism and author-built benchmarks are the main risks.
+\emph{Mitigation:} $T_\text{repair}=0.0$, fixed seeds, $\geq 3$ repeats, the Z3
+satisfiability filter, the real-derived E8 subset, and ablations A1--A3.
+E3 complexity stratification checks that the SMT advantage is not an artefact of
+a single difficulty band.
 
 \paragraph{External validity.}
-Primary evaluation uses 120 synthetic numeric-domain tasks; generalisation is
-validated on smaller E8 samples (40--70 tasks across 3 notations).
-Generated implementations are Python; SOFL-to-code mapping may differ for other
-languages.
-The single-LLM evaluation (Qwen2.5-27B-Instruct) may not generalise to all model
-families.
-Framework claims are validated primarily on the SOFL/FSF instantiation.
+Primary evaluation uses 120 synthetic numeric-domain Python tasks and one LLM.
+\emph{Mitigation:} E8 exercises Mini-Z and Mini-StateMachine via adapters; we
+do not claim language- or model-universal results beyond that evidence.
 
 \paragraph{Conclusion validity.}
 All pairwise comparisons use Holm-Bonferroni correction.
-The strict-success comparison (M vs.\ B1/B2, $p \approx 0.92$) is non-significant by
-design: the conjunctive gate maximises conformance quality on accepted candidates,
-not strict success.
-Prevention comparisons require the full E2 dataset; preliminary results are superseded
-by the full evaluation (120 tasks $\times$ 7 modes $\times$ 8 operators).
-The non-monotonic PDR pattern (B2 $>$ M on preliminary $n=40$) reflects
-complementary detection mechanisms, not M's inferiority as a prevention system.
+\emph{Mitigation:} we treat the non-significant strict-success comparison
+($p \approx 0.92$) as expected under the conjunctive gate, and report
+conformance as the primary metric; full E2 supersedes preliminary $n=40$
+prevention numbers.
 
 
 %=============================================================================

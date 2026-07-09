@@ -1,0 +1,59 @@
+%% End-to-end classify_signal data morphing across pipeline stages
+\input{diagrams/tikz/_theme}
+
+\begin{tikzpicture}[
+  font=\scriptsize\sffamily,
+  node distance=0.22cm and 0.18cm,
+]
+
+\node[sgdp/adapter, minimum width=2.15cm, text width=2.0cm, align=left] (a) {%
+  \textbf{FSF}\\[1pt]
+  {\ttfamily\fontsize{5.5}{6.5}\selectfont
+  S1: level$<$0\\
+  S2: level$\ge$thr\\
+  S3: others}%
+};
+
+\node[sgdp/core, minimum width=2.15cm, text width=2.0cm, align=left, right=of a] (b) {%
+  \textbf{Witness}\\[1pt]
+  $\Phi_1$: level$<$0\\
+  $(-3,-10)$\\
+  expect Error%
+};
+
+\node[sgdp/lower, minimum width=2.25cm, text width=2.1cm, align=left, right=of b] (c) {%
+  \textbf{Bug $c_1$}\\[1pt]
+  {\ttfamily\fontsize{5.5}{6.5}\selectfont
+  if level$\ge$thr:\\
+  ~~return Crit.\\
+  $\Rightarrow$ Critical}%
+};
+
+\node[sgdp/core, minimum width=2.35cm, text width=2.2cm, align=left, right=of c] (d) {%
+  \textbf{Semantic IR}\\[1pt]
+  type: ordering\\
+  scen: S1\\
+  got: Critical\\
+  want: Error%
+};
+
+\node[sgdp/accept, minimum width=2.15cm, text width=2.0cm, align=left, right=of d] (e) {%
+  \textbf{Repair $c_2$}\\[1pt]
+  {\ttfamily\fontsize{5.5}{6.5}\selectfont
+  if level$<$0:\\
+  ~~return Err.\\
+  Conf$=1$}%
+};
+
+\draw[sgdp/arr] (a) -- (b);
+\draw[sgdp/arr] (b) -- (c);
+\draw[sgdp/arr] (c) -- (d);
+\draw[sgdp/arr] (d) -- (e);
+
+\node[sgdp/lbl, below=0.08cm of a] {Stage~1 in};
+\node[sgdp/lbl, below=0.08cm of b] {Stage~2};
+\node[sgdp/lbl, below=0.08cm of c] {fail};
+\node[sgdp/lbl, below=0.08cm of d] {Stage~3};
+\node[sgdp/lbl, below=0.08cm of e] {accept};
+
+\end{tikzpicture}

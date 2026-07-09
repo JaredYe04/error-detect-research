@@ -4,17 +4,95 @@
 \chapter{The \textsc{SgDP} Framework and HSP-Agile Instantiation}
 \label{ch:method}
 
-This chapter presents the methodological foundation of HSP-Agile at two levels.
-\textbf{Part~A} (Section~\ref{sec:method:sgdp}) introduces the
-\textbf{Specification-guided Defect Prevention Framework} (\textsc{SgDP}), its
-instantiation interface, three formal theorems, the Semantic Feedback IR, the
-conjunctive acceptance predicate, prevention metrics, and the full algorithm.
-\textbf{Part~B} (Sections~\ref{sec:method:principles}--\ref{sec:method:summary})
-details the four-stage pipeline: design principles P1--P5, per-stage algorithms,
-prompt engineering, and the requirement pattern guard.
+This chapter turns the problem of Chapter~\ref{ch:intro} into a concrete
+prevention method.
+We first recall the pipeline intuition and walk through
+\code{classify\_signal} end to end (Sections~\ref{sec:method:intuition}--\ref{sec:method:worked}).
+Only then do we abstract the four \textsc{SgDP} components, state the formal
+results, and detail each stage
+(Sections~\ref{sec:method:sgdp}--\ref{sec:method:summary}).
 We inherit the notation of Chapter~\ref{ch:formalization}:
 $t = (\mathcal{S}_t, \mathcal{X}_t, \mathcal{Y}_t)$, oracle $g_t$, and
 first-match semantics over $\mathcal{S}_t = \langle s_1,\ldots,s_n\rangle$.
+
+\section{Pipeline Intuition}
+\label{sec:method:intuition}
+
+In one sentence: HSP-Agile synthesises a candidate from the FSF text, checks it
+on SMT witnesses that respect first-match precedence, repairs with a typed
+failure record when checks fail, and releases the candidate only when every
+witness matches and no high-severity pattern remains.
+Figure~\ref{fig:sgdp-overview} (Chapter~\ref{ch:intro}) shows this loop.
+Reading left to right: a notation adapter produces SpecIR; the witness
+generator builds $\mathcal{D}(t)$; the LLM proposes $c_k$; the verifier
+compares $f_{c_k}$ to $g_t$; failures become Semantic Feedback IR; acceptance
+is conjunctive.
+The dashed orange arc is the repair loop under budget~$K=3$.
+
+\section{Worked Example: \texttt{classify\_signal} End to End}
+\label{sec:method:worked}
+
+We now run one full attempt on the running example before introducing the
+general framework.
+Figure~\ref{fig:worked-example-trace} summarises the data morphing across
+stages.
+
+\begin{figure}[t]
+  \centering
+  \tikzinput{diagrams/tikz/worked_example_trace}
+  \caption{\textbf{Worked example trace for \code{classify\_signal}.}
+    FSF text yields an $S_1$ witness $(-3,-10)$; the buggy candidate returns
+    \texttt{Critical}; the Semantic Feedback IR names the ordering violation;
+    repair restores $S_1$-first evaluation and reaches $\mathrm{Conf}=1$.
+    Takeaway: each stage consumes a typed artefact from the previous stage.}
+  \label{fig:worked-example-trace}
+\end{figure}
+
+\paragraph{Stage~1 (synthesis).}
+The LLM receives the FSF text of Listing~\ref{lst:fsf-spec} and emits a Python
+function.
+A common first attempt is Listing~\ref{lst:llm-incorrect}: it tests
+$\mathit{level}\ge\mathit{threshold}$ before $\mathit{level}<0$.
+
+\paragraph{Stage~2 (witnesses and check).}
+The priority formulas for the three scenarios are
+\begin{align}
+  \Phi_1 &\triangleq \mathit{level}<0, \label{eq:phi1-example}\\
+  \Phi_2 &\triangleq \mathit{level}\ge\mathit{threshold}
+           \;\land\; \neg(\mathit{level}<0), \label{eq:phi2-example}\\
+  \Phi_3 &\triangleq \neg(\mathit{level}<0)
+           \;\land\; \neg(\mathit{level}\ge\mathit{threshold}).
+\end{align}
+Z3 returns, among others, the model $(-3,-10)$ for $\Phi_1$.
+The oracle requires \texttt{"Error"}; the buggy candidate returns
+\texttt{"Critical"}, so $\mathrm{Conf}(c_1,t)<1$.
+
+\paragraph{Stage~3 (Semantic Feedback IR).}
+The failure is recorded as a typed JSON object, then rendered to a repair
+prompt.  In abbreviated form:
+\begin{quote}
+\textit{``For inputs $(\mathit{level}{=}{-}3,\;\mathit{threshold}{=}{-}10)$,
+your code returned \texttt{Critical}, but the specification requires
+\texttt{Error}.
+This input satisfies Scenario~S1 ($\mathit{level}<0$), which must be matched
+before Scenario~S2.''}
+\end{quote}
+
+\paragraph{Stage~4 and acceptance.}
+After repair restores $S_1$-first evaluation, every witness matches and the
+pattern screen is clear, so $\mathrm{Accept}(c_2,t)=1$.
+Figure~\ref{fig:accept-tree} shows the conjunctive decision.
+
+\begin{figure}[t]
+  \centering
+  \tikzinput{diagrams/tikz/accept_decision_tree}
+  \caption{\textbf{Acceptance decision tree.}
+    Release requires both full witness conformance and a clear high-severity
+    pattern screen.
+    Takeaway: high mean conformance does not imply acceptance when residual
+    witnesses or patterns still fail.}
+  \label{fig:accept-tree}
+\end{figure}
 
 \section{The \textsc{SgDP} Framework}
 \label{sec:method:sgdp}
@@ -89,9 +167,13 @@ $\Phi_i$, then $g_i(\mathbf{x}^*)$ holds and $g_j(\mathbf{x}^*)$ is false for al
 hence $g_t(\mathbf{x}^*) = \phi_i(\mathbf{x}^*)$.
 \end{theorem}
 \begin{proof}
-Z3 soundness and encoding correctness give $g_i(\mathbf{x}^*)$ and $\lnot g_j(\mathbf{x}^*)$
-for $j < i$; first-match semantics yields $i = \min\{j : g_j(\mathbf{x}^*)\}$.
-(Proof sketch.)
+By assumption, $\hat{g}_i$ soundly encodes $g_i$ and Z3 returns a model
+$\mathbf{x}^*$ of $\Phi_i$.
+Soundness of the encoding and of Z3 therefore yield
+$g_i(\mathbf{x}^*)$ and $\lnot g_j(\mathbf{x}^*)$ for every $j<i$.
+By Definition~\ref{def:oracle},
+$i=\min\{j:g_j(\mathbf{x}^*)\}$, so
+$g_t(\mathbf{x}^*)=\phi_i(\mathbf{x}^*)$.
 \end{proof}
 
 \subsection{Scenario-aware Semantic Feedback IR}
@@ -107,10 +189,27 @@ with \textit{type} $\in \{\text{ordering}, \text{boundary}, \text{arithmetic},
 \text{output}\}$, ranked \textit{priority}, and suggested \textit{fix}.
 A template renders this IR into repair prompts naming the violated scenario, stating
 the guard, and enforcing first-match ordering.
-The IR serialises to JSON per \texttt{schemas/semantic\_feedback.schema.json};
-\texttt{FeedbackRenderer} (\texttt{src/repair/feedback\_ir.py}) projects the same
-IR onto E6 render variants (test-only, test+expected, full semantic IR), demonstrating
-IR--prompt separation rather than ad-hoc prompt engineering.
+
+\paragraph{Example (classify\_signal).}
+The buggy candidate of Listing~\ref{lst:llm-incorrect} yields the JSON record
+below (abbreviated).  The renderer then projects the same object into the
+natural-language quote of Section~\ref{sec:method:worked}:
+\begin{lstlisting}[language={},basicstyle=\ttfamily\footnotesize,frame=single]
+{
+  "violation_type": "ordering",
+  "scenario_index": 1,
+  "constraint_text": "level < 0",
+  "inputs": {"level": -3, "threshold": -10},
+  "observed": "Critical",
+  "expected": "Error",
+  "reason": "S2 evaluated before S1",
+  "priority": "high",
+  "fix": "test level < 0 first"
+}
+\end{lstlisting}
+The IR serialises per \texttt{schemas/semantic\_feedback.schema.json};
+\texttt{FeedbackRenderer} projects the same IR onto E6 variants (test-only,
+test+expected, full semantic IR), separating failure structure from prompt text.
 
 \subsection{Formal Conformance and Acceptance Predicate}
 \label{subsec:conformance-acceptance}
@@ -128,6 +227,7 @@ The conjunctive acceptance predicate is:
   \mathrm{Conf}(c,t) = 1 \;\land\;
   \sum_{p \in \mathcal{P}^H} \mathbf{1}[p(c,t)] = 0.
 \end{equation}
+Figure~\ref{fig:accept-tree} depicts the same predicate as a decision tree.
 
 \begin{theorem}[Finite-Sample FAR Bound]
 \label{thm:far-bound}
@@ -142,14 +242,23 @@ candidate accepted under~$\mathrm{Accept}(c,t)$ may still fail on inputs outside
 $\mathcal{D}(t)$.
 \end{theorem}
 \begin{proof}
-Independence of witnesses gives $P(\text{all pass} \mid \text{faulty}) \leq
-(1-\varepsilon)^n$ by the union bound complement.  Witness soundness
-(Theorem~\ref{thm:witness-soundness}) ensures each witness $\mathbf{x} \in
-\mathcal{D}(t)$ exercises a non-trivial guard boundary, making $\varepsilon$
-bounded away from zero for the fault classes in the mutation operators
-(Table~\ref{tab:operators}); Corollary~\ref{cor:random-vs-smt} strengthens
-this argument by placing witnesses on precedence-critical boundaries.
-(Proof sketch.)
+Fix a faulty candidate and write $E_i$ for the event that witness $i$ fails to
+expose the fault.
+Independence of the $n$ witnesses and
+$\Pr[E_i]\le 1-\varepsilon$ give
+\[
+  \Pr[\text{all pass}\mid\text{faulty}]
+  \;=\; \prod_{i=1}^{n}\Pr[E_i]
+  \;\le\; (1-\varepsilon)^n.
+\]
+Hence $\mathrm{FAR}\le(1-\varepsilon)^n$.
+Theorem~\ref{thm:witness-soundness} ensures each
+$\mathbf{x}\in\mathcal{D}(t)$ lies in a strict first-match region, so
+$\varepsilon$ is bounded away from zero for the mutation operators of
+Section~\ref{sec:exp:mutants}; Corollary~\ref{cor:random-vs-smt} further places
+witnesses on precedence-critical boundaries.
+The bound is finite-sample only: acceptance under $\mathrm{Accept}(c,t)$ does
+not imply correctness on $\mathcal{X}_t\setminus\mathcal{D}(t)$.
 \end{proof}
 
 \subsection{Structured Feedback and Repair Hypothesis}
@@ -162,22 +271,23 @@ Under fixed model and budget $K$, repair guided by Semantic Feedback IR
 achieves higher expected conformance gain per iteration than repair guided
 by plain test-pass/fail feedback.
 \end{hypothesis}
-\begin{evidence}
-Empirical support is provided by E5 (repair convergence trajectories,
-Fig.~\ref{fig:convergence}) and E6 (feedback variant comparison,
-Fig.~\ref{fig:feedback-variant}): mode~M with structured IR achieves
-$\mu_k$ convergence in fewer iterations than B2 (test-feedback) on the
-same task set.  A fully formal proof would require a stochastic model of
-LLM repair that is beyond current theory; we state this as an empirically
+
+\noindent
+Figures~\ref{fig:convergence} and~\ref{fig:feedback-variant}
+(Chapter~\ref{ch:results}) support the hypothesis: mode~M with structured IR
+reaches higher $\mu_k$ in fewer iterations than B2 (test-feedback), and the
+E6 full-IR variant outperforms test-only and test-plus-expected prompts by
+more than 7\,pp.
+A fully formal proof would need a stochastic model of LLM repair that is
+beyond current theory; we therefore treat the claim as an empirically
 supported hypothesis.
-\end{evidence}
 
 \subsection{Empirical FAR Validation}
 \label{subsec:far-validation}
 
 To ground the Finite-Sample FAR Bound (Theorem~\ref{thm:far-bound})
 empirically, we compare the theoretical upper bound $(1-\varepsilon)^n$ to
-the observed FAR measured in E2 (Section~\ref{sec:e2-prevention}).
+the observed FAR measured in E2 (Section~\ref{sec:results:rq2}).
 Using $\varepsilon = 0.08$ (estimated from the median per-witness detection
 probability of implementation-level mutants) and $n = 9$ (average witness
 count per task), the bound predicts $\mathrm{FAR} \leq (0.92)^9 \approx 0.473$.
@@ -274,6 +384,7 @@ Every iteration appends $\langle k, \mathrm{Conf}(c_k,t), |\text{failures}_k|,
 supporting repair-dynamics (E5) and feedback-quality (E6) analyses.
 
 \input{tables/symbols}
+\input{tables/glossary}
 
 \section{Design Principles}
 \label{sec:method:principles}
@@ -285,7 +396,7 @@ Conformance is decided by an SMT solver and oracle $g_t$, not learned heuristics
 or hand-annotated expected values.
 
 \paragraph{P2 --- Bounded budget with guaranteed termination.}
-A hard budget $K$ caps synthesis-check iterations ($K = 5$ in experiments).
+A hard budget $K$ caps synthesis-check iterations ($K = 3$ in experiments).
 
 \paragraph{P3 --- Counterexample specificity via Semantic Feedback IR.}
 Repair feedback is constructed as JSON-serialised Semantic Feedback records
@@ -371,7 +482,10 @@ a fixed \emph{system} message plus a \emph{user} message carrying $(\mathcal{S}_
 \subsection{Model Configuration and Parsing}
 \label{subsec:method:model}
 
-We use Qwen2.5-27B-Instruct at $\tau = 0.2$ (max 2048 output tokens).
+We use Qwen2.5-27B-Instruct with dual temperatures matching the experimental
+protocol (Chapter~\ref{ch:experiments}): $T_\text{gen} = 0.7$ for the first
+synthesis call and $T_\text{repair} = 0.0$ for subsequent repair calls
+(max 2048 output tokens).
 The parser extracts one \code{```python} fenced block, compiles it, and on failure
 sets $c_k = \bot$ (conformance 0).
 \begin{equation}
@@ -431,21 +545,24 @@ region, realising Theorem~\ref{thm:witness-soundness} and eliminating oracle amb
 When $\mathrm{Conf}(c_k, t) < 1$ or pattern violations occur, Stage~3 assembles
 $\mathit{fb}_k$ mapping $\mathit{cexs}_k$, $\mathit{hits}_k$, attempt $k$, and
 $\mathrm{Conf}(c_k,t)$~\citep{lynn2024verifierloop, solarlezama2008sketching}.
-Each counterexample $(x^*, y^*, y^c, i^*)$ is verbalised, e.g.:
+Each counterexample $(x^*, y^*, y^c, i^*)$ is verbalised.
+For the running example (Section~\ref{sec:method:worked}):
 
 \begin{quote}
-  \textit{``For inputs $(a{=}15,\; b{=}8,\; c{=}3,\; d{=}0,\; e{=}0)$, your code returned
-  \{\textit{risk}{=}\code{MEDIUM}, \textit{action}{=}\code{REVIEW}\}, but the
-  specification requires
-  \{\textit{risk}{=}\code{HIGH}, \textit{action}{=}\code{ESCALATE}\}.
-  This input satisfies Scenario~S1 ($a > 10$ AND $b > 5$), which should be matched first.''}
+  \textit{``For inputs $(\mathit{level}{=}{-}3,\;\mathit{threshold}{=}{-}10)$,
+  your code returned \code{Critical}, but the specification requires
+  \code{Error}.
+  This input satisfies Scenario~S1 ($\mathit{level}<0$), which should be
+  matched first.''}
 \end{quote}
 
 \begin{figure}[t]
   \centering
   \tikzinput{diagrams/tikz/repair_feedback}
-  \caption{Counterexample-guided repair: failed attempts yield structured feedback
-    (counterexamples + pattern violations) for the next synthesis call.}
+  \caption{Counterexample-guided repair for \code{classify\_signal}: failed
+    attempts yield structured feedback (counterexamples + pattern violations)
+    for the next synthesis call.
+    Takeaway: the feedback names the violated scenario, not only the raw I/O.}
   \label{fig:repair-feedback}
 \end{figure}
 

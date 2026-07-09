@@ -4,15 +4,12 @@
 \chapter{Background and Related Work}
 \label{ch:background}
 
-This chapter surveys the technical foundations and related prior work that
-underpin the Specification-guided Defect Prevention Framework (\textsc{SgDP})
-and its HSP-Agile instantiation.
-We begin with SOFL and Agile-SOFL, describe the Functional Specification
-Format (FSF), and review LLM-based code generation, counterexample-guided
-synthesis, SMT solving, requirement-level pattern detection, and mutation
-testing.
-The chapter closes with a structured comparison of related approaches and
-a gap summary that positions \textsc{SgDP} against prior work.
+This chapter gives the background a reader needs before the formalisation in
+Chapter~\ref{ch:formalization}.
+We start from SOFL/Agile-SOFL and the FSF first-match rule (using the same
+\code{classify\_signal} example as Chapter~\ref{ch:intro}), then review LLM
+code generation, CEGIS, SMT solving, pattern detection, and mutation testing.
+A closing comparison table positions \textsc{SgDP} against prior systems.
 
 % ─────────────────────────────────────────────────────────────────────────────
 \section{SOFL and Agile-SOFL}
@@ -90,36 +87,42 @@ An input satisfying both $S_1$'s and $S_2$'s guards is handled exclusively
 by $S_1$; $S_2$ applies only to inputs not already covered by higher-priority
 scenarios.
 
-Consider the canonical \code{classify\_risk(a, b, c)} example:
+We illustrate with the running example \code{classify\_signal} from
+Chapter~\ref{ch:intro} (Listing~\ref{lst:fsf-spec}):
 
 \begin{center}
 \small\ttfamily
 \begin{minipage}{0.85\textwidth}
 \obeylines
-Function: classify\_risk(a, b, c)
-~~Scenario S1: a > 10 and b > 5
-~~~~~~risk := "HIGH"; action := "ESCALATE"; score := 90
-~~Scenario S2: a > 5
-~~~~~~risk := "MEDIUM"; action := "REVIEW"; score := 60
+Function: classify\_signal(level, threshold)
+~~Scenario S1: level < 0
+~~~~~~alert := "Error"
+~~Scenario S2: level >= threshold
+~~~~~~alert := "Critical"
 ~~Scenario S3: others
-~~~~~~risk := "LOW"; action := "MONITOR"; score := 30
+~~~~~~alert := "Normal"
 \end{minipage}
 \end{center}
 
 \noindent
-For input $(a, b, c) = (12, 7, 0)$, both $S_1$'s guard and $S_2$'s guard
-are satisfied, yet FSF semantics require output
-$\langle\texttt{HIGH}, \texttt{ESCALATE}, 90\rangle$ because $S_1$ has higher
-priority.
-An implementation testing $a > 5$ before $a > 10 \wedge b > 5$ would
-incorrectly return \texttt{"MEDIUM"}---a \emph{scenario-order violation}
-invisible to techniques treating guards as a flat Boolean formula.
+For input $(\mathit{level},\mathit{threshold}) = (-3,-10)$, both $S_1$'s
+guard and $S_2$'s guard hold, yet FSF semantics require \texttt{"Error"}
+because $S_1$ has higher priority.
+An implementation that tests $\mathit{level} \ge \mathit{threshold}$ before
+$\mathit{level} < 0$ incorrectly returns \texttt{"Critical"}---a
+\emph{scenario-order violation} invisible to techniques that treat guards as
+a flat Boolean formula.
 
-Figure~\ref{fig:fsf-semantics} (Chapter~\ref{ch:formalization}) illustrates the input-space partition:
-$S_1$ (red) is a strict subset of $S_2$'s guard region (orange); $S_3$
-(green) covers the remainder.
+Figure~\ref{fig:fsf-semantics} (Chapter~\ref{ch:formalization}) illustrates
+the input-space partition for this task: $S_1$ claims the negative-level
+region even when $S_2$'s threshold comparison would also hold; $S_3$ covers
+the remainder.
 The precedence relation $S_1 \succ S_2 \succ S_3$ is structural, not derived
 from the guards alone.
+
+As a secondary pattern (not our running example), multi-output tasks such as
+\code{classify\_risk(a,b,c)} exhibit the same first-match rule when a nested
+guard ($a>10 \wedge b>5$) is a strict subset of a later guard ($a>5$).
 
 \subsection{Formal Notation}
 
@@ -178,23 +181,39 @@ LLM-based formal specification implementation.
 \subsection{Limitations of LLMs for Formal Specification Compliance}
 
 Three systematic failure modes arise without additional guidance
-\citep{dakhel2023copilot, lynn2024verifierloop}:
+\citep{dakhel2023copilot, lynn2024verifierloop}.
+We illustrate each with a short fragment of the kind our checker must catch
+on \code{classify\_signal}-style tasks:
 
 \begin{enumerate}
   \item \textbf{Scenario-order blindness.}
         LLMs learn \texttt{if}--\texttt{elif} surface syntax but not
         specification-level priority ordering; overlapping guards bias the
         model toward ``natural'' code order rather than mandated precedence.
+\begin{lstlisting}[language=Python,basicstyle=\ttfamily\footnotesize,frame=single]
+# Wrong: threshold check before level < 0
+if level >= threshold: return "Critical"
+if level < 0: return "Error"   # never reached when both hold
+\end{lstlisting}
 
   \item \textbf{Boundary hallucination.}
         Comparison operators (\texttt{>}, \texttt{>=}, \texttt{==}) are
-        confused at boundaries; e.g.\ guard $a > 10$ implemented as $a \geq 10$
-        is invisible to random testing but detectable by SMT boundary witnesses.
+        confused at boundaries; e.g.\ guard $\mathit{level} < 0$ implemented
+        as $\mathit{level} \le 0$ is invisible to random testing but
+        detectable by SMT boundary witnesses.
+\begin{lstlisting}[language=Python,basicstyle=\ttfamily\footnotesize,frame=single]
+# Wrong: off-by-one at the S1 boundary
+if level <= 0: return "Error"   # accepts level == 0
+\end{lstlisting}
 
   \item \textbf{Spurious completeness.}
         Hard-coded success values pass superficial tests but violate the
         specification on non-default inputs---corresponding to pattern RF07
         (\emph{unconditional success}, Section~\ref{sec:bg:patterns}).
+\begin{lstlisting}[language=Python,basicstyle=\ttfamily\footnotesize,frame=single]
+# Wrong: ignores the specification entirely
+return "Normal"
+\end{lstlisting}
 \end{enumerate}
 
 \noindent
@@ -253,9 +272,10 @@ enabling simultaneous correction of logical errors and structural anti-patterns.
 \end{figure}
 
 \noindent
-Budget parameter $K$ limits repair iterations (we set $K = 5$); if no conforming
-candidate is found, the system returns the highest-scoring candidate as
-best-effort, consistent with budget-bounded CEGIS \citep{barrett2018smt}.
+Budget parameter $K$ limits repair iterations (we set $K = 3$ in experiments);
+if no conforming candidate is found, the system returns the highest-scoring
+candidate as best-effort, consistent with budget-bounded CEGIS
+\citep{barrett2018smt}.
 
 % ─────────────────────────────────────────────────────────────────────────────
 \section{SMT Solving and Formal Verification}
@@ -520,23 +540,20 @@ Full agent-oracle comparison is future work.
   \end{tabular}
 \end{inlinetable}
 
-The key gap is the absence of \emph{specification-aware} witness generation:
-prior approaches use random tests, execution traces, or general symbolic execution,
-none reliably reaching low-measure boundary regions where specification-conformance
-defects manifest.
-Our Constraint-guided Witness Generator encodes the guard precedence chain as
-SMT constraints~\citep{barrett2018smt}.
-\citet{lynn2024verifierloop} show test-feedback loops with underspecified diagnostics
-converge slowly on violations requiring structural changes; our Semantic Feedback IR
-surfaces violated scenario identity, guard predicate text, and violation type that
-pure test-feedback discards.
+Unlike VerifierLoop-style test-feedback systems~\citep{lynn2024verifierloop},
+we do not treat failing unit tests as the primary signal: we encode guard
+precedence as SMT constraints~\citep{barrett2018smt} and feed the LLM a
+typed failure record that names the violated scenario.
+Unlike DafnyBench-style proof-oriented pipelines~\citep{loughman2024dafnybench},
+we do not ask the model for annotations it systematically fails to produce.
+Unlike Self-Refine / Self-Debug verbal loops, we ground every repair step in
+an executable specification oracle and measure \emph{prevention} (PDR/FAR),
+not only generation success.
 
-Existing approaches either require proof annotations LLMs systematically fail to
-produce~\citep{loughman2024dafnybench}, or repair code without grounding feedback
-in specification semantics.
-\textsc{SgDP} occupies the practical middle ground: specification-semantic awareness
-without proof obligation, with an evaluation protocol measuring prevention rather than
-generation accuracy.
+The remaining gap that Table~\ref{tab:related-positioning} highlights is
+therefore practical: a middle ground with specification-semantic awareness,
+no proof obligation, and an evaluation protocol that asks whether
+non-conforming code is kept out of release.
 \Needspace{3\baselineskip}
 The following chapter establishes the mathematical foundations underpinning each
 pipeline component.

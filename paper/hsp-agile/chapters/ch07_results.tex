@@ -5,24 +5,44 @@
 \label{ch:results}
 
 We present results in mechanism-analysis order: we first show \emph{why} the framework
-works (E3--E6), then confirm \emph{that} it works overall (E1/E2), matching the
-research question order established in Chapter~\ref{ch:experiments}.
+works (E3--E6), then confirm \emph{that} it works overall (E1/E2).
+Table~\ref{tab:results-roadmap} maps each research question to its section and
+key figure so readers can navigate despite the non-numeric section order.
 All experiments use the 120-task hard benchmark and seven primary evaluation modes
 (B0, B1, B2, M, A1, A2, A3) unless otherwise noted; extended baselines B3/B4 and
 notation-specific generalisation tasks are reported where available.
+
+\begin{inlinetable}{Results roadmap: mechanism-first presentation order.}
+  \label{tab:results-roadmap}
+  \footnotesize
+  \begin{tabular}{lll}
+    \toprule
+    RQ & Section & Key figure / table \\
+    \midrule
+    RQ4 & \ref{sec:results:rq4} & Fig.~\ref{fig:complexity} (E3) \\
+    RQ3 & \ref{sec:results:rq3} & Figs.~\ref{fig:convergence},~\ref{fig:feedback-variant} \\
+    RQ1 & \ref{sec:results:rq1} & Table~\ref{tab:main-results} \\
+    RQ2 & \ref{sec:results:rq2} & Figs.~\ref{fig:prevention-heatmap},~\ref{fig:prevention-bar} \\
+    RQ5 & \ref{sec:results:rq5} & Fig.~\ref{fig:pareto} \\
+    \bottomrule
+  \end{tabular}
+\end{inlinetable}
 
 %=============================================================================
 \section{RQ4: Specification Complexity Scaling (E3)}
 \label{sec:results:rq4}
 %=============================================================================
 
+\textbf{Answer in one sentence.}
+The conformance gap between M and the baselines grows with guard-overlap density:
+SMT witnesses matter most where random tests fail.
+
 \begin{figure}[t]
   \centering
   \widefig{figures/complexity_heatmap.pdf}
-  \caption{Mean strict formal conformance by overlap-density tier and mode.
-    The advantage of M over B1/B2 grows with specification complexity, confirming
-    that SMT-based witness generation provides disproportionate benefit on harder
-    specs.}
+  \caption{\textbf{Claim:} M's advantage over B1/B2 grows with overlap density.
+    \textbf{How to read:} rows are density tertiles; cells are mean strict
+    formal conformance.  Compare columns within the high-overlap row.}
   \label{fig:complexity}
 \end{figure}
 
@@ -46,6 +66,15 @@ The degradation is less severe for M than for B1 (which drops to approximately 7
 high-overlap tasks), suggesting that M's CEGIS repair loop provides proportionally
 greater benefit on harder tasks.
 
+\paragraph{Vignette (high-overlap ordering failure).}
+Consider a hard-benchmark sibling of \code{classify\_signal} whose first two
+guards nest as $a>80\land b<20$ before $a>50$.
+Under mode~B1 the candidate evaluates the broader guard first and fails the
+SMT witness in the nested region; under mode~M the Semantic Feedback IR names
+Scenario~S1 and the second attempt restores priority order.
+Tasks of this shape dominate the high-overlap tertile where M's gap over B1
+reaches approximately 8\,pp.
+
 \paragraph{Answer to RQ4.}
 The framework's conformance advantage scales with specification complexity, with the
 largest gains ($\geq$3\,pp over B2, $\geq$8\,pp over B1) in the dense-overlap tier
@@ -61,10 +90,10 @@ where specification-conformance defects are most likely to occur.
 \begin{figure}[t]
   \centering
   \widefig{figures/repair_convergence.pdf}
-  \caption{Mean strict formal conformance at each repair iteration for M (Semantic
-    Feedback IR) vs.\ B2 (test-only feedback).  M reaches B2's final conformance by
-    iteration~2, and continues to improve at iteration~3.  Shaded bands are 95\%
-    bootstrap confidence intervals.}
+  \caption{\textbf{Claim:} most repair gain arrives by iteration~2, justifying
+    budget $K=3$.
+    \textbf{How to read:} solid line is mode~M; compare to B2 at the same
+    attempt index.  Shaded bands are 95\% bootstrap CIs.}
   \label{fig:convergence}
 \end{figure}
 
@@ -81,12 +110,19 @@ diminishing returns on this benchmark.
 \begin{figure}[t]
   \centering
   \widefig{figures/feedback_variant_bar.pdf}
-  \caption{Final conformance and mean iterations-to-convergence for feedback variants
-    A (test only), B (test + expected), and C (full Semantic Feedback IR).
-    Progressive improvement from A to C confirms that specification-level structure,
-    not prompt volume, drives the repair benefit.}
+  \caption{\textbf{Claim:} specification-level structure, not prompt volume, drives
+    repair.
+    \textbf{How to read:} A~=~test only (no scenario info); B~=~test+expected;
+    C~=~full Semantic Feedback IR.  Compare bar heights, not bar widths.}
   \label{fig:feedback-variant}
 \end{figure}
+
+\paragraph{Vignette (feedback content).}
+On the \code{classify\_signal}-style witness $(-3,-10)$, variant~A tells the
+model only that the test failed; variant~B adds the expected string
+\texttt{Error}; variant~C additionally names Scenario~S1 and the guard
+$\mathit{level}<0$.
+The +7.7\,pp gap from A to C is the empirical cost of omitting that structure.
 
 Figure~\ref{fig:feedback-variant} shows the isolated effect of feedback surface
 under identical mode~M pipeline settings ($n=120$ tasks per variant, dedicated E6
@@ -171,6 +207,11 @@ alone.
 \label{sec:results:rq1}
 %=============================================================================
 
+\textbf{Answer in one sentence.}
+HSP-Agile (mode~M) reaches 90.4\% mean strict formal conformance---+6.2\,pp over
+one-shot LLM and +2.4\,pp over test-feedback---while its lower strict-success
+rate reflects a stricter acceptance gate, not weaker code.
+
 \subsection{Main Results}
 
 Table~\ref{tab:main-results} presents the primary experimental results for all eleven
@@ -183,9 +224,14 @@ cost, and multi-metric trade-offs.
 
 \begin{table}[H]
   \caption{Main comparison results ($n = 120$ tasks per mode).  Best formal conformance
-    shown in bold.  Strict = strict success rate; Conf.\ = formal conformance;
-    Kill = mutation kill rate; Fail.\ = mean strict evaluation failures per task
-    (out of 64).  B5 = Reflexion-lite (self-reflection without formal checking).}
+    shown in bold.  Strict = strict success / acceptance rate
+    ($\mathrm{Accept}{=}1$); Conf.\ = mean formal conformance
+    ($\overline{\mathrm{Conf}}$); Kill = mutation kill rate; Fail.\ = mean
+    strict evaluation failures per task (out of 64).
+    B5 = Reflexion-lite.
+    \emph{Note the strict-success paradox:} M's Conf.\ is highest (90.4\%) while
+    its Strict column (25.0\%) is slightly below B1/B2---because acceptance
+    additionally requires a clear pattern screen (Figure~\ref{fig:accept-tree}).}
   \label{tab:main-results}
   \centering
   \thesistable{%
@@ -328,33 +374,50 @@ principled quality gate, not a deficiency.
 \label{sec:results:rq2}
 %=============================================================================
 
+\textbf{Answer in one sentence.}
+M and B2 prevent different fault classes: SMT witnesses catch ordering
+violations; unit-test feedback catches some boundary shifts; neither alone
+covers the full mutant catalogue.
+
 \begin{figure}[t]
   \centering
   \widefig{figures/prevention_heatmap_by_mode_eval.pdf}
-  \caption{PDR heatmap by mode (rows) and mutant operator (columns), preliminary
-    evaluation ($n=10$ per cell, 3 modes $\times$ 4 spec operators).
-    B2 leads on boundary operators; M matches or exceeds B2 on structural operators.}
+  \caption{\textbf{Claim:} prevention is complementary across modes, not
+    uniformly dominated by one pipeline.
+    \textbf{How to read:} rows are modes, columns are mutant operators; darker
+    cells mean higher PDR.  Compare M vs.\ B2 within each column.}
   \label{fig:prevention-heatmap}
 \end{figure}
 
 \begin{figure}[t]
   \centering
   \widefig{figures/prevention_bar.pdf}
-  \caption{Preliminary prevention detection rate (PDR) and false-accept rate (FAR) by
-    mode ($n=40$ tasks).  B2 achieves the highest aggregate PDR on boundary-shift
-    mutants; M's pattern guard targets structural fault classes not captured by unit
-    tests.}
+  \caption{\textbf{Claim:} aggregate PDR alone understates M's structural
+    prevention role.
+    \textbf{How to read:} bars are PDR/FAR by mode on the preliminary
+    $n=40$ subset; pair with Figure~\ref{fig:prevention-heatmap} for
+    per-operator detail.}
   \label{fig:prevention-bar}
 \end{figure}
 
 \begin{figure}[t]
   \centering
   \widefig{figures/pattern_guard_f1_bar.pdf}
-  \caption{Pattern guard precision, recall, and F1 per fault category on the E2
-    mutant population.  Ordering and GuardInversion categories achieve the highest
-    recall, consistent with the guard's design targeting FSF scenario-order violations.}
+  \caption{\textbf{Claim:} the pattern guard is strongest on ordering and
+    guard-inversion faults.
+    \textbf{How to read:} bars are F1 by fault category on the E2 mutant
+    population; the dashed line marks F1~$=0.6$.}
   \label{fig:pattern-f1}
 \end{figure}
+
+\paragraph{Vignette (mutant rejection).}
+Take a correct \code{classify\_signal} implementation and apply an SNO mutant
+that swaps $S_1$ and $S_2$ in the oracle.
+Mode~M's witness $(-3,-10)$ still expects \texttt{Error} under the mutated
+order only if the candidate follows the new text; a candidate that kept the
+original branch order fails $\mathrm{Accept}$ and counts toward PDR.
+A WRO mutant that merely reorders \texttt{if} branches in the candidate is
+likewise rejected when the witness set still encodes first-match priority.
 
 Figure~\ref{fig:prevention-heatmap} reveals a complementary prevention structure:
 M leads on specification-structural operators (scenario reordering, guard inversion),
@@ -412,11 +475,17 @@ Output-dependency and arithmetic defects remain partially outside current covera
 \label{sec:results:rq5}
 %=============================================================================
 
+\textbf{Answer in one sentence.}
+M buys the highest mean conformance at roughly $4.6\times$ B2 latency; A2 is
+the low-latency near-Pareto alternative when pattern screening is optional.
+
 \begin{figure}[t]
   \centering
   \widefig{figures/mode_distribution_latency.pdf}
-  \caption{Distribution of per-task wall-clock latency (ms, log scale) across 120
-    tasks for each mode.  B0 and B1 are tightly concentrated near their means.  M and
+  \caption{\textbf{Claim:} repair modes pay a clear latency premium.
+    \textbf{How to read:} log-scale wall-clock latency per task; compare the
+    M/A1 mass at higher values with B1/B2 near one call.
+    B0 and B1 are tightly concentrated near their means.  M and
     A1 exhibit heavier right tails due to repair loop invocations that reach the
     $K=3$ budget limit.}
   \label{fig:latency-distribution}
@@ -425,9 +494,10 @@ Output-dependency and arithmetic defects remain partially outside current covera
 \begin{figure}[t]
   \centering
   \widefig{figures/pareto_quality_vs_latency.pdf}
-  \caption{Pareto view of strict formal conformance vs.\ mean latency per task.
-    M and A2 form the non-dominated frontier; B2 is dominated by M on conformance at
-    comparable latency.}
+  \caption{\textbf{Claim:} M sits on the quality-dominant side of the
+    latency--conformance frontier.
+    \textbf{How to read:} right/up is better quality, left is cheaper; the
+    dashed polyline is the Pareto frontier and the annotation marks mode~M.}
   \label{fig:pareto}
 \end{figure}
 

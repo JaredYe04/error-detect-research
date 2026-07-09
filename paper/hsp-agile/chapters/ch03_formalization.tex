@@ -15,6 +15,33 @@ $\mathbb{Z}$ for all integers, and $\mathbf{1}[\cdot]$ for the Iverson
 bracket, which equals $1$ when its argument is true and $0$ otherwise.
 
 % ---------------------------------------------------------------------------
+\section{Running Example Roadmap}
+\label{sec:form:roadmap}
+% ---------------------------------------------------------------------------
+
+Every definition in this chapter is instantiated on the same task introduced in
+Chapter~\ref{ch:intro}: \code{classify\_signal(level, threshold)}.
+In words, the function returns \texttt{"Error"} when the level is negative,
+\texttt{"Critical"} when the level meets or exceeds a threshold (and the level
+is non-negative), and \texttt{"Normal"} otherwise.
+As we introduce each formal object, a short \emph{Example} paragraph shows what
+that object looks like for this task.
+Figure~\ref{fig:specir-walkthrough} previews the path from FSF text through
+SpecIR and the priority formula to a concrete witness.
+
+\begin{figure}[t]
+  \centering
+  \tikzinput{diagrams/tikz/specir_walkthrough}
+  \caption{\textbf{From FSF text to witness (classify\_signal).}
+    The adapter lowers surface syntax into SpecIR; the witness generator
+    encodes first-match priority as $\Phi_i$; Z3 returns a model such as
+    $(-3,-10)$ that activates $S_1$.
+    Takeaway: SpecIR is the hinge between notation-specific text and the
+    shared prevention pipeline.}
+  \label{fig:specir-walkthrough}
+\end{figure}
+
+% ---------------------------------------------------------------------------
 \section{Formal Task Model}
 \label{sec:form:task}
 % ---------------------------------------------------------------------------
@@ -41,9 +68,13 @@ where
 \end{itemize}
 \end{definition}
 
-The separation of input domain from specification is deliberate: it allows the
-same FSF structure to be instantiated over domains of varying dimensionality,
-as is the case in our benchmark tasks where $d = 5$ and $m = 3$.
+\paragraph{Example.}
+For \code{classify\_signal}, $d=2$, $m=1$ (string-valued alert encoded as a
+discrete label), $\mathcal{S}_t=\langle s_1,s_2,s_3\rangle$, and
+$\mathcal{X}_t\subseteq\mathbb{Z}^2$ with coordinates
+$(\mathit{level},\mathit{threshold})$.
+Benchmark tasks in later chapters often use $d=5$ and $m=3$; the same
+definitions apply.
 
 % ---------------------------------------------------------------------------
 \section{Specification Intermediate Representation (SpecIR)}
@@ -64,6 +95,13 @@ We write the abstract syntax as
 $\text{SpecIR} \triangleq \langle\Sigma_t, \Gamma_t, C_t, M_t\rangle$ or,
 equivalently, $\text{SpecIR} ::= \texttt{Signature}\;\texttt{Cases}\;[\texttt{Metadata}]$.
 \end{definition}
+
+\paragraph{Example.}
+For \code{classify\_signal}, $\Sigma_t$ declares inputs
+\texttt{level:int}, \texttt{threshold:int} and output \texttt{alert:string};
+$C_t$ holds three guarded cases whose first guard atom is
+$\{\texttt{var}{=}\texttt{level},\;\texttt{op}{=}\texttt{lt},\;
+\texttt{threshold}{=}0\}$ (Figure~\ref{fig:specir-walkthrough}).
 
 \begin{definition}[SpecIR Surface Grammar (EBNF)]
 \label{def:specir-ebnf}
@@ -123,6 +161,12 @@ where
 \end{itemize}
 \end{definition}
 
+\paragraph{Example.}
+$s_1=(\mathit{level}<0,\;\phi_1)$ with $\phi_1\equiv\texttt{"Error"}$;
+$s_2=(\mathit{level}\ge\mathit{threshold},\;\phi_2)$ with
+$\phi_2\equiv\texttt{"Critical"}$; $s_3$ is the \texttt{others} case with
+$\phi_3\equiv\texttt{"Normal"}$.
+
 Guards are expressed as linear arithmetic predicates over the integer
 variables of $\mathcal{X}_t$.  In practice they encode conditions such as
 threshold comparisons ($a > \theta_1$), conjunctions of comparisons, or
@@ -151,7 +195,12 @@ a simple case statement \citep{dijkstra1975guarded}: guard evaluation order
 is part of the specification, not an implementation choice.
 A candidate that evaluates $g_2$ before $g_1$ may be correct on most inputs
 (where guards are disjoint) but wrong wherever both guards hold.
-We return to this point in Section~\ref{sec:form:benchmark}.
+
+\paragraph{Example.}
+On $(-3,-10)$, both $g_1$ and $g_2$ hold, so
+$g_t(-3,-10)=\phi_1(-3,-10)=\texttt{"Error"}$.
+An implementation that checks $g_2$ first returns \texttt{"Critical"} and
+fails the oracle.
 
 % ---------------------------------------------------------------------------
 \section{FSF Scenario Semantics}
@@ -188,6 +237,13 @@ query
 \]
 If satisfiable, add $\bigl(x_i,\;g_t(x_i)\bigr)$ to $\mathcal{D}(t)$.
 \end{definition}
+
+\paragraph{Example.}
+For $s_1$ the query is simply $\mathit{level}<0$; a model is $(-3,-10)$ with
+oracle output \texttt{"Error"}.
+For $s_2$ the query is
+$\mathit{level}\ge\mathit{threshold}\land\neg(\mathit{level}<0)$; a model
+might be $(5,3)$ with oracle output \texttt{"Critical"}.
 
 The conjunct $\bigwedge_{j < i} \neg\,g_j(x)$ enforces strict scenario
 membership: $x_i$ activates $s_i$ \emph{and no higher-priority scenario}.
@@ -249,30 +305,35 @@ deterministically.
 \end{corollary}
 
 \begin{proof}
-Random sampling: $\Pr[f_c(\mathbf{x}) \neq g_t(\mathbf{x})] \leq
-\Pr[\mathbf{x} \in \mathcal{B}_\varepsilon(t)] = \varepsilon$ when faults
-manifest only on boundary inputs.
-SMT: satisfiability of $\Phi_i$ guarantees $g_i(\mathbf{x}_i^*) \land
-\bigwedge_{j<i}\neg g_j(\mathbf{x}_i^*)$, so the witness lies in the
-exclusive first-match region of~$s_i$.
-(Proof sketch.)
+Assume faults of interest manifest only on inputs in
+$\mathcal{B}_\varepsilon(t)$.
+Under uniform sampling,
+$\Pr[f_c(\mathbf{x})\neq g_t(\mathbf{x})]
+  \le \Pr[\mathbf{x}\in\mathcal{B}_\varepsilon(t)]=\varepsilon$.
+For SMT, satisfiability of $\Phi_i$ yields
+$g_i(\mathbf{x}_i^*)\land\bigwedge_{j<i}\neg g_j(\mathbf{x}_i^*)$, so
+$\mathbf{x}_i^*$ lies in the exclusive first-match region of~$s_i$ and
+activates that region with probability~$1$ under a sound encoding
+(Theorem~\ref{thm:witness-soundness}).
+Hence random sampling hits precedence-critical regions with probability
+$\mathcal{O}(\varepsilon)$, while SMT hits them deterministically.
 \end{proof}
 
 \begin{figure}[t]
   \centering
   \tikzinput{diagrams/tikz/fsf_semantics}
-  \caption{\textbf{FSF evaluation semantics (illustrative detail).}
-    Left: a three-scenario FSF function definition.
-    Right: the corresponding input-space partitioning with scenario
-    priority $S_1 \succ S_2 \succ S_3$ and the oracle mapping.
-    Dots represent the concrete cases in $\mathcal{D}(t)$, one per
-    strict scenario region.}
+  \caption{\textbf{FSF evaluation semantics for \code{classify\_signal}.}
+    Left: the three-scenario FSF definition.
+    Right: input-space partitioning with priority $S_1 \succ S_2 \succ S_3$;
+    the green marked point $(-3,-10)$ is an $S_1$ witness that also lies in
+    the geometric region of $S_2$'s guard.
+    Takeaway: first-match, not geometric inclusion alone, decides the oracle.}
   \label{fig:fsf-semantics}
 \end{figure}
 
 Figure~\ref{fig:fsf-semantics} summarises the FSF text, the induced input-space
-partition, and the oracle mapping; SMT case generation places one witness in
-each strict scenario region.
+partition, and the oracle mapping for \code{classify\_signal}; SMT case
+generation places one witness in each strict scenario region.
 
 For the pipeline to communicate \emph{why} a candidate fails, we also need a
 notion of a counterexample that identifies the violated scenario.
@@ -292,6 +353,11 @@ behaviour of $c$.  The associated \emph{counterexample} is the triple
 comprising the failing input, the expected output, and the actual output
 produced by $c$.
 \end{definition}
+
+\paragraph{Example.}
+For Listing~\ref{lst:llm-incorrect} on $(-3,-10)$, the counterexample is
+$\bigl((-3,-10),\;\texttt{Error},\;\texttt{Critical}\bigr)$ and the violated
+scenario is $s_1$.
 
 Counterexamples are the primary feedback signal returned to the LLM.
 They are structured: the pipeline identifies not only that the candidate
@@ -328,6 +394,11 @@ task $t$ is
 $\mathrm{Conf}(c,t) \in [0, 1]$; a value of $1$ indicates that $c$ agrees
 with the oracle on every generated case.
 \end{definition}
+
+\paragraph{Example.}
+If $\mathcal{D}(t)$ has three witnesses and the buggy
+\code{classify\_signal} fails only on $(-3,-10)$, then
+$\mathrm{Conf}(c,t)=2/3$.
 
 \begin{definition}[Strict Success]
 \label{def:strict-success}
@@ -382,13 +453,19 @@ $\mathrm{Accept}(c,t) = 1$ is the condition under which HSP-Agile declares
 the synthesis attempt successful.
 \end{definition}
 
-The conjunction of formal conformance and pattern safety reflects the two
-distinct error modes that the system is designed to detect: (i) functional
-errors that cause incorrect outputs on specific inputs, detected by
-case-based testing; and (ii) structural errors in the implementation logic
-that correspond to known requirement fault patterns, detected by static
-analysis.  Neither check alone is sufficient, since a candidate can be
-formally conformant but harbour a latent pattern violation (or vice versa).
+\paragraph{Example.}
+A repaired \code{classify\_signal} with $\mathrm{Conf}=1$ still fails
+acceptance if RF07 (\emph{unconditional success}) fires on a hard-coded
+\texttt{return "Normal"}.
+Conversely, a candidate that clears the pattern screen but fails one witness
+also fails $\mathrm{Accept}$.
+This is the source of the strict-success paradox in Chapter~\ref{ch:results}:
+mean conformance can be high while acceptance remains selective.
+
+The conjunction of formal conformance and pattern safety reflects two error
+modes: (i)~functional errors on specific inputs, caught by witnesses; and
+(ii)~structural anti-patterns, caught by static screening.
+Neither check alone is sufficient.
 
 We can now state the main computational problem.
 

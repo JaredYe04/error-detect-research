@@ -1,47 +1,31 @@
 \chapter*{Abstract}
 \addcontentsline{toc}{chapter}{Abstract}
 
-LLM-generated implementations systematically fail to respect the ordered guard semantics of
-formal specifications, producing a class of defects we call \emph{specification-conformance
-defects}.  These defects are missed by existing test-based repair loops because they
-manifest only in the low-measure boundary regions that formal specifications are
-specifically designed to characterise.
+Large language models generate code that often looks plausible yet violates
+ordered guard semantics in formal specifications.
+We call these failures \emph{specification-conformance defects}: they hide in
+low-measure boundary regions that ordinary unit tests rarely sample, so
+test-based repair loops systematically miss them.
 
-We present the \textbf{Specification-guided Defect Prevention Framework} (\textsc{SgDP}),
-a general four-component architecture that grounds defect prevention in specification
-semantics at every stage: a \emph{Specification Oracle} derived directly from the formal
-spec, a \emph{Constraint-guided Witness Generator} using SMT solving to navigate to
-semantically critical boundary regions, a \emph{Scenario-aware Semantic Feedback IR}
-structuring counterexample information at the specification level, and a conjunctive
-\emph{Acceptance Predicate} gating release on both formal conformance and
-specification-derived quality criteria.
-A canonical \emph{SpecIR} layer with pluggable notation adapters and JSON schemas
-(\path{schemas/spec_ir.schema.json}, \path{schemas/semantic_feedback.schema.json})
-separates language-specific parsing from shared pipeline logic.
-\textbf{HSP-Agile} instantiates \textsc{SgDP} over the SOFL Functional Specification Format
-(FSF) via an FSF lowerer; Mini-Z and Mini-StateMachine adapters demonstrate cross-notation
-generalisation with only adapter-level changes.
+We present the \textbf{Specification-guided Defect Prevention Framework}
+(\textsc{SgDP}) and its SOFL/FSF instantiation \textbf{HSP-Agile}.
+The key idea is to treat the specification itself as the evidence source:
+SMT solving builds witnesses that activate each scenario under first-match
+precedence, and a typed Semantic Feedback IR turns each failure into a
+scenario-aware repair prompt.
+A conjunctive acceptance gate then releases a candidate only when every
+witness matches the oracle and no high-severity structural pattern remains.
 
-We establish three formal results: scenario-aware witness soundness
-(Theorem~\ref{thm:witness-soundness}), a finite-sample FAR bound on the
-acceptance predicate (Theorem~\ref{thm:far-bound}), and a random-vs.-SMT
-boundary hit-rate corollary (Corollary~\ref{cor:random-vs-smt}), together with
-an empirically supported hypothesis on structured feedback
-(Hypothesis~\ref{hyp:structured-feedback}).
-We evaluate on a benchmark of 120 precedence-sensitive hard tasks (plus 40 real-derived
-tasks from HumanEval/MBPP converted to FSF-style ordered scenarios) across nine execution
-modes (including Self-Refine and Self-Debug extended baselines), with a five-dimension
-evaluation protocol spanning overall effectiveness (E1), full prevention evaluation (E2),
-specification complexity analysis (E3), boundary density analysis (E4), repair dynamics
-(E5), feedback variant comparison (E6), pattern guard precision/recall (E7), and
-generalisation across 18-task Mini-Z and Mini-StateMachine notations (E8).
-
-HSP-Agile achieves 90.4\% mean strict formal conformance (+6.2~pp over one-shot LLM,
-+2.4~pp over test-feedback).  Mechanism analysis confirms that the advantage grows with
-specification complexity, that SMT witnesses maintain boundary coverage where random
-sampling fails, and that the Semantic Feedback IR yields substantially higher
-repair conformance than test-only or test-plus-expected feedback (+7.7\,pp in E6).  Generalisation experiments demonstrate consistent improvement across
-three specification notations with only adapter-level changes.
+On a 120-task precedence-sensitive benchmark, HSP-Agile reaches 90.4\% mean
+strict formal conformance (+6.2\,pp over one-shot LLM, +2.4\,pp over
+test-feedback).
+Mechanism studies show that the gain grows with guard overlap, that SMT
+witnesses keep boundary coverage where random sampling fails, and that the
+Semantic Feedback IR alone contributes +7.7\,pp over test-only repair prompts
+(E6).
+Adapter-level experiments on Mini-Z and Mini-StateMachine confirm the same
+prevention loop transfers across notations.
+All tasks, logs, and scripts are released for reproduction.
 
 \paragraph{Keywords.}
 Specification-guided defect prevention; formal specification; LLM synthesis; SOFL;

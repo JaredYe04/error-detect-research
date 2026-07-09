@@ -1,83 +1,75 @@
-% FSF Scenario Semantics Diagram — Ch. 3
-% Fragment: \input{diagrams/tikz/fsf_semantics} inside a figure environment.
-% Required TikZ libraries (add to document preamble):
-%   \usetikzlibrary{arrows.meta,shadows,shapes.geometric}
+% FSF Scenario Semantics Diagram — classify_signal running example
 \usetikzlibrary{arrows.meta,shadows,shapes.geometric}
+\input{diagrams/tikz/_theme}
 
 \begin{tikzpicture}[
   font=\small\sffamily,
   >=Stealth]
 
-%----------------------------------------------------------------
 % LEFT: FSF specification box
-%----------------------------------------------------------------
 \node[
-  draw=blue!50!black, fill=blue!5,
+  draw=SpecBlue!75!black, fill=SpecBlue!10,
   rounded corners=4pt,
-  text width=5.5cm, align=left, inner sep=7pt,
+  text width=5.6cm, align=left, inner sep=7pt,
   drop shadow={shadow xshift=0.4ex, shadow yshift=-0.4ex,
                shadow opacity=0.30}
 ] (spec) at (0,0) {%
-  \textbf{Function:}\ {\small\fontfamily{zi4}\selectfont classify(a, b, c)}\\[5pt]
+  \textbf{Function:}\ {\small\fontfamily{zi4}\selectfont classify\_signal}\\[2pt]
+  {\scriptsize\ttfamily (level, threshold) $\to$ alert}\\[5pt]
   \textbf{Scenarios:}\\[3pt]
-  \quad $S_1$:\; $a{>}10 \wedge b{>}5$\\
-  \hspace{2.8em}$\Rightarrow$ \textit{result} $:=$ \textquotedblleft high\textquotedblright\\[2pt]
-  \quad $S_2$:\; $a{>}5$\\
-  \hspace{2.8em}$\Rightarrow$ \textit{result} $:=$ \textquotedblleft medium\textquotedblright\\[2pt]
+  \quad $S_1$:\; $\mathit{level}<0$\\
+  \hspace{2.8em}$\Rightarrow$ \textit{alert} $:=$ \textquotedblleft Error\textquotedblright\\[2pt]
+  \quad $S_2$:\; $\mathit{level}\ge\mathit{threshold}$\\
+  \hspace{2.8em}$\Rightarrow$ \textit{alert} $:=$ \textquotedblleft Critical\textquotedblright\\[2pt]
   \quad $S_3$:\; \textit{others}\\
-  \hspace{2.8em}$\Rightarrow$ \textit{result} $:=$ \textquotedblleft low\textquotedblright%
+  \hspace{2.8em}$\Rightarrow$ \textit{alert} $:=$ \textquotedblleft Normal\textquotedblright%
 };
 
-%----------------------------------------------------------------
 % Connecting arrow
-%----------------------------------------------------------------
-\draw[-latex, thick]
+\draw[-latex, thick, SpecGray!80!black]
   (spec.east) --
   node[above, font=\small\sffamily, align=center] {FSF\\Evaluation}
   (6.2, 0);
 
-%----------------------------------------------------------------
-% RIGHT: Evaluation model
-%----------------------------------------------------------------
+% RIGHT: Evaluation model (level vs threshold sketch)
 \begin{scope}[xshift=9.0cm]
 
-  % Input space ellipse
   \draw[gray!50, fill=gray!6,
     drop shadow={shadow xshift=0.4ex, shadow yshift=-0.4ex,
                  shadow opacity=0.30}]
     (0,0) ellipse (2.7cm and 2.2cm);
-  \node[font=\scriptsize\sffamily] at (0, 2.36) {Input space $X$};
+  \node[font=\scriptsize\sffamily] at (0, 2.36)
+    {Input space $(\mathit{level},\mathit{threshold})$};
 
-  % S3 — outermost region (lowest priority)
-  \draw[draw=green!50!black, fill=green!10, rounded corners=2pt]
+  % S3 — others
+  \draw[draw=SpecGreen!70!black, fill=SpecGreen!12, rounded corners=2pt]
     (-1.9,-1.5) rectangle (1.9,1.5);
-  \node[font=\scriptsize\sffamily, above right, green!50!black]
+  \node[font=\scriptsize\sffamily, above right, SpecGreen!60!black]
     at (-1.9,1.5) {$S_3$};
 
-  % S2 — middle region
-  \draw[draw=orange!65!black, fill=orange!12, rounded corners=2pt]
+  % S2 — level >= threshold (middle)
+  \draw[draw=SpecOrange!75!black, fill=SpecOrange!14, rounded corners=2pt]
     (-1.1,-0.8) rectangle (1.5,1.0);
-  \node[font=\scriptsize\sffamily, above right, orange!65!black]
+  \node[font=\scriptsize\sffamily, above right, SpecOrange!80!black]
     at (-1.1,1.0) {$S_2$};
 
-  % S1 — innermost region (highest priority)
-  \draw[draw=red!60!black, fill=red!10, rounded corners=2pt]
-    (-0.1,0.1) rectangle (1.0,0.75);
+  % S1 — level < 0 (highest priority; overlaps S2 when threshold < 0)
+  \draw[draw=red!60!black, fill=red!12, rounded corners=2pt]
+    (-0.1,0.05) rectangle (1.0,0.75);
   \node[font=\scriptsize\sffamily, above right, red!60!black]
     at (-0.1,0.75) {$S_1$};
 
-  % Priority annotation
   \node[font=\scriptsize\sffamily, gray!60!black]
     at (0,-1.85) {$S_1 \succ S_2 \succ S_3$};
 
-  % Sample case dots D(t)
-  \foreach \x/\y in {
-    0.3/0.4,  -0.6/0.5,  0.7/-0.3, -1.3/0.8,
-    1.3/0.7,  -1.5/-0.2,  0.1/-0.9,  1.0/-0.8, -0.2/-0.5}
-    \fill[blue!55!black] (\x,\y) circle (1.6pt);
+  % Witness dots
+  \fill[SpecGreen!80!black] (0.35,0.40) circle (2.2pt);
+  \node[font=\tiny\sffamily, SpecGreen!70!black] at (0.95,0.35) {$(-3,-10)$};
+  \foreach \x/\y in {-0.6/0.5, 0.7/-0.3, -1.3/0.8, 1.3/0.7, -1.5/-0.2, 0.1/-0.9}
+    \fill[SpecBlue!70!black] (\x,\y) circle (1.5pt);
 
   \node[font=\scriptsize\sffamily, align=center]
-    at (0,-2.70) {Oracle $g_t\colon X\to Y$;\enspace dots $\in\mathcal{D}(t)$};
+    at (0,-2.70) {Oracle $g_t$; green dot $=$ $S_1$ witness};
 
 \end{scope}
 

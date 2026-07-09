@@ -1,0 +1,29 @@
+%% Accept decision tree: Conf==1? then Pattern hits? then Accept/Reject
+\input{diagrams/tikz/_theme}
+
+\begin{tikzpicture}[
+  font=\small\sffamily,
+  >=Stealth,
+  every node/.style={align=center},
+  dec/.style={sgdp/core, minimum width=2.4cm, minimum height=0.9cm},
+  yes/.style={sgdp/accept, minimum width=1.8cm},
+  no/.style={sgdp/lower, minimum width=1.8cm},
+]
+
+\node[dec] (conf) at (0,0) {$\mathrm{Conf}(c,t)=1$?};
+\node[dec] (pat) at (3.2,-1.6) {$P^H(c)=0$?};
+\node[no] (rej1) at (-3.2,-1.6) {Reject\\{\scriptsize repair / budget}};
+\node[yes] (acc) at (5.6,-3.2) {Accept};
+\node[no] (rej2) at (0.8,-3.2) {Reject\\{\scriptsize pattern hit}};
+
+\draw[sgdp/arr] (conf) -- node[left, font=\scriptsize] {no} (rej1);
+\draw[sgdp/arr] (conf) -- node[above, font=\scriptsize, pos=0.4] {yes} (pat);
+\draw[sgdp/arr] (pat) -- node[above, font=\scriptsize, pos=0.35] {yes} (acc);
+\draw[sgdp/arr] (pat) -- node[left, font=\scriptsize] {no} (rej2);
+
+\node[sgdp/lbl, below=0.35cm of conf, xshift=-0.2cm]
+  {witness oracle check};
+\node[sgdp/lbl, right=0.1cm of pat]
+  {static RF screen};
+
+\end{tikzpicture}

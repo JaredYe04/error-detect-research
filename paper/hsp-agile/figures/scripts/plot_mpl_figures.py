@@ -742,6 +742,29 @@ def plot_pareto(formats: list[str], dpi: int) -> None:
         ax.plot(frontier_x, frontier_y, ls="--", lw=1.4, color="#444444",
                 marker="D", markersize=4.5, zorder=4, label="Pareto frontier")
 
+    # Highlight mode M quality dominance region (highest Conf among LLM modes)
+    if "M" in df_plot.index:
+        m_row = df_plot.loc["M"]
+        ax.axhline(
+            m_row["quality"],
+            color=SGDP_GREEN,
+            ls=":",
+            lw=1.0,
+            alpha=0.7,
+            zorder=2,
+        )
+        ax.annotate(
+            "M: highest Conf\n(latency trade-off)",
+            xy=(m_row["latency_ms"], m_row["quality"]),
+            xytext=(0.55, 0.72),
+            textcoords="axes fraction",
+            fontsize=FONT_ANNOT - 0.5,
+            color=SGDP_GREEN,
+            fontweight="bold",
+            arrowprops=dict(arrowstyle="->", color=SGDP_GREEN, lw=0.9),
+            bbox=dict(boxstyle="round,pad=0.25", fc="white", ec=SGDP_GREEN, alpha=0.92, lw=0.7),
+        )
+
     ax.set_xscale("log")
     ax.yaxis.set_major_formatter(plt.FuncFormatter(lambda v, _: f"{v:.0%}"))
     ax.set_xlabel("Latency (ms, log scale)")
@@ -1469,11 +1492,39 @@ def plot_ccf_b_mechanism_figures(formats: list[str], dpi: int) -> None:
     ax.set_xlabel("Mode")
     ax.set_ylabel("Overlap density tier")
     ax.set_title(title)
+    # Annotate absolute Conf and, for M, pp delta vs B1 in the same tier
+    b1_col = modes.index("B1") if "B1" in modes else None
+    m_col = modes.index("M") if "M" in modes else None
     for i in range(len(tiers)):
         for j in range(len(modes)):
             val = matrix[i, j]
-            if not np.isnan(val):
-                ax.text(j, i, f"{val:.2f}", ha="center", va="center", fontsize=9)
+            if np.isnan(val):
+                continue
+            label = f"{val:.2f}"
+            if m_col is not None and j == m_col and b1_col is not None:
+                b1v = matrix[i, b1_col]
+                if not np.isnan(b1v):
+                    label = f"{val:.2f}\n({(val - b1v) * 100:+.0f}pp vs B1)"
+            ax.text(j, i, label, ha="center", va="center", fontsize=7.5)
+    if not np.isnan(matrix[0]).all():
+        ax.annotate(
+            "ceiling tier",
+            xy=(1, 0),
+            xytext=(2.55, -0.35),
+            fontsize=FONT_ANNOT - 0.5,
+            color="#555555",
+            arrowprops=dict(arrowstyle="->", color="#888888", lw=0.7),
+        )
+    if not np.isnan(matrix[-1]).all():
+        ax.annotate(
+            "SMT matters here",
+            xy=(m_col if m_col is not None else 2, len(tiers) - 1),
+            xytext=(2.55, len(tiers) - 0.55),
+            fontsize=FONT_ANNOT - 0.5,
+            color=SGDP_GREEN,
+            fontweight="bold",
+            arrowprops=dict(arrowstyle="->", color=SGDP_GREEN, lw=0.8),
+        )
     fig.colorbar(im, ax=ax, fraction=0.046, pad=0.04, label="Conf")
     fig.tight_layout()
     _save(fig, "complexity_heatmap", formats, dpi)
@@ -1496,8 +1547,20 @@ def plot_ccf_b_mechanism_figures(formats: list[str], dpi: int) -> None:
     ax.set_ylim(0.70, 1.0)
     ax.set_ylabel("Mean strict formal conformance")
     ax.set_title("Feedback variant comparison (E6)")
-    for b, v in zip(bars, conf):
-        ax.text(b.get_x() + b.get_width() / 2, v + 0.005, f"{v:.3f}", ha="center", fontsize=9)
+    tip_notes = [
+        "no scenario info",
+        "+expected only",
+        "full IR",
+    ]
+    for b, v, tip in zip(bars, conf, tip_notes[: len(bars)]):
+        ax.text(
+            b.get_x() + b.get_width() / 2,
+            v + 0.008,
+            f"{v:.3f}\n{tip}",
+            ha="center",
+            va="bottom",
+            fontsize=8,
+        )
     fig.tight_layout()
     _save(fig, "feedback_variant_bar", formats, dpi)
     plt.close(fig)

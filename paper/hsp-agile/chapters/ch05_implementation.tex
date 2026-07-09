@@ -5,16 +5,15 @@
 \chapter{Implementation}
 \label{ch:implementation}
 
-This chapter describes how the HSP-Agile pipeline described in
-Chapter~\ref{ch:method} is realised as a working software system.
-We adopt an algorithm-centric presentation: each section explains the
-computational responsibilities of a major module, the data structures it
-consumes and produces, and the control flow that connects it to adjacent
-layers.  The goal is to bridge the formal definitions of
-Chapter~\ref{ch:formalization} and the empirical evaluation of
-Chapter~\ref{ch:experiments} by making the operational semantics of
-$\mathrm{Conf}(c,t)$, $\mathrm{Accept}(c,t)$, and the repair budget~$K$
-concrete.
+This chapter explains how we built what Chapter~\ref{ch:method} defined.
+Each module maps to a pipeline stage: ingestion and SpecIR adapters feed
+Stage~1; the formal checker implements Stage~2; the repair engine implements
+Stage~3; the pattern guard implements Stage~4.
+We focus on data structures, control flow, and engineering trade-offs rather
+than restating the algorithms.
+For the running example \code{classify\_signal}, the same modules produce the
+witness $(-3,-10)$, the Semantic Feedback IR record, and the acceptance
+decision of Section~\ref{sec:method:worked}.
 
 Throughout, we inherit the notation of earlier chapters: an Agile-SOFL
 task $t = (\mathcal{S}_t, \mathcal{X}_t, \mathcal{Y}_t)$, candidate
@@ -60,11 +59,11 @@ exploited in Chapter~\ref{ch:experiments}.
       HSP-Agile system component architecture.
       \vspace{1.2cm}}}%
   }
-  \caption{HSP-Agile system component architecture.  The pipeline core
-           (synthesiser, formal checker, repair engine, pattern guard) sits
-           below specification ingestion; external LLM and SMT services attach
-           further down the stack.  Experiment orchestration feeds tasks in
-           from the benchmark system and returns aggregated results.}
+  \caption{HSP-Agile system component architecture (software view of
+           Figure~\ref{fig:sgdp-overview}).
+           The pipeline core realises Stages~1--4 of Chapter~\ref{ch:method};
+           external LLM and SMT services attach below; experiment orchestration
+           feeds benchmark tasks and returns aggregated results.}
   \label{fig:component-arch}
 \end{figure}
 
@@ -87,10 +86,10 @@ reproducibility and post-hoc analysis.
       HSP-Agile system class diagram.
       \vspace{1.2cm}}}%
   }
-  \caption{System class diagram.  \texttt{PipelineRunner} composes the LLM
-           client, formal checker, and pattern matcher behind a single
-           \texttt{run(task)} entry point.  Configuration is injected at
-           construction time and remains immutable for the lifetime of a run.}
+  \caption{System class diagram implementing Algorithm~\ref{alg:sgdp}.
+           \texttt{PipelineRunner} composes the LLM client (Stage~1), formal
+           checker (Stage~2), and pattern matcher (Stage~4) behind a single
+           \texttt{run(task)} entry point.}
   \label{fig:system-class}
 \end{figure}
 
@@ -101,7 +100,7 @@ each implementing \texttt{SpecAdapter.parse() $\to$ SpecIR} and delegating
 lowering to \texttt{FSFLowerer} (\path{src/ir/lowerers/fsf_lowerer.py}).
 The \emph{specification bridge} (SOFL path) invokes the Agile-SOFL parser and
 normalises its output into \texttt{SpecIR} before FSF lowering.  The \emph{pipeline runner} implements
-the control logic of Algorithm~\ref{alg:pipeline} from
+the control logic of Algorithm~\ref{alg:sgdp} from
 Chapter~\ref{ch:method}, including early termination on
 $\mathrm{Accept}(c_k,t)=1$ and best-effort fallback when $k > K$.
 The \emph{formal checker} encapsulates Z3 query construction, model
@@ -166,10 +165,11 @@ feedback notation-agnostic while preserving backward compatibility with the
       FSF specification parsing and test-case generation class diagram.
       \vspace{1.2cm}}}%
   }
-  \caption{FSF specification parsing and downstream translation.  The
-           specification bridge extracts a \texttt{TaskSpec}; the Z3
-           translator consumes individual \texttt{FSFScenario} objects to
-           produce \texttt{ConcreteCase} witnesses.}
+  \caption{FSF parsing and downstream translation (Stage~2 inputs of
+           Chapter~\ref{ch:method}).
+           For \code{classify\_signal}, the bridge yields a three-scenario
+           \texttt{TaskSpec}; the Z3 translator emits \texttt{ConcreteCase}
+           witnesses such as $(-3,-10)$.}
   \label{fig:fsf-parser-class}
 \end{figure}
 
@@ -291,8 +291,8 @@ and enables manual inspection of failure cases without re-invoking the API.
 
 \subsection{Prompt Template Structure}
 
-Prompt construction follows Definition~\ref{def:prompt} from
-Chapter~\ref{ch:method}.  The adapter does not embed domain logic; instead,
+Prompt construction follows the Stage~1 template of
+Section~\ref{subsec:method:prompt}.  The adapter does not embed domain logic; instead,
 the pipeline runner assembles a two-message chat completion request:
 
 \begin{itemize}
@@ -314,17 +314,10 @@ the user message grows with accumulated counterexamples.
 \subsection{Temperature and Top-$p$ Configuration}
 
 Generation hyperparameters are exposed as configuration fields on
-\texttt{PipelineConfig}.  The default settings are temperature
-$\tau = 0.2$ and nucleus sampling $\mathit{top\_p} = 0.95$.  The low
-temperature favours specification-faithful completions over creative
-variation; the moderately high top-$p$ retains enough diversity to escape
-local optima when the model's first attempt is syntactically valid but
-semantically wrong.
-
-In the experimental configuration reported in
-Chapter~\ref{ch:experiments}, initial synthesis calls use $\tau = 0.7$ to
-encourage diverse first candidates across the 120-task benchmark, while
-repair calls use $\tau = 0.0$ to make corrective edits near-deterministic
+\texttt{PipelineConfig}.  Nucleus sampling uses $\mathit{top\_p} = 0.95$.
+Matching Chapter~\ref{ch:experiments}, initial synthesis calls use
+$T_\text{gen} = 0.7$ to encourage diverse first candidates, while repair
+calls use $T_\text{repair} = 0.0$ so corrective edits are near-deterministic
 given identical counterexample feedback.  This dual-temperature strategy
 reflects the asymmetry between \emph{exploration} (first attempt) and
 \emph{exploitation} (targeted repair): the formal checker provides the
@@ -395,17 +388,18 @@ from case generation through candidate evaluation.
       Formal conformance checker activity diagram.
       \vspace{1.2cm}}}%
   }
-  \caption{Activity diagram of the formal conformance checker.  Case
-           generation (Z3) and candidate evaluation are separate partitions;
-           counterexamples produced in the evaluation partition feed the
-           repair engine on the next synthesis iteration.}
+  \caption{Activity diagram of the formal conformance checker (Stage~2,
+           Algorithm~\ref{alg:checker}).
+           Case generation and candidate evaluation are separate partitions;
+           counterexamples feed Stage~3 repair on the next synthesis iteration.}
   \label{fig:checker-activity}
 \end{figure}
 
 \subsection{FSF-to-Z3 Translation Strategy}
 
 Guard predicates from each \texttt{FSFScenario} are translated into Z3
-integer constraints following Definition~\ref{def:z3-guard}.  The translator
+integer constraints following the priority encoding of
+equation~\eqref{eq:priority}.  The translator
 maintains a symbol table mapping each variable name in $\mathcal{X}_t \cup
 \mathcal{Y}_t$ to a Z3 \texttt{Int} constant.  Relational atoms in the
 normalised syntax (\texttt{gt}, \texttt{lt}, \texttt{eq}, etc.) are mapped
@@ -425,7 +419,7 @@ restriction on $\mathcal{X}_t$.
 First-match semantics require that a test case for scenario~$s_i$ activate
 $s_i$ and no higher-priority scenario.  The implementation encodes this as
 the priority-constrained formula $\Phi_i$ from
-equation~\eqref{eq:priority-constraint}:
+equation~\eqref{eq:priority}:
 \[
   \Phi_i \;\equiv\; \widehat{g}_i \;\land\;
     \bigwedge_{j=1}^{i-1} \lnot\,\widehat{g}_j.
@@ -457,7 +451,7 @@ model, then re-queries for an alternative witness.
 \For{$i = 1$ \textbf{to} $n$}
   \State $\Phi_i \leftarrow \ProcCall{GuardToZ3}{g_i} \land
          \bigwedge_{j<i} \lnot\,\ProcCall{GuardToZ3}{g_j}$
-         \Comment{eq.~\eqref{eq:priority-constraint}}
+         \Comment{eq.~\eqref{eq:priority}}
   \State $\mathit{solver} \leftarrow \ProcCall{FreshSolver}{}$
   \State $\ProcCall{Add}{\mathit{solver},\,\Phi_i}$
   \State $\ProcCall{Add}{\mathit{solver},\,
@@ -486,7 +480,7 @@ compares the returned dictionary against the oracle output field-by-field
 using integer equality.  Runtime exceptions are recorded as counterexamples
 with an empty actual-output field and an error annotation.
 
-The conformance score follows equation~\eqref{eq:conf-score}:
+The conformance score follows equation~\eqref{eq:conformance}:
 $\mathrm{Conf}(c,t) = |\mathit{passed}| / |\mathcal{D}(t)|$.
 A candidate achieves \emph{strict formal pass} when
 $\mathrm{Conf}(c,t) = 1$ and $|\mathcal{D}(t)| > 0$.
@@ -507,7 +501,7 @@ latency--coverage trade-off:
 The 16-case internal budget and 64-case strict budget are configuration
 parameters on \texttt{PipelineConfig}; neither is hard-coded, allowing
 sensitivity analysis over case-count settings (reported in
-Section~\ref{sec:exp:sensitivity} of Chapter~\ref{ch:experiments}).
+Section~\ref{sec:results:sensitivity} of Chapter~\ref{ch:results}).
 
 % ---------------------------------------------------------------------------
 \section{Counterexample-Guided Repair Engine}
@@ -520,7 +514,8 @@ Its core responsibility is state management across iterations: maintaining the
 feedback buffer, incrementing the attempt counter, and deciding whether to
 continue synthesis or exit with a best-effort candidate.
 Figure~\ref{fig:pipeline-state} (below) formalises the control states; the
-repair data flow is shown separately in Figure~\ref{fig:repair-feedback-impl}.
+repair data flow is shown in Figure~\ref{fig:repair-feedback}
+(Chapter~\ref{ch:method}).
 
 \begin{figure}[t]
   \centering
@@ -532,21 +527,12 @@ repair data flow is shown separately in Figure~\ref{fig:repair-feedback-impl}.
       HSP-Agile pipeline state machine.
       \vspace{1.2cm}}}%
   }
-  \caption{Pipeline state machine.  The repair state aggregates
+  \caption{Pipeline state machine (implements Stage~3 of
+           Chapter~\ref{ch:method}).  The repair state aggregates
            counterexamples and pattern hits into the feedback buffer before
            returning to synthesis.  Acceptance requires both formal
            conformance and a clear high-severity pattern screen.}
   \label{fig:pipeline-state}
-\end{figure}
-
-\begin{figure}[t]
-  \centering
-  \tikzinput{diagrams/tikz/repair_feedback}
-  \caption{Counterexample-guided repair iteration (implementation view).
-           Structured feedback combines formal counterexamples and pattern
-           violations; the loop exits on $\mathrm{Accept}(c_k,t)=1$ or when
-           the budget~$K$ is exhausted.}
-  \label{fig:repair-feedback-impl}
 \end{figure}
 
 \subsection{Feedback State Machine}
@@ -643,8 +629,8 @@ Algorithm~\ref{alg:repair-loop} formalises the repair engine control logic.
 
 The pattern guard module instantiates Stage~4 of the pipeline.  It evaluates
 the catalogue $\mathcal{P}$ of 14 requirement fault patterns (RF01--RF14)
-against each candidate, producing a hit set $\mathrm{Hits}(c,t)$ per
-Definition~\ref{def:pattern-hits}.  The hybrid AST/regex strategy follows
+against each candidate, producing a hit set $\mathrm{Hits}(c,t)$ as in
+Section~\ref{subsec:method:detection}.  The hybrid AST/regex strategy follows
 the pattern-matching philosophy of industrial static analysers such as
 FindBugs~\citep{hovemeyer2004findbugs,ayewah2008findbugs}.
 
@@ -653,8 +639,8 @@ FindBugs~\citep{hovemeyer2004findbugs,ayewah2008findbugs}.
 The full catalogue is defined in Table~\ref{tab:patterns} of
 Chapter~\ref{ch:method}.  Patterns are classified by severity:
 \emph{critical} (RF07), \emph{high}, \emph{medium}, and \emph{low}.
-The high-severity subset $\mathcal{P}^H$ from
-equation~\eqref{eq:high-sev} comprises nine patterns whose detection
+The high-severity subset $\mathcal{P}^H$ used in
+equation~\eqref{eq:accept} comprises nine patterns whose detection
 immediately blocks acceptance:
 \[
   \mathcal{P}^H = \{\text{RF01}, \text{RF02}, \text{RF04}, \text{RF05},
@@ -710,7 +696,8 @@ triggers RF07 (unconditional success) is routed to the repair state rather
 than accepted, and the pattern violation is verbalised alongside any
 counterexamples in the feedback buffer.  This ordering ensures that the
 formal checker and pattern guard operate as complementary filters rather
-than redundant substitutes, as argued in Section~\ref{sec:method:accept}.
+than redundant substitutes, as argued in
+Section~\ref{subsec:conformance-acceptance}.
 
 % ---------------------------------------------------------------------------
 \section{Experiment Orchestration}
@@ -893,17 +880,12 @@ principle~P2.
 \addcontentsline{toc}{section}{Chapter Summary}
 % ---------------------------------------------------------------------------
 
-This chapter presented the implementation of HSP-Agile as a layered system
-comprising specification ingestion, pipeline orchestration, and external
-service adapters.  The specification bridge normalises Agile-SOFL artefacts
-into \texttt{TaskSpec} records; the LLM client adapter provides resilient LLM
-access with structured repair feedback; the formal checker translates FSF
-guards into Z3 constraints with priority encoding and generates concrete
-cases at two granularities (16 for repair, 64 for strict evaluation); the
-repair engine implements a bounded CEGIS loop with conjunctive acceptance;
-the pattern guard enforces the RF01--RF14 catalogue via hybrid AST and regex
-detection; and the experiment orchestrator executes seven evaluation modes in
-parallel with resume-safe persistence.  The design decisions---Z3 over random
-testing, conjunctive acceptance, and the two-tier case budget---reflect
-deliberate trade-offs between formal rigour and operational practicality that
-are evaluated empirically in the next chapter.
+In short, the implementation realises Stages~1--4 of Chapter~\ref{ch:method}:
+adapters and \texttt{TaskSpec} ingestion feed synthesis; the Z3 checker builds
+witnesses (16 for repair, 64 for strict evaluation); the repair engine runs a
+bounded CEGIS loop with Semantic Feedback IR; and the pattern guard applies
+RF01--RF14 before acceptance.
+The experiment orchestrator runs the seven evaluation modes in parallel with
+resume-safe logs.
+The next chapter specifies how we measure whether those engineering choices
+pay off.

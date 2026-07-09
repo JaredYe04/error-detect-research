@@ -1,66 +1,178 @@
 {
-  "version": 1,
-  "notes": "Each command is executable from repository root.",
+  "version": 2,
+  "notes": "Commands are executable from the repository root. Primary generator is plot_mpl_figures.py; plot_paper_figures.py remains a Plotly fallback for a subset of stems.",
   "figures": [
     {
       "figure_id": "mode_distribution_strict_conformance",
       "output_files": [
-        "paper/hsp-agile/figures/mode_distribution_strict_conformance.html",
         "paper/hsp-agile/figures/mode_distribution_strict_conformance.png",
         "paper/hsp-agile/figures/mode_distribution_strict_conformance.pdf"
       ],
-      "source_files": [
-        "paper/hsp-agile/data/processed/distribution_by_mode.csv"
-      ],
-      "command": "python paper/hsp-agile/figures/scripts/plot_paper_figures.py --only mode_distribution_strict_conformance --static-formats png pdf --dpi 300 --seed 7"
+      "source_files": ["paper/hsp-agile/data/processed/distribution_by_mode.csv"],
+      "command": "python paper/hsp-agile/figures/scripts/plot_mpl_figures.py --only mode_distribution_strict_conformance --formats pdf png --dpi 200"
     },
     {
       "figure_id": "mode_distribution_latency",
       "output_files": [
-        "paper/hsp-agile/figures/mode_distribution_latency.html",
         "paper/hsp-agile/figures/mode_distribution_latency.png",
         "paper/hsp-agile/figures/mode_distribution_latency.pdf"
       ],
-      "source_files": [
-        "paper/hsp-agile/data/processed/distribution_by_mode.csv"
-      ],
-      "command": "python paper/hsp-agile/figures/scripts/plot_paper_figures.py --only mode_distribution_latency --static-formats png pdf --dpi 300 --seed 7"
+      "source_files": ["paper/hsp-agile/data/processed/distribution_by_mode.csv"],
+      "command": "python paper/hsp-agile/figures/scripts/plot_mpl_figures.py --only mode_distribution_latency --formats pdf png --dpi 200"
     },
     {
       "figure_id": "ablation_contribution_ci",
       "output_files": [
-        "paper/hsp-agile/figures/ablation_contribution_ci.html",
         "paper/hsp-agile/figures/ablation_contribution_ci.png",
         "paper/hsp-agile/figures/ablation_contribution_ci.pdf"
       ],
-      "source_files": [
-        "paper/hsp-agile/data/processed/ablation_contribution.csv"
-      ],
-      "command": "python paper/hsp-agile/figures/scripts/plot_paper_figures.py --only ablation_contribution_ci --static-formats png pdf --dpi 300 --seed 7"
+      "source_files": ["paper/hsp-agile/data/processed/ablation_contribution.csv"],
+      "command": "python paper/hsp-agile/figures/scripts/plot_mpl_figures.py --only ablation_contribution_ci --formats pdf png --dpi 200"
     },
     {
       "figure_id": "prevention_heatmap_by_mode_eval",
       "output_files": [
-        "paper/hsp-agile/figures/prevention_heatmap_by_mode_eval.html",
         "paper/hsp-agile/figures/prevention_heatmap_by_mode_eval.png",
         "paper/hsp-agile/figures/prevention_heatmap_by_mode_eval.pdf"
       ],
-      "source_files": [
-        "paper/hsp-agile/data/processed/prevention_heatmap.csv"
-      ],
-      "command": "python paper/hsp-agile/figures/scripts/plot_paper_figures.py --only prevention_heatmap_by_mode_eval --static-formats png pdf --dpi 300 --seed 7"
+      "source_files": ["paper/hsp-agile/data/processed/prevention_heatmap.csv"],
+      "command": "python paper/hsp-agile/figures/scripts/plot_mpl_figures.py --only prevention_heatmap_by_mode_eval --formats pdf png --dpi 200"
     },
     {
       "figure_id": "pareto_quality_vs_latency",
       "output_files": [
-        "paper/hsp-agile/figures/pareto_quality_vs_latency.html",
         "paper/hsp-agile/figures/pareto_quality_vs_latency.png",
         "paper/hsp-agile/figures/pareto_quality_vs_latency.pdf"
       ],
-      "source_files": [
-        "paper/hsp-agile/data/processed/pareto_by_mode.csv"
+      "source_files": ["paper/hsp-agile/data/processed/pareto_by_mode.csv"],
+      "command": "python paper/hsp-agile/figures/scripts/plot_mpl_figures.py --only pareto_quality_vs_latency --formats pdf png --dpi 200"
+    },
+    {
+      "figure_id": "summary_metrics_by_mode",
+      "output_files": [
+        "paper/hsp-agile/figures/summary_metrics_by_mode.png",
+        "paper/hsp-agile/figures/summary_metrics_by_mode.pdf"
       ],
-      "command": "python paper/hsp-agile/figures/scripts/plot_paper_figures.py --only pareto_quality_vs_latency --static-formats png pdf --dpi 300 --seed 7"
+      "source_files": ["paper/hsp-agile/data/processed/summary_by_mode.csv"],
+      "command": "python paper/hsp-agile/figures/scripts/plot_mpl_figures.py --only summary_metrics_by_mode --formats pdf png --dpi 200"
+    },
+    {
+      "figure_id": "formal_conformance_cdf",
+      "output_files": [
+        "paper/hsp-agile/figures/formal_conformance_cdf.png",
+        "paper/hsp-agile/figures/formal_conformance_cdf.pdf"
+      ],
+      "source_files": ["paper/hsp-agile/data/processed/distribution_by_mode.csv"],
+      "command": "python paper/hsp-agile/figures/scripts/plot_mpl_figures.py --only formal_conformance_cdf --formats pdf png --dpi 200"
+    },
+    {
+      "figure_id": "llm_calls_distribution",
+      "output_files": [
+        "paper/hsp-agile/figures/llm_calls_distribution.png",
+        "paper/hsp-agile/figures/llm_calls_distribution.pdf"
+      ],
+      "source_files": ["paper/hsp-agile/data/processed/distribution_by_mode.csv"],
+      "command": "python paper/hsp-agile/figures/scripts/plot_mpl_figures.py --only llm_calls_distribution --formats pdf png --dpi 200"
+    },
+    {
+      "figure_id": "repair_convergence",
+      "output_files": [
+        "paper/hsp-agile/figures/repair_convergence.png",
+        "paper/hsp-agile/figures/repair_convergence.pdf"
+      ],
+      "source_files": ["paper/hsp-agile/data/processed/repair_convergence.csv"],
+      "command": "python paper/hsp-agile/figures/scripts/plot_mpl_figures.py --only repair_convergence --formats pdf png --dpi 200"
+    },
+    {
+      "figure_id": "sensitivity_heatmap",
+      "output_files": [
+        "paper/hsp-agile/figures/sensitivity_heatmap.png",
+        "paper/hsp-agile/figures/sensitivity_heatmap.pdf"
+      ],
+      "source_files": ["paper/hsp-agile/data/processed/sensitivity.csv"],
+      "command": "python paper/hsp-agile/figures/scripts/plot_mpl_figures.py --only sensitivity_heatmap --formats pdf png --dpi 200"
+    },
+    {
+      "figure_id": "radar_metrics",
+      "output_files": [
+        "paper/hsp-agile/figures/radar_metrics.png",
+        "paper/hsp-agile/figures/radar_metrics.pdf"
+      ],
+      "source_files": ["paper/hsp-agile/data/processed/summary_by_mode.csv"],
+      "command": "python paper/hsp-agile/figures/scripts/plot_mpl_figures.py --only radar_metrics --formats pdf png --dpi 200"
+    },
+    {
+      "figure_id": "prevention_bar",
+      "output_files": [
+        "paper/hsp-agile/figures/prevention_bar.png",
+        "paper/hsp-agile/figures/prevention_bar.pdf"
+      ],
+      "source_files": ["paper/hsp-agile/data/processed/prevention_summary.json"],
+      "command": "python paper/hsp-agile/figures/scripts/plot_mpl_figures.py --only prevention_bar --formats pdf png --dpi 200"
+    },
+    {
+      "figure_id": "complexity_heatmap",
+      "output_files": [
+        "paper/hsp-agile/figures/complexity_heatmap.png",
+        "paper/hsp-agile/figures/complexity_heatmap.pdf"
+      ],
+      "source_files": ["paper/hsp-agile/data/processed/complexity_by_mode.csv"],
+      "command": "python paper/hsp-agile/figures/scripts/plot_mpl_figures.py --only complexity_heatmap --formats pdf png --dpi 200"
+    },
+    {
+      "figure_id": "feedback_variant_bar",
+      "output_files": [
+        "paper/hsp-agile/figures/feedback_variant_bar.png",
+        "paper/hsp-agile/figures/feedback_variant_bar.pdf"
+      ],
+      "source_files": ["paper/hsp-agile/data/processed/feedback_variant.csv"],
+      "command": "python paper/hsp-agile/figures/scripts/plot_mpl_figures.py --only feedback_variant_bar --formats pdf png --dpi 200"
+    },
+    {
+      "figure_id": "pattern_guard_f1_bar",
+      "output_files": [
+        "paper/hsp-agile/figures/pattern_guard_f1_bar.png",
+        "paper/hsp-agile/figures/pattern_guard_f1_bar.pdf"
+      ],
+      "source_files": ["paper/hsp-agile/data/processed/pattern_prf1.json"],
+      "command": "python paper/hsp-agile/figures/scripts/plot_mpl_figures.py --only pattern_guard_f1_bar --formats pdf png --dpi 200"
+    },
+    {
+      "figure_id": "boundary_coverage_by_density",
+      "output_files": [
+        "paper/hsp-agile/figures/boundary_coverage_by_density.png",
+        "paper/hsp-agile/figures/boundary_coverage_by_density.pdf"
+      ],
+      "source_files": ["paper/hsp-agile/data/processed/boundary_coverage.csv"],
+      "command": "python paper/hsp-agile/figures/scripts/plot_mpl_figures.py --only boundary_coverage_by_density --formats pdf png --dpi 200"
+    },
+    {
+      "figure_id": "generalisation_bar",
+      "output_files": [
+        "paper/hsp-agile/figures/generalisation_bar.png",
+        "paper/hsp-agile/figures/generalisation_bar.pdf"
+      ],
+      "source_files": ["paper/hsp-agile/data/processed/generalisation.csv"],
+      "command": "python paper/hsp-agile/figures/scripts/plot_mpl_figures.py --only generalisation_bar --formats pdf png --dpi 200"
+    },
+    {
+      "figure_id": "failure_taxonomy_pie",
+      "output_files": [
+        "paper/hsp-agile/figures/failure_taxonomy_pie.png",
+        "paper/hsp-agile/figures/failure_taxonomy_pie.pdf"
+      ],
+      "source_files": ["paper/hsp-agile/data/processed/failure_taxonomy.json"],
+      "command": "python paper/hsp-agile/figures/scripts/plot_mpl_figures.py --only failure_taxonomy_pie --formats pdf png --dpi 200"
+    },
+    {
+      "figure_id": "residual_error_distribution",
+      "output_files": [
+        "paper/hsp-agile/figures/residual_error_distribution.png",
+        "paper/hsp-agile/figures/residual_error_distribution.pdf"
+      ],
+      "source_files": ["paper/hsp-agile/data/processed/residual_error_distribution.csv"],
+      "command": "python paper/hsp-agile/figures/scripts/plot_mpl_figures.py --only residual_error_distribution --formats pdf png --dpi 200",
+      "notes": "Superseded in Ch8 narrative by failure_taxonomy_pie; retained for reproducibility."
     }
   ]
 }

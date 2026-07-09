@@ -1,0 +1,36 @@
+\begin{table*}[t]
+\caption{Core Terminology}
+\label{tab:glossary}
+\centering
+\begin{tabular}{p{0.28\textwidth} p{0.66\textwidth}}
+\toprule
+Term & Meaning \\
+\midrule
+\emph{Specification-conformance defect}
+  & A fault where generated code behaves correctly on typical inputs yet
+    violates the formal specification on precedence-critical or
+    low-measure boundary regions that ordinary unit tests rarely reach. \\
+\emph{First-match semantics}
+  & Evaluation rule for ordered guard scenarios: the first scenario whose
+    guard holds determines the output; later scenarios apply only to inputs
+    not already claimed by earlier guards. \\
+\emph{Witness}
+  & A concrete input produced by SMT solving so that a designated scenario
+    is the unique first match; used as an oracle test case. \\
+\emph{Strict formal conformance}
+  & Fraction of SMT witnesses on which the candidate matches the
+    specification oracle ($\mathrm{Conf}(c,t)$). \\
+\emph{Strict success / acceptance}
+  & Release decision $\mathrm{Accept}(c,t)$: full witness conformance
+    \emph{and} no high-severity pattern hits. Conformance can be high while
+    acceptance remains low when residual witnesses or patterns still fail. \\
+\emph{Semantic Feedback IR}
+  & Typed JSON record of a conformance failure (scenario, guard, witness,
+    observed vs.\ expected output, violation type) rendered into repair
+    prompts. \\
+\emph{SpecIR}
+  & Notation-agnostic intermediate representation of ordered guarded cases;
+    adapters map surface languages (FSF, Mini-Z, Mini-SM) into SpecIR. \\
+\bottomrule
+\end{tabular}
+\end{table*}

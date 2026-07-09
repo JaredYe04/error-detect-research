@@ -1,0 +1,47 @@
+%% FSF text -> SpecIR JSON -> priority formula -> witness
+\input{diagrams/tikz/_theme}
+
+\begin{tikzpicture}[
+  font=\scriptsize\sffamily,
+  node distance=0.35cm and 0.28cm,
+]
+
+\node[sgdp/adapter, minimum width=2.6cm, text width=2.4cm, align=left] (fsf) {%
+  \textbf{1. FSF text}\\[2pt]
+  {\ttfamily\fontsize{6}{7}\selectfont
+  S1: level < 0\\
+  S2: level >= thr\\
+  S3: others}%
+};
+
+\node[sgdp/core, minimum width=2.9cm, text width=2.7cm, align=left, right=of fsf] (ir) {%
+  \textbf{2. SpecIR}\\[2pt]
+  {\ttfamily\fontsize{5.5}{6.5}\selectfont
+  cases[0].guard:\\
+  ~~\{var:level, op:lt,\\
+  ~~~~threshold:0\}}%
+};
+
+\node[sgdp/core, minimum width=2.8cm, text width=2.6cm, align=left, right=of ir] (phi) {%
+  \textbf{3. Priority $\Phi_1$}\\[2pt]
+  $\Phi_1 \triangleq$\\
+  $\mathit{level}<0$\\
+  (no prior guards)%
+};
+
+\node[sgdp/accept, minimum width=2.4cm, text width=2.2cm, align=left, right=of phi] (wit) {%
+  \textbf{4. Witness}\\[2pt]
+  $(-3,-10)$\\
+  $g_t\mapsto$ Error%
+};
+
+\draw[sgdp/arr] (fsf) -- (ir);
+\draw[sgdp/arr] (ir) -- (phi);
+\draw[sgdp/arr] (phi) -- (wit);
+
+\node[sgdp/lbl, below=0.15cm of fsf] {surface syntax};
+\node[sgdp/lbl, below=0.15cm of ir] {Adapt$_{\text{FSF}}$};
+\node[sgdp/lbl, below=0.15cm of phi] {Z3 encoding};
+\node[sgdp/lbl, below=0.15cm of wit] {model extract};
+
+\end{tikzpicture}
