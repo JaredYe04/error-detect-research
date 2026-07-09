@@ -5,14 +5,12 @@
 \chapter{Discussion and Threats to Validity}
 \label{ch:discussion}
 
-Empirical tables raise questions that numbers alone cannot settle.
-Why does higher conformance coexist with a lower strict-success rate?
-Which residual failures remain after budget~$K=3$?
-What should a sprint team actually change?
-The discussion below answers those questions, situates \textsc{SgDP} among
-related approaches, and states limitations and threats.
-A preview appeared in Section~\ref{sec:exp:threats-preview}; this chapter gives
-the full analysis.
+This chapter is reflection.
+The tables already state \emph{what} happened; the questions here are
+\emph{why it matters}, \emph{what still fails}, and \emph{what a sprint team
+should change}.
+Threats were previewed in Section~\ref{sec:exp:threats-preview}; the full
+analysis is below.
 
 
 %=============================================================================
@@ -21,35 +19,23 @@ the full analysis.
 %=============================================================================
 
 \paragraph{Practical takeaway.}
-When ordered guard specifications are already available, an SMT-backed
-prevention loop is worth the latency: mean conformance exceeds one-shot and
-test-feedback repair, and the gain is largest where guards overlap.
-Not every task clears the conjunctive acceptance gate in three attempts;
-acceptance is best treated as a CI quality bar, with conformance as the
-primary quality signal.
+When ordered guard specifications already exist, an SMT-backed loop is worth
+the latency: the gain is largest where guards overlap, and acceptance is best
+treated as a CI bar with conformance as the primary quality signal.
 
-The headline number is unchanged: mode~M reaches \textbf{90.4\%} mean strict
-formal conformance on the 120-task hard benchmark---\textbf{+6.2\,pp} over
-one-shot LLM (B1: 84.2\%) and \textbf{+2.4\,pp} over test-feedback (B2:
-88.0\%).
+The headline stands: M at \textbf{90.4\%} Conf.\ (+6.2\,pp over B1, +2.4\,pp
+over B2).
+Two mechanisms: Z3 witnesses hit ordering constraints that unit tests
+miss~\citep{barrett2018smt,demoura2008z3,zhu1997specification}; Semantic
+Feedback IR then names the violated scenario for the next
+call~\citep{solarlezama2008sketching,lynn2024verifierloop}.
 
-Two mechanisms explain the gain.
-Z3-driven witnesses target the ordering constraints in each FSF
-specification~\citep{barrett2018smt,demoura2008z3,liu2014sofl}, exposing
-violations that coarser unit tests miss~\citep{zhu1997specification,ammann2016testing}.
-The CEGIS repair loop~\citep{solarlezama2008sketching} then turns those
-failures into Semantic Feedback IR prompts that name the violated scenario and
-guard~\citep{lynn2024verifierloop,chen2021codex}.
-
-B0's 27.5\% conformance is a difficulty calibration, not a production
-baseline: template generation fails on the hard partition by design.
-Ablations separate the contributions: A1 (no formal checker) drops to 86.5\%
-($-3.9$\,pp); A3 (no repair) drops to 84.1\% ($-6.3$\,pp); A2 (no pattern
-guard) yields a marginal $+0.5$\,pp on conformance, discussed in
-Section~\ref{sec:disc:implications}.
-E3--E6 reinforce the same story: the advantage grows with overlap, SMT keeps
-boundary coverage where random sampling fails, and the Semantic Feedback IR
-alone accounts for \textbf{+7.7\,pp} over test-only prompts.
+B0's 27.5\% is difficulty calibration, not a production baseline.
+Ablations: A3 $-$6.3\,pp (no repair), A1 $-$3.9\,pp (no checker), A2
+$+$0.5\,pp on Conf.\ (pattern guard is a gate, not a conformance booster;
+Section~\ref{sec:disc:implications}).
+E3--E6 agree: overlap amplifies the gap; SMT keeps boundary coverage; the
+typed feedback record alone is \textbf{+7.7\,pp} over test-only prompts.
 
 
 %=============================================================================
@@ -77,31 +63,12 @@ The pie in Figure~\ref{fig:failure-taxonomy} is the map of that residual mass.
   \label{fig:failure-taxonomy}
 \end{figure}
 
-Among the 90 non-accepted tasks under mode~M after $K=3$,
-\emph{OrderingError} (31.1\%, $n=28$) is the largest slice.
-These tasks expose scenario-ordering violations that the repair loop cannot
-resolve because the LLM re-introduces the same ordering assumption after each
-witness.
-\emph{BoundaryError} (26.7\%, $n=24$) covers threshold-shift faults where the
-generated code deviates by at most one unit on a boundary condition---violations
-difficult to synthesise without dense boundary-value witnesses.
-\emph{ArithmeticError} (17.8\%, $n=16$) captures tasks where the LLM generates
-an arithmetically inconsistent computation (e.g.\ an off-by-factor-of-ten
-calculation) that passes structural guards but fails numerical witnesses.
-\emph{StateError} (13.3\%, $n=12$) arises when the generated function mismanages
-accumulated state across multiple scenario invocations, yielding correct
-individual-step outputs but incorrect cumulative results.
-\emph{Hallucination} (5.6\%, $n=5$) covers candidates that call non-existent
-library functions or assert preconditions that do not appear in the FSF---errors
-undetectable by the formal witness set but caught by static pattern guard RF07.
-\emph{MissingConstraint} (3.3\%, $n=3$) and \emph{Other} (2.2\%, $n=2$)
-collect residual cases not covered by the named patterns.
-
-These categories directly guide future work: richer Semantic Feedback IR
-templates targeting ordering and arithmetic violations would reduce the combined
-49\%-point majority; denser per-branch witness generation would address
-\emph{BoundaryError}; and state-tracking auxiliary context in the repair prompt
-would reduce \emph{StateError}.
+Of 90 non-accepted tasks after $K{=}3$: OrderingError 31.1\% (LLM re-asserts
+wrong order), BoundaryError 26.7\% (off-by-one), ArithmeticError 17.8\%,
+StateError 13.3\%, Hallucination 5.6\% (often RF07), MissingConstraint /
+Other the rest.
+Implication: richer ordering/arithmetic feedback and denser boundary
+witnesses target the majority; multi-step witnesses target StateError.
 
 %-----------------------------------------------------------------------------
 \subsection{Named Failure Patterns}

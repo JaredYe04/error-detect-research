@@ -4,15 +4,11 @@
 \chapter{Experimental Results}
 \label{ch:results}
 
-Numbers alone do not explain a method.
-The sections below therefore begin with mechanism evidence---\emph{why} the
-framework works (E3--E6)---and only then report overall effectiveness
-(E1/E2).
-Table~\ref{tab:results-roadmap} maps each research question to its section and
-key figure so the non-numeric order remains navigable.
-Unless noted, every experiment uses the 120-task hard benchmark and the seven
-primary modes (B0, B1, B2, M, A1, A2, A3); extended baselines B3/B4 and
-notation-specific generalisation tasks appear where available.
+This chapter is evidence, not method restatement.
+Mechanism first (E3--E6: where and why the gain appears), then aggregates
+(E1/E2), then cost and transfer.
+Table~\ref{tab:results-roadmap} is the map; unless noted, $n{=}120$ hard tasks
+and the seven primary modes apply.
 
 \begin{inlinetable}{Results roadmap: mechanism-first presentation order.}
   \label{tab:results-roadmap}
@@ -48,27 +44,15 @@ SMT witnesses matter most where random tests fail.
   \label{fig:complexity}
 \end{figure}
 
-The stratification in Figure~\ref{fig:complexity} asks where the framework's
-advantage actually lives.
-In the low-complexity tier (sparse guard overlap), M, B2, and B1 are close
-(approximately 93\%, 91\%, and 88\%).
-In the high-complexity tier (dense overlap), M leads B2 by about 3\,pp and B1
-by about 8\,pp (87\% vs.\ 84\% vs.\ 79\%).
-The gap widens exactly where SMT witnesses matter: boundary regions that
-random or test-feedback sampling rarely reach.
-
-Absolute levels follow the same story: about 93\% Conf.\ in the low-overlap
-tertile, 90\% in the medium, and 87\% in the high---with B1 falling to about
-79\% on the hardest band.
-
-\paragraph{Vignette (high-overlap ordering failure).}
-Consider a hard-benchmark sibling of \code{classify\_signal} whose first two
-guards nest as $a>80\land b<20$ before $a>50$.
-Under mode~B1 the candidate evaluates the broader guard first and fails the
-SMT witness in the nested region; under mode~M the Semantic Feedback IR names
-Scenario~S1 and the second attempt restores priority order.
-Tasks of this shape dominate the high-overlap tertile where M's gap over B1
-reaches approximately 8\,pp.
+Where does the advantage live?
+In the sparse-overlap tier, M/B2/B1 are close ($\approx$93/91/88\%).
+In the dense-overlap tier, M leads B2 by $\approx$3\,pp and B1 by $\approx$8\,pp
+(87 vs.\ 84 vs.\ 79\%).
+The gap widens exactly where random tests miss boundary regions---the same
+failure mode as \code{classify\_signal}'s $(-3,-10)$, now nested as
+$a>80\land b<20$ before $a>50$.
+Under B1 the broader guard wins; under M the Semantic Feedback IR names S1 and
+the second attempt restores order.
 
 \paragraph{Answer to RQ4.}
 The framework's conformance advantage scales with specification complexity, with the
@@ -157,47 +141,26 @@ a negative delta indicates that removing the component \emph{hurts} conformance.
 \begin{figure}[t]
   \centering
   \widefig{figures/ablation_contribution_ci.pdf}
-  \caption{Ablation deltas relative to full M.  Error bars show 95\% bootstrap
-    confidence intervals.  Removing the repair loop (A3) causes the largest conformance
-    drop ($-$6.3\,pp); removing the formal checker (A1) costs $-$3.9\,pp.}
+  \caption{\textbf{Key observation:} repair earns the largest conformance
+    share (A3 $-$6.3\,pp); the checker is next (A1 $-$3.9\,pp); the pattern
+    guard is a prevention gate, not a Conf.\ booster.
+    \textbf{How to read:} bars are $\Delta$ vs.\ full M with 95\% bootstrap CIs.}
   \label{fig:ablation}
 \end{figure}
 
-Ablation answers which stage earns the conformance gain.
-Table~\ref{tab:main-results} and Figure~\ref{fig:ablation} attribute the
-deltas relative to full mode~M.
-Removing the repair loop (A3) causes the largest drop
-($\Delta_{A3} = -6.3$\,pp): without repair, formal checking evaluates but cannot
-improve the initial candidate.
-Removing the formal checker (A1) costs $-3.9$\,pp: unit-test feedback lacks
-scenario-indexed Z3 witnesses.
-Removing the pattern guard (A2) has a small effect on conformance ($\Delta_{A2} =
-+0.5$\,pp) but reduces PDR on structural fault classes, confirming that the guard's
-prevention value is not captured by conformance alone.
-When M rejects a high-conformance candidate on structural grounds, budget-limited
-repair may return a worse substitute---a nuanced interaction discussed further in
-Section~\ref{sec:results:rq2}.
+Which stage earns the gain?
+A3 (no repair) $-$6.3\,pp; A1 (no checker) $-$3.9\,pp; A2 (no pattern guard)
+$+$0.5\,pp on Conf.\ but lower structural PDR---prevention value that
+conformance alone misses (Section~\ref{sec:results:rq2}).
 
 \subsection{Ranking of Component Contributions}
 
-Summarising the three ablation deltas:
-\begin{enumerate}
-  \item \textbf{Repair loop}: $+6.3$\,pp contribution to conformance (most important)
-  \item \textbf{Formal checker}: $+3.9$\,pp contribution
-  \item \textbf{Pattern guard}: complex, approximately $-0.5$\,pp at $K=3$ (nuanced)
-\end{enumerate}
-
-The repair loop's dominant contribution underscores that iterative improvement is the
-primary engine of HSP-Agile's performance.
-The formal checker amplifies the repair loop by providing precise counterexamples.
-The pattern guard's contribution is positive in terms of structural quality assurance
-but slightly negative in terms of measured conformance at the current budget level.
+Repair $>$ checker $\gg$ pattern guard on Conf.\ (A3/A1/A2);
+the guard's value shows up in structural PDR, not in mean Conf.
 
 \paragraph{Answer to RQ3.}
-The Semantic Feedback IR (E6: +7.7\,pp over test-only feedback) and the formal
-checker (ablation A1/A3) are the dominant contributing components.
-The pattern guard's contribution is best measured via PDR rather than conformance
-alone.
+Semantic Feedback IR (+7.7\,pp, E6) and the formal checker (A1/A3) dominate;
+measure the pattern guard via PDR.
 
 %=============================================================================
 \section{RQ1: Overall Effectiveness (E1)}
@@ -300,72 +263,34 @@ repair loop spends, and how quality trades against cost.
   \label{fig:radar-metrics}
 \end{figure}
 
-Mode~M reaches 90.4\% mean strict formal conformance: +6.2\,pp over B1 and
-+2.4\,pp over B2 (Table~\ref{tab:main-results}).
+Table~\ref{tab:main-results} is the aggregate: M at 90.4\% Conf.\
+(+6.2\,pp over B1, +2.4\,pp over B2).
 That is the primary quality signal.
+Extended baselines without SMT witnesses fall short (B3 81.9\%, B4 87.1\%,
+B5 81.1\%); execution traces help more than self-critique, but less than
+scenario-indexed witnesses.
+Wilcoxon on per-task strict success (M vs.\ B1/B2) is negligible
+($p{=}0.921$); conformance is the discriminating metric
+(M $>$ B2 $>$ B4 $>$ B1).
 
-Extended baselines that repair without SMT witnesses fall short: B3
-(Self-Refine, 81.9\%), B4 (Self-Debug, 87.1\%), and B5 (Reflexion-lite,
-81.1\%).
-B4 leads that group (+2.9\,pp over B3), consistent with execution traces
-carrying more diagnostic signal than self-critique alone---but still less
-than scenario-indexed witnesses.
+\subsection{Reading the Distributions}
 
-On per-task strict success, Wilcoxon tests of M vs.\ B1/B2 yield
-$p = 0.921$ ($r = -0.033$, negligible).
-The discriminating metric is therefore conformance, which orders
-M $>$ B2 $>$ B4 $>$ B1 $>$ B3 $\approx$ B5 with a practically significant
-6.2\,pp gap over B1.
-
-\subsection{Analysis: The Reference Implementation Surprise}
-
-B0's formal conformance matches its strict success rate at 27.5\%---far below the
-LLM-based methods.
-On hard benchmark tasks with overlapping guard regions, the deterministic template
-renderer does not always match the ground-truth evaluation order encoded in the Z3
-evaluation cases.
-This finding validates the experimental design: a benchmark on which the reference
-implementation scores 95\%+ would provide little headroom to distinguish methods.
-The conformance histogram in Figure~\ref{fig:conf-distribution} makes that
-headroom visible: B0 is bimodal, while LLM modes concentrate in the
-right-skewed 80--100\% band.
-
-\subsection{Analysis: LLM Methods and Conformance Progression}
-
-Formal conformance jumps from 27.5\% (B0) to 84.2\% (B1), reflecting the LLM's
-ability to infer scenario ordering from specification text.
-B2's test-feedback loop improves conformance to 88.0\% (+3.8\,pp over B1), but
-heuristic unit tests may miss boundary inputs that expose ordering errors.
-Mode M achieves the highest formal conformance among fully-specified methods at
-90.4\% (+2.4\,pp over B2, +6.2\,pp over B1), with Z3 counterexamples providing more
-precise corrective feedback than unit-test failures alone.
-M outperforms B2 on 61\% of tasks (73/120).
-
-\subsection{Analysis: The Strict Success Rate Inversion}
-
-Mode M has a \emph{lower} strict success rate (25.0\%) than B1 and B2 (both 26.7\%),
-despite higher formal conformance.
-This is the \emph{expected} consequence of the conjunctive acceptance predicate
-(Equation~\ref{eq:accept}): M requires both formal pass and a clear pattern guard,
-making it more selective---lower strict success but higher mean $\mathit{Conf}$, a
-desirable trade-off for CI quality gates.
-The escaped-defect rate---the share of accepted candidates that still carry a
-mutant-detectable fault---confirms the trade-off.
-M's accepted set is cleaner despite the lower acceptance rate: selectivity,
-not deficiency.
-
-\subsection{Mutation Kill Rate}
-
-Mutation kill rate measures \emph{checker} quality, not generator quality.
-B0's 79.0\% exceeds LLM modes (60--63\%); inter-mode differences among LLM modes are
-small ($\le$2.6\,pp) and should not be over-interpreted.
+Three observations settle the rest of RQ1.
+First, B0 at 27.5\% is a difficulty calibration: Figure~\ref{fig:conf-distribution}
+shows a bimodal template failure, while LLM modes concentrate in the
+80--100\% band---headroom the benchmark was built to provide.
+Second, the progression B0$\to$B1$\to$B2$\to$M (27.5$\to$84.2$\to$88.0$\to$90.4\%)
+is the cost of successively better evidence; M beats B2 on 73/120 tasks.
+Third, M's \emph{lower} strict success (25.0\% vs.\ 26.7\%) is the conjunctive
+gate of Equation~\ref{eq:accept}, not weaker code: acceptance additionally
+requires a clear pattern screen, so the accepted set is cleaner.
+Mutation kill rate measures checker quality; B0's 79.0\% exceeds LLM modes
+(60--63\%), and inter-LLM gaps ($\le$2.6\,pp) should not be over-read.
 
 \paragraph{Answer to RQ1.}
-M improves strict formal conformance by +6.2\,pp over the one-shot baseline and
-+2.4\,pp over the strongest test-feedback baseline.
-Conformance, not strict success, is the appropriate discriminating metric on hard
-precedence-sensitive benchmarks; M's slightly lower strict success reflects a
-principled quality gate, not a deficiency.
+Conformance, not strict success, discriminates on this benchmark: +6.2\,pp
+over one-shot, +2.4\,pp over test-feedback; the slightly lower acceptance rate
+is selectivity.
 
 %=============================================================================
 \section{RQ2: Fault Class Prevention (E2, E7)}
@@ -501,27 +426,15 @@ the low-latency near-Pareto alternative when pattern screening is optional.
 \end{figure}
 
 The insight in Figure~\ref{fig:pareto} is a trade-off, not a free lunch.
-Mode~M sits on the quality-dominant side of the frontier together with A2
-(no pattern guard: lower latency, slightly weaker prevention).
-At 43.7\,s/task versus 10.8\,s for B2, M pays a $4.6\times$ latency premium,
-driven mainly by extra LLM calls (mean 2.08 vs.\ 1.24) and Z3/pattern-guard
-overhead.
-That cost is acceptable inside a sprint-cycle CI gate where tasks run in
-parallel.
-A2 (12.1\,s, 90.9\% conformance) is the near-Pareto alternative when pattern
-screening is optional.
-A1 remains almost as slow as M despite dropping Z3, because weaker unit-test
-feedback delays early termination.
-
-Mann-Whitney U comparison of M vs.\ B2 latency confirms the expected directional
-dominance ($p = 0.9999$): M is uniformly slower, not a sampling artefact.
-At 43.7\,s per task, M suits CI pre-merge gates rather than interactive IDE use.
+M pays $4.6\times$ vs.\ B2 (43.7\,s vs.\ 10.8\,s), mostly extra LLM calls
+(2.08 vs.\ 1.24)---acceptable for parallel CI, not for interactive IDE use.
+A2 (12.1\,s, 90.9\% Conf.) is the near-Pareto alternative when pattern
+screening is optional; A1 stays slow because weak feedback delays exit.
+Mann-Whitney confirms the latency gap is not a sampling artefact
+($p{=}0.9999$).
 
 \paragraph{Answer to RQ5.}
-M achieves the best quality (conformance + PDR on structural faults) at a 4$\times$
-latency premium over B2.
-For latency-constrained settings, A2 (no pattern guard) provides most of the
-conformance benefit at substantially lower cost.
+Best quality at $\approx$4$\times$ latency vs.\ B2; use A2 when latency binds.
 
 %=============================================================================
 \section{RQ4 Extended: Boundary Density (E4)}
@@ -577,8 +490,10 @@ space, so SMT adds little discriminating power.
 That boundary case is discussed in Chapter~\ref{ch:discussion}.
 
 \begin{table}[H]
-  \caption{Generalisation results: conformance by specification notation and mode
-    (E8 LLM evaluation on adapter tasks, $n=18$ each).}
+  \caption{\textbf{Key observation:} SpecIR adapters carry the loop beyond
+    SOFL; Mini-Z is the boundary case where simple guards make test-feedback
+    look stronger.
+    E8 LLM evaluation, $n{=}18$ per adapter notation.}
   \label{tab:generalisation}
   \centering
   \thesistable{%

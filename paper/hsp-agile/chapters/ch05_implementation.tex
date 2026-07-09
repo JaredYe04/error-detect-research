@@ -5,49 +5,33 @@
 \chapter{Implementation}
 \label{ch:implementation}
 
-A method is only as credible as the system that realises it.
-This chapter therefore maps each stage of Chapter~\ref{ch:method} onto
-concrete modules: ingestion and SpecIR adapters feed Stage~1; the formal
-checker implements Stage~2; the repair engine implements Stage~3; the pattern
-guard implements Stage~4.
-The focus is data structures, control flow, and engineering trade-offs---not a
-restatement of the algorithms.
-On \code{classify\_signal}, the same modules produce the witness $(-3,-10)$,
-the Semantic Feedback IR record, and the acceptance decision of
-Section~\ref{sec:method:worked}.
+This chapter is engineering, not re-derivation.
+Reviewers who already accept the method need to know which module owns which
+failure mode, what can be swapped for ablation, and where latency is spent.
+Algorithms stay in Chapter~\ref{ch:method}; here the concern is modules,
+control flow, and trade-offs.
+On \code{classify\_signal}, the same modules emit the witness $(-3,-10)$,
+serialise the Semantic Feedback IR record, and decide $\mathrm{Accept}$.
 
-Notation is inherited from earlier chapters: task
-$t = (\mathcal{S}_t, \mathcal{X}_t, \mathcal{Y}_t)$, candidate~$c$,
-conformance $\mathrm{Conf}(c,t) \in [0,1]$, and acceptance
-$\mathrm{Accept}(c,t)$ from equation~\eqref{eq:accept}.
+Notation: $t = (\mathcal{S}_t, \mathcal{X}_t, \mathcal{Y}_t)$, candidate~$c$,
+$\mathrm{Conf}(c,t)$, $\mathrm{Accept}(c,t)$ from~\eqref{eq:accept}.
 
 % ---------------------------------------------------------------------------
 \section{System Architecture Overview}
 \label{sec:impl:architecture}
 % ---------------------------------------------------------------------------
 
-A method is credible only if each stage can be swapped, ablated, or audited
-without rewriting the rest.
-That engineering constraint drives the layout: ingestion, orchestration, and
-external services stay separate so Stages~1--4 can be tested independently
-(Chapter~\ref{ch:experiments}).
+Why separate modules?
+Because Stages~1--4 must be ablatable and auditable without rewriting the
+rest (Chapter~\ref{ch:experiments}).
+Ingestion, orchestration, and external services therefore stay apart.
 
-On \code{classify\_signal}, the path is concrete.
-An adapter lowers FSF text to SpecIR; the orchestrator asks the LLM for a
-candidate, asks Z3 for witnesses such as $(-3,-10)$, and routes failures into
-Semantic Feedback IR; the pattern guard screens the repaired code before
-$\mathrm{Accept}$.
-
-Separation of those concerns is the point of Figure~\ref{fig:component-arch}.
-Ingestion translates surface notations into SpecIR and, for the SOFL
-instantiation, into FSF-shaped \texttt{TaskSpec} records
-(Chapter~\ref{ch:method}, Figure~\ref{fig:specir-arch}).
-Orchestration runs the bounded synthesis--check--repair--guard loop.
-External services host the OpenAI-compatible LLM endpoint and the Z3
-solver~\citep{demoura2008z3,barrett2018smt}.
-For E8, Mini-Z and Mini-StateMachine adapters feed the same SpecIR path;
-typed result objects (\texttt{CheckResult}, \texttt{PipelineResult}) keep
-stages isolatable.
+For the monitoring alert \code{classify\_signal}, the path is: adapter
+$\to$ SpecIR $\to$ LLM candidate $\to$ Z3 witness $(-3,-10)$ $\to$ Semantic
+Feedback IR $\to$ pattern screen $\to$ $\mathrm{Accept}$.
+Figure~\ref{fig:component-arch} is that layout.
+E8 adapters (Mini-Z, Mini-StateMachine) feed the same SpecIR path; typed
+result objects keep stages isolatable.
 
 \begin{figure}[t]
   \centering
@@ -59,20 +43,18 @@ stages isolatable.
       HSP-Agile system component architecture.
       \vspace{1.2cm}}}%
   }
-  \caption{HSP-Agile system component architecture (software view of
-           Figure~\ref{fig:sgdp-overview}).
-           The pipeline core realises Stages~1--4 of Chapter~\ref{ch:method};
-           external LLM and SMT services attach below; experiment orchestration
-           feeds benchmark tasks and returns aggregated results.}
+  \caption{\textbf{Key observation:} Stages~1--4 are isolatable modules under one
+    orchestrator, so ablations swap a stage without rewriting the rest.
+    \textbf{How to read:} pipeline core (centre) vs.\ external LLM/SMT (below)
+    vs.\ experiment orchestration (above); software view of
+    Figure~\ref{fig:sgdp-overview}.}
   \label{fig:component-arch}
 \end{figure}
 
-One façade owns the loop: \texttt{PipelineRunner} holds immutable
-\texttt{PipelineConfig} and delegates synthesis to \texttt{ECNUClient},
-conformance to \texttt{FormalChecker}, and structural screening to
+\texttt{PipelineRunner} owns the loop: immutable \texttt{PipelineConfig},
+delegation to \texttt{ECNUClient}, \texttt{FormalChecker}, and
 \texttt{PatternMatcher} (Figure~\ref{fig:system-class}).
-Value objects (\texttt{BenchmarkTask}, \texttt{CheckResult},
-\texttt{PatternHit}) carry serialisable audit traces after each run.
+Value objects carry serialisable audit traces.
 
 \begin{figure}[t]
   \centering
@@ -84,10 +66,10 @@ Value objects (\texttt{BenchmarkTask}, \texttt{CheckResult},
       HSP-Agile system class diagram.
       \vspace{1.2cm}}}%
   }
-  \caption{System class diagram implementing Algorithm~\ref{alg:sgdp}.
-           \texttt{PipelineRunner} composes the LLM client (Stage~1), formal
-           checker (Stage~2), and pattern matcher (Stage~4) behind a single
-           \texttt{run(task)} entry point.}
+  \caption{\textbf{Key observation:} one \texttt{run(task)} entry point composes
+    Stages~1, 2, and~4 behind Algorithm~\ref{alg:sgdp}.
+    \textbf{How to read:} \texttt{PipelineRunner} at the hub; clients and
+    checkers as leaves.}
   \label{fig:system-class}
 \end{figure}
 
@@ -243,13 +225,9 @@ enables RF04 (missing output field) detection in Stage~4.
 
 Synthesis is the only non-deterministic stage; everything else must be
 replayable.
-The LLM integration layer is therefore the sole stochastic component of
-HSP-Agile.  It wraps an OpenAI-compatible LLM gateway behind a small adapter
-that handles authentication, retry logic, request timeouts, token accounting,
-and structured logging.  In the source tree this adapter is implemented as
-\texttt{ECNUClient} (\path{src/llm/ecnu_client.py}); the name reflects the
-historical deployment endpoint rather than any institution-specific coupling,
-referred to generically as the \emph{LLM client adapter} below.
+The LLM layer wraps an OpenAI-compatible gateway
+(\texttt{ECNUClient}, \path{src/llm/ecnu_client.py}) for auth, retry, timeout,
+token accounting, and audit logs---the name is historical, not a coupling.
 
 \subsection{LLM Client Adapter Design}
 
@@ -297,22 +275,14 @@ the pipeline runner assembles a two-message chat completion request:
         verbalised feedback from the previous attempt.
 \end{itemize}
 
-The separation of system and user roles follows established practice in
-code-generation pipelines~\citep{chen2021codex,lynn2024verifierloop} and
-allows the system message to remain constant across iterations while only
-the user message grows with accumulated counterexamples.
+System messages stay fixed; user messages grow with counterexamples
+\cite{chen2021codex,lynn2024verifierloop}.
 
 \subsection{Temperature and Top-$p$ Configuration}
 
-Generation hyperparameters are exposed as configuration fields on
-\texttt{PipelineConfig}.  Nucleus sampling uses $\mathit{top\_p} = 0.95$.
-Matching Chapter~\ref{ch:experiments}, initial synthesis calls use
-$T_\text{gen} = 0.7$ to encourage diverse first candidates, while repair
-calls use $T_\text{repair} = 0.0$ so corrective edits are near-deterministic
-given identical counterexample feedback.  This dual-temperature strategy
-reflects the asymmetry between \emph{exploration} (first attempt) and
-\emph{exploitation} (targeted repair): the formal checker provides the
-deterministic acceptance verdict regardless of LLM stochasticity.
+$T_\text{gen}{=}0.7$ for first attempts, $T_\text{repair}{=}0.0$ for repair,
+$\mathit{top\_p}{=}0.95$---explore once, then exploit under a deterministic
+checker (Chapter~\ref{ch:experiments}).
 
 \subsection{Semantic Feedback IR and Two-Layer Repair Prompting}
 \label{sec:impl:repair-feedback}
@@ -874,12 +844,8 @@ principle~P2.
 \addcontentsline{toc}{section}{Chapter Summary}
 % ---------------------------------------------------------------------------
 
-In short, the implementation realises Stages~1--4 of Chapter~\ref{ch:method}:
-adapters and \texttt{TaskSpec} ingestion feed synthesis; the Z3 checker builds
-witnesses (16 for repair, 64 for strict evaluation); the repair engine runs a
-bounded CEGIS loop with Semantic Feedback IR; and the pattern guard applies
-RF01--RF14 before acceptance.
-The experiment orchestrator runs the seven evaluation modes in parallel with
-resume-safe logs.
-Whether those engineering choices pay off is an empirical question---answered
-next.
+Modules own failure modes: adapters keep surface syntax out; Z3 owns
+witnesses (16 repair / 64 strict); Semantic Feedback IR owns repair state;
+RF01--RF14 own the structural gate; the orchestrator owns crash-safe
+throughput.
+Whether those choices pay off is empirical---Chapter~\ref{ch:experiments}.

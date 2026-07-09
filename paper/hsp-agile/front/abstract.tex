@@ -1,32 +1,30 @@
 \chapter*{Abstract}
 \addcontentsline{toc}{chapter}{Abstract}
 
-Ordered guard specifications tell an implementation which scenario must fire
-first when several guards hold at once.
-Large language models rarely respect that rule.
-They emit code that looks reasonable on everyday inputs yet fails exactly on
-the thin overlap regions that formal specifications are meant to pin down.
-Ordinary unit tests almost never sample those regions, so test-based repair
-loops leave the defects in place.
+Ordered guard specifications say which scenario must fire first when several
+guards hold.
+Large language models rarely obey that rule: they look right on everyday
+inputs and fail on the thin overlaps that formal contracts are meant to pin
+down.
+Unit tests almost never sample those regions, so test-based repair leaves the
+defects in place.
 That failure class is \emph{specification-conformance defects}.
 
-The remedy explored here is to treat the specification itself as the evidence
-source.
+The key insight is to treat the specification itself as the evidence source.
 The \textbf{Specification-guided Defect Prevention Framework} (\textsc{SgDP}),
-instantiated as \textbf{HSP-Agile} for SOFL/FSF, builds SMT witnesses that
-activate each scenario under first-match precedence, turns each failure into a
-structured repair record, and releases a candidate only when every witness
-matches and no high-severity structural pattern remains.
+instantiated as \textbf{HSP-Agile} for SOFL/FSF, builds first-match SMT
+witnesses, turns each failure into a typed repair record, and releases a
+candidate only when every witness matches and no high-severity pattern remains.
 
 On a 120-task precedence-sensitive benchmark, HSP-Agile reaches 90.4\% mean
 strict formal conformance (+6.2\,pp over one-shot LLM, +2.4\,pp over
 test-feedback).
-The advantage grows with guard overlap; SMT witnesses keep boundary coverage
-where random sampling fails; and the structured repair record alone accounts
-for +7.7\,pp over test-only prompts (E6).
+The advantage grows with guard overlap; SMT keeps boundary coverage where
+random sampling fails; the typed repair record alone accounts for +7.7\,pp
+over test-only prompts (E6).
 The same loop transfers to Mini-Z and Mini-StateMachine with adapter-level
 changes.
-Tasks, logs, and scripts are released for reproduction.
+Tasks, logs, and scripts are released.
 
 \paragraph{Keywords.}
 Specification-guided defect prevention; formal specification; LLM synthesis; SOFL;

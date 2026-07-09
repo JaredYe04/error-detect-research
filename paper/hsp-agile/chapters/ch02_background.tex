@@ -4,15 +4,15 @@
 \chapter{Background and Related Work}
 \label{ch:background}
 
-Preventing specification-conformance defects requires tools that already exist
-in formal methods and in LLM-based synthesis---but that have not been combined
-for this purpose.
-What follows is the background needed to see that gap clearly.
-The exposition begins with SOFL/Agile-SOFL and the FSF first-match rule
-(reusing \code{classify\_signal} from Chapter~\ref{ch:intro}), then reviews
-LLM code generation, CEGIS, SMT solving, pattern detection, and mutation
-testing.
-A closing comparison table positions \textsc{SgDP} against prior systems.
+This chapter is a guide, not a method chapter.
+The pieces needed for prevention already exist---ordered FSF contracts,
+LLM synthesis, CEGIS-style repair, SMT witnesses, pattern screens, mutation
+metrics---but they have not been combined for specification-conformance
+defects.
+The survey below maps each piece and ends with a comparison table that
+positions \textsc{SgDP}.
+\code{classify\_signal} reappears only where first-match semantics must be
+recalled; the formal objects themselves wait for Chapter~\ref{ch:formalization}.
 
 % ─────────────────────────────────────────────────────────────────────────────
 \section{SOFL and Agile-SOFL}
@@ -21,19 +21,12 @@ A closing comparison table positions \textsc{SgDP} against prior systems.
 
 \subsection{The SOFL Formal Method}
 
-The prevention problem assumes a formal artefact that already names ordered
-scenarios.
-SOFL is that artefact's historical home.
-Structured Object-Oriented Formal Language~\citep{liu1997sofl} is a
-\emph{process-oriented} formal method synthesising Z notation, data flow
-diagrams, and object-oriented structuring, bridging diagrammatic accessibility
-with verification-grade semantics.
-SOFL's development paradigm is \emph{stepwise refinement}
-\citep{back1998refinement}: each refinement step must preserve abstract
-specification properties, preventing specification drift.
-Its \emph{process specification} enumerates named scenarios with guard
-conditions and output bodies---the direct ancestor of FSF
-(Section~\ref{sec:bg:fsf}) and the primary unit of the HSP-Agile pipeline.
+Prevention assumes an artefact that already names ordered scenarios; SOFL is
+that artefact's historical home~\citep{liu1997sofl}.
+It combines Z, data-flow diagrams, and OO structuring under stepwise
+refinement~\citep{back1998refinement}.
+Process specifications enumerate guarded scenarios---the direct ancestor of
+FSF (Section~\ref{sec:bg:fsf}).
 
 \subsection{Agile-SOFL: Lightweight Formal Methods in Sprints}
 
@@ -407,22 +400,26 @@ analysis evaluation, motivating PDR and FAR as primary prevention-quality measur
 \label{sec:bg:related}
 % ─────────────────────────────────────────────────────────────────────────────
 
+What is missing from prior systems is not another synthesiser, but a
+prevention loop that treats ordered guards as first-class evidence.
+Table~\ref{tab:related-work} is the short answer; the paragraphs below
+supply the citations.
+
 \subsection{Formal Methods in Software Engineering Practice}
 
-\citet{woodcock2009formalsurvey} found that the most successful formal-method
-deployments combine automated analysis with existing workflows rather than
-replacing them wholesale.
-They adopt formal methods in narrow, high-value layers.
-Agile-SOFL follows this prescription; HSP-Agile automates synthesis and repair
-without manual annotation effort.
-Requirements-engineering research \citep{pohl2010requirements} emphasises
-detecting ambiguities at the specification level.
-HSP-Agile's pattern guard checks implementation structure against the FSF
-specification before executing any test case.
+Successful formal-method deployments combine automated analysis with existing
+workflows in narrow, high-value layers~\citep{woodcock2009formalsurvey}.
+Agile-SOFL follows that prescription; HSP-Agile automates synthesis and repair
+without manual annotation.
+Requirements work emphasises catching ambiguity at the specification
+level~\citep{pohl2010requirements}; the pattern guard checks structure against
+FSF before any test runs.
 
 \subsection{Approaches to LLM-Verified Code Synthesis}
 
-Table~\ref{tab:related-work} compares closely related systems.
+Closest systems differ on three axes: whether witnesses respect first-match
+order, whether repair carries scenario structure, and whether prevention
+(not only pass@k) is measured.
 
 \paragraph{DafnyBench \citep{loughman2024dafnybench}.}
 Evaluates LLM synthesis of Dafny programs with full deductive verification.

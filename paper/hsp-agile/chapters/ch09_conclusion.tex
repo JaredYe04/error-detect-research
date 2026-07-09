@@ -5,13 +5,11 @@
 \chapter{Conclusion and Future Work}
 \label{ch:conclusion}
 
-LLM-assisted development can accelerate Agile-SOFL workflows, but it also
-introduces specification-conformance defects: code that looks right on everyday
-inputs yet violates first-match guard order on thin boundary regions.
-The question was whether those defects can be prevented by using the
-specification itself as evidence, without full deductive verification.
-The answer developed here is the \textbf{Specification-guided Defect Prevention
-Framework} (\textsc{SgDP}) and its SOFL/FSF instantiation \textbf{HSP-Agile}.
+The industrial-monitoring contract \code{classify\_signal} asked a practical
+question: can first-match ordering defects be prevented by using the
+specification itself as evidence, without full deductive verification?
+The answer is the \textbf{Specification-guided Defect Prevention Framework}
+(\textsc{SgDP}) and its SOFL/FSF instantiation \textbf{HSP-Agile}.
 
 
 %=============================================================================
@@ -20,33 +18,25 @@ Framework} (\textsc{SgDP}) and its SOFL/FSF instantiation \textbf{HSP-Agile}.
 %=============================================================================
 
 \paragraph{Problem.}
-Test-based repair loops miss precedence-sensitive faults because they do not
-know which input regions the specification treats as critical.
+Test-based repair does not know which input regions the specification treats
+as critical.
 
 \paragraph{Insight.}
-Encode first-match priority as SMT witnesses, turn each failure into a typed
-Semantic Feedback IR record, and release a candidate only when every witness
-matches and no high-severity pattern remains.
+SMT witnesses for first-match priority, a typed failure record for repair, and
+a conjunctive release gate---not denser unit tests.
 
 \paragraph{Evidence.}
-On a 120-task hard benchmark, HSP-Agile reaches 90.4\% mean strict formal
-conformance (+6.2\,pp over one-shot LLM, +2.4\,pp over test-feedback).
-Mechanism studies show the gain grows with guard overlap (E3), that SMT
-witnesses keep boundary coverage where random sampling fails (E4), and that the
-Semantic Feedback IR alone contributes +7.7\,pp over test-only prompts (E6).
-Adapter-level experiments on Mini-Z and Mini-StateMachine support the framework
-claim beyond SOFL/FSF.
-Theorem~\ref{thm:witness-soundness} and Theorem~\ref{thm:far-bound} bound the
-witness and acceptance arguments; Hypothesis~\ref{hyp:structured-feedback}
-captures the empirically supported repair claim.
+90.4\% mean Conf.\ (+6.2\,pp / +2.4\,pp over one-shot / test-feedback);
+gain grows with overlap (E3); SMT keeps boundary coverage (E4); Semantic
+Feedback IR alone +7.7\,pp (E6); adapters transfer to Mini-Z and
+Mini-StateMachine (E8).
+Theorems~\ref{thm:witness-soundness} and~\ref{thm:far-bound} bound the
+formal claims; Hypothesis~\ref{hyp:structured-feedback} is the repair claim.
 
 \paragraph{Limitation.}
-Acceptance under budget $K=3$ remains selective (25.0\% strict success): many
-tasks improve conformance without clearing every residual witness or pattern
-hit.
-E9 shows that ordering-repair and boundary/arithmetic failures dominate the
-remainder.
-Latency is the main cost (about $4.6\times$ vs.\ test-feedback).
+Under $K{=}3$, acceptance stays selective (25.0\% strict success); E9 residues
+are mostly ordering and boundary/arithmetic; latency is $\approx 4.6\times$
+vs.\ test-feedback.
 
 
 %=============================================================================
@@ -54,20 +44,13 @@ Latency is the main cost (about $4.6\times$ vs.\ test-feedback).
 \label{sec:conc:findings}
 %=============================================================================
 
-Five results summarise the evidence.
-Conformance, not binary pass/fail, is the right primary metric: M leads on
-mean $\mathrm{Conf}$ while its slightly lower strict-success rate reflects
-the intentionally stricter conjunctive gate
-(Section~\ref{sec:disc:paradox})---the same selectivity that rejects a
-hard-coded \code{classify\_signal} even when most witnesses pass.
-Repair is the largest ablation drop (A3: $-6.3$\,pp; A1: $-3.9$\,pp).
-Structure in feedback matters more than prompt length: E6's full Semantic
-Feedback IR outperforms test-only and test-plus-expected variants by more
-than 7\,pp.
-Harder specifications amplify the method: the M--B1 gap is largest in the
-dense-overlap tertile (E3).
-Finally, the loop transfers across notations: Mini-Z and Mini-StateMachine
-improve with adapter-only changes (E8).
+Conformance, not binary pass/fail, is the right primary metric---the same
+selectivity that rejects a hard-coded \code{classify\_signal} even when most
+witnesses pass (Section~\ref{sec:disc:paradox}).
+Repair is the largest ablation drop (A3 $-$6.3\,pp; A1 $-$3.9\,pp).
+Structure in feedback beats prompt length (E6 $>$7\,pp).
+Dense overlap amplifies the M--B1 gap (E3).
+The loop transfers with adapter-only changes (E8).
 
 
 %=============================================================================

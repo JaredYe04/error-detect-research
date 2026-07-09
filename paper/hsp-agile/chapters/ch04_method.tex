@@ -4,39 +4,34 @@
 \chapter{The \textsc{SgDP} Framework and HSP-Agile Instantiation}
 \label{ch:method}
 
-The formal objects of Chapter~\ref{ch:formalization} are not yet a method.
-What remains is to show how they assemble into a prevention loop that an LLM
-can participate in.
-The exposition therefore begins with intuition and a full walkthrough of
-\code{classify\_signal}, and only afterwards abstracts the four \textsc{SgDP}
-components, states the formal results, and details each stage.
-Notation is inherited from Chapter~\ref{ch:formalization}:
+This chapter is the design document.
+Chapter~\ref{ch:formalization} fixed the objects; here they become a loop an
+LLM can participate in.
+The industrial-monitoring example \code{classify\_signal} is run end to end
+\emph{before} the interfaces are stated---so the four stages are seen as
+artefact transforms, not as a taxonomy.
+Notation is inherited:
 $t = (\mathcal{S}_t, \mathcal{X}_t, \mathcal{Y}_t)$, oracle $g_t$, and
 first-match semantics over $\mathcal{S}_t = \langle s_1,\ldots,s_n\rangle$.
 
 \section{Pipeline Intuition}
 \label{sec:method:intuition}
 
-HSP-Agile can be summarised in one sentence.
-It synthesises a candidate from the FSF text, checks that candidate on SMT
-witnesses that respect first-match precedence, repairs with a structured
-failure record when checks fail, and releases the candidate only when every
-witness matches and no high-severity pattern remains.
-Figure~\ref{fig:sgdp-overview} (Chapter~\ref{ch:intro}) is that loop.
-Left to right: a notation adapter produces SpecIR; the witness generator
-builds $\mathcal{D}(t)$; the LLM proposes $c_k$; the verifier compares
-$f_{c_k}$ to $g_t$; failures become Semantic Feedback IR; acceptance is
-conjunctive.
-The dashed orange arc is the repair loop under budget~$K=3$.
+One sentence: synthesise from FSF text, check on first-match SMT witnesses,
+repair from a typed failure record, release only when every witness matches
+and no high-severity pattern remains.
+Figure~\ref{fig:sgdp-overview} (Chapter~\ref{ch:intro}) is that loop; the
+dashed orange arc is budget~$K=3$.
 
 \section{Worked Example: \texttt{classify\_signal} End to End}
 \label{sec:method:worked}
 
-Abstractions components are easier to trust after one concrete run.
-The walkthrough below follows a single attempt on the running example before
-the general framework is stated.
-Figure~\ref{fig:worked-example-trace} follows one artefact morphing across
-those stages.
+Observation first: the buggy candidate of Listing~\ref{lst:llm-incorrect}
+returns \texttt{"Critical"} on $(-3,-10)$ where the oracle requires
+\texttt{"Error"}.
+The walkthrough below shows how each stage transforms that failure into a
+repairable record and, after one iteration, into $\mathrm{Accept}=1$.
+Figure~\ref{fig:worked-example-trace} is the artefact trail.
 
 \begin{figure}[t]
   \centering
@@ -139,10 +134,11 @@ Synthesis, repair, pattern guard, and acceptance are shared core components.
 \begin{figure}[t]
   \centering
   \tikzinput{diagrams/tikz/sgdp_specir_architecture}
-  \caption{\textbf{SpecIR adapter layer (detail).}
-    Adapters unify SOFL/FSF, Mini-Z, and Mini-StateMachine into canonical SpecIR;
-    HSP-Agile applies $\text{Lower}_{\text{FSF}}$ for FSF-shaped screening.
-    See Figure~\ref{fig:sgdp-overview} for the full pipeline context.}
+  \caption{\textbf{Key observation:} notation changes stop at the adapter;
+    the shared pipeline never sees SOFL, Mini-Z, or Mini-StateMachine text.
+    \textbf{How to read:} adapters into SpecIR; optional
+    $\text{Lower}_{\text{FSF}}$ for FSF-shaped screening; full context in
+    Figure~\ref{fig:sgdp-overview}.}
   \label{fig:specir-arch}
 \end{figure}
 
@@ -473,7 +469,10 @@ Figure~\ref{fig:pipeline-seq} is the message-level sequence of one run.
         \textit{[pipeline\_sequence.pdf pending]} \vspace{0.8cm}}}%
     }%
   }
-  \caption{Sequence diagram of one HSP-Agile run (repair loop until accept or budget~$K$).}
+  \caption{\textbf{Key observation:} one run is a message sequence until
+    $\mathrm{Accept}$ or budget~$K$, not a single LLM call.
+    \textbf{How to read:} synthesis $\to$ check $\to$ feedback $\to$ accept;
+    the loop arc is Stage~3.}
   \label{fig:pipeline-seq}
 \end{figure}
 

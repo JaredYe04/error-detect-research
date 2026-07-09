@@ -5,18 +5,21 @@
 \chapter{Experimental Setup}
 \label{ch:experiments}
 
-Claims about prevention are only as strong as the protocol that tests them.
-The design below fixes five research questions, the hardware and run protocol,
-the hard benchmark, the compared modes, the metrics, and the E1--E9 tracks.
-Results appear in Chapter~\ref{ch:results}; a short threats preview closes the
-chapter, with the full analysis deferred to Chapter~\ref{ch:discussion}.
+This chapter is the measurement protocol.
+It fixes what is compared, under which oracle conditions, and how prevention
+is scored---so Chapter~\ref{ch:results} can report evidence without reopening
+design choices.
+Five research questions, hardware, benchmark, modes, metrics, and E1--E9
+tracks are stated once; threats are previewed here and analysed in
+Chapter~\ref{ch:discussion}.
 
 %=============================================================================
 \section{Research Questions}
 \label{sec:exp:rq}
 %=============================================================================
 
-Five questions organise the evaluation.
+Each question answers a reviewer concern: does it work, on which faults, by
+which component, under what complexity, at what cost?
 
 \paragraph{RQ1 (Overall Effectiveness).}
 Does specification-guided prevention significantly improve formal correctness over pure
@@ -120,31 +123,17 @@ Full reproduction instructions are provided in Appendix~\ref{app:reproducibility
 
 \subsection{Design Rationale}
 
-A central challenge in evaluating specification-conformance tools is that
-off-the-shelf software repositories rarely contain ordered guard-case formal
-specifications in machine-readable form; such artefacts must be constructed.
-The benchmark needed three properties:
-(i)~\emph{discriminative power}---tasks hard enough that baselines fail non-trivially;
-(ii)~\emph{formal validity}---every task satisfiable by at least one correct
-implementation, verifiable by Z3; and
-(iii)~\emph{diversity}---varied input combinations, scenario orderings, and boundary
-conditions to prevent overfitting.
-Existing formal-synthesis benchmarks such as DafnyBench~\citep{loughman2024dafnybench}
-target annotation-heavy verification languages rather than FSF scenario semantics,
-motivating a domain-specific corpus.
+Ordered FSF artefacts are rare in public repos, so the corpus is constructed.
+Three requirements: discriminative (baselines fail non-trivially), formally
+valid (Z3-satisfiable), and diverse (varied orderings and boundaries).
+DafnyBench~\citep{loughman2024dafnybench} targets annotation-heavy
+verification, not FSF precedence---hence a domain-specific set.
 
-The benchmark consists of 120 hard synthetic formal specification tasks (SOFL/FSF
-instantiation), selected from 180 generated candidates by a Z3 satisfiability filter that retains only tasks with
-non-empty precedence-sensitive overlap regions (the class where
-specification-conformance defects occur).
-Each task contains five integer input variables, three output variables, and 8 ordered
-FSF scenarios with overlapping guard regions.
-Tasks are annotated with three complexity metadata fields:
-(i)~\emph{overlap density} (fraction of input space where multiple guards are
-simultaneously satisfiable);
-(ii)~\emph{guard complexity label} (Simple/AND/Nested/Arithmetic/Mixed);
-(iii)~\emph{scenario count}.
-The template baseline B0 scores 27.5\% strict success, confirming genuine difficulty.
+120 hard tasks (from 180 candidates) survive a Z3 filter that keeps only
+non-empty overlap regions: five inputs, three outputs, eight ordered
+scenarios, annotated by overlap density, guard-complexity label, and
+scenario count.
+B0 at 27.5\% strict success confirms genuine difficulty.
 
 \subsection{Base Tasks and Hard Synthetic Generation}
 
@@ -174,10 +163,10 @@ ordering defects actually occur.
 \begin{figure}[t]
   \centering
   \tikzinput{diagrams/tikz/benchmark_pipeline}
-  \caption{Benchmark construction pipeline.
-    Hard synthetic tasks are generated with precedence-sensitive FSF scenarios,
-    validated by Z3 for scenario satisfiability, and assembled into the final
-    120-task benchmark used across all evaluation modes.}
+  \caption{\textbf{Key observation:} the Z3 filter keeps only overlap-heavy,
+    satisfiable tasks---the regime where ordering defects actually occur.
+    \textbf{How to read:} left-to-right from sampled guards through filtering
+    to the final 120-task set.}
   \label{fig:benchmark-pipeline}
 \end{figure}
 
@@ -202,16 +191,14 @@ are released with the artifact package.
 
 \subsection{Illustrative Task Example}
 
-The hard benchmark uses five-input, eight-scenario tasks, but the same
-first-match structure as the running example \code{classify\_signal}
-(Listing~\ref{lst:fsf-spec}): negative levels must fire before threshold
-checks, and the overlap region is where ordering bugs hide.
-Hard tasks expand that skeleton with five inputs $(a,b,c,d,e)$, three outputs,
-and eight nested guards.
-The following illustrative task models a financial risk classifier with inputs
-\code{a}--\code{e} $\in [0,100]$ and outputs \code{risk} $\in \{0,1,2,3\}$,
-\code{action} $\in \{0,1,2\}$, and \code{score} $\in [0,100]$.
-The eight FSF scenarios are ordered from most-specific to least-specific:
+\code{classify\_signal} was the two-input monitoring alert; the hard benchmark
+is the same first-match skeleton scaled up.
+Five inputs $(a,b,c,d,e)$, three outputs, eight nested guards---still
+``most-specific fires first,'' still the overlap region where ordering bugs
+hide.
+The illustrative task below is a financial risk classifier
+(\code{a}--\code{e} $\in [0,100]$; outputs \code{risk}, \code{action},
+\code{score}), ordered most-specific to least-specific:
 
 \begin{enumerate}
   \item High credit AND low debt AND low volatility $\Rightarrow$ (risk=0, action=0, score=90)

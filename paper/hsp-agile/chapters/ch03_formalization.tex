@@ -1,31 +1,26 @@
 \chapter{Formal Problem Definition}
 \label{ch:formalization}
 
-Chapter~\ref{ch:intro} stated the prevention problem in words.
-Making that problem precise is the job of this chapter.
-The sections below fix what a task is, how ordered guards are evaluated, how
-conformance and acceptance are scored, and how the hard benchmark is
-characterised---always returning to \code{classify\_signal} so the notation
-never floats free of an example.
-
-Notation used throughout: $\mathbb{N}$ for the non-negative integers,
-$\mathbb{Z}$ for all integers, and $\mathbf{1}[\cdot]$ for the Iverson
-bracket ($1$ when its argument is true and $0$ otherwise).
+This chapter is the mathematical core of the report.
+It does not yet describe a pipeline; it fixes the objects a pipeline must
+manipulate.
+The industrial-monitoring contract \code{classify\_signal} from
+Chapter~\ref{ch:intro} is the sole running example: every definition is
+instantiated on it before the next object is introduced.
+Notation: $\mathbb{N}$, $\mathbb{Z}$, and $\mathbf{1}[\cdot]$ for the Iverson
+bracket.
 
 % ---------------------------------------------------------------------------
 \section{Running Example Roadmap}
 \label{sec:form:roadmap}
 % ---------------------------------------------------------------------------
 
-Readers should keep one concrete task in mind while reading the definitions.
-That task is \code{classify\_signal(level, threshold)} from
-Chapter~\ref{ch:intro}: return \texttt{"Error"} when the level is negative,
-\texttt{"Critical"} when the level meets or exceeds a threshold (and is
-non-negative), and \texttt{"Normal"} otherwise.
-Each formal object is followed by a short \emph{Example} paragraph that
-instantiates it on this task.
-Figure~\ref{fig:specir-walkthrough} previews the path from FSF text through an
-intermediate representation and a priority formula to a concrete witness.
+What must be true of \code{classify\_signal} before any synthesis loop is
+built?
+The answer is a short chain: a typed task, an ordered oracle, a finite witness
+set that respects first-match priority, and a release predicate under budget~$K$.
+Figure~\ref{fig:specir-walkthrough} previews that chain from FSF text to the
+witness $(-3,-10)$.
 
 \begin{figure}[t]
   \centering
@@ -107,10 +102,9 @@ $C_t$ holds three guarded cases whose first guard atom is
 $\{\texttt{var}{=}\texttt{level},\;\texttt{op}{=}\texttt{lt},\;
 \texttt{threshold}{=}0\}$ (Figure~\ref{fig:specir-walkthrough}).
 
-Adapters and validators need a concrete surface form.
-The EBNF below is that form: it matches the JSON schema used in the
-implementation, so every SpecIR document the pipeline accepts can be checked
-mechanically.
+The abstract tuple is not yet checkable.
+Adapters and validators need a concrete surface form that matches the JSON
+schema used in the implementation.
 
 \begin{definition}[SpecIR Surface Grammar (EBNF)]
 \label{def:specir-ebnf}
@@ -128,9 +122,9 @@ GuardAtom   ::= var op [threshold]   (* op in eq,ne,lt,le,gt,ge,others *)
 \end{lstlisting}
 \end{definition}
 
-Not every string that parses is a usable specification.
-Well-formedness rules out missing variables, non-consecutive indices, and a
-final case that fails to cover the residual input space.
+Parsing alone is not enough: a document can parse and still omit variables,
+skip indices, or leave residual inputs uncovered.
+Well-formedness rules those cases out.
 
 \begin{definition}[SpecIR Well-formedness]
 \label{def:specir-wf}
@@ -147,19 +141,21 @@ Validation is enforced by \texttt{src/ir/schema\_validate.py}
 (Appendix~\ref{sec:repro:schemas}).
 \end{definition}
 
+\paragraph{Why adapters and lowering exist.}
 Surface notations still differ.
-An adapter is the thin translation that turns notation-specific text into
-well-formed SpecIR; after that step, the shared pipeline never sees the
-original syntax.
+A thin map turns notation-specific text into well-formed SpecIR; after that
+step the shared pipeline never sees the original syntax.
+HSP-Agile optionally projects SpecIR back onto an FSF-shaped view for
+screening that still speaks in scenarios.
 
 \begin{definition}[Specification Adapter]
 \label{def:spec-adapter}
 A \emph{Specification Adapter} is $\text{Adapt}_L : \text{Text}_L \longrightarrow \text{SpecIR}$.
 \end{definition}
 
-HSP-Agile optionally projects SpecIR back onto an FSF-shaped view for
-screening that still speaks in scenarios.
-That projection is lowering; the core stages continue to depend only on SpecIR.
+On the SOFL path, screening still speaks in scenarios, so SpecIR is projected
+onto an FSF-shaped \texttt{TaskSpec}; the core stages continue to depend only
+on SpecIR.
 
 \begin{definition}[FSF Lowering (HSP-Agile Instantiation)]
 \label{def:fsf-lowering}
@@ -167,24 +163,14 @@ $\text{Lower}_{\text{FSF}} : \text{SpecIR} \longrightarrow \text{TaskSpec}_{\tex
 projects SpecIR onto the FSF view; the pipeline core depends only on SpecIR.
 \end{definition}
 
-Each ordered case in SpecIR corresponds to one FSF scenario: a guard that
-selects a region of the input space, and an output mapping that says what
-must be returned there.
+Each ordered SpecIR case is one FSF scenario: a guard that selects a region,
+and an output mapping that says what must be returned there.
 
 \begin{definition}[FSF Scenario]
 \label{def:scenario}
 A \emph{Functional Scenario Framework (FSF) scenario} is a pair
-\[
-  s_i \;=\; (g_i,\;\phi_i),
-\]
-where
-\begin{itemize}
-  \item $g_i : \mathcal{X}_t \to \{0, 1\}$ is a Boolean \emph{guard
-        condition} over the input domain; and
-  \item $\phi_i : \mathcal{X}_t \to \mathcal{Y}_t$ is a total
-        \emph{output mapping} that prescribes the correct output for every
-        input satisfying the guard.
-\end{itemize}
+$s_i = (g_i,\;\phi_i)$, where $g_i : \mathcal{X}_t \to \{0, 1\}$ is a Boolean
+guard and $\phi_i : \mathcal{X}_t \to \mathcal{Y}_t$ is a total output mapping.
 \end{definition}
 
 \paragraph{Example.}
@@ -192,41 +178,33 @@ $s_1=(\mathit{level}<0,\;\phi_1)$ with $\phi_1\equiv\texttt{"Error"}$;
 $s_2=(\mathit{level}\ge\mathit{threshold},\;\phi_2)$ with
 $\phi_2\equiv\texttt{"Critical"}$; $s_3$ is the \texttt{others} case with
 $\phi_3\equiv\texttt{"Normal"}$.
+Guards are linear arithmetic predicates over $\mathcal{X}_t$; each scenario is
+a self-contained input--output contract.
 
-Guards are expressed as linear arithmetic predicates over the integer
-variables of $\mathcal{X}_t$.  In practice they encode conditions such as
-threshold comparisons ($a > \theta_1$), conjunctions of comparisons, or
-negations thereof.  Output mappings specify concrete assignments to the output
-variables, making each scenario a self-contained input-output contract.
+Priority is not an implementation detail.
+It is part of the specification, and the oracle is the function that enforces
+it~\citep{dijkstra1975guarded}.
 
 \begin{definition}[Scenario Ordering and Specification Oracle]
 \label{def:oracle}
 Scenario $s_i$ has \emph{higher priority} than $s_j$ whenever $i < j$.
 For any input $x \in \mathcal{X}_t$, the \emph{specification oracle}
-$g_t : \mathcal{X}_t \to \mathcal{Y}_t$ is defined by first-match
-evaluation:
+$g_t : \mathcal{X}_t \to \mathcal{Y}_t$ is
 \[
   g_t(x) \;=\; \phi_i(x),
   \qquad \text{where } i = \min\bigl\{j : g_j(x) = 1\bigr\}.
 \]
-The final scenario $s_n$ is the \emph{``others'' case} with guard
-\[
-  g_n(x) \;=\; \neg\,\bigvee_{j=1}^{n-1} g_j(x),
-\]
-ensuring that every input is handled by exactly one scenario.
+The final scenario $s_n$ is the \emph{``others'' case} with
+$g_n(x) = \neg\bigvee_{j=1}^{n-1} g_j(x)$, so every input is handled by
+exactly one scenario.
 \end{definition}
-
-The first-match semantics above is the key property distinguishing FSF from
-a simple case statement \citep{dijkstra1975guarded}: guard evaluation order
-is part of the specification, not an implementation choice.
-A candidate that evaluates $g_2$ before $g_1$ may be correct on most inputs
-(where guards are disjoint) but wrong wherever both guards hold.
 
 \paragraph{Example.}
 On $(-3,-10)$, both $g_1$ and $g_2$ hold, so
 $g_t(-3,-10)=\phi_1(-3,-10)=\texttt{"Error"}$.
 An implementation that checks $g_2$ first returns \texttt{"Critical"} and
-fails the oracle.
+fails the oracle---correct on most disjoint inputs, wrong wherever both
+guards hold.
 
 % ---------------------------------------------------------------------------
 \section{FSF Scenario Semantics}
@@ -295,9 +273,10 @@ contributes at least one case whose correct output is determined by
 $\phi_i$, and the precedence ordering is witnessed by all $n$ cases jointly.
 \end{proof}
 
-Precedence defects concentrate near guard boundaries: inputs that sit close
-to where one scenario yields to another.
-That thin set is the boundary region; random tests rarely land inside it.
+Precedence defects concentrate near guard boundaries---the thin set where
+one scenario yields to another.
+Random tests rarely land there; when they miss, unit-test repair looks
+healthy while ordering bugs remain.
 
 \begin{definition}[Boundary Region]
 \label{def:boundary-region}
@@ -306,10 +285,8 @@ $\mathcal{B}_\varepsilon(t) = \{\mathbf{x} \in \mathcal{X}_t :
   \exists i,\; \partial g_i(\mathbf{x}) < \varepsilon\}$.
 \end{definition}
 
-How often a faulty candidate fails on a randomly drawn witness is its
-fault-exposure probability.
-When that probability is small, unit-test repair loops look healthy while
-ordering bugs remain.
+Fault-exposure probability is how often a faulty candidate fails on a
+randomly drawn witness; when it is small, denser unit tests still look fine.
 
 \begin{definition}[Per-witness Fault-Exposure Probability]
 \label{def:fault-exposure}
@@ -318,9 +295,7 @@ For faulty candidate $c$, $\varepsilon_c =
 $\varepsilon = \min_{c \in \mathcal{C}\setminus\{g_t\}} \varepsilon_c > 0$.
 \end{definition}
 
-In plain terms: random tests miss the thin overlap slivers where ordering
-bugs live; SMT witnesses are built to land there.
-The corollary makes that contrast quantitative.
+The corollary makes the random-vs-SMT contrast quantitative.
 
 \begin{corollary}[Random vs.\ SMT Fault-Exposure Hit Rate]
 \label{cor:random-vs-smt}
@@ -412,38 +387,30 @@ language model to localise the bug within the FSF specification.
 
 The oracle and the case set answer whether a candidate is right on the
 witnesses that matter.
-Release, however, is a stronger decision: the candidate must clear those
-witnesses \emph{and} a structural screen, and the search for such a candidate
-must terminate within a fixed LLM budget.
-The definitions below make that decision precise.
+Release is stronger: clear those witnesses \emph{and} a structural screen,
+within a fixed LLM budget.
 
 \begin{definition}[Candidate Implementation]
 \label{def:candidate}
 A \emph{candidate implementation} for task $t$ is any computable function
 $c : \mathcal{X}_t \to \mathcal{Y}_t$.
-Write $f_c$ for its observable input-output behaviour---the function computed
-when $c$ is executed.
+Write $f_c$ for its observable input-output behaviour.
 \end{definition}
 
-A natural quality score is the fraction of witnesses on which the candidate
-matches the oracle.
-That score is \emph{strict formal conformance}: it is continuous, so partial
-progress during repair remains visible, and it is grounded in the
-specification rather than in an arbitrary unit-test suite.
+The natural quality score is the fraction of witnesses on which $c$ matches
+the oracle---continuous, so repair progress remains visible, and grounded in
+the specification rather than an arbitrary unit-test suite.
 
 \begin{definition}[Strict Formal Conformance]
 \label{def:conformance}
-The \emph{strict formal conformance} of candidate $c$ with respect to
-task $t$ is
 \[
   \mathrm{Conf}(c,\,t)
   \;=\;
   \frac{1}{|\mathcal{D}(t)|}
   \sum_{(x,\,y)\,\in\,\mathcal{D}(t)}
-  \mathbf{1}\bigl[f_c(x) = y\bigr].
+  \mathbf{1}\bigl[f_c(x) = y\bigr]
+  \;\in\; [0,1].
 \]
-$\mathrm{Conf}(c,t) \in [0, 1]$; a value of $1$ indicates that $c$ agrees
-with the oracle on every generated case.
 \end{definition}
 
 \paragraph{Example.}
@@ -451,45 +418,34 @@ If $\mathcal{D}(t)$ has three witnesses and the buggy
 \code{classify\_signal} fails only on $(-3,-10)$, then
 $\mathrm{Conf}(c,t)=2/3$.
 
+\emph{Strict success} is the thresholded form: $\mathrm{Conf}(c,t)\ge\tau$
+with $\tau=1$ (Definition~\ref{def:strict-success}).
+A lower $\tau$ would mask ordering violations that pass most cases where
+overlapping guards prescribe identical outputs~\citep{zhu1997specification}.
+
 \begin{definition}[Strict Success]
 \label{def:strict-success}
-Candidate $c$ \emph{strictly succeeds} on task $t$ if and only if
-\[
-  \mathrm{Conf}(c,\,t) \;\geq\; \tau,
-  \qquad \tau = 1.
-\]
+Candidate $c$ \emph{strictly succeeds} on task $t$ iff
+$\mathrm{Conf}(c,\,t) \ge \tau$ with $\tau = 1$.
 \end{definition}
 
-The choice $\tau = 1$ (all generated cases must pass) is deliberate.
-A threshold below $1$ would tolerate partial conformance and mask
-scenario-ordering violations: a candidate with wrong guard order may pass
-most cases where overlapping guards prescribe identical outputs, yet fail
-systematically where they disagree \citep{zhu1997specification}.
-Hence all $n$ generated cases must pass before formal conformance is declared.
-
-Conformance alone is insufficient for acceptance; the pipeline also screens
-candidates for the presence of high-severity requirement fault patterns.
+Conformance alone is still insufficient: structural anti-patterns (hard-coded
+returns, unconditional success) can clear every witness.
+The high-severity screen $\mathcal{P}^H$ (nine patterns in
+Table~\ref{tab:patterns}; Appendix~\ref{app:patterns}) blocks those cases;
+medium/low patterns inform repair without gating release.
 
 \begin{definition}[High-Severity Pattern Violation]
 \label{def:pattern-violation}
-Let $\mathcal{P}^H$ be the set of high-severity requirement fault patterns
-(as enumerated in Appendix~\ref{app:patterns}).  Candidate $c$ is
-\emph{pattern-safe} with respect to task $t$ if
-\[
-  \forall p \in \mathcal{P}^H : p(c,\,t) = 0.
-\]
-Each pattern checker $p : (c, t) \mapsto \{0, 1\}$ returns $1$ when the
-pattern is detected.
+Candidate $c$ is \emph{pattern-safe} iff
+$\forall p \in \mathcal{P}^H : p(c,\,t) = 0$, where each checker
+$p : (c, t) \mapsto \{0, 1\}$ returns $1$ on a hit.
 \end{definition}
 
-$\mathcal{P}^H$ contains the \textbf{nine} high-severity patterns (severity = high or
-critical in Table~\ref{tab:patterns}); the remaining five patterns carry medium or low
-severity and inform repair feedback without blocking acceptance.
-Each pattern is encoded as a static analysis rule applied to the candidate source.
+Release is the conjunction of the two checks---neither alone is enough.
 
 \begin{definition}[Hybrid Acceptance Predicate]
 \label{def:accept}
-The \emph{hybrid acceptance predicate} for candidate $c$ and task $t$ is
 \[
   \mathrm{Accept}(c,\,t)
   \;=\;
@@ -499,66 +455,37 @@ The \emph{hybrid acceptance predicate} for candidate $c$ and task $t$ is
     \forall p \in \mathcal{P}^H : p(c,\,t) = 0
   \right].
 \]
-$\mathrm{Accept}(c,t) = 1$ is the condition under which HSP-Agile declares
-the synthesis attempt successful.
 \end{definition}
 
 \paragraph{Example.}
 A repaired \code{classify\_signal} with $\mathrm{Conf}=1$ still fails
 acceptance if RF07 (\emph{unconditional success}) fires on a hard-coded
 \texttt{return "Normal"}.
-Conversely, a candidate that clears the pattern screen but fails one witness
-also fails $\mathrm{Accept}$.
-This is the source of the strict-success paradox in Chapter~\ref{ch:results}:
-mean conformance can be high while acceptance remains selective.
+Conversely, clearing the pattern screen while failing one witness also fails
+$\mathrm{Accept}$.
+That conjunction is the source of the strict-success paradox in
+Chapter~\ref{ch:results}: mean conformance can be high while acceptance stays
+selective.
 
-The conjunction of formal conformance and pattern safety reflects two error
-modes: (i)~functional errors on specific inputs, caught by witnesses; and
-(ii)~structural anti-patterns, caught by static screening.
-Neither check alone is sufficient.
-
-Those pieces assemble into the main computational problem: find an acceptable
-candidate within a fixed LLM budget, or return the best-effort candidate when
-the budget is exhausted.
+Those pieces assemble into the computational problem: find an acceptable
+candidate within budget~$K$, or return the best-effort candidate when the
+budget is exhausted.
+The feedback object on attempt~$k{+}1$ is a structured JSON record
+(counterexamples, pattern hits, attempt index); Chapter~\ref{ch:method}
+details its fields.
+The search is CEGIS-shaped~\citep{solarlezama2008sketching,lynn2024verifierloop}
+with a stochastic synthesiser---hence the explicit fallback.
 
 \begin{definition}[Bounded Acceptance Problem]
 \label{def:bap}
-Given:
-\begin{itemize}
-  \item a task $t = (\mathcal{S}_t, \mathcal{X}_t, \mathcal{Y}_t)$;
-  \item a budget $K \in \mathbb{N}^+$ bounding the number of LLM calls; and
-  \item a synthesis oracle $\mathrm{LLM}(\cdot)$ that, given a task and a
-        feedback object, generates a candidate implementation;
-\end{itemize}
-the \emph{Bounded Acceptance Problem} (BAP) is to find a candidate
-\[
-  c^* = \mathrm{LLM}\!\bigl(t,\;\mathrm{feedback}_1, \ldots,
-                              \mathrm{feedback}_{k-1}\bigr)
-\]
-with at most $K$ calls to $\mathrm{LLM}$ such that $\mathrm{Accept}(c^*, t) = 1$.
-If no such candidate exists within budget, return the best-effort candidate
-\[
-  c^* \;=\; \arg\max_{c \,\in\, C_K} \mathrm{Conf}(c,\,t),
-\]
-where $C_K = \{c_1, \ldots, c_K\}$ is the set of all candidates generated
-during the $K$ attempts.
+Given task $t$, budget $K \in \mathbb{N}^+$, and synthesis oracle
+$\mathrm{LLM}(\cdot)$, find
+$c^* = \mathrm{LLM}(t,\mathrm{feedback}_1,\ldots,\mathrm{feedback}_{k-1})$
+with at most $K$ calls such that $\mathrm{Accept}(c^*, t) = 1$;
+otherwise return
+$c^* = \arg\max_{c \in C_K} \mathrm{Conf}(c,\,t)$
+where $C_K$ is the set of candidates generated in the $K$ attempts.
 \end{definition}
-
-The feedback object $\mathrm{feedback}_k$ passed to the LLM on attempt $k+1$
-is a structured JSON record containing: (i) the list of counterexamples from
-attempt $k$; (ii) the list of detected pattern violations; and (iii) the
-attempt index $k$.  The structure and content of feedback messages are
-described in detail in Chapter~\ref{ch:method}.
-
-The pipeline is therefore an instance of counterexample-guided inductive
-synthesis (CEGIS) \citep{solarlezama2008sketching, lynn2024verifierloop}, where the verifier is the
-SMT-generated case set and the pattern checker, and the synthesiser is the
-language model.
-Unlike classical CEGIS, however, the synthesiser is stochastic: the same prompt
-may produce different outputs on successive calls, with no guarantee of
-convergence within budget $K$.
-The BAP makes this limitation explicit by specifying a graceful fallback when
-the budget is exhausted.
 
 % ---------------------------------------------------------------------------
 \section{Prevention and Quality Metrics}
@@ -567,57 +494,41 @@ the budget is exhausted.
 
 Generation success is the wrong primary metric for a prevention system.
 What matters is whether faulty candidates are kept out of release, and whether
-correct candidates are not rejected by accident.
-Those two rates are measured over a mutant population
-\citep{demillo1978mutation, ammann2016testing} and reported in
-Chapter~\ref{ch:experiments}.
+correct ones are not rejected by accident.
+Both rates are measured over a mutant population
+\citep{demillo1978mutation,ammann2016testing}.
 
 \begin{definition}[Mutant Population]
 \label{def:mutants}
 A \emph{mutant population} $\mathcal{M}$ is a finite set of pairs
-$(c_m, t_m)$, each consisting of a candidate and a task, where at least
-one of the two has been artificially perturbed.
-Two sub-populations matter:
-\begin{itemize}
-  \item \emph{Specification-confusion mutants} $\mathcal{M}^S$: the task
-        $t_m$ is a mutated version of a reference task, obtained by
-        modifying scenario guards or output bindings in $\mathcal{S}_t$.
-        The candidate $c_m$ is a correct implementation of the
-        \emph{original} task, so it is faulty with respect to $t_m$.
-  \item \emph{Implementation-screening mutants} $\mathcal{M}^I$: the
-        task $t_m$ is unchanged, but $c_m$ is a deliberately mutated
-        version of a reference implementation, obtained by applying a
-        standard mutation operator (e.g., guard-order swap,
-        boundary-off-by-one).
-\end{itemize}
-A mutant pair $(c_m, t_m)$ is \emph{genuinely faulty}, written
-$\mathrm{Faulty}(m) = 1$, if the reference specification or the reference
-implementation has been perturbed.
+$(c_m, t_m)$ where at least one of the two has been artificially perturbed.
+\emph{Specification-confusion} mutants $\mathcal{M}^S$ mutate the task
+(guards or outputs) while keeping a correct implementation of the original;
+\emph{implementation-screening} mutants $\mathcal{M}^I$ mutate the candidate
+(e.g.\ guard-order swap) while keeping the task.
+Write $\mathrm{Faulty}(m)=1$ when the pair is genuinely faulty.
 \end{definition}
 
-PDR asks a recall-like question: of all mutants, how many does the pipeline
-correctly refuse to accept?
+PDR is recall-like: of all mutants, how many does the pipeline refuse?
+FAR is precision-like: of genuinely faulty mutants, how many still slip
+through $\mathrm{Accept}$?
+In a sprint review, high PDR and low FAR mean the gate is selective without
+rubber-stamping~\citep{okun2007mutation}.
 
 \begin{definition}[Prevention Detection Rate]
 \label{def:pdr}
-The \emph{Prevention Detection Rate} (PDR) is the fraction of mutants that
-the pipeline correctly rejects:
 \[
   \mathrm{PDR}
   \;=\;
   \frac{\bigl|\bigl\{m \in \mathcal{M} : \neg\,\mathrm{Accept}(c_m,\,t_m)\bigr\}\bigr|}
        {|\mathcal{M}|}.
 \]
-In a sprint review, high PDR means fewer faulty candidates reach release.
 \end{definition}
 
-FAR asks the complementary precision-like question: among genuinely faulty
-mutants, how many still slip through $\mathrm{Accept}$?
+FAR is the complementary slip-through rate.
 
 \begin{definition}[False Accept Rate]
 \label{def:far}
-The \emph{False Accept Rate} (FAR) is the fraction of genuinely faulty
-mutants that the pipeline incorrectly accepts:
 \[
   \mathrm{FAR}
   \;=\;
@@ -627,20 +538,16 @@ mutants that the pipeline incorrectly accepts:
     \bigr\}\bigr|}
        {|\mathcal{M}|}.
 \]
-In a sprint review, low FAR means the gate is not rubber-stamping mutants.
 \end{definition}
 
-PDR and FAR are complementary but not redundant \citep{okun2007mutation}.
-PDR counts every rejected mutant, including trivial crashes; FAR focuses on
-faulty mutants that still receive $\mathrm{Accept}=1$.
-
-A related metric quantifies the contribution of the formal case-based check
-alone, independent of the pattern screening layer.
+Mutation kill rate $\mu_k$ isolates the formal check alone
+(Definition~\ref{def:mkr}): the fraction of mutants with
+$\mathrm{Conf}<1$.
+The gap $\mathrm{PDR}-\mu_k$ is the additive value of pattern screening---mutants
+that clear every witness yet still fail $\mathrm{Accept}$.
 
 \begin{definition}[Mutation Kill Rate]
 \label{def:mkr}
-The \emph{mutation kill rate} is the fraction of mutants detected by formal
-conformance checking:
 \[
   \mu_k
   \;=\;
@@ -648,16 +555,6 @@ conformance checking:
        {|\mathcal{M}|}.
 \]
 \end{definition}
-
-The distinction between $\mu_k$ and PDR is important.  $\mu_k$ measures
-whether the formal case-based check alone is sufficient to detect a given
-mutant (i.e., at least one generated case produces a wrong output).  PDR
-measures whether the \emph{full pipeline} — including pattern screening —
-correctly rejects the candidate.  A mutant with $\mathrm{Conf}(c_m, t_m) = 1$
-but a detected pattern violation contributes to PDR but not to $\mu_k$,
-because the conformance check alone would have passed it.  The gap
-$\mathrm{PDR} - \mu_k$ therefore quantifies the additive value of the
-pattern-screening layer over pure case-based testing.
 
 % ---------------------------------------------------------------------------
 \section{Benchmark Formalization}
@@ -803,18 +700,11 @@ than a single LLM call.
 \section*{Chapter Summary}
 % ---------------------------------------------------------------------------
 
-The formal picture is now complete enough to build on.
-A task is an ordered scenario specification over typed domains; SpecIR is the
-shared hinge across notations; first-match semantics yield an executable
-oracle; SMT witnesses populate a finite case set with full scenario coverage
-(Lemma~\ref{lem:coverage}); and release is the conjunctive predicate
-$\mathrm{Accept}$ under a bounded search
+What must be true is now fixed: ordered tasks, SpecIR as the shared hinge,
+first-match oracles, SMT witnesses with full scenario coverage
+(Lemma~\ref{lem:coverage}), and $\mathrm{Accept}$ under budget~$K$
 (Definition~\ref{def:bap}).
-PDR, FAR, and mutation kill rate measure prevention rather than generation
-success.
-Every hard benchmark task requires strict scenario ordering
-(Proposition~\ref{prop:order-required}), while formal checking remains cheap
-relative to LLM inference.
-What remains is operational: how an LLM participates in that loop, how
-failures become Semantic Feedback IR, and how the four stages assemble into a
-method.
+PDR/FAR measure prevention; every hard task requires ordering
+(Proposition~\ref{prop:order-required}); formal checking stays cheap relative
+to LLM inference.
+Chapter~\ref{ch:method} turns these objects into a runnable loop.
