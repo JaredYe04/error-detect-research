@@ -100,17 +100,32 @@ class FeedbackRenderer:
     intermediate representation, not merely a prompt template.
     """
 
-    VARIANTS = ("test_only", "test_expected", "semantic_ir")
+    VARIANTS = (
+        "test_only",
+        "test_expected",
+        "semantic_ir",
+        "verifier_loop",
+        "self_critique",
+        "execution_trace",
+        "reflexion",
+    )
 
     @staticmethod
     def render(records: list[SemanticFeedback], variant: str = "semantic_ir") -> str:
         """Render IR records to a repair prompt string."""
         if variant == "test_only":
             return FeedbackRenderer._render_test_only(records)
-        elif variant == "test_expected":
+        if variant == "test_expected":
             return FeedbackRenderer._render_test_expected(records)
-        else:
-            return FeedbackRenderer._render_full(records)
+        if variant == "verifier_loop":
+            return FeedbackRenderer._render_verifier_loop(records)
+        if variant == "self_critique":
+            return FeedbackRenderer._render_self_critique(records)
+        if variant == "execution_trace":
+            return FeedbackRenderer._render_execution_trace(records)
+        if variant == "reflexion":
+            return FeedbackRenderer._render_reflexion(records)
+        return FeedbackRenderer._render_full(records)
 
     @staticmethod
     def _render_test_only(records: list[SemanticFeedback]) -> str:
@@ -125,6 +140,48 @@ class FeedbackRenderer:
         for r in records:
             lines.append(f"  inputs={r.inputs} → observed={r.observed}, expected={r.expected}")
         return "\n".join(lines)
+
+    @staticmethod
+    def _render_verifier_loop(records: list[SemanticFeedback]) -> str:
+        """VerifierLoop-FSF: SMT witness failures without full Semantic Feedback IR."""
+        lines = ["Verifier counterexamples (SMT witnesses):"]
+        for r in records:
+            lines.append(f"  Scenario {r.scenario_index}: guard ({r.constraint_text})")
+            lines.append(f"    inputs={r.inputs} → observed={r.observed}, expected={r.expected}")
+        return "\n".join(lines)
+
+    @staticmethod
+    def _render_self_critique(records: list[SemanticFeedback]) -> str:
+        """Self-Refine style: critique without oracle expected values."""
+        lines = [
+            "Self-critique (no oracle expected values provided):",
+            "Review your implementation against the specification.",
+            "Identify logical errors, missing scenarios, and boundary mistakes.",
+        ]
+        for r in records[:3]:
+            lines.append(f"  Failed witness: inputs={r.inputs}, observed={r.observed}")
+        return "\n".join(lines)
+
+    @staticmethod
+    def _render_execution_trace(records: list[SemanticFeedback]) -> str:
+        """Self-Debug style: execution trace without Z3 semantic IR."""
+        lines = ["Execution trace on failing witnesses:"]
+        for r in records:
+            lines.append(f"  inputs={r.inputs}")
+            lines.append(f"    execute → return {r.observed}")
+            lines.append(f"    oracle mismatch on scenario {r.scenario_index}")
+        return "\n".join(lines)
+
+    @staticmethod
+    def _render_reflexion(records: list[SemanticFeedback], memory: list[str] | None = None) -> str:
+        """Reflexion-lite: verbal memory plus test-only counterexamples."""
+        parts: list[str] = []
+        if memory:
+            parts.append("Reflection memory from prior attempts:")
+            for m in memory[-3:]:
+                parts.append(f"  - {m}")
+        parts.append(FeedbackRenderer._render_test_only(records))
+        return "\n".join(parts)
 
     @staticmethod
     def _render_full(records: list[SemanticFeedback]) -> str:

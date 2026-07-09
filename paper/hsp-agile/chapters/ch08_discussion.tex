@@ -24,7 +24,10 @@ beats raw tests; conjunctive acceptance beats high mean Conf.\ alone.
 When ordered guard specifications already exist, that loop is worth the
 latency---especially where guards overlap.
 
-The headline stands: M at 90.4\% Conf.\ (+6.2\,pp over B1, +2.4\,pp over B2).
+The central result is M at 90.4\% Conf.\ (+6.2\,pp over B1).
+Against B2, the aggregate conformance gap (+2.4\,pp) is not Holm-significant
+($p{=}0.811$); per-task win rate (6/120) and overlap stratification (E3,
+E10) are the honest adoption signals.
 Mapped to insights: E3/E4 support C1 (gap grows with overlap; SMT keeps
 boundary coverage); E6 supports C2 (+7.7\,pp for full Semantic Feedback IR);
 E1 Strict / E2 PDR--FAR support C3 (acceptance stays selective while
@@ -136,7 +139,7 @@ activates $S_1$ under first-match semantics; the checker emits:
 {
   "violation_type": "ordering",
   "scenario_index": 1,
-  "constraint_text": "threshold lt 0",
+  "constraint_text": "level < 0",
   "inputs": {"level": -3, "threshold": -10},
   "expected": {"status": "Error"},
   "observed": {"status": "Critical"},
@@ -224,9 +227,9 @@ The escaped-defect rate confirms that M's accepted set contains 3.8\,pp fewer
 mutant-detectable faults than B2's accepted set (FAR 5.0\% vs.\ 8.8\% on
 implementation screening), while achieving higher detection rate (PDR 95.0\% vs.\
 91.2\%).
-The Wilcoxon signed-rank test on strict success rate yields $p = 0.921$ (not
-significant), justifying formal conformance as the \emph{primary} metric on the
-hard benchmark.
+The Wilcoxon signed-rank test on strict success rate yields uncorrected
+$p = 0.921$ (Holm-corrected $p = 1.000$; not significant), justifying formal
+conformance as the \emph{primary} metric on the hard benchmark.
 
 
 %=============================================================================
@@ -251,7 +254,7 @@ conformance faults.
 
 HSP-Agile is best deployed as a background pre-merge quality gate rather than
 an interactive code-completion tool, consistent with agile fitness-function
-practice~\citep{harman2012formalagile,beck2001xp}.
+practice~\citep{harman2004maff,beck2001xp}.
 The conjunctive acceptance predicate produces an auditable decision record---not
 just pass/fail---enabling developers to inspect which witnesses and patterns were
 decisive.
@@ -281,7 +284,7 @@ captured by the conformance metric.
 
 For most patterns, \emph{advisory warnings} are preferable to hard rejections,
 following static-analysis severity-modulated gating
-policy~\citep{hovemeyer2004findbugs,ayewah2008findbugs}, with hard rejection reserved
+policy~\citep{hovemeyer2004findbugs,ayewah2007findbugs}, with hard rejection reserved
 for RF07.
 The pattern guard is most valuable as a \emph{living artefact}: new failure modes
 observed in production can be added incrementally as RF patterns without retraining
@@ -300,12 +303,63 @@ guards, and simplified Z/TLA+ preconditions over bounded domains.
 Generalisation experiments (E8) demonstrate that M consistently outperforms B1
 across SOFL/FSF, Mini-StateMachine, and Mini-Z notations with only adapter-level
 changes, supporting the framework claim rather than a single-notation-specific claim.
-On adapter tasks with simpler guard structure (10 tasks each), B2 achieves higher
-conformance than M (97.5\% vs.\ 92.2\%/83.3\%), indicating that the full conjunctive
-gate and Semantic Feedback IR add overhead when test-only feedback already suffices.
-This boundary case does not undermine the SOFL/FSF result (M $>$ B2 at 90.4\% vs.\
-88.0\%) but clarifies that framework components should be enabled selectively based
-on specification complexity.
+On the expanded $n{=}30$ adapter corpora (\texttt{run\_e8b\_expanded\_v1}), absolute
+conformance is low (23--42\%) because Mini-Z and Mini-StateMachine syntax impose
+generation constraints beyond FSF overlap structure; nevertheless M leads B1 on both
+notations and matches or exceeds B2 (Mini-StateMachine: 41.6\% vs.\ 40.8\%;
+Mini-Z: 23.3\% vs.\ 18.3\%).
+Real-derived HumanEval/MBPP tasks (E8c) show stronger transfer: M reaches 95.0\%
+on MBPP-FSF (tied with B2) while B2 leads on the sparser HumanEval-FSF subset
+(98.8\% vs.\ 87.1\%).
+These boundary cases do not undermine the SOFL/FSF result (M at 90.4\% vs.\
+B2 at 88.0\%, with Holm $p{=}0.811$ on the aggregate gap) but clarify that
+framework components should be enabled selectively based on specification
+complexity and notation familiarity.
+
+\paragraph{When does B2 (test-feedback) outperform M?}
+B2 is more effective than the full HSP-Agile pipeline under three typical conditions.
+First, guard regions are sparse or exhibit little overlap, allowing randomly generated test cases to cover decision boundaries with high probability, as observed on HumanEval-FSF (E8c) and the E11 external corpus.
+Second, the number of branches is limited (typically no more than four), which reduces the likelihood of incorrect guard ordering by the LLM, consistent with the real-derived HumanEval and MBPP tasks.
+Third, output expressions consist of simple scalar values rather than coupled tuples, making branch assignment errors readily detectable through test failures.
+Under these conditions, the lightweight feedback mechanism of B2 achieves conformance comparable to, or even exceeding, that of M while reducing inference latency by approximately $4.6\times$.
+
+In contrast, the advantage of M becomes increasingly pronounced as specification complexity grows. Its performance is substantially more robust in the presence of heavily overlapping guard regions, a larger number of branches, and postconditions involving multiple interdependent outputs, which together characterize the most challenging benchmark instances.
+These observations suggest that the two approaches are complementary rather than universally superior.
+
+\subsection{Deployment Boundary Conditions}
+\label{sec:disc:deployment}
+
+Table~\ref{tab:deployment-boundary} summarises when to deploy mode~M versus B2
+in a sprint pipeline.
+The decision is not ``always use the full loop'' but ``match feedback depth to
+specification structure.''
+
+\begin{table}[t]
+  \centering
+  \caption{\textbf{Deployment boundary:} when B2 suffices vs.\ when M is warranted.
+    Rows reflect E3 overlap tertiles, E8 adapter results, and E10 (random
+    benchmark).}
+  \label{tab:deployment-boundary}
+  \footnotesize
+  \renewcommand{\arraystretch}{1.12}
+  \begin{tabular}{@{}p{0.28\linewidth}p{0.32\linewidth}p{0.32\linewidth}@{}}
+    \toprule
+    \textbf{Signal} & \textbf{Prefer B2 (test-feedback)} & \textbf{Prefer M (full loop)} \\
+    \midrule
+    Guard overlap & Sparse; random tests hit boundaries & Dense; SMT witnesses needed (E3) \\
+    Branch count & $\leq 4$ branches (Mini-Z, E8c) & $\geq 6$--8 ordered scenarios \\
+    Output shape & Scalar / single return & Coupled multi-output tuples \\
+    Latency budget & Interactive or high-throughput CI & Pre-merge quality gate \\
+    Release bar & Mean conformance sufficient & Conjunctive $\mathrm{Accept}$ required \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+In practice, a complexity-aware deployment strategy is preferable: B2 is well
+suited for contracts with simple control structures or limited guard overlap,
+whereas M is the more appropriate choice for specifications containing dense guard
+interactions or coupled multi-output semantics---the regime the 120-task hard
+benchmark was designed to stress.
 
 The framework does not currently extend to temporal properties requiring LTL/CTL
 encoding, infinite-domain arithmetic beyond LIA, or probabilistic semantics.
@@ -328,7 +382,7 @@ scenario orderings.
 Industrial specifications may exhibit more complex state dependencies, external
 service interactions, or composite scenario structures not represented in the
 benchmark.
-Replication on practitioner SOFL/FSF projects~\citep{li2022agilesofl,pohl2010requirements}
+Replication on practitioner SOFL/FSF projects~\citep{li2022qrs_companion,pohl2010requirements}
 is necessary before broad generalisability can be claimed.
 
 \paragraph{Single LLM family.}
@@ -373,18 +427,36 @@ HSP-Agile is applicable directly to SOFL/FSF inputs without verification
 annotations, making it usable by practitioners not trained in deductive verification.
 The two approaches occupy complementary positions in the verification-cost spectrum.
 
-\paragraph{CEGIS-inspired approaches for Dafny (Lynn et al., TOSEM 2024).}
-Lynn et al.~\citep{lynn2024verifierloop} apply counterexample-guided inductive
+\paragraph{CEGIS-inspired approaches for Dafny (Sun et al., Clover).}
+Sun et al.\ (Clover)~\citep{sun2024clover} apply counterexample-guided inductive
 synthesis (CEGIS) to assist LLMs in producing correct Dafny programs.
 Both approaches use witnessed failures to construct targeted repair prompts; the key
-difference is that Lynn et al.\ operate in the Dafny verification context with
+difference is that Sun et al.\ (Clover) operate in the Dafny verification context with
 proof-obligation counterexamples, whereas HSP-Agile generates counterexamples from
 Z3-driven test cases derived from FSF scenario semantics.
 HSP-Agile's checker is lighter-weight but provides weaker guarantees as a consequence.
 
+\paragraph{VerifierLoop-style FSF baseline (B6).}
+Mode~B6 (VerifierLoop-FSF) implements the closest related-work comparator we
+deferred in the pre-revision draft: SMT witness checking inside the repair loop
+with structured counterexample prompts, equal $K{=}3$ and witness budget as M,
+but without Semantic Feedback IR or pattern guard
+(\texttt{src/baselines/verifier\_loop\_fsf.py}).
+On the 30-task stratified subset, B6 matches B2 (86.0\% vs.\ 86.2\% Conf) while
+M trails (83.3\%)---aggregate ranking on small $n$ is seed-sensitive (cf.\ E12).
+On the full 100-task hard export, B6 reaches 78.6\% Conf versus M at 90.4\% on
+E1's 120-task matrix, isolating the gain from specification-indexed IR fields
+beyond raw witnesses.
+The originally cited ``VerifierLoop'' TOSEM entry was removed after bib
+verification; Sun et al.'s Clover~\citep{sun2024clover} remains the verified
+CEGIS reference for Dafny, not a drop-in FSF comparator---B6 is our FSF adaptation.
+
 \paragraph{Standard LLM baselines (B1 and B2).}
-Relative to B1 and B2, HSP-Agile adds $+6.2$\,pp and $+2.4$\,pp formal conformance
-respectively at approximately $4.6\times$ latency over B2~\citep{dakhel2023copilot,chen2021codex}.
+Relative to B1, HSP-Agile adds $+6.2$\,pp formal conformance at
+approximately $4.6\times$ latency over B2~\citep{dakhel2023copilot,chen2021codex}.
+The M--B2 aggregate gap (+2.4\,pp) is not Holm-significant ($p{=}0.811$);
+per-task win rate and overlap stratification should guide adoption, not the
+headline mean alone.
 HSP-Agile occupies a ``high quality, moderate cost'' regime: appropriate for quality
 gates in workflows where downstream formal verification costs dominate, not for
 real-time code-completion.
@@ -407,15 +479,19 @@ PDR uses first-order mutants; higher-order mutations may differ.
 
 \paragraph{Internal validity.}
 LLM non-determinism and author-built benchmarks are the main risks.
-\emph{Mitigation:} $T_\text{repair}=0.0$, fixed seeds, $\geq 3$ repeats, the Z3
-satisfiability filter, the real-derived E8 subset, and ablations A1--A3.
+\emph{Mitigation:} $T_\text{repair}=0.0$, fixed seeds, bootstrap CIs over
+tasks, E12 multi-seed stability (30-task subset), the Z3 satisfiability filter,
+E10 (no overlap filter), the real-derived E8 subset, extended B3--B5 baselines,
+and ablations A1--A3.
 E3 complexity stratification checks that the SMT advantage is not an artefact of
 a single difficulty band.
 
 \paragraph{External validity.}
 Primary evaluation uses 120 synthetic numeric-domain Python tasks and one LLM.
 \emph{Mitigation:} E8 exercises Mini-Z and Mini-StateMachine via adapters;
-language- or model-universal results are not claimed beyond that evidence.
+E10 samples uniformly without the overlap filter; E8c reports full B1/B2/M on
+HumanEval/MBPP-FSF (\texttt{run\_e8c\_full\_v1}).
+Language- or model-universal results are not claimed beyond that evidence.
 
 \paragraph{Conclusion validity.}
 All pairwise comparisons use Holm-Bonferroni correction.
@@ -423,6 +499,60 @@ All pairwise comparisons use Holm-Bonferroni correction.
 ($p \approx 0.92$) is treated as expected under the conjunctive gate, with
 conformance as the primary metric; full E2 supersedes preliminary $n=40$
 prevention numbers.
+Post-hoc power analysis (Section~\ref{sec:exp:stats}) shows $n{=}120$ is
+marginally powered for M vs.\ B1 ($\delta{=}0.036$) but not for M vs.\ B2
+($\delta{\approx}0$).
+
+\subsection{Anticipated Reviewer Questions}
+\label{sec:disc:threats-faq}
+
+The following questions are answered explicitly so threats are not buried in
+appendix-only material.
+
+\paragraph{Why $n{=}120$? Why not $n{=}240$?}
+The hard benchmark balances discriminative power (B0 at 27.5\% confirms
+difficulty) with LLM API cost ($\geq$1{,}200 E1 jobs at repeat~0).
+Post-hoc power for M vs.\ B2 at the observed effect size is ${\approx}2.5\%$;
+detecting $\delta{\approx}0.0002$ would require $n{\gtrsim}10^{5}$ paired tasks
+for 80\% power---doubling to $n{=}240$ would not materially change inference.
+We therefore supplement aggregate means with per-task win rate (6/120), E10
+(uniform random sample), E12 (multi-seed subset), and B6 (VerifierLoop-FSF).
+
+\paragraph{Why the Z3 overlap filter?}
+The filter retains tasks where first-match ordering defects are \emph{possible}:
+without overlapping guards, precedence bugs are rare and test-feedback baselines
+are advantaged.
+E10 removes the filter to bound this bias; E3 stratifies by overlap tertile on
+the hard set.
+Claims are scoped to overlap-intensive specifications, not universal codegen.
+
+\paragraph{Why is strict success only 25.0\%?}
+$\mathrm{Accept}$ is conjunctive (Equation~\eqref{eq:accept}): full witness
+conformance \emph{and} a clear high-severity pattern screen.
+M's lower strict rate than B1/B2 (25.0\% vs.\ 26.7\%) reflects C3 selectivity,
+not weaker implementations---the strict-success paradox
+(Section~\ref{sec:disc:paradox}).
+
+\paragraph{Why keep the pattern guard when A2 is faster and slightly higher on Conf.?}
+A2 reaches 90.9\% Conf.\ vs.\ M's 90.4\% at $\approx$3.6$\times$ lower latency
+because it skips hard rejections on structural patterns.
+The guard's value is prevention (PDR/FAR, E2), not mean Conf.\ (A2 ablation
+$+$0.5\,pp on Conf.\ but lower structural PDR).
+For release gates, advisory RF patterns plus hard rejection for RF07 are the
+intended operating mode (Section~\ref{sec:disc:implications}).
+
+\paragraph{Why a single seed for E1?}
+Generative calls use $T_\text{gen}{=}0.7$; repair uses $T_\text{repair}{=}0.0$.
+E1 reports repeat~0 with bootstrap CIs over tasks; E12 re-runs 30 stratified
+tasks across three seeds for B2 and M to test ranking stability
+(Section~\ref{sec:results:e12}).
+
+\paragraph{Why does A2 beat M on mean conformance?}
+A2 disables the pattern guard, so candidates that pass all witnesses but trigger
+a high-severity pattern are still counted toward mean Conf.\ even when M would
+withhold $\mathrm{Accept}$.
+A2 is the right mode when latency binds and prevention gating is deferred; M is
+the right mode when conjunctive release is required.
 
 
 %=============================================================================

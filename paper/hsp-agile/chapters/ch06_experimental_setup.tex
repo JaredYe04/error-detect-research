@@ -76,9 +76,9 @@ is treated as non-constraining rather than as a hard failure.
 
 \subsection{Language Model Configuration}
 
-All LLM-based modes (B1, B2, B3, B4, M, A1, A2, A3) used
-Qwen2.5-27B-Instruct (\textsf{Qwen-27B}) accessed through an OpenAI-compatible LLM
-gateway.
+All evaluated LLM-based modes (B1, B2, M, A1, A2, A3) used
+Qwen2.5-27B-Instruct~\citep{yang2024qwen25} (\textsf{Qwen-27B}) accessed through an
+OpenAI-compatible LLM gateway.
 Temperature was set to $T_\text{gen} = 0.7$ for all generation calls and to
 $T_\text{repair} = 0.0$ for all repair calls, following the prompting strategy
 described in Chapter~\ref{ch:method}.
@@ -91,8 +91,12 @@ calls depending on when the loop terminates.
 
 The primary experiment was conducted under the run identifier
 \code{run\_hard\_full\_parallel\_v1}.
-In total, 840 runs were executed: 7 modes $\times$ 120 tasks, each run processed
-independently by a dedicated worker process.
+In total, 1{,}200 runs were executed: 10 modes $\times$ 120 tasks, each run
+processed independently by a dedicated worker process.
+The core seven-mode matrix (\code{run\_hard\_full\_parallel\_v1}) covers
+B0--B2, M, and A1--A3; extended baselines B3--B5 were evaluated under
+\code{run\_ccf\_b\_extended\_v1} (repeat~0 merged into the reported tables
+after \texttt{config\_for\_mode} was corrected for those modes).
 Run artefacts (prompts, LLM responses, Z3 query logs, evaluation traces, timing
 records) were serialised to disk in JSONL format for
 reproducibility~\citep{ammann2016testing}.
@@ -100,10 +104,8 @@ All random-number generation used fixed seed~42 for task generation and prompt
 construction; the LLM API itself is not seeded, but temperature~0.0 for repair
 calls makes those responses near-deterministic in practice.
 
-The full CCF-B experimental matrix extends this baseline with extended baselines B3
-and B4 and $\geq 3$ repeats per mode for E1, yielding
-$120 \times 9 \text{ modes} \times 3 \text{ repeats} = 3{,}240$ runs under the
-identifier \code{run\_ccf\_b\_main\_v1}.
+Multi-seed stability (E12) and uniform random-benchmark (E10) protocols are
+described in Sections~\ref{sec:exp:e10} and~\ref{sec:exp:e12}.
 
 \subsection{Reproducibility Measures}
 
@@ -113,11 +115,12 @@ statistical tests robust to residual LLM non-determinism.
 The \code{attempt\_history} field in every result JSONL records per-iteration
 conformance and counterexample counts, enabling E5 repair dynamics analysis without
 re-running experiments.
-Data preparation, aggregation, and plotting are separated into distinct pipeline
-stages (\code{prepare\_paper\_data.py}, \code{prepare\_mechanism\_data.py},
+Data preparation, aggregation, and plotting each run as a distinct pipeline
+stage (\code{prepare\_paper\_data.py}, \code{prepare\_mechanism\_data.py},
 \code{plot\_mpl\_figures.py}).
 All reported tables and figures are generated from the canonical
-\code{run\_hard\_full\_parallel\_v1} artifact (120 tasks $\times$ 7 modes) and
+\code{run\_hard\_full\_parallel\_v1} artifact (120 tasks $\times$ 7 modes),
+\code{run\_ccf\_b\_extended\_v1} (B3--B5, repeat~0), and
 \code{prevention\_full\_v1} prevention evaluation.
 Long-running mechanism experiments (E6 feedback variants, E8 generalisation) write
 incremental \code{results.jsonl} and a live \code{progress.json} with completed/total
@@ -146,7 +149,7 @@ B0 at 27.5\% strict success confirms genuine difficulty.
 \subsection{Base Tasks and Hard Synthetic Generation}
 
 Construction began with 20 base SOFL/FSF tasks extracted by manual inspection from published
-example specifications~\citep{liu2014sofl,li2022agilesofl}.
+example specifications~\citep{liu2004soflbook,li2022qrs_companion}.
 Each base task defines a small module with 3--5 inputs, 2--3 outputs, and 5--8 FSF
 scenarios.
 The base tasks were retained as a development set but excluded from primary evaluation
@@ -181,13 +184,45 @@ ordering defects actually occur.
 The generator produced 180 candidate tasks, of which 60 were discarded by the Z3
 satisfiability filter, leaving the final benchmark of 120 hard synthetic tasks.
 
+\subsection{Random Benchmark (E10)}
+\label{sec:exp:e10}
+
+To address overlap-filter bias, a \emph{uniform random} benchmark of 100 tasks
+was generated from the same \emph{HardTaskGenerator} family but \emph{without}
+the Z3 overlap-density filter (\texttt{--no-filter} in
+\texttt{build\_benchmark.py}).
+Tasks were annotated with overlap rate, boundary density, and scenario count for
+post-hoc stratification.
+Evaluation runs B1, B2, and M under the same $K{=}3$, model, and token budget
+as E1 (\texttt{run\_e10\_random\_v1} on
+\texttt{benchmarks/random\_tasks\_annotated.json}).
+The decision question is whether M's advantage over B2 persists on uniformly
+sampled tasks or concentrates in the overlap-intensive tertiles already
+observed in E3.
+
+\subsection{External SOFL Benchmark (E11)}
+\label{sec:exp:e11}
+
+To bound author-construction bias, we curated $n{=}22$ hand-authored FSF tasks
+in \texttt{benchmarks/external\_sofl.json} from published Agile-SOFL and IET
+fault-prevention patterns~\citep{liu2004soflbook,li2022qrs_companion,li2023iet_faultprevention}.
+Each task records \texttt{externalProvenance} (source citation, book section);
+none are generated by \texttt{HardTaskGenerator}.
+Task IDs are disjoint from the 120-task E1 hard set.
+A parallel export \texttt{benchmarks/manual\_heldout.json} (same $n{=}22$, zero E1
+overlap) is reserved for vendor-example provenance when the Agile-SOFL submodule is
+available; in this artifact package both files reference the curated external corpus
+because \texttt{vendor/agile-sofl-toolchain/examples} is not bundled.
+Evaluation (\texttt{run\_e11\_external\_v1}) runs B1, B2, and M under the same
+$K{=}3$ budget as E1.
+
 \subsection{Generalisation Subset (E8)}
 
 \paragraph{Real-derived benchmark subset.}
 External validity is further probed on 40 tasks derived from publicly available
 coding benchmarks: 20 from HumanEval~\citep{chen2021codex} and 20 from
 MBPP~\citep{austin2021mbpp}.
-Problems were selected using the following protocol: (i)~the reference solution
+We selected problems using the following protocol: (i)~the reference solution
 contains 3--6 ordered conditional branches; (ii)~each branch maps naturally to an
 FSF scenario with a guard predicate involving linear inequalities or equalities;
 (iii)~no external library imports or recursive depth~$>2$.
@@ -227,7 +262,7 @@ guard and by Z3 witnesses in the overlap region
 A one-shot LLM may handle 7 of 8 scenarios correctly yet fail on this overlap
 because it did not fully parse priority ordering from the specification
 text~\citep{chen2021codex,dakhel2023copilot}; the CEGIS repair loop can correct this
-in a single iteration given a Z3 boundary input~\citep{solarlezama2008sketching,lynn2024verifierloop}.
+in a single iteration given a Z3 boundary input~\citep{solarlezama2008sketching,sun2024clover}.
 
 \subsection{Benchmark Characteristics}
 
@@ -250,7 +285,7 @@ the mean guard region overlap rate is 1.8 scenarios per input point.
       Mean guard-overlap rate (scenarios/point) & 1.8 \\
       Tasks rejected by Z3 filter & 60 \\
       Tasks accepted & 120 \\
-      Evaluation cases per task (\code{strict\_eval}) & 64 \\
+      Conformance cases per task (\code{strict\_eval}) & 64 \\
       \bottomrule
     \end{tabular}%
   }
@@ -264,12 +299,15 @@ the mean guard region overlap rate is 1.8 scenarios per input point.
 The evaluation question is which feedback source actually repairs precedence
 faults: none, unit tests, self-critique, execution traces, or
 specification-indexed SMT witnesses.
-Nine modes span that design space---from a formal reference (B0) through LLM
-baselines (B1--B4) to full HSP-Agile (M) and three ablations (A1--A3).
+Ten modes are evaluated in E1 (B0--B5, M, A1--A3).
+The design space spans formal reference (B0), LLM baselines (B1--B5), full
+HSP-Agile (M), and three ablations (A1--A3).
 
 \begin{table}[H]
   \caption{Compared modes.
-    Columns indicate whether each component is active.}
+    Columns indicate whether each component is active.
+    B3--B5 are evaluated in E1-ext (\code{run\_ccf\_b\_extended\_v1},
+    repeat~0 merged into Table~\ref{tab:main-results}).}
   \label{tab:modes}
   \centering
   \thesistable{%
@@ -282,8 +320,10 @@ baselines (B1--B4) to full HSP-Agile (M) and three ablations (A1--A3).
       B0 & Reference (template) & eval only & --- & --- \\
       B1 & One-shot LLM & --- & --- & --- \\
       B2 & Test-feedback & --- & --- & \checkmark (tests) \\
-      B3 & Self-Refine & --- & --- & \checkmark (self-critique) \\
-      B4 & Self-Debug & --- & --- & \checkmark (execution trace) \\
+      B3 & Self-Refine~\citep{madaan2023selfrefine} & --- & --- & \checkmark (self-critique) \\
+      B4 & Self-Debug~\citep{chen2023selfdebug} & --- & --- & \checkmark (execution trace) \\
+      B5 & Reflexion-lite~\citep{shinn2023reflexion} & --- & --- & \checkmark (verbal memory) \\
+      B6 & VerifierLoop-FSF (REV-7) & \checkmark & --- & \checkmark (witness cex) \\
       M  & Full \textsc{SgDP}/HSP-Agile & \checkmark & \checkmark & \checkmark (IR) \\
       A1 & Ablation: no formal checker & --- & \checkmark & \checkmark (IR) \\
       A2 & Ablation: no pattern guard & \checkmark & --- & \checkmark (IR) \\
@@ -322,8 +362,28 @@ reference test cases and execution failures are fed back as natural-language wit
 specification-level annotation.
 Unlike B2, B4 uses only reference-implementation observable behaviour rather than
 FSF-derived tests.
-Both extended baselines B3 and B4 use the same prompt template family as M and the
-same budget~$K$.
+All three extended baselines B3--B5 use the same prompt template family as M,
+the same budget~$K$, and the same per-call token cap; results appear in
+Table~\ref{tab:main-results} (repeat~0, \code{run\_ccf\_b\_extended\_v1}).
+
+\paragraph{B5 --- Reflexion-Lite Baseline.}
+B5 (Reflexion-style~\citep{shinn2023reflexion}): a lightweight verbal memory
+buffer records prior attempt summaries across repair iterations without Z3 or
+pattern-guard signals.
+Like B3 and B4, B5 isolates whether unstructured self-improvement can match
+specification-indexed Semantic Feedback IR under equal budget.
+
+\paragraph{B6 --- VerifierLoop-FSF Baseline (REV-7).}
+B6 adapts verifier-in-the-loop repair to FSF~\citep{sun2024clover}:
+the formal checker runs during the repair loop with the same witness budget as M
+(\texttt{formal\_max\_cases}${=}24$), but repair prompts expose only structured
+SMT counterexamples (scenario guard, inputs, expected outputs) via the
+\texttt{verifier\_loop} feedback variant---without Semantic Feedback IR fields
+(\texttt{violation\_type}, \texttt{reason}, \texttt{suggested\_fix}) and without
+the pattern guard.
+Implementation: \texttt{src/baselines/verifier\_loop\_fsf.py};
+evaluation: \texttt{run\_b6\_full\_v1} ($n{=}100$ hard tasks) and
+\texttt{run\_b6\_stratified\_v1} (30-task E12 subset vs.\ B2/M).
 
 \paragraph{M --- Full HSP-Agile Pipeline.}
 Mode~M runs the complete pipeline (Chapters~\ref{ch:method} and~\ref{ch:implementation}):
@@ -430,8 +490,9 @@ Appendix~\ref{app:reproducibility}.
 
 \paragraph{E1 --- Overall Effectiveness.}
 Does the full loop beat one-shot and test-feedback on Conf, PDR, FAR, and
-latency?  120 tasks $\times$ 9 modes $\times$ $\geq$3 repeats;
-$K=3$, $T_\text{gen}=0.7$, $T_\text{repair}=0.0$.
+latency?  120 tasks $\times$ 10 modes (1{,}200 runs: core matrix plus B3--B5
+from \code{run\_ccf\_b\_extended\_v1}); $K=3$, $T_\text{gen}=0.7$,
+$T_\text{repair}=0.0$.
 
 \paragraph{E2 --- Full Prevention Evaluation.}
 Which mutant operators does each mode catch?  120 tasks $\times$ 6 modes
@@ -463,9 +524,23 @@ mutant population?
 Do SpecIR adapters carry the loop beyond SOFL?  Conf for M, B1, B2 on
 SOFL/FSF, Mini-Z, and Mini-StateMachine (adapter $\to$ SpecIR $\to$ shared
 pipeline).
+E8b expands the Mini-Z and Mini-StateMachine corpora to $n{=}30$ tasks each
+(\texttt{run\_e8b\_expanded\_v1}); E8c reports full B1/B2/M on 40
+real-derived HumanEval/MBPP tasks.
 
 \paragraph{E9 --- Failure Analysis.}
 What remains after $K=3$?  Taxonomy of non-accepted tasks under mode~M.
+
+\paragraph{E10 --- Random Benchmark.}
+Does M's advantage persist without overlap filtering?  100 uniformly sampled
+tasks $\times$ modes B1, B2, M (Section~\ref{sec:exp:e10}).
+
+\paragraph{E12 --- Multi-Seed Stability.}
+Does the M--B2 ranking flip under LLM stochasticity?  30 stratified tasks
+(from \texttt{benchmarks/e12\_stratified\_30.json}) $\times$ seeds
+$\{0,1,2\}$ $\times$ modes B2, M (\texttt{run\_e12\_stability\_v1}).
+Per-mode mean, standard deviation, win rate, and Friedman test across seeds
+are reported in Section~\ref{sec:results:e12}.
 
 %=============================================================================
 \section{Statistical Protocol}
@@ -488,7 +563,36 @@ The full statistical protocol comprises:
 Effect sizes are interpreted as: $|\delta| < 0.147$ negligible,
 $0.147 \le |\delta| < 0.33$ small, $0.33 \le |\delta| < 0.474$ medium,
 $|\delta| \ge 0.474$ large.
-Holm-Bonferroni correction is applied for E1 all-mode comparisons.
+We apply Holm-Bonferroni correction for E1 all-mode comparisons.
+
+\paragraph{Post-hoc power analysis (REV-5).}
+With $n{=}120$ paired tasks, observed Cliff's $\delta$ for M vs.\ B1 conformance
+is $+0.036$ (Wilcoxon $p{=}0.010$, Holm $p{=}0.075$): the benchmark is
+marginally powered for that comparison.
+For M vs.\ B2, $\delta{\approx}0.0002$ (Holm $p{=}0.811$): the observed gap is
+negligible and post-hoc power is ${\approx}2.5\%$ at $\alpha{=}0.05$---far below
+the conventional 80\% target.
+Detecting an effect of this size would require $n{\gtrsim}10^{5}$ paired tasks
+for 80\% power at $\alpha{=}0.05$ (\texttt{power\_analysis.json}); an
+$n{=}240$ extension was therefore not pursued.
+We report per-task win rate (6/120), overlap stratification (E3, E10),
+multi-seed stability (E12), and VerifierLoop-FSF (B6) rather than treating the
+aggregate M--B2 conformance delta as a headline claim.
+Analysis script: \texttt{power\_analysis.py} $\to$
+\texttt{data/processed/power\_analysis.json}.
+
+\subsection{Multi-Seed Protocol (E12)}
+\label{sec:exp:e12}
+
+E12 selects 30 tasks stratified by overlap tertile and guard-complexity label
+(\texttt{scripts/select\_stratified\_subset.py}) and re-runs modes B2 and M with
+three independent LLM seeds while holding $T_\text{gen}$, $T_\text{repair}$, and
+$K$ fixed.
+The primary stability outcomes are: (i)~whether M's mean conformance exceeds B2's
+in every seed; (ii)~per-task win rate M vs.\ B2 pooled across seeds; and
+(iii)~Friedman test across seeds for ranking reversals.
+This supplements the single-repeat E1 matrix without re-running all 120 tasks
+$\times$ 10 modes at three seeds.
 
 %=============================================================================
 \section{Threats to Validity (Preview)}
@@ -508,12 +612,15 @@ per-pattern P/R/F1 to expose gaps.
 PDR uses first-order mutation operators; higher-order and real-world faults may differ.
 
 \paragraph{Internal validity.}
-LLM non-determinism is mitigated by $T_\text{repair}=0.0$, fixed seeds, and
-$\geq 3$ repeats.
+LLM non-determinism is mitigated by $T_\text{repair}=0.0$, fixed seeds, bootstrap CIs over
+tasks, and E12 multi-seed stability on a 30-task stratified subset.
+The extended B3--B5 baselines use dedicated \texttt{config\_for\_mode} branches
+validated before merge.
 Reference implementations are auto-generated via \code{reference\_gen.py} with
 hand-crafted overrides for core tasks.
 Benchmark construction by the same authors introduces possible tuning bias, mitigated
-by ablation (A1--A3), sensitivity analysis, and the independent E8 subset.
+by ablation (A1--A3), sensitivity analysis, E10 (no overlap filter), and the
+independent E8 subset.
 The Z3 overlap filter selects tasks where SMT-based approaches are advantaged.
 
 \paragraph{External validity.}
@@ -524,10 +631,24 @@ Implementations are Python; results may not transfer to other languages or LLMs.
 \paragraph{Conclusion validity.}
 Holm-Bonferroni correction, Cliff's~$\delta$, and bootstrap 95\% CIs are applied
 throughout.
-The strict-success null result (M vs.\ B1/B2, $p \approx 0.92$) reflects the conjunctive
-acceptance gate design, not method equivalence on conformance.
-Preliminary prevention results ($n=40$) are superseded by full E2; the non-monotonic
-B2/M ordering reflects complementary detection mechanisms.
+The strict-success null result (M vs.\ B1/B2, uncorrected $p \approx 0.92$;
+Holm $p = 1.000$) reflects the conjunctive acceptance gate design, not method
+equivalence on conformance.
+The full prevention evaluation supersedes preliminary spec-confusion results
+($n=40$); the non-monotonic B2/M ordering reflects complementary detection
+mechanisms.
 
 With the protocol fixed, the next chapter reports what those experiments
 actually show---mechanism first, then overall effectiveness.
+
+% -----------------------------------------------------------------------------
+\section*{Chapter Summary}
+\addcontentsline{toc}{section}{Chapter Summary}
+% -----------------------------------------------------------------------------
+
+Nine core experiments (E1--E9) plus E10 (random benchmark) and E12
+(multi-seed stability) test the three Tier-1 claims across five research
+questions on a 120-task hard benchmark with ten compared modes.
+Prevention is measured by PDR and FAR alongside formal conformance and latency;
+statistical comparisons use Holm-Bonferroni-corrected non-parametric tests.
+Threats are previewed here and fully analysed in Chapter~\ref{ch:discussion}.

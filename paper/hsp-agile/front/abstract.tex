@@ -21,11 +21,17 @@ The \textbf{Specification-guided Defect Prevention Framework} (\textsc{SgDP}),
 instantiated as \textbf{HSP-Agile} for SOFL/FSF, is the vehicle for those
 three ideas.
 
-On a 120-task precedence-sensitive benchmark, HSP-Agile reaches 90.4\% mean
-strict formal conformance (+6.2\,pp over one-shot LLM, +2.4\,pp over
-test-feedback).
-The advantage grows with guard overlap; the typed repair record alone accounts
-for +7.7\,pp over test-only prompts.
+On a 120-task overlap-intensive benchmark, HSP-Agile reaches 90.4\% mean
+formal conformance (+6.2\,pp over one-shot LLM).
+Against test-feedback (B2), the aggregate gap is modest and \emph{not
+significant} after Holm--Bonferroni correction ($p{=}0.811$); M wins 6/120
+paired tasks ($\approx$5\%), with the margin concentrating where guard regions
+overlap.
+Structured Semantic Feedback IR alone accounts for +7.7\,pp over test-only
+prompts (E6); conjunctive acceptance trades a lower strict-success rate
+(25.0\%) for fewer escaped defects.
+Extended self-refinement baselines (B3--B5, evaluated) and uniform random (E10)
+and external SOFL (E11) benchmarks bound external validity.
 The same loop transfers to Mini-Z and Mini-StateMachine with adapter-level
 changes.
 Tasks, logs, and scripts are released.

@@ -29,14 +29,18 @@ test bits.
 high-severity pattern screen.
 
 \paragraph{Evidence.}
-90.4\% mean Conf.\ (+6.2\,pp / +2.4\,pp over one-shot / test-feedback);
-gain grows with overlap (E3); Feedback IR alone +7.7\,pp (E6); adapters
-transfer to Mini-Z and Mini-StateMachine (E8).
+90.4\% mean Conf.\ (+6.2\,pp over one-shot B1); M wins 6/120 tasks against
+test-feedback B2 ($\approx$5\%) but the aggregate M--B2 gap is not
+Holm-significant ($p{=}0.811$).
+Gain concentrates where guards overlap (E3, E10); Feedback IR alone +7.7\,pp
+(E6); conjunctive acceptance keeps escaped defects lower (PDR 95.0\%, FAR 5.0\%
+vs.\ B2); adapters transfer to Mini-Z and Mini-StateMachine (E8).
 
 \paragraph{Limitation.}
-Under $K{=}3$, acceptance stays selective (25.0\% strict success); residual
-failures are mostly ordering and boundary/arithmetic; latency is
-$\approx 4.6\times$ vs.\ test-feedback.
+Under $K{=}3$, acceptance stays selective (25.0\% strict success by design);
+residual failures are mostly ordering and boundary/arithmetic; latency is
+$\approx 4.6\times$ vs.\ test-feedback; E8c and E10/E12 subsets bound rather
+than prove universal external validity.
 
 
 %=============================================================================
@@ -86,7 +90,9 @@ against project acceptance criteria.
 \textsc{SgDP} is not a substitute for full formal verification.
 It is a practical bridge built on three ideas---shared semantic regions,
 typed repair feedback, and conjunctive acceptance---that keep many
-specification-conformance defects out of release while remaining usable inside
-a sprint.
-How far that bridge extends depends on richer encodings, industrial tasks, and
-adaptive repair.
+specification-conformance defects out of release on overlap-intensive ordered
+guard specifications while remaining usable inside a sprint.
+The M--B2 aggregate margin is modest; deployment should follow specification
+complexity (Section~\ref{sec:disc:deployment}), not a universal superiority claim.
+How far that bridge extends depends on richer encodings, industrial tasks,
+E10/E12 completion, and adaptive repair.

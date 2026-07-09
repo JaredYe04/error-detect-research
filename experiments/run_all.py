@@ -161,10 +161,23 @@ def run_experiment(
     sensitivity: bool = False,
     mutation_eval: bool = True,
     seed: int = 42,
+    benchmark_path: Path | None = None,
+    task_subset_path: Path | None = None,
     run_name: str | None = None,
     parallelism: int = 1,
 ) -> Path:
-    tasks = load_benchmark()
+    tasks = load_benchmark(benchmark_path, include_hard=False) if benchmark_path else load_benchmark()
+    if task_subset_path:
+        subset_raw = json.loads(task_subset_path.read_text(encoding="utf-8"))
+        if isinstance(subset_raw, list) and subset_raw and isinstance(subset_raw[0], dict):
+            subset_ids = {t.get("taskId") for t in subset_raw}
+        elif isinstance(subset_raw, dict) and "taskIds" in subset_raw:
+            subset_ids = set(subset_raw["taskIds"])
+        else:
+            subset_ids = set(subset_raw)
+        tasks = [t for t in tasks if t.get("taskId") in subset_ids]
+        order = {tid: i for i, tid in enumerate(subset_ids)}
+        tasks.sort(key=lambda t: order.get(t.get("taskId"), 10**9))
     if task_limit:
         tasks = tasks[:task_limit]
 
@@ -275,6 +288,8 @@ def run_experiment(
         "sensitivity": sensitivity,
         "llm_usage": {"calls": sum(int(r.get("llm_calls", 0)) for r in records)} if use_llm else {},
         "parallelism": parallelism,
+        "benchmark_path": str(benchmark_path) if benchmark_path else None,
+        "task_subset_path": str(task_subset_path) if task_subset_path else None,
         "completed": len(done_keys),
         "total": total,
     }
@@ -296,6 +311,8 @@ def main() -> None:
     parser.add_argument("--modes", nargs="+", default=["B0", "B1", "B2", "B3", "B4", "B5", "M", "A1", "A2", "A3"])
     parser.add_argument("--repeats", type=int, default=3)
     parser.add_argument("--task-limit", type=int, default=None)
+    parser.add_argument("--benchmark-path", type=Path, default=None, help="Benchmark JSON (default: benchmarks/tasks.json)")
+    parser.add_argument("--task-subset", type=Path, default=None, help="JSON list of taskIds or task objects for stratified runs")
     parser.add_argument("--output", type=Path, default=ROOT / "artifacts")
     parser.add_argument("--no-llm", action="store_true", help="Skip LLM calls (B0 only)")
     parser.add_argument("--sensitivity", action="store_true")
@@ -316,6 +333,8 @@ def main() -> None:
         output_dir=args.output,
         use_llm=not args.no_llm,
         task_limit=args.task_limit,
+        benchmark_path=args.benchmark_path,
+        task_subset_path=args.task_subset,
         sensitivity=args.sensitivity,
         run_name=args.run_name,
         parallelism=args.parallelism,

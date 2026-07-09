@@ -1274,7 +1274,7 @@ def plot_radar_metrics(formats: list[str], dpi: int) -> None:
 
 
 # ─────────────────────────────────────────────────────────────────────────────
-# Figure 12: Prevention PDR bar chart (preliminary)
+# Figure 12: Prevention PDR bar chart (E2 full evaluation)
 # ─────────────────────────────────────────────────────────────────────────────
 def plot_prevention_bar(formats: list[str], dpi: int) -> None:
     import json
@@ -1307,7 +1307,7 @@ def plot_prevention_bar(formats: list[str], dpi: int) -> None:
     ax.set_ylim(0, max(pdr_vals) * 1.40 if pdr_vals else 0.25)
     ax.set_xlabel("Mode")
     ax.set_ylabel("Prevention Detection Rate (PDR)")
-    ax.text(0.98, 0.97, f"preliminary (n={n_label})",
+    ax.text(0.98, 0.97, f"E2 full (n={n_label})",
             transform=ax.transAxes, ha="right", va="top",
             fontsize=FONT_ANNOT, style="italic", color="#888888",
             bbox={"boxstyle": "round,pad=0.3", "facecolor": "#f9f9f9", "edgecolor": "#cccccc"})
@@ -1451,10 +1451,70 @@ def main() -> None:
     plot_radar_metrics(args.formats, args.dpi)
     plot_prevention_bar(args.formats, args.dpi)
 
+    plot_e10_performance_vs_overlap(args.formats, args.dpi)
+
     # CCF-B mechanism analysis (E3–E9)
     plot_ccf_b_mechanism_figures(args.formats, args.dpi)
 
     print("Done.")
+
+
+# ── E10 random benchmark: conformance vs overlap rate ───────────────────────
+
+REPO_ROOT = PAPER_ROOT.parents[1]
+
+
+def plot_e10_performance_vs_overlap(formats: list[str], dpi: int) -> None:
+    """E10: mean conformance by overlap tertile for B1/B2/M on random benchmark."""
+    jsonl_path = REPO_ROOT / "artifacts" / "run_e10_random_v1" / "results.jsonl"
+    bench_path = REPO_ROOT / "benchmarks" / "random_tasks_annotated.json"
+    fig, ax = plt.subplots(figsize=(7.5, 4.5))
+    if not jsonl_path.exists() or not bench_path.exists():
+        _placeholder_note(ax, "E10 performance vs overlap (missing run or benchmark)")
+        fig.tight_layout()
+        _save(fig, "performance_vs_overlap", formats, dpi)
+        plt.close(fig)
+        return
+
+    rows = [json.loads(line) for line in jsonl_path.read_text(encoding="utf-8").splitlines() if line.strip()]
+    df = pd.DataFrame(rows).drop_duplicates(subset=["task_id", "mode"], keep="last")
+    conf_col = "strict_formal_conformance" if "strict_formal_conformance" in df.columns else "formal_conformance"
+
+    tasks = json.loads(bench_path.read_text(encoding="utf-8"))
+    overlap_map = {}
+    for t in tasks:
+        tid = t.get("taskId")
+        cpx = t.get("complexity", {})
+        overlap_map[tid] = float(cpx.get("overlap_rate", cpx.get("overlap_density", 0.0)))
+
+    df["overlap_rate"] = df["task_id"].map(overlap_map).fillna(0.0)
+    if df["overlap_rate"].max() > df["overlap_rate"].min():
+        df["overlap_tertile"] = pd.qcut(df["overlap_rate"], 3, labels=["low", "medium", "high"], duplicates="drop")
+    else:
+        df["overlap_tertile"] = "medium"
+
+    modes = ["B1", "B2", "M"]
+    colors = {"B1": PALETTE["B1"], "B2": PALETTE["B2"], "M": PALETTE["M"]}
+    tertiles = ["low", "medium", "high"]
+    x = np.arange(len(tertiles))
+    w = 0.25
+    for j, mode in enumerate(modes):
+        sub = df[df["mode"] == mode]
+        means = [
+            float(sub[sub["overlap_tertile"] == t][conf_col].mean()) if not sub[sub["overlap_tertile"] == t].empty else 0.0
+            for t in tertiles
+        ]
+        ax.bar(x + (j - 1) * w, means, w, label=mode, color=colors[mode], alpha=0.9)
+
+    ax.set_xticks(x, ["Low", "Medium", "High"])
+    ax.set_xlabel("Overlap rate tertile (E10 random benchmark)")
+    ax.set_ylabel("Mean formal conformance")
+    ax.set_ylim(0, 1.05)
+    ax.set_title("Conformance vs guard overlap (E10; unfiltered sample)")
+    ax.legend(frameon=False, ncol=3)
+    fig.tight_layout()
+    _save(fig, "performance_vs_overlap", formats, dpi)
+    plt.close(fig)
 
 
 # ── CCF-B mechanism analysis figures (E3/E6/E7/E8/E9) ─────────────────────
@@ -1625,36 +1685,32 @@ def plot_ccf_b_mechanism_figures(formats: list[str], dpi: int) -> None:
     # E8 generalisation
     fig, ax = plt.subplots(figsize=(7.5, 4.5))
     e8_path = PROC_DIR / "generalisation_summary.csv"
+    notations_order = ["SOFL/FSF", "Mini-StateMachine", "Mini-Z"]
+    display_labels = ["SOFL/FSF", "Mini-\nStateMachine", "Mini-Z"]
+    b1, b2, m = [], [], []
     if e8_path.exists():
         e8 = pd.read_csv(e8_path)
-        sofl = e8[e8["notation"] == "SOFL/FSF"]
-        notations = ["SOFL/FSF"]
-        b1, b2, m = [], [], []
-        for mode_col, lst in [("B1", b1), ("B2", b2), ("M", m)]:
-            row = sofl[sofl["mode"] == mode_col]
-            lst.append(float(row.iloc[0]["mean_conf"]) / 100 if not row.empty else 0.0)
-        # Append reference-oracle rows for adapters (scaled 0-1)
-        for notation in ["Mini-StateMachine", "Mini-Z"]:
-            ref = e8[(e8["notation"] == notation) & (e8["mode"] == "B0")]
-            if not ref.empty:
-                val = float(ref.iloc[0]["mean_conf"]) / 100
-                notations.append(notation.replace("Mini-", "Mini-\n"))
-                b1.append(val)
-                b2.append(val)
-                m.append(val)
+        for notation in notations_order:
+            sub = e8[e8["notation"] == notation]
+            for mode_col, lst in [("B1", b1), ("B2", b2), ("M", m)]:
+                row = sub[sub["mode"] == mode_col]
+                if row.empty:
+                    lst.append(0.0)
+                else:
+                    val = float(row.iloc[0]["mean_conf"])
+                    lst.append(val / 100.0 if val > 1.0 else val)
     else:
-        notations = ["SOFL/FSF", "Mini-SM", "Mini-Z"]
         b1, b2, m = [0.0] * 3, [0.0] * 3, [0.0] * 3
-    x = np.arange(len(notations))
+    x = np.arange(len(notations_order))
     w = 0.25
-    ax.bar(x - w, b1, w, label="B1 / ref.", color="#332288")
-    ax.bar(x, b2, w, label="B2 / ref.", color="#88CCEE")
-    ax.bar(x + w, m, w, label="M / ref.", color="#117733")
-    ax.set_xticks(x, notations)
+    ax.bar(x - w, b1, w, label="B1", color="#332288")
+    ax.bar(x, b2, w, label="B2", color="#88CCEE")
+    ax.bar(x + w, m, w, label="M", color="#117733")
+    ax.set_xticks(x, display_labels)
     ax.set_ylabel("Mean Conf")
     ax.set_title("Generalisation across spec notations (E8)")
     ax.legend(frameon=False, ncol=3, fontsize=7)
-    ax.set_ylim(0.7, 1.0)
+    ax.set_ylim(0, 1.05)
     fig.tight_layout()
     _save(fig, "generalisation_bar", formats, dpi)
     plt.close(fig)

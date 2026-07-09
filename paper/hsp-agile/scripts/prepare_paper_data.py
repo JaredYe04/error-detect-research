@@ -42,7 +42,62 @@ def _parse_args() -> argparse.Namespace:
         default=DEFAULT_PREVENTION,
         help="Prevention summary JSON (default: prevention_full_v1/prevention_summary.json).",
     )
+    parser.add_argument(
+        "--extended-run-dir",
+        type=Path,
+        default=None,
+        help="Optional run directory whose results are merged (e.g. B3--B5 extended baselines).",
+    )
+    parser.add_argument(
+        "--extended-repeat",
+        type=int,
+        default=0,
+        help="Repeat index to merge from --extended-run-dir (default 0, matches E1 single-repeat).",
+    )
+    parser.add_argument(
+        "--e10-run-dir",
+        type=Path,
+        default=None,
+        help="E10 random-benchmark run directory → e10_random_summary.csv",
+    )
+    parser.add_argument(
+        "--e11-run-dir",
+        type=Path,
+        default=None,
+        help="E11 external SOFL run directory → e11_external_summary.csv",
+    )
+    parser.add_argument(
+        "--b6-run-dir",
+        type=Path,
+        default=None,
+        help="B6 VerifierLoop-FSF full run → b6_verifierloop_summary.csv",
+    )
+    parser.add_argument(
+        "--b6-stratified-run-dir",
+        type=Path,
+        default=None,
+        help="B6/B2/M stratified run → b6_stratified_summary.csv",
+    )
     return parser.parse_args()
+
+
+def _win_rate_m_vs_b2(df: pd.DataFrame, conf_col: str) -> dict[str, float | int]:
+    e1 = df[df["repeat"] == 0] if "repeat" in df.columns else df
+    e1 = e1[e1["mode"].isin(["M", "B2"])]
+    m = e1[e1["mode"] == "M"].set_index("task_id")[conf_col]
+    b2 = e1[e1["mode"] == "B2"].set_index("task_id")[conf_col]
+    common = m.index.intersection(b2.index)
+    wins = int((m.loc[common] > b2.loc[common]).sum())
+    n = len(common)
+    rate = wins / n if n else 0.0
+    se = math.sqrt(rate * (1 - rate) / n) if n else 0.0
+    return {
+        "wins": wins,
+        "n": n,
+        "win_rate": rate,
+        "ci_low": max(0.0, rate - 1.96 * se),
+        "ci_high": min(1.0, rate + 1.96 * se),
+    }
 
 
 def main() -> None:
@@ -56,6 +111,17 @@ def main() -> None:
         raise FileNotFoundError(f"Missing {results_path}")
 
     rows = [json.loads(line) for line in results_path.read_text(encoding="utf-8").splitlines() if line.strip()]
+    if args.extended_run_dir is not None:
+        ext_path = args.extended_run_dir.resolve() / "results.jsonl"
+        if not ext_path.exists():
+            raise FileNotFoundError(f"Missing {ext_path}")
+        ext_rows = [
+            json.loads(line)
+            for line in ext_path.read_text(encoding="utf-8").splitlines()
+            if line.strip()
+        ]
+        ext_rows = [r for r in ext_rows if int(r.get("repeat", 0)) == args.extended_repeat]
+        rows.extend(ext_rows)
     df = pd.DataFrame(rows)
     df.to_csv(RAW_DIR / "results_raw.csv", index=False)
 
@@ -142,7 +208,10 @@ def main() -> None:
 
     analysis_dir = run_dir / "analysis"
     if analysis_dir.exists():
+        skip_summary = args.extended_run_dir is not None
         for fname in ["ablation.csv", "sensitivity.csv", "significance_tests.json", "summary_by_mode.csv"]:
+            if skip_summary and fname == "summary_by_mode.csv":
+                continue
             p = analysis_dir / fname
             if p.exists():
                 target = PROC_DIR / fname
@@ -182,6 +251,91 @@ def main() -> None:
         columns=["mode", "eval_type", "detection_rate", "false_accept_rate", "strict_conformance", "n"],
     )
     prevention_heatmap.to_csv(PROC_DIR / "prevention_heatmap.csv", index=False)
+
+    win_rate = _win_rate_m_vs_b2(df, conf_col)
+    (PROC_DIR / "win_rate_m_vs_b2.json").write_text(json.dumps(win_rate, indent=2), encoding="utf-8")
+
+    if args.e10_run_dir is not None:
+        e10_path = args.e10_run_dir.resolve() / "results.jsonl"
+        if e10_path.exists():
+            e10_rows = [
+                json.loads(line) for line in e10_path.read_text(encoding="utf-8").splitlines() if line.strip()
+            ]
+            e10_df = pd.DataFrame(e10_rows)
+            e10_summary = (
+                e10_df.groupby("mode")
+                .agg(
+                    n=(success_col, "count"),
+                    success_rate=(success_col, "mean"),
+                    strict_conformance=(conf_col, "mean"),
+                    latency_ms=("latency_ms", "mean"),
+                )
+                .reset_index()
+            )
+            e10_summary.to_csv(PROC_DIR / "e10_random_summary.csv", index=False)
+
+    if args.e11_run_dir is not None:
+        e11_path = args.e11_run_dir.resolve() / "results.jsonl"
+        if e11_path.exists():
+            e11_rows = [
+                json.loads(line) for line in e11_path.read_text(encoding="utf-8").splitlines() if line.strip()
+            ]
+            e11_df = pd.DataFrame(e11_rows)
+            if "repeat" in e11_df.columns:
+                e11_df = e11_df[e11_df["repeat"] == 0]
+            e11_summary = (
+                e11_df.groupby("mode")
+                .agg(
+                    n=(success_col, "count"),
+                    success_rate=(success_col, "mean"),
+                    strict_conformance=(conf_col, "mean"),
+                    latency_ms=("latency_ms", "mean"),
+                )
+                .reset_index()
+            )
+            e11_summary.to_csv(PROC_DIR / "e11_external_summary.csv", index=False)
+
+    if args.b6_run_dir is not None:
+        b6_path = args.b6_run_dir.resolve() / "results.jsonl"
+        if b6_path.exists():
+            b6_rows = [
+                json.loads(line) for line in b6_path.read_text(encoding="utf-8").splitlines() if line.strip()
+            ]
+            b6_df = pd.DataFrame(b6_rows)
+            if "repeat" in b6_df.columns:
+                b6_df = b6_df[b6_df["repeat"] == 0]
+            b6_summary = (
+                b6_df.groupby("mode")
+                .agg(
+                    n=(success_col, "count"),
+                    success_rate=(success_col, "mean"),
+                    strict_conformance=(conf_col, "mean"),
+                    latency_ms=("latency_ms", "mean"),
+                )
+                .reset_index()
+            )
+            b6_summary.to_csv(PROC_DIR / "b6_verifierloop_summary.csv", index=False)
+
+    if args.b6_stratified_run_dir is not None:
+        strat_path = args.b6_stratified_run_dir.resolve() / "results.jsonl"
+        if strat_path.exists():
+            strat_rows = [
+                json.loads(line) for line in strat_path.read_text(encoding="utf-8").splitlines() if line.strip()
+            ]
+            strat_df = pd.DataFrame(strat_rows)
+            if "repeat" in strat_df.columns:
+                strat_df = strat_df[strat_df["repeat"] == 0]
+            strat_summary = (
+                strat_df.groupby("mode")
+                .agg(
+                    n=(success_col, "count"),
+                    success_rate=(success_col, "mean"),
+                    strict_conformance=(conf_col, "mean"),
+                    latency_ms=("latency_ms", "mean"),
+                )
+                .reset_index()
+            )
+            strat_summary.to_csv(PROC_DIR / "b6_stratified_summary.csv", index=False)
 
     print(f"Prepared paper data from {run_dir}")
     print(f"Raw dir: {RAW_DIR}")

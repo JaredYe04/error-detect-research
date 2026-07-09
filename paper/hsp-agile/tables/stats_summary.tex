@@ -1,14 +1,67 @@
 \begin{table}[t]
-\caption{Statistical Test Summary (auto-filled from analysis artifacts)}
+\caption{Statistical test summary for E1 (120-task hard benchmark, repeat~0). Wilcoxon signed-rank for per-task strict success and conformance; Mann--Whitney~U for latency. Holm--Bonferroni correction within each metric family. Cliff's $\delta$: positive favours the first mode in each pair.}
 \label{tab:stats}
 \centering
+\small
 \begin{tabular}{lccc}
 \toprule
-Comparison & p-value & Significant (\(\alpha=0.05\)) & Effect/Speedup \\
+Comparison & $p$ (Holm) & Significant ($\alpha{=}0.05$) & Cliff's $\delta$ / ratio \\
 \midrule
-\texttt{M} vs \texttt{B1} (strict) & 0.9214 & No & -0.0329 \\
-\texttt{M} vs \texttt{B2} (strict) & 0.9214 & No & -0.0329 \\
-\texttt{M} vs \texttt{B2} (latency) & 1.0000 & No & 0.25x \\
+\multicolumn{4}{l}{\textit{Primary comparisons}} \\
+\addlinespace
+\texttt{M} vs \texttt{B1} (strict success) & 1.0000 & No & -0.0167 \\
+\texttt{M} vs \texttt{B2} (strict success) & 1.0000 & No & -0.0167 \\
+\texttt{M} vs \texttt{B1} (conformance) & 0.0745 & No & +0.0358 \\
+\texttt{M} vs \texttt{B2} (conformance) & 0.8113 & No & +0.0002 \\
+\texttt{M} vs \texttt{B2} (latency) & <0.001 & Yes & 4.05$\times$ \\
+\addlinespace
+\multicolumn{4}{l}{\textit{All pairwise conformance (Holm-corrected)}} \\
+\addlinespace
+\texttt{A1} vs \texttt{B0} (Conf) & <0.001 & Yes & +0.4750 \\
+\texttt{A1} vs \texttt{B1} (Conf) & 1.0000 & No & +0.0227 \\
+\texttt{A1} vs \texttt{B2} (Conf) & 1.0000 & No & -0.0112 \\
+\texttt{A1} vs \texttt{M} (Conf) & 1.0000 & No & -0.0119 \\
+\texttt{A2} vs \texttt{A1} (Conf) & 0.9931 & No & +0.0285 \\
+\texttt{A2} vs \texttt{B0} (Conf) & <0.001 & Yes & +0.5112 \\
+\texttt{A2} vs \texttt{B1} (Conf) & 0.0745 & No & +0.0517 \\
+\texttt{A2} vs \texttt{B2} (Conf) & 1.0000 & No & +0.0171 \\
+\texttt{A2} vs \texttt{M} (Conf) & 1.0000 & No & +0.0174 \\
+\texttt{A3} vs \texttt{A1} (Conf) & 1.0000 & No & -0.0272 \\
+\texttt{A3} vs \texttt{A2} (Conf) & 1.0000 & No & -0.0568 \\
+\texttt{A3} vs \texttt{B0} (Conf) & <0.001 & Yes & +0.4569 \\
+\texttt{A3} vs \texttt{B1} (Conf) & 1.0000 & No & -0.0044 \\
+\texttt{A3} vs \texttt{B2} (Conf) & 1.0000 & No & -0.0387 \\
+\texttt{A3} vs \texttt{M} (Conf) & 1.0000 & No & -0.0407 \\
+\texttt{B1} vs \texttt{B0} (Conf) & <0.001 & Yes & +0.4569 \\
+\texttt{B2} vs \texttt{B0} (Conf) & <0.001 & Yes & +0.4871 \\
+\texttt{B2} vs \texttt{B1} (Conf) & 1.0000 & No & +0.0341 \\
+\texttt{M} vs \texttt{B0} (Conf) & <0.001 & Yes & +0.5067 \\
+\texttt{M} vs \texttt{B1} (Conf) & 0.0745 & No & +0.0358 \\
+\texttt{M} vs \texttt{B2} (Conf) & 0.8113 & No & +0.0002 \\
+\addlinespace
+\multicolumn{4}{l}{\textit{All pairwise strict success (Holm-corrected)}} \\
+\addlinespace
+\texttt{A1} vs \texttt{B0} (strict) & 1.0000 & No & -0.0083 \\
+\texttt{A1} vs \texttt{B1} (strict) & 1.0000 & No & +0.0000 \\
+\texttt{A1} vs \texttt{B2} (strict) & 1.0000 & No & +0.0000 \\
+\texttt{A1} vs \texttt{M} (strict) & 1.0000 & No & +0.0167 \\
+\texttt{A2} vs \texttt{A1} (strict) & 1.0000 & No & +0.0000 \\
+\texttt{A2} vs \texttt{B0} (strict) & 1.0000 & No & -0.0083 \\
+\texttt{A2} vs \texttt{B1} (strict) & 1.0000 & No & +0.0000 \\
+\texttt{A2} vs \texttt{B2} (strict) & 1.0000 & No & +0.0000 \\
+\texttt{A2} vs \texttt{M} (strict) & 1.0000 & No & +0.0167 \\
+\texttt{A3} vs \texttt{A1} (strict) & 1.0000 & No & +0.0000 \\
+\texttt{A3} vs \texttt{A2} (strict) & 1.0000 & No & +0.0000 \\
+\texttt{A3} vs \texttt{B0} (strict) & 1.0000 & No & -0.0083 \\
+\texttt{A3} vs \texttt{B1} (strict) & 1.0000 & No & +0.0000 \\
+\texttt{A3} vs \texttt{B2} (strict) & 1.0000 & No & +0.0000 \\
+\texttt{A3} vs \texttt{M} (strict) & 1.0000 & No & +0.0167 \\
+\texttt{B1} vs \texttt{B0} (strict) & 1.0000 & No & -0.0083 \\
+\texttt{B2} vs \texttt{B0} (strict) & 1.0000 & No & -0.0083 \\
+\texttt{B2} vs \texttt{B1} (strict) & 1.0000 & No & +0.0000 \\
+\texttt{M} vs \texttt{B0} (strict) & 1.0000 & No & -0.0250 \\
+\texttt{M} vs \texttt{B1} (strict) & 1.0000 & No & -0.0167 \\
+\texttt{M} vs \texttt{B2} (strict) & 1.0000 & No & -0.0167 \\
 \bottomrule
 \end{tabular}
 \end{table}

@@ -1,0 +1,1722 @@
+[
+  {
+    "taskId": "ExternalSOFL.ClassifySignal",
+    "kind": "process",
+    "sourceFile": "external://liu2004soflbook",
+    "module": "ExternalSOFL",
+    "name": "classify_signal",
+    "signature": {
+      "inputs": [
+        {
+          "name": "level",
+          "type": "int"
+        },
+        {
+          "name": "threshold",
+          "type": "int"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "status",
+          "type": "int"
+        },
+        {
+          "name": "action",
+          "type": "int"
+        }
+      ]
+    },
+    "fsfScenarios": [
+      {
+        "index": 1,
+        "kind": "scenario",
+        "test": "level lt 0",
+        "def": "status eq 2 && action eq 3"
+      },
+      {
+        "index": 2,
+        "kind": "scenario",
+        "test": "level ge 0 && threshold lt 0",
+        "def": "status eq 1 && action eq 2"
+      },
+      {
+        "index": 3,
+        "kind": "scenario",
+        "test": "level ge 0 && threshold ge 0",
+        "def": "status eq 0 && action eq 1"
+      },
+      {
+        "index": 4,
+        "kind": "others",
+        "test": "others",
+        "def": "status eq 0 && action eq 0"
+      }
+    ],
+    "ext": [],
+    "promptSpec": "Process classify_signal(level, threshold) -> (status, action)\n\nFSF specification:\nif (level lt 0) => status eq 2 && action eq 3\nif (level ge 0 && threshold lt 0) => status eq 1 && action eq 2\nif (level ge 0 && threshold ge 0) => status eq 0 && action eq 1\nothers => status eq 0 && action eq 0",
+    "sourceBasename": "liu2004soflbook",
+    "externalProvenance": {
+      "source": "liu2004soflbook",
+      "section": "Ch.5 monitoring alert (adapted)",
+      "generator": "manual_curation"
+    },
+    "referenceCode": "def classify_signal(level: int, threshold: int) -> dict:\n    \"\"\"Reference implementation auto-generated from FSF.\"\"\"\n    if level < 0:\n        return {\"status\": 2, \"action\": 3}\n    elif level >= 0  and  threshold < 0:\n        return {\"status\": 1, \"action\": 2}\n    elif level >= 0  and  threshold >= 0:\n        return {\"status\": 0, \"action\": 1}\n    else:\n        return {\"status\": 0, \"action\": 0}\n",
+    "complexity": {
+      "scenario_count": 3,
+      "guard_complexity": "AND",
+      "overlap_rate": 1.0,
+      "has_external_vars": false,
+      "overlap_density_tier": "low"
+    }
+  },
+  {
+    "taskId": "ExternalSOFL.BorrowBook",
+    "kind": "process",
+    "sourceFile": "external://liu2004soflbook",
+    "module": "ExternalSOFL",
+    "name": "borrow",
+    "signature": {
+      "inputs": [
+        {
+          "name": "member_id",
+          "type": "int"
+        },
+        {
+          "name": "book_id",
+          "type": "int"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "success",
+          "type": "int"
+        }
+      ]
+    },
+    "fsfScenarios": [
+      {
+        "index": 1,
+        "kind": "scenario",
+        "test": "member_id gt 0 && book_id gt 0",
+        "def": "success eq 1"
+      },
+      {
+        "index": 2,
+        "kind": "scenario",
+        "test": "member_id le 0",
+        "def": "success eq 0"
+      },
+      {
+        "index": 3,
+        "kind": "others",
+        "test": "others",
+        "def": "success eq 0"
+      }
+    ],
+    "ext": [],
+    "promptSpec": "Process borrow(member_id, book_id) -> (success)\n\nFSF specification:\nif (member_id gt 0 && book_id gt 0) => success eq 1\nif (member_id le 0) => success eq 0\nothers => success eq 0",
+    "sourceBasename": "liu2004soflbook",
+    "externalProvenance": {
+      "source": "liu2004soflbook",
+      "section": "Library service example",
+      "generator": "manual_curation"
+    },
+    "referenceCode": "def borrow(member_id: int, book_id: int) -> dict:\n    \"\"\"Reference implementation auto-generated from FSF.\"\"\"\n    if member_id > 0  and  book_id > 0:\n        return {\"success\": 1}\n    elif member_id <= 0:\n        return {\"success\": 0}\n    else:\n        return {\"success\": 0}\n",
+    "complexity": {
+      "scenario_count": 2,
+      "guard_complexity": "AND",
+      "overlap_rate": 1.0,
+      "has_external_vars": false,
+      "overlap_density_tier": "low"
+    }
+  },
+  {
+    "taskId": "ExternalSOFL.ReserveBook",
+    "kind": "process",
+    "sourceFile": "external://liu2004soflbook",
+    "module": "ExternalSOFL",
+    "name": "reserve",
+    "signature": {
+      "inputs": [
+        {
+          "name": "member_id",
+          "type": "int"
+        },
+        {
+          "name": "book_id",
+          "type": "int"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "queued",
+          "type": "int"
+        }
+      ]
+    },
+    "fsfScenarios": [
+      {
+        "index": 1,
+        "kind": "scenario",
+        "test": "book_id gt 0 && member_id gt 0",
+        "def": "queued eq 1"
+      },
+      {
+        "index": 2,
+        "kind": "scenario",
+        "test": "book_id le 0",
+        "def": "queued eq 0"
+      },
+      {
+        "index": 3,
+        "kind": "others",
+        "test": "others",
+        "def": "queued eq 0"
+      }
+    ],
+    "ext": [],
+    "promptSpec": "Process reserve(member_id, book_id) -> (queued)\n\nFSF specification:\nif (book_id gt 0 && member_id gt 0) => queued eq 1\nif (book_id le 0) => queued eq 0\nothers => queued eq 0",
+    "sourceBasename": "liu2004soflbook",
+    "externalProvenance": {
+      "source": "liu2004soflbook",
+      "section": "Library service example",
+      "generator": "manual_curation"
+    },
+    "referenceCode": "def reserve(member_id: int, book_id: int) -> dict:\n    \"\"\"Reference implementation auto-generated from FSF.\"\"\"\n    if book_id > 0  and  member_id > 0:\n        return {\"queued\": 1}\n    elif book_id <= 0:\n        return {\"queued\": 0}\n    else:\n        return {\"queued\": 0}\n",
+    "complexity": {
+      "scenario_count": 2,
+      "guard_complexity": "AND",
+      "overlap_rate": 1.0,
+      "has_external_vars": false,
+      "overlap_density_tier": "low"
+    }
+  },
+  {
+    "taskId": "ExternalSOFL.InventoryReorder",
+    "kind": "process",
+    "sourceFile": "external://li2022qrs_companion",
+    "module": "ExternalSOFL",
+    "name": "reorder_stock",
+    "signature": {
+      "inputs": [
+        {
+          "name": "stock",
+          "type": "int"
+        },
+        {
+          "name": "demand",
+          "type": "int"
+        },
+        {
+          "name": "lead_days",
+          "type": "int"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "order_qty",
+          "type": "int"
+        },
+        {
+          "name": "urgent",
+          "type": "int"
+        }
+      ]
+    },
+    "fsfScenarios": [
+      {
+        "index": 1,
+        "kind": "scenario",
+        "test": "stock le 0 && demand gt 0",
+        "def": "order_qty eq 100 && urgent eq 1"
+      },
+      {
+        "index": 2,
+        "kind": "scenario",
+        "test": "stock le 10 && demand ge 20",
+        "def": "order_qty eq 50 && urgent eq 1"
+      },
+      {
+        "index": 3,
+        "kind": "scenario",
+        "test": "stock le 30 && lead_days le 2",
+        "def": "order_qty eq 30 && urgent eq 0"
+      },
+      {
+        "index": 4,
+        "kind": "scenario",
+        "test": "stock gt 30",
+        "def": "order_qty eq 0 && urgent eq 0"
+      },
+      {
+        "index": 5,
+        "kind": "others",
+        "test": "others",
+        "def": "order_qty eq 0 && urgent eq 0"
+      }
+    ],
+    "ext": [],
+    "promptSpec": "Process reorder_stock(stock, demand, lead_days) -> (order_qty, urgent)\n\nFSF specification:\nif (stock le 0 && demand gt 0) => order_qty eq 100 && urgent eq 1\nif (stock le 10 && demand ge 20) => order_qty eq 50 && urgent eq 1\nif (stock le 30 && lead_days le 2) => order_qty eq 30 && urgent eq 0\nif (stock gt 30) => order_qty eq 0 && urgent eq 0\nothers => order_qty eq 0 && urgent eq 0",
+    "sourceBasename": "li2022qrs_companion",
+    "externalProvenance": {
+      "source": "li2022qrs_companion",
+      "section": "Inventory sprint case",
+      "generator": "manual_curation"
+    },
+    "referenceCode": "def reorder_stock(stock: int, demand: int, lead_days: int) -> dict:\n    \"\"\"Reference implementation auto-generated from FSF.\"\"\"\n    if stock <= 0  and  demand > 0:\n        return {\"order_qty\": 100, \"urgent\": 1}\n    elif stock <= 10  and  demand >= 20:\n        return {\"order_qty\": 50, \"urgent\": 1}\n    elif stock <= 30  and  lead_days <= 2:\n        return {\"order_qty\": 30, \"urgent\": 0}\n    elif stock > 30:\n        return {\"order_qty\": 0, \"urgent\": 0}\n    else:\n        return {\"order_qty\": 0, \"urgent\": 0}\n",
+    "complexity": {
+      "scenario_count": 4,
+      "guard_complexity": "Nested",
+      "overlap_rate": 1.5,
+      "has_external_vars": false,
+      "overlap_density_tier": "high"
+    }
+  },
+  {
+    "taskId": "ExternalSOFL.LoanApproval",
+    "kind": "process",
+    "sourceFile": "external://liu2004soflbook",
+    "module": "ExternalSOFL",
+    "name": "approve_loan",
+    "signature": {
+      "inputs": [
+        {
+          "name": "score",
+          "type": "int"
+        },
+        {
+          "name": "income",
+          "type": "int"
+        },
+        {
+          "name": "debt",
+          "type": "int"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "approved",
+          "type": "int"
+        },
+        {
+          "name": "limit",
+          "type": "int"
+        }
+      ]
+    },
+    "fsfScenarios": [
+      {
+        "index": 1,
+        "kind": "scenario",
+        "test": "score lt 600",
+        "def": "approved eq 0 && limit eq 0"
+      },
+      {
+        "index": 2,
+        "kind": "scenario",
+        "test": "score ge 750 && income gt 50 && debt le 30",
+        "def": "approved eq 1 && limit eq 100"
+      },
+      {
+        "index": 3,
+        "kind": "scenario",
+        "test": "score ge 650 && income gt 30",
+        "def": "approved eq 1 && limit eq 50"
+      },
+      {
+        "index": 4,
+        "kind": "scenario",
+        "test": "score ge 600",
+        "def": "approved eq 0 && limit eq 0"
+      },
+      {
+        "index": 5,
+        "kind": "others",
+        "test": "others",
+        "def": "approved eq 0 && limit eq 0"
+      }
+    ],
+    "ext": [],
+    "promptSpec": "Process approve_loan(score, income, debt) -> (approved, limit)\n\nFSF specification:\nif (score lt 600) => approved eq 0 && limit eq 0\nif (score ge 750 && income gt 50 && debt le 30) => approved eq 1 && limit eq 100\nif (score ge 650 && income gt 30) => approved eq 1 && limit eq 50\nif (score ge 600) => approved eq 0 && limit eq 0\nothers => approved eq 0 && limit eq 0",
+    "sourceBasename": "liu2004soflbook",
+    "externalProvenance": {
+      "source": "liu2004soflbook",
+      "section": "Financial control process",
+      "generator": "manual_curation"
+    },
+    "referenceCode": "def approve_loan(score: int, income: int, debt: int) -> dict:\n    \"\"\"Reference implementation auto-generated from FSF.\"\"\"\n    if score < 600:\n        return {\"approved\": 0, \"limit\": 0}\n    elif score >= 750  and  income > 50  and  debt <= 30:\n        return {\"approved\": 1, \"limit\": 100}\n    elif score >= 650  and  income > 30:\n        return {\"approved\": 1, \"limit\": 50}\n    elif score >= 600:\n        return {\"approved\": 0, \"limit\": 0}\n    else:\n        return {\"approved\": 0, \"limit\": 0}\n",
+    "complexity": {
+      "scenario_count": 4,
+      "guard_complexity": "Nested",
+      "overlap_rate": 1.0,
+      "has_external_vars": false,
+      "overlap_density_tier": "low"
+    }
+  },
+  {
+    "taskId": "ExternalSOFL.TicketRouting",
+    "kind": "process",
+    "sourceFile": "external://li2023iet_faultprevention",
+    "module": "ExternalSOFL",
+    "name": "route_ticket",
+    "signature": {
+      "inputs": [
+        {
+          "name": "priority",
+          "type": "int"
+        },
+        {
+          "name": "category",
+          "type": "int"
+        },
+        {
+          "name": "vip",
+          "type": "int"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "queue",
+          "type": "int"
+        },
+        {
+          "name": "escalate",
+          "type": "int"
+        }
+      ]
+    },
+    "fsfScenarios": [
+      {
+        "index": 1,
+        "kind": "scenario",
+        "test": "vip eq 1",
+        "def": "queue eq 0 && escalate eq 1"
+      },
+      {
+        "index": 2,
+        "kind": "scenario",
+        "test": "priority ge 8 && category le 2",
+        "def": "queue eq 1 && escalate eq 1"
+      },
+      {
+        "index": 3,
+        "kind": "scenario",
+        "test": "priority ge 5",
+        "def": "queue eq 2 && escalate eq 0"
+      },
+      {
+        "index": 4,
+        "kind": "scenario",
+        "test": "priority lt 5",
+        "def": "queue eq 3 && escalate eq 0"
+      },
+      {
+        "index": 5,
+        "kind": "others",
+        "test": "others",
+        "def": "queue eq 0 && escalate eq 0"
+      }
+    ],
+    "ext": [],
+    "promptSpec": "Process route_ticket(priority, category, vip) -> (queue, escalate)\n\nFSF specification:\nif (vip eq 1) => queue eq 0 && escalate eq 1\nif (priority ge 8 && category le 2) => queue eq 1 && escalate eq 1\nif (priority ge 5) => queue eq 2 && escalate eq 0\nif (priority lt 5) => queue eq 3 && escalate eq 0\nothers => queue eq 0 && escalate eq 0",
+    "sourceBasename": "li2023iet_faultprevention",
+    "externalProvenance": {
+      "source": "li2023iet_faultprevention",
+      "section": "RF pattern: service routing",
+      "generator": "manual_curation"
+    },
+    "referenceCode": "def route_ticket(priority: int, category: int, vip: int) -> dict:\n    \"\"\"Reference implementation auto-generated from FSF.\"\"\"\n    if vip == 1:\n        return {\"queue\": 0, \"escalate\": 1}\n    elif priority >= 8  and  category <= 2:\n        return {\"queue\": 1, \"escalate\": 1}\n    elif priority >= 5:\n        return {\"queue\": 2, \"escalate\": 0}\n    elif priority < 5:\n        return {\"queue\": 3, \"escalate\": 0}\n    else:\n        return {\"queue\": 0, \"escalate\": 0}\n",
+    "complexity": {
+      "scenario_count": 4,
+      "guard_complexity": "Nested",
+      "overlap_rate": 1.4,
+      "has_external_vars": false,
+      "overlap_density_tier": "high"
+    }
+  },
+  {
+    "taskId": "ExternalSOFL.FraudScreen",
+    "kind": "process",
+    "sourceFile": "external://li2023iet_faultprevention",
+    "module": "ExternalSOFL",
+    "name": "screen_payment",
+    "signature": {
+      "inputs": [
+        {
+          "name": "amount",
+          "type": "int"
+        },
+        {
+          "name": "velocity",
+          "type": "int"
+        },
+        {
+          "name": "country",
+          "type": "int"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "block",
+          "type": "int"
+        },
+        {
+          "name": "review",
+          "type": "int"
+        }
+      ]
+    },
+    "fsfScenarios": [
+      {
+        "index": 1,
+        "kind": "scenario",
+        "test": "country ge 5",
+        "def": "block eq 1 && review eq 0"
+      },
+      {
+        "index": 2,
+        "kind": "scenario",
+        "test": "amount gt 500 && velocity gt 10",
+        "def": "block eq 1 && review eq 0"
+      },
+      {
+        "index": 3,
+        "kind": "scenario",
+        "test": "amount gt 200 && velocity gt 5",
+        "def": "block eq 0 && review eq 1"
+      },
+      {
+        "index": 4,
+        "kind": "scenario",
+        "test": "amount le 200",
+        "def": "block eq 0 && review eq 0"
+      },
+      {
+        "index": 5,
+        "kind": "others",
+        "test": "others",
+        "def": "block eq 0 && review eq 0"
+      }
+    ],
+    "ext": [],
+    "promptSpec": "Process screen_payment(amount, velocity, country) -> (block, review)\n\nFSF specification:\nif (country ge 5) => block eq 1 && review eq 0\nif (amount gt 500 && velocity gt 10) => block eq 1 && review eq 0\nif (amount gt 200 && velocity gt 5) => block eq 0 && review eq 1\nif (amount le 200) => block eq 0 && review eq 0\nothers => block eq 0 && review eq 0",
+    "sourceBasename": "li2023iet_faultprevention",
+    "externalProvenance": {
+      "source": "li2023iet_faultprevention",
+      "section": "RF pattern: boundary screening",
+      "generator": "manual_curation"
+    },
+    "referenceCode": "def screen_payment(amount: int, velocity: int, country: int) -> dict:\n    \"\"\"Reference implementation auto-generated from FSF.\"\"\"\n    if country >= 5:\n        return {\"block\": 1, \"review\": 0}\n    elif amount > 500  and  velocity > 10:\n        return {\"block\": 1, \"review\": 0}\n    elif amount > 200  and  velocity > 5:\n        return {\"block\": 0, \"review\": 1}\n    elif amount <= 200:\n        return {\"block\": 0, \"review\": 0}\n    else:\n        return {\"block\": 0, \"review\": 0}\n",
+    "complexity": {
+      "scenario_count": 4,
+      "guard_complexity": "AND",
+      "overlap_rate": 1.333,
+      "has_external_vars": false,
+      "overlap_density_tier": "high"
+    }
+  },
+  {
+    "taskId": "ExternalSOFL.AccessControl",
+    "kind": "process",
+    "sourceFile": "external://li2023iet_faultprevention",
+    "module": "ExternalSOFL",
+    "name": "check_access",
+    "signature": {
+      "inputs": [
+        {
+          "name": "role",
+          "type": "int"
+        },
+        {
+          "name": "clearance",
+          "type": "int"
+        },
+        {
+          "name": "resource",
+          "type": "int"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "allowed",
+          "type": "int"
+        },
+        {
+          "name": "audit",
+          "type": "int"
+        }
+      ]
+    },
+    "fsfScenarios": [
+      {
+        "index": 1,
+        "kind": "scenario",
+        "test": "clearance ge 3 && role ge 3",
+        "def": "allowed eq 1 && audit eq 1"
+      },
+      {
+        "index": 2,
+        "kind": "scenario",
+        "test": "clearance ge 2 && role ge 2 && resource le 2",
+        "def": "allowed eq 1 && audit eq 0"
+      },
+      {
+        "index": 3,
+        "kind": "scenario",
+        "test": "role ge 1 && resource eq 1",
+        "def": "allowed eq 1 && audit eq 0"
+      },
+      {
+        "index": 4,
+        "kind": "scenario",
+        "test": "role le 0",
+        "def": "allowed eq 0 && audit eq 1"
+      },
+      {
+        "index": 5,
+        "kind": "others",
+        "test": "others",
+        "def": "allowed eq 0 && audit eq 0"
+      }
+    ],
+    "ext": [],
+    "promptSpec": "Process check_access(role, clearance, resource) -> (allowed, audit)\n\nFSF specification:\nif (clearance ge 3 && role ge 3) => allowed eq 1 && audit eq 1\nif (clearance ge 2 && role ge 2 && resource le 2) => allowed eq 1 && audit eq 0\nif (role ge 1 && resource eq 1) => allowed eq 1 && audit eq 0\nif (role le 0) => allowed eq 0 && audit eq 1\nothers => allowed eq 0 && audit eq 0",
+    "sourceBasename": "li2023iet_faultprevention",
+    "externalProvenance": {
+      "source": "li2023iet_faultprevention",
+      "section": "RF pattern: authorization",
+      "generator": "manual_curation"
+    },
+    "referenceCode": "def check_access(role: int, clearance: int, resource: int) -> dict:\n    \"\"\"Reference implementation auto-generated from FSF.\"\"\"\n    if clearance >= 3  and  role >= 3:\n        return {\"allowed\": 1, \"audit\": 1}\n    elif clearance >= 2  and  role >= 2  and  resource <= 2:\n        return {\"allowed\": 1, \"audit\": 0}\n    elif role >= 1  and  resource == 1:\n        return {\"allowed\": 1, \"audit\": 0}\n    elif role <= 0:\n        return {\"allowed\": 0, \"audit\": 1}\n    else:\n        return {\"allowed\": 0, \"audit\": 0}\n",
+    "complexity": {
+      "scenario_count": 4,
+      "guard_complexity": "Nested",
+      "overlap_rate": 1.2,
+      "has_external_vars": false,
+      "overlap_density_tier": "medium"
+    }
+  },
+  {
+    "taskId": "ExternalSOFL.ShipRate",
+    "kind": "process",
+    "sourceFile": "external://liu2004soflbook",
+    "module": "ExternalSOFL",
+    "name": "calc_shipping",
+    "signature": {
+      "inputs": [
+        {
+          "name": "weight",
+          "type": "int"
+        },
+        {
+          "name": "distance",
+          "type": "int"
+        },
+        {
+          "name": "express",
+          "type": "int"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "cost",
+          "type": "int"
+        },
+        {
+          "name": "eta",
+          "type": "int"
+        }
+      ]
+    },
+    "fsfScenarios": [
+      {
+        "index": 1,
+        "kind": "scenario",
+        "test": "express eq 1 && weight gt 20",
+        "def": "cost eq 50 && eta eq 1"
+      },
+      {
+        "index": 2,
+        "kind": "scenario",
+        "test": "express eq 1",
+        "def": "cost eq 30 && eta eq 1"
+      },
+      {
+        "index": 3,
+        "kind": "scenario",
+        "test": "weight gt 50 && distance gt 100",
+        "def": "cost eq 40 && eta eq 5"
+      },
+      {
+        "index": 4,
+        "kind": "scenario",
+        "test": "weight gt 20",
+        "def": "cost eq 20 && eta eq 3"
+      },
+      {
+        "index": 5,
+        "kind": "others",
+        "test": "others",
+        "def": "cost eq 0 && eta eq 0"
+      }
+    ],
+    "ext": [],
+    "promptSpec": "Process calc_shipping(weight, distance, express) -> (cost, eta)\n\nFSF specification:\nif (express eq 1 && weight gt 20) => cost eq 50 && eta eq 1\nif (express eq 1) => cost eq 30 && eta eq 1\nif (weight gt 50 && distance gt 100) => cost eq 40 && eta eq 5\nif (weight gt 20) => cost eq 20 && eta eq 3\nothers => cost eq 0 && eta eq 0",
+    "sourceBasename": "liu2004soflbook",
+    "externalProvenance": {
+      "source": "liu2004soflbook",
+      "section": "Logistics pricing",
+      "generator": "manual_curation"
+    },
+    "referenceCode": "def calc_shipping(weight: int, distance: int, express: int) -> dict:\n    \"\"\"Reference implementation auto-generated from FSF.\"\"\"\n    if express == 1  and  weight > 20:\n        return {\"cost\": 50, \"eta\": 1}\n    elif express == 1:\n        return {\"cost\": 30, \"eta\": 1}\n    elif weight > 50  and  distance > 100:\n        return {\"cost\": 40, \"eta\": 5}\n    elif weight > 20:\n        return {\"cost\": 20, \"eta\": 3}\n    else:\n        return {\"cost\": 0, \"eta\": 0}\n",
+    "complexity": {
+      "scenario_count": 4,
+      "guard_complexity": "AND",
+      "overlap_rate": 0.5,
+      "has_external_vars": false,
+      "overlap_density_tier": "low"
+    }
+  },
+  {
+    "taskId": "ExternalSOFL.GradeAssign",
+    "kind": "process",
+    "sourceFile": "external://liu2004soflbook",
+    "module": "ExternalSOFL",
+    "name": "assign_grade",
+    "signature": {
+      "inputs": [
+        {
+          "name": "score",
+          "type": "int"
+        },
+        {
+          "name": "bonus",
+          "type": "int"
+        },
+        {
+          "name": "late",
+          "type": "int"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "grade",
+          "type": "int"
+        },
+        {
+          "name": "points",
+          "type": "int"
+        }
+      ]
+    },
+    "fsfScenarios": [
+      {
+        "index": 1,
+        "kind": "scenario",
+        "test": "late eq 1",
+        "def": "grade eq 0 && points eq 0"
+      },
+      {
+        "index": 2,
+        "kind": "scenario",
+        "test": "score ge 90 && bonus ge 5",
+        "def": "grade eq 4 && points eq 100"
+      },
+      {
+        "index": 3,
+        "kind": "scenario",
+        "test": "score ge 80",
+        "def": "grade eq 3 && points eq 80"
+      },
+      {
+        "index": 4,
+        "kind": "scenario",
+        "test": "score ge 60",
+        "def": "grade eq 2 && points eq 60"
+      },
+      {
+        "index": 5,
+        "kind": "others",
+        "test": "others",
+        "def": "grade eq 0 && points eq 0"
+      }
+    ],
+    "ext": [],
+    "promptSpec": "Process assign_grade(score, bonus, late) -> (grade, points)\n\nFSF specification:\nif (late eq 1) => grade eq 0 && points eq 0\nif (score ge 90 && bonus ge 5) => grade eq 4 && points eq 100\nif (score ge 80) => grade eq 3 && points eq 80\nif (score ge 60) => grade eq 2 && points eq 60\nothers => grade eq 0 && points eq 0",
+    "sourceBasename": "liu2004soflbook",
+    "externalProvenance": {
+      "source": "liu2004soflbook",
+      "section": "Academic assessment",
+      "generator": "manual_curation"
+    },
+    "referenceCode": "def assign_grade(score: int, bonus: int, late: int) -> dict:\n    \"\"\"Reference implementation auto-generated from FSF.\"\"\"\n    if late == 1:\n        return {\"grade\": 0, \"points\": 0}\n    elif score >= 90  and  bonus >= 5:\n        return {\"grade\": 4, \"points\": 100}\n    elif score >= 80:\n        return {\"grade\": 3, \"points\": 80}\n    elif score >= 60:\n        return {\"grade\": 2, \"points\": 60}\n    else:\n        return {\"grade\": 0, \"points\": 0}\n",
+    "complexity": {
+      "scenario_count": 4,
+      "guard_complexity": "Nested",
+      "overlap_rate": 0.5,
+      "has_external_vars": false,
+      "overlap_density_tier": "low"
+    }
+  },
+  {
+    "taskId": "ExternalSOFL.PowerDispatch",
+    "kind": "process",
+    "sourceFile": "external://li2022qrs_companion",
+    "module": "ExternalSOFL",
+    "name": "dispatch_power",
+    "signature": {
+      "inputs": [
+        {
+          "name": "load",
+          "type": "int"
+        },
+        {
+          "name": "solar",
+          "type": "int"
+        },
+        {
+          "name": "battery",
+          "type": "int"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "source",
+          "type": "int"
+        },
+        {
+          "name": "charge",
+          "type": "int"
+        }
+      ]
+    },
+    "fsfScenarios": [
+      {
+        "index": 1,
+        "kind": "scenario",
+        "test": "load eq 0 && solar gt 0 && battery lt 90",
+        "def": "source eq 2 && charge eq 1"
+      },
+      {
+        "index": 2,
+        "kind": "scenario",
+        "test": "load gt 0 && solar ge load",
+        "def": "source eq 2 && charge eq 0"
+      },
+      {
+        "index": 3,
+        "kind": "scenario",
+        "test": "load gt 0 && battery ge 20",
+        "def": "source eq 3 && charge eq 0"
+      },
+      {
+        "index": 4,
+        "kind": "scenario",
+        "test": "load gt 0",
+        "def": "source eq 1 && charge eq 0"
+      },
+      {
+        "index": 5,
+        "kind": "others",
+        "test": "others",
+        "def": "source eq 0 && charge eq 0"
+      }
+    ],
+    "ext": [],
+    "promptSpec": "Process dispatch_power(load, solar, battery) -> (source, charge)\n\nFSF specification:\nif (load eq 0 && solar gt 0 && battery lt 90) => source eq 2 && charge eq 1\nif (load gt 0 && solar ge load) => source eq 2 && charge eq 0\nif (load gt 0 && battery ge 20) => source eq 3 && charge eq 0\nif (load gt 0) => source eq 1 && charge eq 0\nothers => source eq 0 && charge eq 0",
+    "sourceBasename": "li2022qrs_companion",
+    "externalProvenance": {
+      "source": "li2022qrs_companion",
+      "section": "Energy management sprint",
+      "generator": "manual_curation"
+    },
+    "referenceCode": "def dispatch_power(load: int, solar: int, battery: int) -> dict:\n    \"\"\"Reference implementation auto-generated from FSF.\"\"\"\n    if load == 0  and  solar > 0  and  battery < 90:\n        return {\"source\": 2, \"charge\": 1}\n    elif load > 0  and  solar >= load:\n        return {\"source\": 2, \"charge\": 0}\n    elif load > 0  and  battery >= 20:\n        return {\"source\": 3, \"charge\": 0}\n    elif load > 0:\n        return {\"source\": 1, \"charge\": 0}\n    else:\n        return {\"source\": 0, \"charge\": 0}\n",
+    "complexity": {
+      "scenario_count": 4,
+      "guard_complexity": "Nested",
+      "overlap_rate": 1.2,
+      "has_external_vars": false,
+      "overlap_density_tier": "medium"
+    }
+  },
+  {
+    "taskId": "ExternalSOFL.CacheEvict",
+    "kind": "process",
+    "sourceFile": "external://li2023iet_faultprevention",
+    "module": "ExternalSOFL",
+    "name": "evict_cache",
+    "signature": {
+      "inputs": [
+        {
+          "name": "hits",
+          "type": "int"
+        },
+        {
+          "name": "size",
+          "type": "int"
+        },
+        {
+          "name": "ttl",
+          "type": "int"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "evict",
+          "type": "int"
+        },
+        {
+          "name": "refresh",
+          "type": "int"
+        }
+      ]
+    },
+    "fsfScenarios": [
+      {
+        "index": 1,
+        "kind": "scenario",
+        "test": "ttl le 0",
+        "def": "evict eq 1 && refresh eq 0"
+      },
+      {
+        "index": 2,
+        "kind": "scenario",
+        "test": "hits ge 100 && size le 10",
+        "def": "evict eq 0 && refresh eq 1"
+      },
+      {
+        "index": 3,
+        "kind": "scenario",
+        "test": "hits ge 50 && ttl le 60",
+        "def": "evict eq 0 && refresh eq 1"
+      },
+      {
+        "index": 4,
+        "kind": "scenario",
+        "test": "size gt 50",
+        "def": "evict eq 1 && refresh eq 0"
+      },
+      {
+        "index": 5,
+        "kind": "others",
+        "test": "others",
+        "def": "evict eq 0 && refresh eq 0"
+      }
+    ],
+    "ext": [],
+    "promptSpec": "Process evict_cache(hits, size, ttl) -> (evict, refresh)\n\nFSF specification:\nif (ttl le 0) => evict eq 1 && refresh eq 0\nif (hits ge 100 && size le 10) => evict eq 0 && refresh eq 1\nif (hits ge 50 && ttl le 60) => evict eq 0 && refresh eq 1\nif (size gt 50) => evict eq 1 && refresh eq 0\nothers => evict eq 0 && refresh eq 0",
+    "sourceBasename": "li2023iet_faultprevention",
+    "externalProvenance": {
+      "source": "li2023iet_faultprevention",
+      "section": "RF pattern: resource lifecycle",
+      "generator": "manual_curation"
+    },
+    "referenceCode": "def evict_cache(hits: int, size: int, ttl: int) -> dict:\n    \"\"\"Reference implementation auto-generated from FSF.\"\"\"\n    if ttl <= 0:\n        return {\"evict\": 1, \"refresh\": 0}\n    elif hits >= 100  and  size <= 10:\n        return {\"evict\": 0, \"refresh\": 1}\n    elif hits >= 50  and  ttl <= 60:\n        return {\"evict\": 0, \"refresh\": 1}\n    elif size > 50:\n        return {\"evict\": 1, \"refresh\": 0}\n    else:\n        return {\"evict\": 0, \"refresh\": 0}\n",
+    "complexity": {
+      "scenario_count": 4,
+      "guard_complexity": "AND",
+      "overlap_rate": 1.0,
+      "has_external_vars": false,
+      "overlap_density_tier": "low"
+    }
+  },
+  {
+    "taskId": "ExternalSOFL.RateLimit",
+    "kind": "process",
+    "sourceFile": "external://li2023iet_faultprevention",
+    "module": "ExternalSOFL",
+    "name": "throttle_request",
+    "signature": {
+      "inputs": [
+        {
+          "name": "rate",
+          "type": "int"
+        },
+        {
+          "name": "burst",
+          "type": "int"
+        },
+        {
+          "name": "priority",
+          "type": "int"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "allow",
+          "type": "int"
+        },
+        {
+          "name": "delay",
+          "type": "int"
+        }
+      ]
+    },
+    "fsfScenarios": [
+      {
+        "index": 1,
+        "kind": "scenario",
+        "test": "priority ge 9",
+        "def": "allow eq 1 && delay eq 0"
+      },
+      {
+        "index": 2,
+        "kind": "scenario",
+        "test": "rate gt 1000 && burst gt 50",
+        "def": "allow eq 0 && delay eq 0"
+      },
+      {
+        "index": 3,
+        "kind": "scenario",
+        "test": "rate gt 500 && priority ge 5",
+        "def": "allow eq 1 && delay eq 100"
+      },
+      {
+        "index": 4,
+        "kind": "scenario",
+        "test": "rate gt 500",
+        "def": "allow eq 0 && delay eq 200"
+      },
+      {
+        "index": 5,
+        "kind": "others",
+        "test": "others",
+        "def": "allow eq 0 && delay eq 0"
+      }
+    ],
+    "ext": [],
+    "promptSpec": "Process throttle_request(rate, burst, priority) -> (allow, delay)\n\nFSF specification:\nif (priority ge 9) => allow eq 1 && delay eq 0\nif (rate gt 1000 && burst gt 50) => allow eq 0 && delay eq 0\nif (rate gt 500 && priority ge 5) => allow eq 1 && delay eq 100\nif (rate gt 500) => allow eq 0 && delay eq 200\nothers => allow eq 0 && delay eq 0",
+    "sourceBasename": "li2023iet_faultprevention",
+    "externalProvenance": {
+      "source": "li2023iet_faultprevention",
+      "section": "RF pattern: overload control",
+      "generator": "manual_curation"
+    },
+    "referenceCode": "def throttle_request(rate: int, burst: int, priority: int) -> dict:\n    \"\"\"Reference implementation auto-generated from FSF.\"\"\"\n    if priority >= 9:\n        return {\"allow\": 1, \"delay\": 0}\n    elif rate > 1000  and  burst > 50:\n        return {\"allow\": 0, \"delay\": 0}\n    elif rate > 500  and  priority >= 5:\n        return {\"allow\": 1, \"delay\": 100}\n    elif rate > 500:\n        return {\"allow\": 0, \"delay\": 200}\n    else:\n        return {\"allow\": 0, \"delay\": 0}\n",
+    "complexity": {
+      "scenario_count": 4,
+      "guard_complexity": "Nested",
+      "overlap_rate": 0.5,
+      "has_external_vars": false,
+      "overlap_density_tier": "low"
+    }
+  },
+  {
+    "taskId": "ExternalSOFL.MedDosage",
+    "kind": "process",
+    "sourceFile": "external://liu2004soflbook",
+    "module": "ExternalSOFL",
+    "name": "calc_dose",
+    "signature": {
+      "inputs": [
+        {
+          "name": "weight",
+          "type": "int"
+        },
+        {
+          "name": "age",
+          "type": "int"
+        },
+        {
+          "name": "severity",
+          "type": "int"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "dose",
+          "type": "int"
+        },
+        {
+          "name": "warn",
+          "type": "int"
+        }
+      ]
+    },
+    "fsfScenarios": [
+      {
+        "index": 1,
+        "kind": "scenario",
+        "test": "severity ge 3 && age lt 12",
+        "def": "dose eq 0 && warn eq 2"
+      },
+      {
+        "index": 2,
+        "kind": "scenario",
+        "test": "age lt 12 && weight lt 20",
+        "def": "dose eq 1 && warn eq 1"
+      },
+      {
+        "index": 3,
+        "kind": "scenario",
+        "test": "age ge 75 && severity ge 2",
+        "def": "dose eq 2 && warn eq 1"
+      },
+      {
+        "index": 4,
+        "kind": "scenario",
+        "test": "weight ge 70",
+        "def": "dose eq 3 && warn eq 0"
+      },
+      {
+        "index": 5,
+        "kind": "others",
+        "test": "others",
+        "def": "dose eq 0 && warn eq 0"
+      }
+    ],
+    "ext": [],
+    "promptSpec": "Process calc_dose(weight, age, severity) -> (dose, warn)\n\nFSF specification:\nif (severity ge 3 && age lt 12) => dose eq 0 && warn eq 2\nif (age lt 12 && weight lt 20) => dose eq 1 && warn eq 1\nif (age ge 75 && severity ge 2) => dose eq 2 && warn eq 1\nif (weight ge 70) => dose eq 3 && warn eq 0\nothers => dose eq 0 && warn eq 0",
+    "sourceBasename": "liu2004soflbook",
+    "externalProvenance": {
+      "source": "liu2004soflbook",
+      "section": "Healthcare dosing control",
+      "generator": "manual_curation"
+    },
+    "referenceCode": "def calc_dose(weight: int, age: int, severity: int) -> dict:\n    \"\"\"Reference implementation auto-generated from FSF.\"\"\"\n    if severity >= 3  and  age < 12:\n        return {\"dose\": 0, \"warn\": 2}\n    elif age < 12  and  weight < 20:\n        return {\"dose\": 1, \"warn\": 1}\n    elif age >= 75  and  severity >= 2:\n        return {\"dose\": 2, \"warn\": 1}\n    elif weight >= 70:\n        return {\"dose\": 3, \"warn\": 0}\n    else:\n        return {\"dose\": 0, \"warn\": 0}\n",
+    "complexity": {
+      "scenario_count": 4,
+      "guard_complexity": "AND",
+      "overlap_rate": 1.333,
+      "has_external_vars": false,
+      "overlap_density_tier": "high"
+    }
+  },
+  {
+    "taskId": "ExternalSOFL.EnrollCheck",
+    "kind": "process",
+    "sourceFile": "external://liu2004soflbook",
+    "module": "ExternalSOFL",
+    "name": "check_enrollment",
+    "signature": {
+      "inputs": [
+        {
+          "name": "credits",
+          "type": "int"
+        },
+        {
+          "name": "gpa",
+          "type": "int"
+        },
+        {
+          "name": "status",
+          "type": "int"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "eligible",
+          "type": "int"
+        },
+        {
+          "name": "units",
+          "type": "int"
+        }
+      ]
+    },
+    "fsfScenarios": [
+      {
+        "index": 1,
+        "kind": "scenario",
+        "test": "status eq 0",
+        "def": "eligible eq 0 && units eq 0"
+      },
+      {
+        "index": 2,
+        "kind": "scenario",
+        "test": "credits ge 90 && gpa ge 35",
+        "def": "eligible eq 1 && units eq 18"
+      },
+      {
+        "index": 3,
+        "kind": "scenario",
+        "test": "credits ge 60 && gpa ge 30",
+        "def": "eligible eq 1 && units eq 15"
+      },
+      {
+        "index": 4,
+        "kind": "scenario",
+        "test": "gpa lt 20",
+        "def": "eligible eq 0 && units eq 0"
+      },
+      {
+        "index": 5,
+        "kind": "others",
+        "test": "others",
+        "def": "eligible eq 0 && units eq 0"
+      }
+    ],
+    "ext": [],
+    "promptSpec": "Process check_enrollment(credits, gpa, status) -> (eligible, units)\n\nFSF specification:\nif (status eq 0) => eligible eq 0 && units eq 0\nif (credits ge 90 && gpa ge 35) => eligible eq 1 && units eq 18\nif (credits ge 60 && gpa ge 30) => eligible eq 1 && units eq 15\nif (gpa lt 20) => eligible eq 0 && units eq 0\nothers => eligible eq 0 && units eq 0",
+    "sourceBasename": "liu2004soflbook",
+    "externalProvenance": {
+      "source": "liu2004soflbook",
+      "section": "Registration workflow",
+      "generator": "manual_curation"
+    },
+    "referenceCode": "def check_enrollment(credits: int, gpa: int, status: int) -> dict:\n    \"\"\"Reference implementation auto-generated from FSF.\"\"\"\n    if status == 0:\n        return {\"eligible\": 0, \"units\": 0}\n    elif credits >= 90  and  gpa >= 35:\n        return {\"eligible\": 1, \"units\": 18}\n    elif credits >= 60  and  gpa >= 30:\n        return {\"eligible\": 1, \"units\": 15}\n    elif gpa < 20:\n        return {\"eligible\": 0, \"units\": 0}\n    else:\n        return {\"eligible\": 0, \"units\": 0}\n",
+    "complexity": {
+      "scenario_count": 4,
+      "guard_complexity": "AND",
+      "overlap_rate": 1.444,
+      "has_external_vars": false,
+      "overlap_density_tier": "high"
+    }
+  },
+  {
+    "taskId": "ExternalSOFL.AlarmEscalate",
+    "kind": "process",
+    "sourceFile": "external://li2023iet_faultprevention",
+    "module": "ExternalSOFL",
+    "name": "escalate_alarm",
+    "signature": {
+      "inputs": [
+        {
+          "name": "level",
+          "type": "int"
+        },
+        {
+          "name": "ack",
+          "type": "int"
+        },
+        {
+          "name": "duration",
+          "type": "int"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "tier",
+          "type": "int"
+        },
+        {
+          "name": "notify",
+          "type": "int"
+        }
+      ]
+    },
+    "fsfScenarios": [
+      {
+        "index": 1,
+        "kind": "scenario",
+        "test": "level ge 3 && ack eq 0 && duration gt 60",
+        "def": "tier eq 3 && notify eq 2"
+      },
+      {
+        "index": 2,
+        "kind": "scenario",
+        "test": "level ge 2 && ack eq 0",
+        "def": "tier eq 2 && notify eq 1"
+      },
+      {
+        "index": 3,
+        "kind": "scenario",
+        "test": "level ge 1 && ack eq 1",
+        "def": "tier eq 1 && notify eq 0"
+      },
+      {
+        "index": 4,
+        "kind": "scenario",
+        "test": "level eq 0",
+        "def": "tier eq 0 && notify eq 0"
+      },
+      {
+        "index": 5,
+        "kind": "others",
+        "test": "others",
+        "def": "tier eq 0 && notify eq 0"
+      }
+    ],
+    "ext": [],
+    "promptSpec": "Process escalate_alarm(level, ack, duration) -> (tier, notify)\n\nFSF specification:\nif (level ge 3 && ack eq 0 && duration gt 60) => tier eq 3 && notify eq 2\nif (level ge 2 && ack eq 0) => tier eq 2 && notify eq 1\nif (level ge 1 && ack eq 1) => tier eq 1 && notify eq 0\nif (level eq 0) => tier eq 0 && notify eq 0\nothers => tier eq 0 && notify eq 0",
+    "sourceBasename": "li2023iet_faultprevention",
+    "externalProvenance": {
+      "source": "li2023iet_faultprevention",
+      "section": "RF pattern: monitoring escalation",
+      "generator": "manual_curation"
+    },
+    "referenceCode": "def escalate_alarm(level: int, ack: int, duration: int) -> dict:\n    \"\"\"Reference implementation auto-generated from FSF.\"\"\"\n    if level >= 3  and  ack == 0  and  duration > 60:\n        return {\"tier\": 3, \"notify\": 2}\n    elif level >= 2  and  ack == 0:\n        return {\"tier\": 2, \"notify\": 1}\n    elif level >= 1  and  ack == 1:\n        return {\"tier\": 1, \"notify\": 0}\n    elif level == 0:\n        return {\"tier\": 0, \"notify\": 0}\n    else:\n        return {\"tier\": 0, \"notify\": 0}\n",
+    "complexity": {
+      "scenario_count": 4,
+      "guard_complexity": "Nested",
+      "overlap_rate": 0.833,
+      "has_external_vars": false,
+      "overlap_density_tier": "low"
+    }
+  },
+  {
+    "taskId": "ExternalSOFL.StockAllocate",
+    "kind": "process",
+    "sourceFile": "external://li2022qrs_companion",
+    "module": "ExternalSOFL",
+    "name": "allocate_stock",
+    "signature": {
+      "inputs": [
+        {
+          "name": "on_hand",
+          "type": "int"
+        },
+        {
+          "name": "reserved",
+          "type": "int"
+        },
+        {
+          "name": "incoming",
+          "type": "int"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "alloc",
+          "type": "int"
+        },
+        {
+          "name": "backorder",
+          "type": "int"
+        }
+      ]
+    },
+    "fsfScenarios": [
+      {
+        "index": 1,
+        "kind": "scenario",
+        "test": "on_hand ge reserved",
+        "def": "alloc eq reserved && backorder eq 0"
+      },
+      {
+        "index": 2,
+        "kind": "scenario",
+        "test": "on_hand lt reserved && incoming gt 0",
+        "def": "alloc eq on_hand && backorder eq 1"
+      },
+      {
+        "index": 3,
+        "kind": "scenario",
+        "test": "on_hand lt reserved",
+        "def": "alloc eq on_hand && backorder eq 1"
+      },
+      {
+        "index": 4,
+        "kind": "others",
+        "test": "others",
+        "def": "alloc eq 0 && backorder eq 0"
+      }
+    ],
+    "ext": [],
+    "promptSpec": "Process allocate_stock(on_hand, reserved, incoming) -> (alloc, backorder)\n\nFSF specification:\nif (on_hand ge reserved) => alloc eq reserved && backorder eq 0\nif (on_hand lt reserved && incoming gt 0) => alloc eq on_hand && backorder eq 1\nif (on_hand lt reserved) => alloc eq on_hand && backorder eq 1\nothers => alloc eq 0 && backorder eq 0",
+    "sourceBasename": "li2022qrs_companion",
+    "externalProvenance": {
+      "source": "li2022qrs_companion",
+      "section": "Warehouse allocation",
+      "generator": "manual_curation"
+    },
+    "referenceCode": "def allocate_stock(on_hand: int, reserved: int, incoming: int) -> dict:\n    \"\"\"Reference implementation auto-generated from FSF.\"\"\"\n    if on_hand >= reserved:\n        return {\"alloc\": reserved, \"backorder\": 0}\n    elif on_hand < reserved  and  incoming > 0:\n        return {\"alloc\": on_hand, \"backorder\": 1}\n    elif on_hand < reserved:\n        return {\"alloc\": on_hand, \"backorder\": 1}\n    else:\n        return {\"alloc\": 0, \"backorder\": 0}\n",
+    "complexity": {
+      "scenario_count": 3,
+      "guard_complexity": "Nested",
+      "overlap_rate": 1.25,
+      "has_external_vars": false,
+      "overlap_density_tier": "high"
+    }
+  },
+  {
+    "taskId": "ExternalSOFL.PremiumCalc",
+    "kind": "process",
+    "sourceFile": "external://liu2004soflbook",
+    "module": "ExternalSOFL",
+    "name": "calc_premium",
+    "signature": {
+      "inputs": [
+        {
+          "name": "age",
+          "type": "int"
+        },
+        {
+          "name": "risk",
+          "type": "int"
+        },
+        {
+          "name": "claims",
+          "type": "int"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "premium",
+          "type": "int"
+        },
+        {
+          "name": "tier",
+          "type": "int"
+        }
+      ]
+    },
+    "fsfScenarios": [
+      {
+        "index": 1,
+        "kind": "scenario",
+        "test": "claims ge 5",
+        "def": "premium eq 0 && tier eq 0"
+      },
+      {
+        "index": 2,
+        "kind": "scenario",
+        "test": "age lt 25 && risk ge 3",
+        "def": "premium eq 80 && tier eq 3"
+      },
+      {
+        "index": 3,
+        "kind": "scenario",
+        "test": "age ge 65 && risk ge 2",
+        "def": "premium eq 60 && tier eq 3"
+      },
+      {
+        "index": 4,
+        "kind": "scenario",
+        "test": "risk ge 2",
+        "def": "premium eq 40 && tier eq 2"
+      },
+      {
+        "index": 5,
+        "kind": "others",
+        "test": "others",
+        "def": "premium eq 0 && tier eq 0"
+      }
+    ],
+    "ext": [],
+    "promptSpec": "Process calc_premium(age, risk, claims) -> (premium, tier)\n\nFSF specification:\nif (claims ge 5) => premium eq 0 && tier eq 0\nif (age lt 25 && risk ge 3) => premium eq 80 && tier eq 3\nif (age ge 65 && risk ge 2) => premium eq 60 && tier eq 3\nif (risk ge 2) => premium eq 40 && tier eq 2\nothers => premium eq 0 && tier eq 0",
+    "sourceBasename": "liu2004soflbook",
+    "externalProvenance": {
+      "source": "liu2004soflbook",
+      "section": "Insurance underwriting",
+      "generator": "manual_curation"
+    },
+    "referenceCode": "def calc_premium(age: int, risk: int, claims: int) -> dict:\n    \"\"\"Reference implementation auto-generated from FSF.\"\"\"\n    if claims >= 5:\n        return {\"premium\": 0, \"tier\": 0}\n    elif age < 25  and  risk >= 3:\n        return {\"premium\": 80, \"tier\": 3}\n    elif age >= 65  and  risk >= 2:\n        return {\"premium\": 60, \"tier\": 3}\n    elif risk >= 2:\n        return {\"premium\": 40, \"tier\": 2}\n    else:\n        return {\"premium\": 0, \"tier\": 0}\n",
+    "complexity": {
+      "scenario_count": 4,
+      "guard_complexity": "AND",
+      "overlap_rate": 1.0,
+      "has_external_vars": false,
+      "overlap_density_tier": "low"
+    }
+  },
+  {
+    "taskId": "ExternalSOFL.TrafficSignal",
+    "kind": "process",
+    "sourceFile": "external://li2022qrs_companion",
+    "module": "ExternalSOFL",
+    "name": "set_signal",
+    "signature": {
+      "inputs": [
+        {
+          "name": "queue",
+          "type": "int"
+        },
+        {
+          "name": "emergency",
+          "type": "int"
+        },
+        {
+          "name": "cycle",
+          "type": "int"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "green",
+          "type": "int"
+        },
+        {
+          "name": "yellow",
+          "type": "int"
+        }
+      ]
+    },
+    "fsfScenarios": [
+      {
+        "index": 1,
+        "kind": "scenario",
+        "test": "emergency eq 1",
+        "def": "green eq 1 && yellow eq 0"
+      },
+      {
+        "index": 2,
+        "kind": "scenario",
+        "test": "queue gt 5 && cycle ge 30",
+        "def": "green eq 1 && yellow eq 0"
+      },
+      {
+        "index": 3,
+        "kind": "scenario",
+        "test": "queue le 5 && cycle lt 30",
+        "def": "green eq 0 && yellow eq 1"
+      },
+      {
+        "index": 4,
+        "kind": "others",
+        "test": "others",
+        "def": "green eq 0 && yellow eq 0"
+      }
+    ],
+    "ext": [],
+    "promptSpec": "Process set_signal(queue, emergency, cycle) -> (green, yellow)\n\nFSF specification:\nif (emergency eq 1) => green eq 1 && yellow eq 0\nif (queue gt 5 && cycle ge 30) => green eq 1 && yellow eq 0\nif (queue le 5 && cycle lt 30) => green eq 0 && yellow eq 1\nothers => green eq 0 && yellow eq 0",
+    "sourceBasename": "li2022qrs_companion",
+    "externalProvenance": {
+      "source": "li2022qrs_companion",
+      "section": "Traffic control sprint",
+      "generator": "manual_curation"
+    },
+    "referenceCode": "def set_signal(queue: int, emergency: int, cycle: int) -> dict:\n    \"\"\"Reference implementation auto-generated from FSF.\"\"\"\n    if emergency == 1:\n        return {\"green\": 1, \"yellow\": 0}\n    elif queue > 5  and  cycle >= 30:\n        return {\"green\": 1, \"yellow\": 0}\n    elif queue <= 5  and  cycle < 30:\n        return {\"green\": 0, \"yellow\": 1}\n    else:\n        return {\"green\": 0, \"yellow\": 0}\n",
+    "complexity": {
+      "scenario_count": 3,
+      "guard_complexity": "AND",
+      "overlap_rate": 1.333,
+      "has_external_vars": false,
+      "overlap_density_tier": "high"
+    }
+  },
+  {
+    "taskId": "ExternalSOFL.SalaryBonus",
+    "kind": "process",
+    "sourceFile": "external://liu2004soflbook",
+    "module": "ExternalSOFL",
+    "name": "calc_bonus",
+    "signature": {
+      "inputs": [
+        {
+          "name": "base",
+          "type": "int"
+        },
+        {
+          "name": "years",
+          "type": "int"
+        },
+        {
+          "name": "perf",
+          "type": "int"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "bonus",
+          "type": "int"
+        },
+        {
+          "name": "raise",
+          "type": "int"
+        }
+      ]
+    },
+    "fsfScenarios": [
+      {
+        "index": 1,
+        "kind": "scenario",
+        "test": "perf ge 5 && years ge 5",
+        "def": "bonus eq 20 && raise eq 10"
+      },
+      {
+        "index": 2,
+        "kind": "scenario",
+        "test": "perf ge 5",
+        "def": "bonus eq 15 && raise eq 5"
+      },
+      {
+        "index": 3,
+        "kind": "scenario",
+        "test": "perf ge 3 && years ge 10",
+        "def": "bonus eq 10 && raise eq 8"
+      },
+      {
+        "index": 4,
+        "kind": "scenario",
+        "test": "years ge 15",
+        "def": "bonus eq 8 && raise eq 5"
+      },
+      {
+        "index": 5,
+        "kind": "others",
+        "test": "others",
+        "def": "bonus eq 0 && raise eq 0"
+      }
+    ],
+    "ext": [],
+    "promptSpec": "Process calc_bonus(base, years, perf) -> (bonus, raise)\n\nFSF specification:\nif (perf ge 5 && years ge 5) => bonus eq 20 && raise eq 10\nif (perf ge 5) => bonus eq 15 && raise eq 5\nif (perf ge 3 && years ge 10) => bonus eq 10 && raise eq 8\nif (years ge 15) => bonus eq 8 && raise eq 5\nothers => bonus eq 0 && raise eq 0",
+    "sourceBasename": "liu2004soflbook",
+    "externalProvenance": {
+      "source": "liu2004soflbook",
+      "section": "HR compensation",
+      "generator": "manual_curation"
+    },
+    "referenceCode": "def calc_bonus(base: int, years: int, perf: int) -> dict:\n    \"\"\"Reference implementation auto-generated from FSF.\"\"\"\n    if perf >= 5  and  years >= 5:\n        return {\"bonus\": 20, \"raise\": 10}\n    elif perf >= 5:\n        return {\"bonus\": 15, \"raise\": 5}\n    elif perf >= 3  and  years >= 10:\n        return {\"bonus\": 10, \"raise\": 8}\n    elif years >= 15:\n        return {\"bonus\": 8, \"raise\": 5}\n    else:\n        return {\"bonus\": 0, \"raise\": 0}\n",
+    "complexity": {
+      "scenario_count": 4,
+      "guard_complexity": "AND",
+      "overlap_rate": 1.0,
+      "has_external_vars": false,
+      "overlap_density_tier": "low"
+    }
+  },
+  {
+    "taskId": "ExternalSOFL.NetworkRoute",
+    "kind": "process",
+    "sourceFile": "external://li2023iet_faultprevention",
+    "module": "ExternalSOFL",
+    "name": "route_packet",
+    "signature": {
+      "inputs": [
+        {
+          "name": "protocol",
+          "type": "int"
+        },
+        {
+          "name": "port",
+          "type": "int"
+        },
+        {
+          "name": "priority",
+          "type": "int"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "route",
+          "type": "int"
+        },
+        {
+          "name": "queue",
+          "type": "int"
+        }
+      ]
+    },
+    "fsfScenarios": [
+      {
+        "index": 1,
+        "kind": "scenario",
+        "test": "protocol eq 0",
+        "def": "route eq 0 && queue eq 0"
+      },
+      {
+        "index": 2,
+        "kind": "scenario",
+        "test": "priority ge 8 && protocol eq 1",
+        "def": "route eq 1 && queue eq 0"
+      },
+      {
+        "index": 3,
+        "kind": "scenario",
+        "test": "protocol eq 1 && port le 1024",
+        "def": "route eq 2 && queue eq 1"
+      },
+      {
+        "index": 4,
+        "kind": "scenario",
+        "test": "port gt 1024",
+        "def": "route eq 3 && queue eq 2"
+      },
+      {
+        "index": 5,
+        "kind": "others",
+        "test": "others",
+        "def": "route eq 0 && queue eq 0"
+      }
+    ],
+    "ext": [],
+    "promptSpec": "Process route_packet(protocol, port, priority) -> (route, queue)\n\nFSF specification:\nif (protocol eq 0) => route eq 0 && queue eq 0\nif (priority ge 8 && protocol eq 1) => route eq 1 && queue eq 0\nif (protocol eq 1 && port le 1024) => route eq 2 && queue eq 1\nif (port gt 1024) => route eq 3 && queue eq 2\nothers => route eq 0 && queue eq 0",
+    "sourceBasename": "li2023iet_faultprevention",
+    "externalProvenance": {
+      "source": "li2023iet_faultprevention",
+      "section": "RF pattern: network policy",
+      "generator": "manual_curation"
+    },
+    "referenceCode": "def route_packet(protocol: int, port: int, priority: int) -> dict:\n    \"\"\"Reference implementation auto-generated from FSF.\"\"\"\n    if protocol == 0:\n        return {\"route\": 0, \"queue\": 0}\n    elif priority >= 8  and  protocol == 1:\n        return {\"route\": 1, \"queue\": 0}\n    elif protocol == 1  and  port <= 1024:\n        return {\"route\": 2, \"queue\": 1}\n    elif port > 1024:\n        return {\"route\": 3, \"queue\": 2}\n    else:\n        return {\"route\": 0, \"queue\": 0}\n",
+    "complexity": {
+      "scenario_count": 4,
+      "guard_complexity": "Nested",
+      "overlap_rate": 1.083,
+      "has_external_vars": false,
+      "overlap_density_tier": "medium"
+    }
+  },
+  {
+    "taskId": "ExternalSOFL.WaterTank",
+    "kind": "process",
+    "sourceFile": "external://liu2004soflbook",
+    "module": "ExternalSOFL",
+    "name": "control_tank",
+    "signature": {
+      "inputs": [
+        {
+          "name": "level",
+          "type": "int"
+        },
+        {
+          "name": "inflow",
+          "type": "int"
+        },
+        {
+          "name": "outflow",
+          "type": "int"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "pump",
+          "type": "int"
+        },
+        {
+          "name": "valve",
+          "type": "int"
+        }
+      ]
+    },
+    "fsfScenarios": [
+      {
+        "index": 1,
+        "kind": "scenario",
+        "test": "level gt 90",
+        "def": "pump eq 0 && valve eq 1"
+      },
+      {
+        "index": 2,
+        "kind": "scenario",
+        "test": "level gt 70 && level le 90",
+        "def": "pump eq 0 && valve eq 1"
+      },
+      {
+        "index": 3,
+        "kind": "scenario",
+        "test": "level lt 30 && inflow gt 0",
+        "def": "pump eq 1 && valve eq 0"
+      },
+      {
+        "index": 4,
+        "kind": "scenario",
+        "test": "level ge 30 && level le 70",
+        "def": "pump eq 0 && valve eq 0"
+      },
+      {
+        "index": 5,
+        "kind": "others",
+        "test": "others",
+        "def": "pump eq 0 && valve eq 0"
+      }
+    ],
+    "ext": [],
+    "promptSpec": "Process control_tank(level, inflow, outflow) -> (pump, valve)\n\nFSF specification:\nif (level gt 90) => pump eq 0 && valve eq 1\nif (level gt 70 && level le 90) => pump eq 0 && valve eq 1\nif (level lt 30 && inflow gt 0) => pump eq 1 && valve eq 0\nif (level ge 30 && level le 70) => pump eq 0 && valve eq 0\nothers => pump eq 0 && valve eq 0",
+    "sourceBasename": "liu2004soflbook",
+    "externalProvenance": {
+      "source": "liu2004soflbook",
+      "section": "Process control tank",
+      "generator": "manual_curation"
+    },
+    "referenceCode": "def control_tank(level: int, inflow: int, outflow: int) -> dict:\n    \"\"\"Reference implementation auto-generated from FSF.\"\"\"\n    if level > 90:\n        return {\"pump\": 0, \"valve\": 1}\n    elif level > 70  and  level <= 90:\n        return {\"pump\": 0, \"valve\": 1}\n    elif level < 30  and  inflow > 0:\n        return {\"pump\": 1, \"valve\": 0}\n    elif level >= 30  and  level <= 70:\n        return {\"pump\": 0, \"valve\": 0}\n    else:\n        return {\"pump\": 0, \"valve\": 0}\n",
+    "complexity": {
+      "scenario_count": 4,
+      "guard_complexity": "AND",
+      "overlap_rate": 0.5,
+      "has_external_vars": false,
+      "overlap_density_tier": "low"
+    }
+  }
+]

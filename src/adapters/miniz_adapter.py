@@ -206,7 +206,131 @@ class MiniZAdapter(SpecAdapter):
         )
 
 
-# ── Built-in Mini-Z task corpus (18 schemas) ──────────────────────────────────
+# ── Built-in Mini-Z task corpus (30 schemas) ──────────────────────────────────
+
+_EXTRA_MINIZ_SPECS: list[str] = [
+    """\
+SCHEMA TaxBracket
+INPUTS: income: int, dependents: int, region: int
+OUTPUTS: rate: int, credit: int
+
+CASE income le 0                                    => rate eq 0 && credit eq 0
+CASE dependents ge 3 && income le 20000             => rate eq 5 && credit eq 30
+CASE income le 40000 && region le 1                 => rate eq 10 && credit eq 10
+CASE income le 80000                                => rate eq 20 && credit eq 5
+DEFAULT rate eq 30 && credit eq 0
+""",
+    """\
+SCHEMA RefundPolicy
+INPUTS: days: int, condition: int, price: int
+OUTPUTS: refund_pct: int, fee: int
+
+CASE days le 7 && condition eq 1                    => refund_pct eq 100 && fee eq 0
+CASE days le 14 && condition eq 1                   => refund_pct eq 80 && fee eq 5
+CASE days le 30 && price gt 100                     => refund_pct eq 50 && fee eq 10
+DEFAULT refund_pct eq 0 && fee eq 15
+""",
+    """\
+SCHEMA SeatAssign
+INPUTS: party: int, vip: int, available: int
+OUTPUTS: section: int, priority: int
+
+CASE vip eq 1 && available ge party               => section eq 3 && priority eq 1
+CASE party ge 6 && available ge party             => section eq 2 && priority eq 2
+CASE available ge party                             => section eq 1 && priority eq 3
+DEFAULT section eq 0 && priority eq 0
+""",
+    """\
+SCHEMA LoanTier
+INPUTS: score: int, collateral: int, term: int
+OUTPUTS: tier: int, apr: int
+
+CASE score lt 550                                   => tier eq 0 && apr eq 0
+CASE score ge 750 && collateral ge 50               => tier eq 3 && apr eq 5
+CASE score ge 650 && term le 12                     => tier eq 2 && apr eq 8
+DEFAULT tier eq 1 && apr eq 12
+""",
+    """\
+SCHEMA AlertLevel
+INPUTS: metric: int, baseline: int, spike: int
+OUTPUTS: level: int, page: int
+
+CASE metric gt baseline + spike && spike gt 10      => level eq 3 && page eq 1
+CASE metric gt baseline + spike                     => level eq 2 && page eq 0
+CASE metric gt baseline                             => level eq 1 && page eq 0
+DEFAULT level eq 0 && page eq 0
+""",
+    """\
+SCHEMA CouponApply
+INPUTS: subtotal: int, coupon: int, member: int
+OUTPUTS: discount: int, payable: int
+
+CASE coupon ge 50 && subtotal ge 200                => discount eq 50 && payable eq subtotal - 50
+CASE coupon ge 20 && member ge 2                    => discount eq 20 && payable eq subtotal - 20
+CASE coupon ge 10                                   => discount eq 10 && payable eq subtotal - 10
+DEFAULT discount eq 0 && payable eq subtotal
+""",
+    """\
+SCHEMA ShiftAssign
+INPUTS: skill: int, availability: int, demand: int
+OUTPUTS: shift: int, overtime: int
+
+CASE skill ge 5 && availability eq 1 && demand ge 3 => shift eq 2 && overtime eq 1
+CASE skill ge 3 && availability eq 1                  => shift eq 1 && overtime eq 0
+CASE demand ge 5                                    => shift eq 2 && overtime eq 1
+DEFAULT shift eq 0 && overtime eq 0
+""",
+    """\
+SCHEMA WarrantyClaim
+INPUTS: months: int, defect: int, misuse: int
+OUTPUTS: covered: int, payout: int
+
+CASE misuse eq 1                                    => covered eq 0 && payout eq 0
+CASE months le 12 && defect eq 1                    => covered eq 1 && payout eq 100
+CASE months le 24 && defect eq 1                    => covered eq 1 && payout eq 50
+DEFAULT covered eq 0 && payout eq 0
+""",
+    """\
+SCHEMA ParkingFee
+INPUTS: minutes: int, zone: int, permit: int
+OUTPUTS: fee: int, valid: int
+
+CASE permit eq 1                                    => fee eq 0 && valid eq 1
+CASE zone ge 3 && minutes gt 120                    => fee eq 40 && valid eq 1
+CASE minutes gt 60                                  => fee eq 20 && valid eq 1
+DEFAULT fee eq 5 && valid eq 1
+""",
+    """\
+SCHEMA RiskScore
+INPUTS: exposure: int, volatility: int, hedge: int
+OUTPUTS: score: int, action: int
+
+CASE exposure gt 80 && hedge lt 20                    => score eq 90 && action eq 2
+CASE volatility gt 50 && exposure gt 50           => score eq 70 && action eq 1
+CASE exposure gt 30                                   => score eq 40 && action eq 1
+DEFAULT score eq 10 && action eq 0
+""",
+    """\
+SCHEMA BatchRelease
+INPUTS: passed: int, failed: int, sample: int
+OUTPUTS: release: int, rework: int
+
+CASE failed gt 0 && sample lt 10                    => release eq 0 && rework eq 1
+CASE passed ge 95 && failed eq 0                    => release eq 1 && rework eq 0
+CASE passed ge 80                                   => release eq 1 && rework eq 0
+DEFAULT release eq 0 && rework eq 1
+""",
+    """\
+SCHEMA LoyaltyTier
+INPUTS: points: int, tenure: int, complaints: int
+OUTPUTS: tier: int, bonus: int
+
+CASE complaints ge 3                                => tier eq 0 && bonus eq 0
+CASE points ge 1000 && tenure ge 5                  => tier eq 3 && bonus eq 50
+CASE points ge 500                                  => tier eq 2 && bonus eq 20
+DEFAULT tier eq 1 && bonus eq 5
+""",
+]
 
 BUILTIN_MINIZ_TASKS_SPEC: list[str] = [
     """\
@@ -437,8 +561,11 @@ DEFAULT dose_level eq 2 && frequency eq 2 && warning eq 0
 ]
 
 
+BUILTIN_MINIZ_TASKS_SPEC: list[str] = BUILTIN_MINIZ_TASKS_SPEC + _EXTRA_MINIZ_SPECS  # type: ignore[misc]
+
+
 def load_builtin_miniz_tasks() -> list[dict[str, Any]]:
-    """Return the 18 built-in Mini-Z tasks as TaskSpec dicts."""
+    """Return the 30 built-in Mini-Z tasks as TaskSpec dicts."""
     from src.ir.lowerers.fsf_lowerer import FSFLowerer
     adapter = MiniZAdapter()
     tasks = []

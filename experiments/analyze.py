@@ -123,8 +123,8 @@ def pairwise_tests(df: pd.DataFrame, baseline: str = "B1", method: str = "M", me
         stat, p = stats.wilcoxon(t, b, alternative="greater")
     except ValueError:
         stat, p = float("nan"), 1.0
-    # Cliff's delta (non-parametric effect size)
-    cd = _cliffs_delta(b, t)
+    # Cliff's delta: positive when method > baseline
+    cd = _cliffs_delta(t, b)
     # Bootstrap 95% CI on mean difference
     lo, hi = _bootstrap_ci(b, t, n_boot=1000, ci=0.95)
     # rank-biserial correlation (legacy)
@@ -202,20 +202,68 @@ def ablation_analysis(df: pd.DataFrame) -> pd.DataFrame:
     return pd.DataFrame(rows)
 
 
-def latency_comparison(df: pd.DataFrame) -> dict:
-    m = df[df["mode"] == "M"]["latency_ms"]
-    b2 = df[df["mode"] == "B2"]["latency_ms"]
-    if len(m) < 3 or len(b2) < 3:
+def latency_comparison(df: pd.DataFrame, baseline: str = "B2", method: str = "M") -> dict:
+    m = df[df["mode"] == method]["latency_ms"]
+    b = df[df["mode"] == baseline]["latency_ms"]
+    if len(m) < 3 or len(b) < 3:
         return {"error": "insufficient samples"}
-    stat, p = stats.mannwhitneyu(m, b2, alternative="less")
+    stat, p = stats.mannwhitneyu(m, b, alternative="greater")
     return {
-        "comparison": "M_latency_vs_B2",
-        "M_mean_ms": float(m.mean()),
-        "B2_mean_ms": float(b2.mean()),
-        "speedup": float(b2.mean() / m.mean()) if m.mean() else 0,
+        "comparison": f"{method}_latency_vs_{baseline}",
+        "baseline": baseline,
+        "method": method,
+        f"{method}_mean_ms": float(m.mean()),
+        f"{baseline}_mean_ms": float(b.mean()),
+        "latency_ratio": float(m.mean() / b.mean()) if b.mean() else 0,
         "mannwhitney_p": float(p),
+        "cliffs_delta": float(_cliffs_delta(m.values, b.values)),
         "significant_0.05": bool(p < 0.05),
     }
+
+
+def all_pairwise_latency_with_holm(
+    df: pd.DataFrame,
+    modes: list[str] | None = None,
+) -> dict:
+    """Mann-Whitney U for latency across all mode pairs (separate Holm family)."""
+    modes = modes or ["B0", "B1", "B2", "M", "A1", "A2", "A3"]
+    modes = [m for m in modes if m in df["mode"].unique()]
+    pairs = [(a, b) for i, a in enumerate(modes) for b in modes[i + 1:]]
+
+    raw_results: dict = {}
+    p_values: list[float] = []
+    pair_keys: list[str] = []
+    for baseline, method in pairs:
+        key = f"{method}_vs_{baseline}"
+        m_lat = df[df["mode"] == method]["latency_ms"].values
+        b_lat = df[df["mode"] == baseline]["latency_ms"].values
+        if len(m_lat) < 3 or len(b_lat) < 3:
+            continue
+        try:
+            _, p = stats.mannwhitneyu(m_lat, b_lat, alternative="two-sided")
+        except ValueError:
+            p = 1.0
+        raw_results[key] = {
+            "baseline": baseline,
+            "method": method,
+            "metric": "latency_ms",
+            "n_method": int(len(m_lat)),
+            "n_baseline": int(len(b_lat)),
+            "method_mean": float(np.mean(m_lat)),
+            "baseline_mean": float(np.mean(b_lat)),
+            "latency_ratio": float(np.mean(m_lat) / np.mean(b_lat)) if np.mean(b_lat) else 0,
+            "mannwhitney_p": float(p),
+            "cliffs_delta": float(_cliffs_delta(m_lat, b_lat)),
+        }
+        p_values.append(float(p))
+        pair_keys.append(key)
+
+    corrected = holm_bonferroni(p_values)
+    for key, adj_p in zip(pair_keys, corrected):
+        raw_results[key]["p_value_holm"] = adj_p
+        raw_results[key]["significant_holm_0.05"] = adj_p < 0.05
+
+    return raw_results
 
 
 def sensitivity_analysis(df: pd.DataFrame) -> pd.DataFrame:
@@ -370,6 +418,11 @@ def analyze(run_dir: Path) -> Path:
         df["strict_success"] = df["strict_formal_passed"].astype(int)
     else:
         df["strict_success"] = df["success"].astype(int)
+    conf_col = (
+        "strict_formal_conformance"
+        if "strict_formal_conformance" in df.columns
+        else "formal_conformance"
+    )
     report_dir = run_dir / "analysis"
     report_dir.mkdir(parents=True, exist_ok=True)
 
@@ -377,17 +430,30 @@ def analyze(run_dir: Path) -> Path:
     summary.to_csv(report_dir / "summary_by_mode.csv", index=False)
 
     # Upgraded stats: all pairwise with Holm correction + Cliff's delta + bootstrap CI
-    all_modes = df["mode"].unique().tolist()
-    pairwise_all = all_pairwise_tests_with_holm(df, modes=all_modes, metric="strict_success")
-    pairwise_conf = all_pairwise_tests_with_holm(df, modes=all_modes, metric="formal_conformance")
+    e1_modes = [m for m in ["B0", "B1", "B2", "M", "A1", "A2", "A3"] if m in df["mode"].unique()]
+    pairwise_strict = all_pairwise_tests_with_holm(df, modes=e1_modes, metric="strict_success")
+    pairwise_conf = all_pairwise_tests_with_holm(df, modes=e1_modes, metric=conf_col)
+    pairwise_latency = all_pairwise_latency_with_holm(df, modes=e1_modes)
+    lat_m_b2 = latency_comparison(df)
     tests = {
-        "pairwise_strict_success_holm": pairwise_all,
+        "pairwise_strict_success_holm": pairwise_strict,
         "pairwise_conformance_holm": pairwise_conf,
-        "latency_M_vs_B2": latency_comparison(df),
+        "pairwise_latency_holm": pairwise_latency,
+        "latency_M_vs_B2": lat_m_b2,
         # Keep primary comparisons at top level for backward compatibility
         "M_vs_B1": pairwise_tests(df, "B1", "M", metric="strict_success"),
         "M_vs_B2": pairwise_tests(df, "B2", "M", metric="strict_success"),
+        "M_vs_B1_conf": pairwise_tests(df, "B1", "M", metric=conf_col),
+        "M_vs_B2_conf": pairwise_tests(df, "B2", "M", metric=conf_col),
     }
+    for key, holm_key in [("M_vs_B1", "M_vs_B1"), ("M_vs_B2", "M_vs_B2")]:
+        if holm_key in pairwise_strict:
+            tests[key]["p_value_holm"] = pairwise_strict[holm_key]["p_value_holm"]
+            tests[key]["significant_holm_0.05"] = pairwise_strict[holm_key]["significant_holm_0.05"]
+    for key, holm_key in [("M_vs_B1_conf", "M_vs_B1"), ("M_vs_B2_conf", "M_vs_B2")]:
+        if holm_key in pairwise_conf:
+            tests[key]["p_value_holm"] = pairwise_conf[holm_key]["p_value_holm"]
+            tests[key]["significant_holm_0.05"] = pairwise_conf[holm_key]["significant_holm_0.05"]
     (report_dir / "significance_tests.json").write_text(
         json.dumps(tests, indent=2), encoding="utf-8"
     )

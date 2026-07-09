@@ -102,7 +102,7 @@ notation-specific parsing via a registered \texttt{SpecAdapter};
 canonicalisation into ordered \texttt{GuardedCase} records; and lowering via
 \texttt{FSFLowerer}.
 The primary SOFL path uses the Agile-SOFL
-toolchain~\citep{li2022agilesofl,liu2014sofl}; E8 adapters bypass SOFL
+toolchain~\citep{li2022qrs_companion,liu2004soflbook}; E8 adapters bypass SOFL
 syntax while producing the same SpecIR structure.
 Figure~\ref{fig:fsf-parser-class} shows the SOFL-side bridge classes.
 
@@ -353,7 +353,7 @@ Stage~4 therefore screens structural anti-patterns before release (C3).
 The module evaluates catalogue $\mathcal{P}$ (RF01--RF14;
 Table~\ref{tab:patterns}) and returns $\mathrm{Hits}(c,t)$ as in
 Section~\ref{subsec:method:detection}, using a hybrid AST/regex strategy in
-the spirit of FindBugs~\citep{hovemeyer2004findbugs,ayewah2008findbugs}.
+the spirit of FindBugs~\citep{hovemeyer2004findbugs,ayewah2007findbugs}.
 
 The high-severity subset that gates acceptance is
 \[
@@ -390,11 +390,11 @@ Checker and guard are complementary filters, not substitutes
 
 The orchestrator prioritises parallel throughput, crash-safe resumption, and
 live progress for the 840-run matrix (7 modes $\times$ 120
-tasks)~\citep{harman2012formalagile,beck2001xp}.
+tasks)~\citep{harman2004maff,beck2001xp}.
 Jobs run in a \emph{process pool} (one worker per core) because Z3's native
 global state is not thread-safe; each worker owns its own client, config, and
 pipeline, then appends a strict 64-case evaluation (and optional mutation
-score~\citep{demillo1978mutation,li2023iet}) to a shared JSONL log.
+score~\citep{demillo1978mutation,li2023iet_faultprevention}) to a shared JSONL log.
 Incremental persistence plus a \texttt{progress.json} sidecar make mid-batch
 restarts resume-safe without re-running finished keys.
 
@@ -449,7 +449,7 @@ uniform sampling over $\mathbb{Z}^5$;
 (ii)~priority encoding $\Phi_i$ yields exclusive first-match witnesses,
 avoiding mis-attributed overlap inputs; and
 (iii)~failures arrive as scenario-indexed concrete counterexamples usable by
-CEGIS repair~\citep{lynn2024verifierloop}.
+CEGIS repair~\citep{sun2024clover}.
 The cost is solver latency ($\sim$50--200\,ms per query; $\sim$2\,s per
 16-case repair iteration; $\sim$6--8\,s for 64-case strict scoring).
 
