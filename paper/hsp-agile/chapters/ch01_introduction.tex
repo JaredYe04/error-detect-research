@@ -1,37 +1,33 @@
 \chapter{Introduction}
 \label{ch:intro}
 
-Formal specifications give requirements a precision that informal prose cannot
-match.
-When large language models (LLMs) implement those specifications, that precision
-becomes a liability: the model has no native notion of guard order or
-first-match semantics, so it produces code that is statistically plausible yet
-formally wrong.
-We call the resulting failures \emph{specification-conformance defects}---faults
-that pass most everyday inputs but break exactly where the specification draws
-its boundaries.
-Test-based repair loops miss these defects because they sample the input space
-without knowing which regions the specification treats as critical.
+Formal specifications buy precision that informal prose cannot match.
+That precision becomes a liability when large language models (LLMs) write the
+implementation: the model has no native notion of guard order, so it produces
+code that is statistically plausible yet formally wrong.
+The resulting faults pass most everyday inputs and break exactly where the
+specification draws its boundaries.
+Test-based repair loops miss them because they sample the input space without
+knowing which regions matter.
 
-This report asks: \emph{can we prevent specification-conformance defects in
-LLM-generated code by using the specification itself as the primary evidence
-source, without requiring full deductive verification?}
-We answer yes.
-We present the \textbf{Specification-guided Defect Prevention Framework}
-(\textsc{SgDP}), with \textbf{HSP-Agile} as its primary instantiation over
-ordered guard-based specifications (SOFL/FSF in our benchmark).
+The question that drives this report is therefore practical:
+\emph{can specification-conformance defects in LLM-generated code be prevented
+by using the specification itself as the primary evidence source, without full
+deductive verification?}
+The answer developed below is affirmative.
+The vehicle is the \textbf{Specification-guided Defect Prevention Framework}
+(\textsc{SgDP}), with \textbf{HSP-Agile} as its SOFL/FSF instantiation.
 
 
 \section{Problem Statement}
 \label{sec:intro:problem}
 
 \subsection{Setting}
-The Structured Object-oriented Formal Language (SOFL)
-\cite{liu1997sofl,liu2014sofl} provides the Functional Specification Format
-(FSF): an ordered list of scenarios, each pairing a guard predicate with a
+SOFL \citep{liu1997sofl,liu2014sofl} provides the Functional Specification
+Format (FSF): an ordered list of scenarios, each pairing a guard with a
 postcondition under first-match precedence.
-Agile-SOFL \citep{li2022agilesofl} embeds FSF tasks in sprint workflows as
-design documents, oracles, and acceptance criteria.
+Agile-SOFL \citep{li2022agilesofl} embeds those artefacts in sprint workflows
+as design documents, oracles, and acceptance criteria.
 LLM-assisted generation accelerates that workflow
 \cite{chen2021codex,openai2023gpt4}, but synthesises by pattern completion
 rather than by respecting guard order
@@ -40,18 +36,18 @@ Overlapping guards therefore expose precedence-sensitive faults that standard
 test suites miss \citep{zhu1997specification}.
 
 \subsection{What Goes Wrong}
-In plain terms, a specification-conformance defect is a bug that unit tests
+A specification-conformance defect is, in plain terms, a bug that unit tests
 rarely catch.
-The generated function may look correct on the ``happy path,'' yet on a thin
-slice of the input space---often where two guards overlap---it returns the
-output of the wrong scenario.
-Random or distribution-biased tests almost never land in that slice, so a
-repair loop that only sees failing unit tests never learns about the ordering
+The generated function may look correct on the happy path, yet on a thin slice
+of the input space---often where two guards overlap---it returns the output of
+the wrong scenario.
+Random or distribution-biased tests almost never land in that slice.
+A repair loop that only sees failing unit tests never learns about the ordering
 constraint.
 
-Formally, the release decision is a bounded acceptance predicate.
+That observation leads to a release decision.
 Given task~$t$ with ordered scenarios $\mathcal{S}_t = (S_1,\ldots,S_n)$ and
-synthesis budget~$K$, we ask whether any candidate~$c$ satisfies
+synthesis budget~$K$, the question is whether any candidate~$c$ satisfies
 \begin{equation}
   \mathrm{Accept}(c, t)
   \;\iff\;
@@ -60,22 +56,23 @@ synthesis budget~$K$, we ask whether any candidate~$c$ satisfies
   P^H(c) = 0,
   \label{eq:acceptance}
 \end{equation}
-where $\mathrm{Conf}(c,t)\in[0,1]$ is the scenario-level conformance score,
-$\tau=1.0$ in this work, and $P^H(c)=0$ asserts absence of high-severity fault
-patterns under static screening.
-Building a witness for scenario~$S_i$ requires an input that satisfies
+where $\mathrm{Conf}(c,t)\in[0,1]$ is the fraction of specification-derived
+witnesses on which $c$ matches the oracle, $\tau=1.0$ in this work, and
+$P^H(c)=0$ asserts that no high-severity structural pattern remains.
+A witness for scenario~$S_i$ must satisfy
 $G_i(\mathbf{x}) \wedge \bigwedge_{j<i}\neg G_j(\mathbf{x})$---a conjunction
 that standard sampling heuristics cannot reliably reach
 \cite{barrett2018smt}.
 
 \subsection{A Concrete Example}
-Consider the \code{classify\_signal} specification from our benchmark
+The running example throughout the report is \code{classify\_signal}
 (Listing~\ref{lst:fsf-spec}).
-We reuse this task as the running example throughout the report.
+It is small enough to hold in working memory, yet rich enough to expose the
+ordering conflict that motivates the whole framework.
 
 \inputfsf{listings/classify_signal.fsf}{FSF specification for \code{classify\_signal} (pseudocode notation).}{lst:fsf-spec}
 
-\noindent When \code{threshold} is negative, the input
+When \code{threshold} is negative, the input
 $(\mathit{level}{=}{-}3,\;\mathit{threshold}{=}{-}10)$ satisfies both $G_1$
 (\texttt{level < 0}) and $G_2$ (\texttt{level >= threshold}).
 FSF ordering mandates \code{"Error"} via~$S_1$.
@@ -83,11 +80,12 @@ A typical LLM candidate evaluates the threshold comparison first:
 
 \inputpython{listings/classify_signal_bug.py}{LLM-generated candidate with a scenario-ordering violation.}{lst:llm-incorrect}
 
-\noindent The candidate returns \code{"Critical"} instead of \code{"Error"}.
+The candidate returns \code{"Critical"} instead of \code{"Error"}.
 A test suite that draws \code{threshold} from a non-negative distribution never
 reaches this region---exactly the latent defect that
 Equation~\eqref{eq:acceptance} must prevent.
-Figure~\ref{fig:defect-vs-test} contrasts the two sampling regimes.
+Figure~\ref{fig:defect-vs-test} makes the sampling contrast concrete: denser
+random tests do not help; a specification-aware witness does.
 
 \begin{figure}[t]
   \centering
@@ -97,8 +95,8 @@ Figure~\ref{fig:defect-vs-test} contrasts the two sampling regimes.
     exercise the ordering conflict.
     Right: an SMT witness for $\Phi_1$ forces a point in the missed region
     (e.g.\ $(-3,-10)$), exposing the conformance failure.
-    Takeaway: prevention needs specification-aware witnesses, not denser
-    random tests.}
+    The figure motivates specification-aware witnesses rather than denser
+    random testing.}
   \label{fig:defect-vs-test}
 \end{figure}
 
@@ -106,47 +104,48 @@ Figure~\ref{fig:defect-vs-test} contrasts the two sampling regimes.
 \section{Research Challenges}
 \label{sec:intro:challenges}
 
-Three challenges stand between the example above and a usable prevention
+Three obstacles stand between the example above and a usable prevention
 pipeline.
 
 \subsection{Closing the Specification--Code Semantic Gap}
-Verifying conformance to scenario~$S_i$ requires inputs in
+Checking scenario~$S_i$ requires inputs in
 $G_i \wedge \bigwedge_{j<i}\neg G_j$, often a low-measure region missed by
 random sampling.
 SMT solvers \citep{demoura2008z3,barrett2018smt} can generate such witnesses,
 but only if the FSF encoding is faithful.
-\textsc{SgDP} addresses this with a \emph{constraint-guided witness generator}
-that encodes guard precedence as SMT constraints
-(Chapter~\ref{ch:method}).
+The response in \textsc{SgDP} is a constraint-guided witness generator that
+encodes guard precedence as SMT constraints (Chapter~\ref{ch:method}).
 
 \subsection{Structured Counterexample-Guided Repair}
 Test-feedback loops lack specification-level structure
-\cite{lynn2024verifierloop}: the LLM may patch one counterexample without
+\cite{lynn2024verifierloop}: the model may patch one counterexample without
 fixing guard precedence.
 Effective repair needs prompts that name the violated scenario, state the
 ordering constraint, and include the SMT witness.
-\textsc{SgDP} addresses this with a \emph{scenario-aware Semantic Feedback IR}
-that structures failures before they become natural-language prompts.
+\textsc{SgDP} therefore structures each failure into a scenario-aware record
+\emph{before} rendering natural-language prompts---the Semantic Feedback IR
+introduced in Chapter~\ref{ch:method}.
 
 \subsection{Operationalising Prevention within a Bounded Budget}
 Full verification is impractical for unannotated LLM output
 \cite{leino2010dafny,loughman2024dafnybench}.
-The challenge is calibrated prevention: stronger than test-feedback
+What is needed is calibrated prevention: stronger than test-feedback
 \cite{chen2021codex}, weaker than deductive proof, and fast enough for sprint
 budgets \citep{beck2001xp,li2022agilesofl}.
-\textsc{SgDP} addresses this with a conjunctive \emph{acceptance predicate}
-and a hard repair budget~$K$ (we use $K=3$ in experiments).
+\textsc{SgDP} answers with a conjunctive acceptance predicate and a hard repair
+budget~$K$ ($K=3$ in the experiments).
 
 
 \section{Proposed Approach}
 \label{sec:intro:approach}
 
-At a high level, HSP-Agile runs a four-stage loop on each task: synthesise a
-candidate from the FSF text, check it against SMT witnesses derived from the
-specification, repair with scenario-aware feedback when checks fail, and gate
-release with a pattern screen.
-Figure~\ref{fig:sgdp-overview} shows the end-to-end flow.
-Chapter~\ref{ch:method} defines the general \textsc{SgDP} interface, proves
+HSP-Agile runs a four-stage loop on each task.
+It synthesises a candidate from the FSF text, checks that candidate against SMT
+witnesses derived from the specification, repairs with scenario-aware feedback
+when checks fail, and gates release with a pattern screen.
+Figure~\ref{fig:sgdp-overview} is the map of that loop: adapters feed SpecIR,
+witnesses and Semantic Feedback IR drive repair, and acceptance is conjunctive.
+Chapter~\ref{ch:method} develops the general \textsc{SgDP} interface, states
 three correctness results, and walks through \code{classify\_signal} end to
 end; Chapter~\ref{ch:results} shows that the same loop transfers to Mini-Z and
 Mini-StateMachine via a SpecIR adapter layer.
@@ -169,7 +168,7 @@ Mini-StateMachine via a SpecIR adapter layer.
 \section{Contributions}
 \label{sec:intro:contributions}
 
-This report makes five concrete contributions
+Five contributions structure the rest of the report
 (Figure~\ref{fig:contribution-map}).
 
 \begin{figure}[t]
@@ -189,8 +188,8 @@ This report makes five concrete contributions
 
   \item[\textbf{C2.}] \textbf{Strict Acceptance Predicate and Semantic Feedback
     IR.}
-    Definition of $\mathrm{Accept}(c,t)$ and a nine-field JSON IR that separates
-    failure structure from prompt rendering.
+    The release predicate $\mathrm{Accept}(c,t)$ and a nine-field JSON record
+    that separates failure structure from prompt rendering.
 
   \item[\textbf{C3.}] \textbf{Precedence-Sensitive Hard Benchmark.}
     120 synthetic tasks with overlapping guards, plus real-derived and
@@ -209,10 +208,10 @@ This report makes five concrete contributions
 \section{Research Questions}
 \label{sec:intro:rq}
 
-Five research questions guide the evaluation.
-Chapter~\ref{ch:results} presents results in \emph{mechanism-first} order
-(why the framework works, then that it works overall); the RQ numbers below
-follow the experimental logic of Chapter~\ref{ch:experiments}.
+Five research questions organise the evaluation.
+Results appear in \emph{mechanism-first} order in Chapter~\ref{ch:results}
+(why the framework works, then that it works overall); the numbering below
+follows the experimental logic of Chapter~\ref{ch:experiments}.
 
 \textbf{RQ1}---overall effectiveness of specification-guided prevention (E1, E2);
 \textbf{RQ2}---fault-class coverage and residual failure modes (E2, E7, E9);
@@ -224,23 +223,20 @@ follow the experimental logic of Chapter~\ref{ch:experiments}.
 \section{Report Organisation}
 \label{sec:intro:organisation}
 
-\textbf{Chapter~\ref{ch:background}} surveys Agile-SOFL, LLM code generation,
-and the foundations of SMT solving, mutation testing, and conformance checking.
-\textbf{Chapter~\ref{ch:formalization}} defines FSF scenario semantics, the
-conformance problem, and witness soundness properties, instantiating each
-definition on \code{classify\_signal}.
-\textbf{Chapter~\ref{ch:method}} presents the \textsc{SgDP} framework, a
-worked end-to-end example, and formal theorems.
-\textbf{Chapter~\ref{ch:implementation}} describes the software realisation.
-\textbf{Chapter~\ref{ch:experiments}} specifies the experimental setup.
-\textbf{Chapter~\ref{ch:results}} reports results across all five research
-questions, including generalisation to Mini-Z and Mini-StateMachine
-(Section~\ref{ch:generalization}).
-\textbf{Chapter~\ref{ch:discussion}} interprets findings and discusses threats
-to validity.
-\textbf{Chapter~\ref{ch:conclusion}} summarises contributions and future
-directions.
-Three appendices provide reproducibility instructions
-(Appendix~\ref{app:reproducibility}), benchmark construction details
+The remainder of the report follows the path from background to evidence.
+Background material on Agile-SOFL, LLM synthesis, SMT, and mutation testing
+appears in Chapter~\ref{ch:background}.
+Chapter~\ref{ch:formalization} makes the conformance problem precise on
+\code{classify\_signal}; Chapter~\ref{ch:method} turns that problem into the
+\textsc{SgDP} method with a worked end-to-end example and formal theorems.
+The software realisation and experimental protocol occupy
+Chapters~\ref{ch:implementation} and~\ref{ch:experiments}.
+Results across all five research questions---including generalisation to
+Mini-Z and Mini-StateMachine (Section~\ref{ch:generalization})---appear in
+Chapter~\ref{ch:results}; interpretation and threats follow in
+Chapter~\ref{ch:discussion}.
+Chapter~\ref{ch:conclusion} closes with contributions and future directions.
+Three appendices cover reproducibility
+(Appendix~\ref{app:reproducibility}), benchmark construction
 (Appendix~\ref{app:benchmark}), and the fault pattern catalogue
 (Appendix~\ref{app:patterns}).

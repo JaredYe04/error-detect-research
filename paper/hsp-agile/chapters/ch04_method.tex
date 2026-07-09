@@ -4,38 +4,39 @@
 \chapter{The \textsc{SgDP} Framework and HSP-Agile Instantiation}
 \label{ch:method}
 
-This chapter turns the problem of Chapter~\ref{ch:intro} into a concrete
-prevention method.
-We first recall the pipeline intuition and walk through
-\code{classify\_signal} end to end (Sections~\ref{sec:method:intuition}--\ref{sec:method:worked}).
-Only then do we abstract the four \textsc{SgDP} components, state the formal
-results, and detail each stage
-(Sections~\ref{sec:method:sgdp}--\ref{sec:method:summary}).
-We inherit the notation of Chapter~\ref{ch:formalization}:
+The formal objects of Chapter~\ref{ch:formalization} are not yet a method.
+What remains is to show how they assemble into a prevention loop that an LLM
+can participate in.
+The exposition therefore begins with intuition and a full walkthrough of
+\code{classify\_signal}, and only afterwards abstracts the four \textsc{SgDP}
+components, states the formal results, and details each stage.
+Notation is inherited from Chapter~\ref{ch:formalization}:
 $t = (\mathcal{S}_t, \mathcal{X}_t, \mathcal{Y}_t)$, oracle $g_t$, and
 first-match semantics over $\mathcal{S}_t = \langle s_1,\ldots,s_n\rangle$.
 
 \section{Pipeline Intuition}
 \label{sec:method:intuition}
 
-In one sentence: HSP-Agile synthesises a candidate from the FSF text, checks it
-on SMT witnesses that respect first-match precedence, repairs with a typed
+HSP-Agile can be summarised in one sentence.
+It synthesises a candidate from the FSF text, checks that candidate on SMT
+witnesses that respect first-match precedence, repairs with a structured
 failure record when checks fail, and releases the candidate only when every
 witness matches and no high-severity pattern remains.
-Figure~\ref{fig:sgdp-overview} (Chapter~\ref{ch:intro}) shows this loop.
-Reading left to right: a notation adapter produces SpecIR; the witness
-generator builds $\mathcal{D}(t)$; the LLM proposes $c_k$; the verifier
-compares $f_{c_k}$ to $g_t$; failures become Semantic Feedback IR; acceptance
-is conjunctive.
+Figure~\ref{fig:sgdp-overview} (Chapter~\ref{ch:intro}) is that loop.
+Left to right: a notation adapter produces SpecIR; the witness generator
+builds $\mathcal{D}(t)$; the LLM proposes $c_k$; the verifier compares
+$f_{c_k}$ to $g_t$; failures become Semantic Feedback IR; acceptance is
+conjunctive.
 The dashed orange arc is the repair loop under budget~$K=3$.
 
 \section{Worked Example: \texttt{classify\_signal} End to End}
 \label{sec:method:worked}
 
-We now run one full attempt on the running example before introducing the
-general framework.
-Figure~\ref{fig:worked-example-trace} summarises the data morphing across
-stages.
+Abstractions components are easier to trust after one concrete run.
+The walkthrough below follows a single attempt on the running example before
+the general framework is stated.
+Figure~\ref{fig:worked-example-trace} follows one artefact morphing across
+those stages.
 
 \begin{figure}[t]
   \centering
@@ -81,7 +82,8 @@ before Scenario~S2.''}
 \paragraph{Stage~4 and acceptance.}
 After repair restores $S_1$-first evaluation, every witness matches and the
 pattern screen is clear, so $\mathrm{Accept}(c_2,t)=1$.
-Figure~\ref{fig:accept-tree} shows the conjunctive decision.
+Figure~\ref{fig:accept-tree} makes the conjunctive decision explicit:
+conformance alone never releases a candidate.
 
 \begin{figure}[t]
   \centering
@@ -100,22 +102,30 @@ Figure~\ref{fig:accept-tree} shows the conjunctive decision.
 \subsection{Framework Overview and Instantiation Interface}
 \label{subsec:framework-overview}
 
-The \textbf{Specification-guided Defect Prevention Framework} (\textsc{SgDP})
-prevents specification-conformance defects in LLM-generated implementations via
-four language-independent components:
+The walkthrough above already used four ideas that are not FSF-specific:
+an oracle derived from the specification, witnesses that hit first-match
+regions, a structured failure record for repair, and a conjunctive release
+gate.
+Those ideas are the language-independent core of \textsc{SgDP}.
+
 \begin{enumerate}
-  \item \textbf{Specification Oracle} ($\mathcal{G}$): executable oracle derived
-    from the formal specification without a reference implementation.
-  \item \textbf{Constraint-guided Witness Generator} ($\mathcal{W}$): SMT-based
-    witnesses targeting boundary regions where conformance defects manifest.
-  \item \textbf{Scenario-aware Semantic Feedback IR} ($\mathcal{F}$): typed
-    failure records carrying specification-level semantics for repair prompts.
-  \item \textbf{Conjunctive Acceptance Predicate} ($\mathcal{A}$): release gate on
-    oracle-grounded conformance and specification-derived quality criteria.
+  \item \textbf{Specification Oracle} ($\mathcal{G}$).
+    An executable oracle derived from the formal specification, without a
+    reference implementation.
+  \item \textbf{Constraint-guided Witness Generator} ($\mathcal{W}$).
+    SMT-based witnesses aimed at the boundary regions where conformance
+    defects appear.
+  \item \textbf{Scenario-aware Semantic Feedback IR} ($\mathcal{F}$).
+    Structured failure records that carry specification-level semantics into
+    repair prompts, instead of raw pass/fail bits.
+  \item \textbf{Conjunctive Acceptance Predicate} ($\mathcal{A}$).
+    A release gate that demands both oracle-grounded conformance and
+    specification-derived quality criteria.
 \end{enumerate}
 
-Figure~\ref{fig:sgdp-overview} (Chapter~\ref{ch:intro}) depicts the end-to-end
-\textsc{SgDP} pipeline; the present section details the instantiation interface.
+The end-to-end map remains Figure~\ref{fig:sgdp-overview}
+(Chapter~\ref{ch:intro}); the remainder of this section details the
+instantiation interface.
 
 An instantiation for language $\mathcal{L}$ provides:
 (i)~Specification Adapter $\text{Adapt}_L : \text{Text}_L \to \text{SpecIR}$;
@@ -151,13 +161,19 @@ The FSF oracle requires no reference implementation:
 \subsection{Constraint-guided Witness Generation}
 \label{subsec:witness-gen}
 
-For scenario $s_i$, the witness generator solves the \emph{priority formula}
+Random tests rarely land where two guards overlap.
+What is needed is one input per scenario that activates that scenario
+\emph{and no higher-priority one}---exactly the region where ordering bugs
+appear.
+For scenario $s_i$, the witness generator therefore solves the
+\emph{priority formula}
 \begin{equation}
   \label{eq:priority}
   \Phi_i \;\triangleq\; \hat{g}_i(\mathbf{x}) \;\land\; \bigwedge_{j=1}^{i-1} \lnot\hat{g}_j(\mathbf{x}),
 \end{equation}
-where $\hat{g}_j$ is the Z3 encoding of $g_j$, ensuring activation of $s_i$ under
-first-match semantics.
+where $\hat{g}_j$ is the Z3 encoding of $g_j$.
+The negated higher guards are not optional: without them, a model of $g_i$
+alone may still belong to $s_j$ for some $j<i$.
 The witness set is $\mathcal{D}(t) = \{\mathbf{x}_1^*, \ldots, \mathbf{x}_n^*\}$.
 
 \begin{theorem}[Scenario-aware Witness Soundness]
@@ -179,7 +195,13 @@ $g_t(\mathbf{x}^*)=\phi_i(\mathbf{x}^*)$.
 \subsection{Scenario-aware Semantic Feedback IR}
 \label{subsec:feedback-ir}
 
-On witness failure, the framework records
+Sending raw failing tests back to the LLM is not enough.
+The model needs to know \emph{which scenario} failed, \emph{why} the ordering
+matters, and \emph{what} the oracle expected.
+That information is organised into a structured semantic record before any
+natural-language prompt is rendered.
+The record is the Semantic Feedback IR.
+
 \begin{equation}
   \mathcal{F}(i, c, t) = \langle \textit{type},\ s_i,\ g_i,\ \mathbf{x}_i^*,
   \ c(\mathbf{x}_i^*),\ g_t(\mathbf{x}_i^*),\ \textit{reason},\
@@ -187,12 +209,12 @@ On witness failure, the framework records
 \end{equation}
 with \textit{type} $\in \{\text{ordering}, \text{boundary}, \text{arithmetic},
 \text{output}\}$, ranked \textit{priority}, and suggested \textit{fix}.
-A template renders this IR into repair prompts naming the violated scenario, stating
-the guard, and enforcing first-match ordering.
+A template then renders the IR into a repair prompt that names the violated
+scenario, states the guard, and enforces first-match ordering.
 
 \paragraph{Example (classify\_signal).}
 The buggy candidate of Listing~\ref{lst:llm-incorrect} yields the JSON record
-below (abbreviated).  The renderer then projects the same object into the
+below (abbreviated).  The renderer projects the same object into the
 natural-language quote of Section~\ref{sec:method:worked}:
 \begin{lstlisting}[language={},basicstyle=\ttfamily\footnotesize,frame=single]
 {
@@ -207,12 +229,17 @@ natural-language quote of Section~\ref{sec:method:worked}:
   "fix": "test level < 0 first"
 }
 \end{lstlisting}
-The IR serialises per \texttt{schemas/semantic\_feedback.schema.json};
+Serialisation follows \texttt{schemas/semantic\_feedback.schema.json};
 \texttt{FeedbackRenderer} projects the same IR onto E6 variants (test-only,
 test+expected, full semantic IR), separating failure structure from prompt text.
 
 \subsection{Formal Conformance and Acceptance Predicate}
 \label{subsec:conformance-acceptance}
+
+Conformance answers a continuous question: on what fraction of witnesses does
+the candidate match the oracle?
+Acceptance answers a binary release question: is the candidate safe enough to
+ship under the conjunctive gate of Figure~\ref{fig:accept-tree}?
 
 \begin{equation}
   \label{eq:conformance}
@@ -220,14 +247,13 @@ test+expected, full semantic IR), separating failure structure from prompt text.
   \mathbf{1}\bigl[f_c(\mathbf{x}) = g_t(\mathbf{x})\bigr].
 \end{equation}
 Let $\mathcal{P}^H$ be the nine high-severity RF patterns (Table~\ref{tab:patterns}).
-The conjunctive acceptance predicate is:
+Release then requires both full witness agreement and a clear pattern screen:
 \begin{equation}
   \label{eq:accept}
   \mathrm{Accept}(c,t) \;\iff\;
   \mathrm{Conf}(c,t) = 1 \;\land\;
   \sum_{p \in \mathcal{P}^H} \mathbf{1}[p(c,t)] = 0.
 \end{equation}
-Figure~\ref{fig:accept-tree} depicts the same predicate as a decision tree.
 
 \begin{theorem}[Finite-Sample FAR Bound]
 \label{thm:far-bound}
@@ -279,20 +305,20 @@ reaches higher $\mu_k$ in fewer iterations than B2 (test-feedback), and the
 E6 full-IR variant outperforms test-only and test-plus-expected prompts by
 more than 7\,pp.
 A fully formal proof would need a stochastic model of LLM repair that is
-beyond current theory; we therefore treat the claim as an empirically
-supported hypothesis.
+beyond current theory, so the claim is treated as an empirically supported
+hypothesis.
 
 \subsection{Empirical FAR Validation}
 \label{subsec:far-validation}
 
-To ground the Finite-Sample FAR Bound (Theorem~\ref{thm:far-bound})
-empirically, we compare the theoretical upper bound $(1-\varepsilon)^n$ to
-the observed FAR measured in E2 (Section~\ref{sec:results:rq2}).
-Using $\varepsilon = 0.08$ (estimated from the median per-witness detection
-probability of implementation-level mutants) and $n = 9$ (average witness
-count per task), the bound predicts $\mathrm{FAR} \leq (0.92)^9 \approx 0.473$.
-The empirically measured FAR on mode~M in E2 is $0.14$ (Table~\ref{tab:far-validation}),
-well within the theoretical bound.
+To ground Theorem~\ref{thm:far-bound} empirically, the theoretical upper bound
+$(1-\varepsilon)^n$ is compared with the observed FAR in E2
+(Section~\ref{sec:results:rq2}).
+With $\varepsilon = 0.08$ (median per-witness detection probability of
+implementation-level mutants) and $n = 9$ (average witnesses per task), the
+bound predicts $\mathrm{FAR} \leq (0.92)^9 \approx 0.473$.
+Mode~M's measured FAR in E2 is $0.14$ (Table~\ref{tab:far-validation}), well
+within that bound.
 
 \begin{inlinetable}{Theoretical FAR bound vs.\ empirical FAR (mode M, E2).}
   \label{tab:far-validation}
@@ -323,7 +349,7 @@ For mutant set $\mathcal{M}$:
   \qquad
   \mathrm{FAR} = \frac{|\{m \in \mathcal{M} : \mathrm{Accept}(c_m, t_m) \land \text{faulty}(m)\}|}{|\mathcal{M}|}.
 \end{equation}
-We report PDR, FAR, strict formal conformance, and latency jointly.
+PDR, FAR, strict formal conformance, and latency are reported jointly.
 
 \subsection{Pipeline Complexity Cost Model}
 \label{subsec:complexity-cost}
@@ -416,7 +442,9 @@ Boolean flags enable or disable Stages~2--4 independently for ablation
 \section{Pipeline Overview}
 \label{sec:method:overview}
 
-Per-task data flow:
+After the worked example, the same four artefacts appear on every task:
+specification text, candidate, witnesses, and a typed failure record.
+The per-task data flow is
 \begin{equation}
   \mathcal{S}_t
   \;\xrightarrow{\text{Stage 1}}\;
@@ -430,8 +458,8 @@ Per-task data flow:
   \label{eq:pipeline-flow}
 \end{equation}
 iterated until $\mathrm{Accept}(c_k, t) = 1$ or $k = K$.
-Figure~\ref{fig:sgdp-overview} shows the architecture; Figure~\ref{fig:pipeline-seq}
-the message-level sequence.
+Figure~\ref{fig:sgdp-overview} remains the architectural map;
+Figure~\ref{fig:pipeline-seq} is the message-level sequence of one run.
 
 \begin{figure}[t]
   \centering
@@ -482,10 +510,10 @@ a fixed \emph{system} message plus a \emph{user} message carrying $(\mathcal{S}_
 \subsection{Model Configuration and Parsing}
 \label{subsec:method:model}
 
-We use Qwen2.5-27B-Instruct with dual temperatures matching the experimental
-protocol (Chapter~\ref{ch:experiments}): $T_\text{gen} = 0.7$ for the first
-synthesis call and $T_\text{repair} = 0.0$ for subsequent repair calls
-(max 2048 output tokens).
+The synthesiser is Qwen2.5-27B-Instruct with dual temperatures matching the
+experimental protocol (Chapter~\ref{ch:experiments}): $T_\text{gen} = 0.7$ for
+the first synthesis call and $T_\text{repair} = 0.0$ for subsequent repair
+calls (max 2048 output tokens).
 The parser extracts one \code{```python} fenced block, compiles it, and on failure
 sets $c_k = \bot$ (conformance 0).
 \begin{equation}
@@ -573,10 +601,14 @@ the feedback bridge.
 \section{Stage 4: Requirement Pattern Guard}
 \label{sec:method:guard}
 
-Candidates with $\mathrm{Conf}(c, t) = 1$ may still violate structural requirements
-outside $\mathcal{D}(t)$~\citep{hovemeyer2004findbugs, li2023iet}.
-Stage~4 applies 14 RF patterns (Table~\ref{tab:patterns}); nine high-severity patterns
-form $\mathcal{P}^H$ used in equation~\eqref{eq:accept}.
+Witness agreement is necessary but not sufficient.
+A candidate can match every point in $\mathcal{D}(t)$ and still hard-code a
+success path, drop an output field, or ignore a precondition that the finite
+witness set never exercised~\citep{hovemeyer2004findbugs, li2023iet}.
+Stage~4 therefore applies a finite catalogue of requirement-fault patterns
+before release.
+Fourteen RF patterns appear in Table~\ref{tab:patterns}; nine high-severity
+patterns form $\mathcal{P}^H$ in equation~\eqref{eq:accept}.
 
 \begin{table}[H]
   \caption{HSP-Agile Error Pattern Catalog ($|\mathcal{P}| = 14$).
@@ -646,5 +678,7 @@ predicate (equation~\eqref{eq:accept}) combines Stages~2 and~4 per Principle~P4.
 \end{inlinetable}
 
 \enlargethispage{1\baselineskip}
-Chapters~\ref{ch:implementation} and~\ref{ch:experiments} present the
-implementation and experimental evaluation.
+Table~\ref{tab:stage-summary} is the contract that the software realisation
+must honour.
+How that contract is implemented, and how it is measured, occupy the next two
+chapters.

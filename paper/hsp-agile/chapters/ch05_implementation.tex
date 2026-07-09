@@ -5,49 +5,49 @@
 \chapter{Implementation}
 \label{ch:implementation}
 
-This chapter explains how we built what Chapter~\ref{ch:method} defined.
-Each module maps to a pipeline stage: ingestion and SpecIR adapters feed
-Stage~1; the formal checker implements Stage~2; the repair engine implements
-Stage~3; the pattern guard implements Stage~4.
-We focus on data structures, control flow, and engineering trade-offs rather
-than restating the algorithms.
-For the running example \code{classify\_signal}, the same modules produce the
-witness $(-3,-10)$, the Semantic Feedback IR record, and the acceptance
-decision of Section~\ref{sec:method:worked}.
+A method is only as credible as the system that realises it.
+This chapter therefore maps each stage of Chapter~\ref{ch:method} onto
+concrete modules: ingestion and SpecIR adapters feed Stage~1; the formal
+checker implements Stage~2; the repair engine implements Stage~3; the pattern
+guard implements Stage~4.
+The focus is data structures, control flow, and engineering trade-offs---not a
+restatement of the algorithms.
+On \code{classify\_signal}, the same modules produce the witness $(-3,-10)$,
+the Semantic Feedback IR record, and the acceptance decision of
+Section~\ref{sec:method:worked}.
 
-Throughout, we inherit the notation of earlier chapters: an Agile-SOFL
-task $t = (\mathcal{S}_t, \mathcal{X}_t, \mathcal{Y}_t)$, candidate
-implementation~$c$, conformance score $\mathrm{Conf}(c,t) \in [0,1]$, and
-hybrid acceptance predicate $\mathrm{Accept}(c,t)$ defined in
-equation~\eqref{eq:accept}.
+Notation is inherited from earlier chapters: task
+$t = (\mathcal{S}_t, \mathcal{X}_t, \mathcal{Y}_t)$, candidate~$c$,
+conformance $\mathrm{Conf}(c,t) \in [0,1]$, and acceptance
+$\mathrm{Accept}(c,t)$ from equation~\eqref{eq:accept}.
 
 % ---------------------------------------------------------------------------
 \section{System Architecture Overview}
 \label{sec:impl:architecture}
 % ---------------------------------------------------------------------------
 
-HSP-Agile is organised as a \emph{layered architecture} with three principal
-tiers.  The \textbf{specification ingestion layer} applies a pluggable
-\texttt{SpecAdapter} registry (Chapter~\ref{ch:method}, Figure~\ref{fig:specir-arch})
-to translate surface specifications into the canonical \texttt{SpecIR}
-representation, then lowers to FSF-shaped \texttt{TaskSpec} records for the
-SOFL instantiation.  The \textbf{pipeline orchestration layer} coordinates the
-four-stage synthesis--check--repair--guard loop within a bounded budget~$K$.
-The \textbf{external services layer} hosts stateless backends---an
-OpenAI-compatible large language model endpoint and the Z3 SMT
-solver~\citep{demoura2008z3,barrett2018smt}---that the orchestrator invokes
-through thin adapter interfaces.
+A method is credible only if each stage can be swapped, ablated, or audited
+without rewriting the rest.
+That engineering constraint drives the layout: ingestion, orchestration, and
+external services stay separate so Stages~1--4 can be tested independently
+(Chapter~\ref{ch:experiments}).
 
-As illustrated in Figure~\ref{fig:component-arch}, the component-level
-decomposition separates ingestion, orchestration, and external services.
-For the primary SOFL/FSF benchmark, the Agile-SOFL toolchain supplies parsed
-specifications; for E8 generalisation, Mini-Z and Mini-StateMachine adapters
-parse alternative notations into the same \texttt{SpecIR} before lowering.
-The pipeline consumes \texttt{TaskSpec} records (or raw \texttt{SpecIR} via
-\texttt{task\_input.py}) and emits evaluation results.  The formal checker and repair engine communicate exclusively through
-well-typed result objects (\texttt{CheckResult}, \texttt{PipelineResult}),
-ensuring that each stage can be unit-tested or ablated independently, as
-exploited in Chapter~\ref{ch:experiments}.
+On \code{classify\_signal}, the path is concrete.
+An adapter lowers FSF text to SpecIR; the orchestrator asks the LLM for a
+candidate, asks Z3 for witnesses such as $(-3,-10)$, and routes failures into
+Semantic Feedback IR; the pattern guard screens the repaired code before
+$\mathrm{Accept}$.
+
+Separation of those concerns is the point of Figure~\ref{fig:component-arch}.
+Ingestion translates surface notations into SpecIR and, for the SOFL
+instantiation, into FSF-shaped \texttt{TaskSpec} records
+(Chapter~\ref{ch:method}, Figure~\ref{fig:specir-arch}).
+Orchestration runs the bounded synthesis--check--repair--guard loop.
+External services host the OpenAI-compatible LLM endpoint and the Z3
+solver~\citep{demoura2008z3,barrett2018smt}.
+For E8, Mini-Z and Mini-StateMachine adapters feed the same SpecIR path;
+typed result objects (\texttt{CheckResult}, \texttt{PipelineResult}) keep
+stages isolatable.
 
 \begin{figure}[t]
   \centering
@@ -67,14 +67,12 @@ exploited in Chapter~\ref{ch:experiments}.
   \label{fig:component-arch}
 \end{figure}
 
-Figure~\ref{fig:system-class} (below) presents the principal class relationships.
-The \texttt{PipelineRunner} is the façade through which all task processing
-occurs: it holds immutable \texttt{PipelineConfig} state, delegates LLM calls
-to the LLM client adapter (\texttt{ECNUClient}), conformance evaluation to \texttt{FormalChecker},
-and structural screening to \texttt{PatternMatcher}.  Value objects
-(\texttt{BenchmarkTask}, \texttt{CheckResult}, \texttt{PatternHit}) carry
-serialisable audit traces that are written to disk after each run, supporting
-reproducibility and post-hoc analysis.
+One façade owns the loop: \texttt{PipelineRunner} holds immutable
+\texttt{PipelineConfig} and delegates synthesis to \texttt{ECNUClient},
+conformance to \texttt{FormalChecker}, and structural screening to
+\texttt{PatternMatcher} (Figure~\ref{fig:system-class}).
+Value objects (\texttt{BenchmarkTask}, \texttt{CheckResult},
+\texttt{PatternHit}) carry serialisable audit traces after each run.
 
 \begin{figure}[t]
   \centering
@@ -93,45 +91,36 @@ reproducibility and post-hoc analysis.
   \label{fig:system-class}
 \end{figure}
 
-\paragraph{Module responsibilities.}
-The \emph{adapter registry} (\path{src/adapters/}) exposes
-\texttt{SoflAdapter}, \texttt{MiniZAdapter}, and \texttt{StateMachineAdapter},
-each implementing \texttt{SpecAdapter.parse() $\to$ SpecIR} and delegating
-lowering to \texttt{FSFLowerer} (\path{src/ir/lowerers/fsf_lowerer.py}).
-The \emph{specification bridge} (SOFL path) invokes the Agile-SOFL parser and
-normalises its output into \texttt{SpecIR} before FSF lowering.  The \emph{pipeline runner} implements
-the control logic of Algorithm~\ref{alg:sgdp} from
-Chapter~\ref{ch:method}, including early termination on
+\paragraph{What each subsystem prevents.}
+Adapters keep notation changes out of the core: SOFL, Mini-Z, and
+Mini-StateMachine each implement \texttt{SpecAdapter.parse() $\to$ SpecIR},
+then lower via \texttt{FSFLowerer}.
+The pipeline runner realises Algorithm~\ref{alg:sgdp}, including early exit on
 $\mathrm{Accept}(c_k,t)=1$ and best-effort fallback when $k > K$.
-The \emph{formal checker} encapsulates Z3 query construction, model
-extraction, candidate sandbox execution, and counterexample assembly.
-The \emph{pattern guard} applies the catalogue $\mathcal{P}$ from
-Table~\ref{tab:patterns} via hybrid AST and regex detectors.
-The \emph{experiment orchestrator} schedules mode--task combinations across
-a process pool, enforces resume-safe incremental persistence, and maintains a
-live progress monitor.
+The formal checker builds Z3 queries, executes candidates in a sandbox, and
+assembles counterexamples.
+The pattern guard applies catalogue $\mathcal{P}$ (Table~\ref{tab:patterns})
+with AST and regex detectors.
+The experiment orchestrator schedules mode--task pairs across a process pool
+with resume-safe logs.
 
 % ---------------------------------------------------------------------------
 \section{Specification Ingestion Layer}
 \label{sec:impl:ingestion}
 % ---------------------------------------------------------------------------
 
-Before any LLM call or Z3 query can be issued, a surface specification must
-be parsed into the \texttt{SpecIR} representation of
-Chapter~\ref{ch:formalization} and then lowered to the FSF-shaped
-\texttt{TaskSpec} dict consumed by the checker and repair engine.
-The ingestion layer performs this transformation in three phases:
-(i)~notation-specific parsing via a registered \texttt{SpecAdapter};
-(ii)~canonicalisation into \texttt{SpecIR} with ordered \texttt{GuardedCase}
-records and JSON serialisation (\path{schemas/spec_ir.schema.json});
-(iii)~lowering via \texttt{FSFLowerer} into \texttt{TaskSpec} and
-\texttt{FSFScenario} records.
-For the primary SOFL benchmark, phase~(i) uses the Agile-SOFL
-toolchain~\citep{li2022agilesofl,liu2014sofl}; for E8, Mini-Z and
-Mini-StateMachine adapters bypass SOFL syntax entirely while producing
-identical \texttt{SpecIR} structure.
-Figure~\ref{fig:fsf-parser-class} shows the SOFL-side class structure and
-downstream translation flow.
+The checker must never see raw SOFL, Mini-Z, or Mini-StateMachine text.
+Ingestion therefore parses each surface notation into SpecIR
+(Chapter~\ref{ch:formalization}) and lowers it to the FSF-shaped
+\texttt{TaskSpec} consumed by Stages~2--4.
+Three phases do the work: notation-specific parsing via a registered
+\texttt{SpecAdapter}; canonicalisation into ordered \texttt{GuardedCase}
+records; and lowering via \texttt{FSFLowerer}.
+The primary SOFL path uses the Agile-SOFL
+toolchain~\citep{li2022agilesofl,liu2014sofl}; E8 adapters bypass SOFL
+syntax while producing the same SpecIR structure.
+On the SOFL path, the parser classes in Figure~\ref{fig:fsf-parser-class}
+are what keep surface syntax from leaking into the checker.
 
 \subsection{SpecIR Adapter Registry}
 \label{sec:impl:specir-adapters}
@@ -252,13 +241,15 @@ enables RF04 (missing output field) detection in Stage~4.
 \label{sec:impl:llm}
 % ---------------------------------------------------------------------------
 
-The LLM integration layer is the sole non-deterministic component of
+Synthesis is the only non-deterministic stage; everything else must be
+replayable.
+The LLM integration layer is therefore the sole stochastic component of
 HSP-Agile.  It wraps an OpenAI-compatible LLM gateway behind a small adapter
 that handles authentication, retry logic, request timeouts, token accounting,
 and structured logging.  In the source tree this adapter is implemented as
 \texttt{ECNUClient} (\path{src/llm/ecnu_client.py}); the name reflects the
 historical deployment endpoint rather than any institution-specific coupling,
-and we refer to it generically as the \emph{LLM client adapter} in what follows.
+referred to generically as the \emph{LLM client adapter} below.
 
 \subsection{LLM Client Adapter Design}
 
@@ -370,13 +361,14 @@ repair on the next iteration without crashing the pipeline.
 \label{sec:impl:checker}
 % ---------------------------------------------------------------------------
 
-The formal conformance checker is the deterministic oracle that grounds
-HSP-Agile's acceptance decisions in SMT-backed test generation rather than
-heuristic sampling~\citep{claessen2000quickcheck}.  Given candidate~$c$ and
-task~$t$, it computes $\mathrm{Conf}(c,t)$ and assembles the counterexample
-set $\mathit{cexs}$ used by the repair engine.
-Figure~\ref{fig:checker-activity} (below) summarises the checker activity flow
-from case generation through candidate evaluation.
+Acceptance must not rest on lucky unit tests.
+The formal checker is the deterministic oracle that grounds release decisions
+in SMT-backed witnesses rather than heuristic
+sampling~\citep{claessen2000quickcheck}.
+Given candidate~$c$ and task~$t$, it computes $\mathrm{Conf}(c,t)$ and
+assembles the counterexample set $\mathit{cexs}$ for repair.
+Case generation and evaluation are the two partitions in
+Figure~\ref{fig:checker-activity}.
 
 \begin{figure}[t]
   \centering
@@ -508,13 +500,14 @@ Section~\ref{sec:results:sensitivity} of Chapter~\ref{ch:results}).
 \label{sec:impl:repair}
 % ---------------------------------------------------------------------------
 
-The repair engine implements the CEGIS feedback loop
-\citep{solarlezama2008sketching} adapted to the LLM-as-synthesiser setting.
-Its core responsibility is state management across iterations: maintaining the
-feedback buffer, incrementing the attempt counter, and deciding whether to
-continue synthesis or exit with a best-effort candidate.
-Figure~\ref{fig:pipeline-state} (below) formalises the control states; the
-repair data flow is shown in Figure~\ref{fig:repair-feedback}
+Without careful state management, a repair loop either loops forever or
+forgets why the previous candidate failed.
+The repair engine adapts CEGIS~\citep{solarlezama2008sketching} to an
+LLM synthesiser: it keeps the feedback buffer, increments the attempt
+counter, and decides whether to continue or exit with a best-effort
+candidate.
+Figure~\ref{fig:pipeline-state} makes those control states explicit; the
+data that flows on each repair arc is Figure~\ref{fig:repair-feedback}
 (Chapter~\ref{ch:method}).
 
 \begin{figure}[t]
@@ -627,17 +620,18 @@ Algorithm~\ref{alg:repair-loop} formalises the repair engine control logic.
 \label{sec:impl:patterns}
 % ---------------------------------------------------------------------------
 
-The pattern guard module instantiates Stage~4 of the pipeline.  It evaluates
-the catalogue $\mathcal{P}$ of 14 requirement fault patterns (RF01--RF14)
-against each candidate, producing a hit set $\mathrm{Hits}(c,t)$ as in
-Section~\ref{subsec:method:detection}.  The hybrid AST/regex strategy follows
-the pattern-matching philosophy of industrial static analysers such as
-FindBugs~\citep{hovemeyer2004findbugs,ayewah2008findbugs}.
+A candidate can match every witness and still hard-code success or drop an
+output field that the finite case set never exercised.
+Stage~4 therefore screens structural anti-patterns before release.
+The module evaluates catalogue $\mathcal{P}$ (RF01--RF14) and returns
+$\mathrm{Hits}(c,t)$ as in Section~\ref{subsec:method:detection}, using a
+hybrid AST/regex strategy in the spirit of FindBugs
+\citep{hovemeyer2004findbugs,ayewah2008findbugs}.
 
 \subsection{Pattern Catalogue and High-Severity Subset}
 
-The full catalogue is defined in Table~\ref{tab:patterns} of
-Chapter~\ref{ch:method}.  Patterns are classified by severity:
+Table~\ref{tab:patterns} (Chapter~\ref{ch:method}) lists the full catalogue.
+Patterns are classified by severity:
 \emph{critical} (RF07), \emph{high}, \emph{medium}, and \emph{low}.
 The high-severity subset $\mathcal{P}^H$ used in
 equation~\eqref{eq:accept} comprises nine patterns whose detection
@@ -704,11 +698,11 @@ Section~\ref{subsec:conformance-acceptance}.
 \label{sec:impl:orchestration}
 % ---------------------------------------------------------------------------
 
-The experiment orchestrator schedules and executes the full benchmark
-evaluation across seven modes and 120 tasks.  Its design priorities are
-\emph{parallel throughput}, \emph{crash-safe resumption}, and
-\emph{live progress visibility}, aligned with sprint-cycle fitness-function
-thinking in agile formal methods~\citep{harman2012formalagile,beck2001xp}.
+An 840-run matrix is useless if a mid-batch crash forces a full restart, or
+if Z3 races corrupt results.
+The orchestrator therefore prioritises parallel throughput, crash-safe
+resumption, and live progress visibility---fitness-function concerns for
+sprint-cycle formal methods~\citep{harman2012formalagile,beck2001xp}.
 
 \subsection{Parallel Execution Design}
 
@@ -796,9 +790,9 @@ file for live dashboard display without parsing the full results log.
 \label{sec:impl:tradeoffs}
 % ---------------------------------------------------------------------------
 
-The implementation embodies several deliberate engineering trade-offs between
-correctness guarantees, operational latency, and system complexity~\citep{woodcock2009formalsurvey}.
-We discuss the three most consequential decisions.
+Every implementation choice trades correctness guarantees against latency and
+complexity~\citep{woodcock2009formalsurvey}.
+Three decisions dominate the rest.
 
 \subsection{Z3 Over Random Testing}
 
@@ -887,5 +881,5 @@ bounded CEGIS loop with Semantic Feedback IR; and the pattern guard applies
 RF01--RF14 before acceptance.
 The experiment orchestrator runs the seven evaluation modes in parallel with
 resume-safe logs.
-The next chapter specifies how we measure whether those engineering choices
-pay off.
+Whether those engineering choices pay off is an empirical question---answered
+next.

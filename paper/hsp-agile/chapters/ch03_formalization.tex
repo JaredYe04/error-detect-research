@@ -1,33 +1,31 @@
 \chapter{Formal Problem Definition}
 \label{ch:formalization}
 
-This chapter establishes the mathematical foundations of \textsc{SgDP}. We begin by
-defining the structure of a \emph{formal specification task} and the semantics of its
-ordered guard-case specification (instantiated as FSF in HSP-Agile). We then formalise the
-conformance checking problem, the acceptance criterion that drives the
-iterative repair loop, and the quality metrics used to evaluate pipeline
-performance. The chapter closes with the formalisation of our benchmark suite
-and a brief analysis of the computational overhead introduced by each pipeline
-stage.
+Chapter~\ref{ch:intro} stated the prevention problem in words.
+Making that problem precise is the job of this chapter.
+The sections below fix what a task is, how ordered guards are evaluated, how
+conformance and acceptance are scored, and how the hard benchmark is
+characterised---always returning to \code{classify\_signal} so the notation
+never floats free of an example.
 
-Throughout this chapter we write $\mathbb{N}$ for the non-negative integers,
+Notation used throughout: $\mathbb{N}$ for the non-negative integers,
 $\mathbb{Z}$ for all integers, and $\mathbf{1}[\cdot]$ for the Iverson
-bracket, which equals $1$ when its argument is true and $0$ otherwise.
+bracket ($1$ when its argument is true and $0$ otherwise).
 
 % ---------------------------------------------------------------------------
 \section{Running Example Roadmap}
 \label{sec:form:roadmap}
 % ---------------------------------------------------------------------------
 
-Every definition in this chapter is instantiated on the same task introduced in
-Chapter~\ref{ch:intro}: \code{classify\_signal(level, threshold)}.
-In words, the function returns \texttt{"Error"} when the level is negative,
-\texttt{"Critical"} when the level meets or exceeds a threshold (and the level
-is non-negative), and \texttt{"Normal"} otherwise.
-As we introduce each formal object, a short \emph{Example} paragraph shows what
-that object looks like for this task.
-Figure~\ref{fig:specir-walkthrough} previews the path from FSF text through
-SpecIR and the priority formula to a concrete witness.
+Readers should keep one concrete task in mind while reading the definitions.
+That task is \code{classify\_signal(level, threshold)} from
+Chapter~\ref{ch:intro}: return \texttt{"Error"} when the level is negative,
+\texttt{"Critical"} when the level meets or exceeds a threshold (and is
+non-negative), and \texttt{"Normal"} otherwise.
+Each formal object is followed by a short \emph{Example} paragraph that
+instantiates it on this task.
+Figure~\ref{fig:specir-walkthrough} previews the path from FSF text through an
+intermediate representation and a priority formula to a concrete witness.
 
 \begin{figure}[t]
   \centering
@@ -46,10 +44,12 @@ SpecIR and the priority formula to a concrete witness.
 \label{sec:form:task}
 % ---------------------------------------------------------------------------
 
-A \emph{formal specification task} encapsulates a single software function whose
+Release decisions need a precise unit of work: what must the pipeline know
+about a sprint artefact before it can judge a candidate?
+That unit is a \emph{formal specification task}---a single function whose
 behaviour is described entirely by an ordered scenario specification.
-HSP-Agile instantiates this model over SOFL/FSF~\citep{li2022agilesofl,liu2014sofl};
-the task is the basic unit processed by the shared \textsc{SgDP} pipeline.
+HSP-Agile instantiates the model over SOFL/FSF~\citep{li2022agilesofl,liu2014sofl};
+every later stage consumes one such task.
 
 \begin{definition}[Formal Specification Task]
 \label{def:task}
@@ -81,9 +81,13 @@ definitions apply.
 \label{sec:form:specir}
 % ---------------------------------------------------------------------------
 
-To support multiple specification notations without rewriting the prevention
-pipeline, we introduce a notation-agnostic \textbf{Specification Intermediate
-Representation} (\textbf{SpecIR}).
+The prevention pipeline should not be rewritten for every surface notation.
+What is needed is a shared hinge: a notation-agnostic form that still preserves
+ordered guarded cases.
+That hinge is the \textbf{Specification Intermediate Representation}
+(\textbf{SpecIR}).
+Adapters map SOFL/FSF, Mini-Z, or Mini-StateMachine text into SpecIR; the rest
+of the pipeline depends only on SpecIR.
 
 \begin{definition}[Specification Intermediate Representation]
 \label{def:specir}
@@ -91,7 +95,7 @@ For task $t$, $\text{SpecIR}(t) = (\Sigma_t,\; \Gamma_t,\; C_t,\; M_t)$, where
 $\Sigma_t$ is the typed I/O signature, $\Gamma_t$ the variable domain,
 $C_t = \langle c_1,\ldots,c_n\rangle$ an ordered list of guarded cases
 (first-match semantics), and $M_t$ notation-specific metadata.
-We write the abstract syntax as
+The abstract syntax is written
 $\text{SpecIR} \triangleq \langle\Sigma_t, \Gamma_t, C_t, M_t\rangle$ or,
 equivalently, $\text{SpecIR} ::= \texttt{Signature}\;\texttt{Cases}\;[\texttt{Metadata}]$.
 \end{definition}
@@ -102,6 +106,11 @@ For \code{classify\_signal}, $\Sigma_t$ declares inputs
 $C_t$ holds three guarded cases whose first guard atom is
 $\{\texttt{var}{=}\texttt{level},\;\texttt{op}{=}\texttt{lt},\;
 \texttt{threshold}{=}0\}$ (Figure~\ref{fig:specir-walkthrough}).
+
+Adapters and validators need a concrete surface form.
+The EBNF below is that form: it matches the JSON schema used in the
+implementation, so every SpecIR document the pipeline accepts can be checked
+mechanically.
 
 \begin{definition}[SpecIR Surface Grammar (EBNF)]
 \label{def:specir-ebnf}
@@ -119,6 +128,10 @@ GuardAtom   ::= var op [threshold]   (* op in eq,ne,lt,le,gt,ge,others *)
 \end{lstlisting}
 \end{definition}
 
+Not every string that parses is a usable specification.
+Well-formedness rules out missing variables, non-consecutive indices, and a
+final case that fails to cover the residual input space.
+
 \begin{definition}[SpecIR Well-formedness]
 \label{def:specir-wf}
 A SpecIR document $d$ is \emph{well-formed} iff:
@@ -134,16 +147,29 @@ Validation is enforced by \texttt{src/ir/schema\_validate.py}
 (Appendix~\ref{sec:repro:schemas}).
 \end{definition}
 
+Surface notations still differ.
+An adapter is the thin translation that turns notation-specific text into
+well-formed SpecIR; after that step, the shared pipeline never sees the
+original syntax.
+
 \begin{definition}[Specification Adapter]
 \label{def:spec-adapter}
 A \emph{Specification Adapter} is $\text{Adapt}_L : \text{Text}_L \longrightarrow \text{SpecIR}$.
 \end{definition}
+
+HSP-Agile optionally projects SpecIR back onto an FSF-shaped view for
+screening that still speaks in scenarios.
+That projection is lowering; the core stages continue to depend only on SpecIR.
 
 \begin{definition}[FSF Lowering (HSP-Agile Instantiation)]
 \label{def:fsf-lowering}
 $\text{Lower}_{\text{FSF}} : \text{SpecIR} \longrightarrow \text{TaskSpec}_{\text{FSF}}$
 projects SpecIR onto the FSF view; the pipeline core depends only on SpecIR.
 \end{definition}
+
+Each ordered case in SpecIR corresponds to one FSF scenario: a guard that
+selects a region of the input space, and an output mapping that says what
+must be returned there.
 
 \begin{definition}[FSF Scenario]
 \label{def:scenario}
@@ -207,11 +233,11 @@ fails the oracle.
 \label{sec:form:semantics}
 % ---------------------------------------------------------------------------
 
-The oracle defined in Definition~\ref{def:oracle} is a mathematical object;
-the HSP-Agile pipeline must make it \emph{operational} so that the system can
-generate test cases and check candidate implementations against it.  We now
-define the concrete cases used for evaluation and the procedure by which they
-are generated.
+The oracle in Definition~\ref{def:oracle} is a mathematical object.
+The pipeline must make it operational: it needs concrete inputs on which to
+execute candidates and compare outputs.
+Those inputs are the concrete cases below, generated by SMT solving rather than
+by random sampling.
 
 \begin{definition}[Concrete Case]
 \label{def:concrete-case}
@@ -269,6 +295,10 @@ contributes at least one case whose correct output is determined by
 $\phi_i$, and the precedence ordering is witnessed by all $n$ cases jointly.
 \end{proof}
 
+Precedence defects concentrate near guard boundaries: inputs that sit close
+to where one scenario yields to another.
+That thin set is the boundary region; random tests rarely land inside it.
+
 \begin{definition}[Boundary Region]
 \label{def:boundary-region}
 For margin $\varepsilon > 0$, the \emph{boundary region} is
@@ -276,12 +306,21 @@ $\mathcal{B}_\varepsilon(t) = \{\mathbf{x} \in \mathcal{X}_t :
   \exists i,\; \partial g_i(\mathbf{x}) < \varepsilon\}$.
 \end{definition}
 
+How often a faulty candidate fails on a randomly drawn witness is its
+fault-exposure probability.
+When that probability is small, unit-test repair loops look healthy while
+ordering bugs remain.
+
 \begin{definition}[Per-witness Fault-Exposure Probability]
 \label{def:fault-exposure}
 For faulty candidate $c$, $\varepsilon_c =
 \Pr_{\mathbf{x} \sim \mathcal{D}(t)}[\,f_c(\mathbf{x}) \neq g_t(\mathbf{x})\,]$;
 $\varepsilon = \min_{c \in \mathcal{C}\setminus\{g_t\}} \varepsilon_c > 0$.
 \end{definition}
+
+In plain terms: random tests miss the thin overlap slivers where ordering
+bugs live; SMT witnesses are built to land there.
+The corollary makes that contrast quantitative.
 
 \begin{corollary}[Random vs.\ SMT Fault-Exposure Hit Rate]
 \label{cor:random-vs-smt}
@@ -331,12 +370,14 @@ $\mathcal{O}(\varepsilon)$, while SMT hits them deterministically.
   \label{fig:fsf-semantics}
 \end{figure}
 
-Figure~\ref{fig:fsf-semantics} summarises the FSF text, the induced input-space
-partition, and the oracle mapping for \code{classify\_signal}; SMT case
-generation places one witness in each strict scenario region.
+The point of Figure~\ref{fig:fsf-semantics} is the green witness $(-3,-10)$:
+geometrically it also satisfies $S_2$'s guard, yet first-match assigns it to
+$S_1$.
+SMT case generation places one such witness in each strict scenario region.
 
-For the pipeline to communicate \emph{why} a candidate fails, we also need a
-notion of a counterexample that identifies the violated scenario.
+Pass/fail alone is not enough for repair.
+The pipeline also needs a counterexample that names the violated scenario,
+so the model can localise the bug inside the ordered specification.
 
 \begin{definition}[Strict Scenario Violation]
 \label{def:violation}
@@ -369,16 +410,26 @@ language model to localise the bug within the FSF specification.
 \label{sec:form:acceptance}
 % ---------------------------------------------------------------------------
 
-Armed with the oracle and the case set, we can now define what it means for
-a candidate to be accepted, and state the central computational problem
-that HSP-Agile solves.
+The oracle and the case set answer whether a candidate is right on the
+witnesses that matter.
+Release, however, is a stronger decision: the candidate must clear those
+witnesses \emph{and} a structural screen, and the search for such a candidate
+must terminate within a fixed LLM budget.
+The definitions below make that decision precise.
 
 \begin{definition}[Candidate Implementation]
 \label{def:candidate}
 A \emph{candidate implementation} for task $t$ is any computable function
-$c : \mathcal{X}_t \to \mathcal{Y}_t$.  We write $f_c$ for its observable
-input-output behaviour, i.e., the function computed when $c$ is executed.
+$c : \mathcal{X}_t \to \mathcal{Y}_t$.
+Write $f_c$ for its observable input-output behaviour---the function computed
+when $c$ is executed.
 \end{definition}
+
+A natural quality score is the fraction of witnesses on which the candidate
+matches the oracle.
+That score is \emph{strict formal conformance}: it is continuous, so partial
+progress during repair remains visible, and it is grounded in the
+specification rather than in an arbitrary unit-test suite.
 
 \begin{definition}[Strict Formal Conformance]
 \label{def:conformance}
@@ -414,8 +465,7 @@ A threshold below $1$ would tolerate partial conformance and mask
 scenario-ordering violations: a candidate with wrong guard order may pass
 most cases where overlapping guards prescribe identical outputs, yet fail
 systematically where they disagree \citep{zhu1997specification}.
-We therefore require all $n$ generated cases to pass before declaring
-formal conformance.
+Hence all $n$ generated cases must pass before formal conformance is declared.
 
 Conformance alone is insufficient for acceptance; the pipeline also screens
 candidates for the presence of high-severity requirement fault patterns.
@@ -467,7 +517,9 @@ modes: (i)~functional errors on specific inputs, caught by witnesses; and
 (ii)~structural anti-patterns, caught by static screening.
 Neither check alone is sufficient.
 
-We can now state the main computational problem.
+Those pieces assemble into the main computational problem: find an acceptable
+candidate within a fixed LLM budget, or return the best-effort candidate when
+the budget is exhausted.
 
 \begin{definition}[Bounded Acceptance Problem]
 \label{def:bap}
@@ -513,17 +565,19 @@ the budget is exhausted.
 \label{sec:form:metrics}
 % ---------------------------------------------------------------------------
 
-To evaluate how effectively HSP-Agile prevents faulty candidates from being
-accepted, we define population-level metrics over a mutant population
-\citep{demillo1978mutation, ammann2016testing}.
-These metrics are used in the experimental evaluation of
+Generation success is the wrong primary metric for a prevention system.
+What matters is whether faulty candidates are kept out of release, and whether
+correct candidates are not rejected by accident.
+Those two rates are measured over a mutant population
+\citep{demillo1978mutation, ammann2016testing} and reported in
 Chapter~\ref{ch:experiments}.
 
 \begin{definition}[Mutant Population]
 \label{def:mutants}
 A \emph{mutant population} $\mathcal{M}$ is a finite set of pairs
 $(c_m, t_m)$, each consisting of a candidate and a task, where at least
-one of the two has been artificially perturbed.  We distinguish two sub-populations:
+one of the two has been artificially perturbed.
+Two sub-populations matter:
 \begin{itemize}
   \item \emph{Specification-confusion mutants} $\mathcal{M}^S$: the task
         $t_m$ is a mutated version of a reference task, obtained by
@@ -541,6 +595,9 @@ $\mathrm{Faulty}(m) = 1$, if the reference specification or the reference
 implementation has been perturbed.
 \end{definition}
 
+PDR asks a recall-like question: of all mutants, how many does the pipeline
+correctly refuse to accept?
+
 \begin{definition}[Prevention Detection Rate]
 \label{def:pdr}
 The \emph{Prevention Detection Rate} (PDR) is the fraction of mutants that
@@ -551,9 +608,11 @@ the pipeline correctly rejects:
   \frac{\bigl|\bigl\{m \in \mathcal{M} : \neg\,\mathrm{Accept}(c_m,\,t_m)\bigr\}\bigr|}
        {|\mathcal{M}|}.
 \]
-A higher PDR indicates that more faulty candidates are correctly identified
-and prevented from passing the pipeline.
+In a sprint review, high PDR means fewer faulty candidates reach release.
 \end{definition}
+
+FAR asks the complementary precision-like question: among genuinely faulty
+mutants, how many still slip through $\mathrm{Accept}$?
 
 \begin{definition}[False Accept Rate]
 \label{def:far}
@@ -568,14 +627,12 @@ mutants that the pipeline incorrectly accepts:
     \bigr\}\bigr|}
        {|\mathcal{M}|}.
 \]
-A lower FAR indicates that fewer genuinely faulty candidates escape detection.
+In a sprint review, low FAR means the gate is not rubber-stamping mutants.
 \end{definition}
 
-We note that PDR and FAR are complementary but not redundant \citep{okun2007mutation}.
-PDR is recall-like over all mutants, including those trivially caught by
-crashes or type mismatches.
-FAR is precision-like: it focuses on genuinely faulty mutants that the pipeline
-incorrectly accepts.
+PDR and FAR are complementary but not redundant \citep{okun2007mutation}.
+PDR counts every rejected mutant, including trivial crashes; FAR focuses on
+faulty mutants that still receive $\mathrm{Accept}=1$.
 
 A related metric quantifies the contribution of the formal case-based check
 alone, independent of the pattern screening layer.
@@ -607,9 +664,9 @@ pattern-screening layer over pure case-based testing.
 \label{sec:form:benchmark}
 % ---------------------------------------------------------------------------
 
-Our experimental evaluation is based on a synthetic benchmark of hard tasks
-designed to stress FSF precedence sensitivity \citep{li2023iet}.
-This section formalises benchmark construction and proves that correct
+The evaluation uses a synthetic benchmark of hard tasks built to stress FSF
+precedence sensitivity \citep{li2023iet}.
+The construction below makes that stress precise and proves that correct
 solutions must respect scenario ordering.
 
 \begin{definition}[Precedence-Sensitive Task]
@@ -652,8 +709,8 @@ would be semantically irrelevant and the task would not test ordering at all.
 Hence $f_c(x^*) \neq g_t(x^*)$, and $c$ does not strictly succeed.
 \end{proof}
 
-Our benchmark tasks are constructed as follows.  Each \emph{hard synthetic
-task} $t^H$ has the following structure:
+Hard synthetic tasks are constructed as follows.
+Each task $t^H$ has the following structure:
 
 \begin{itemize}
   \item \textbf{Input variables}: five non-negative integers
@@ -689,9 +746,9 @@ SMT-generated test suite.
 \label{sec:form:complexity}
 % ---------------------------------------------------------------------------
 
-The HSP-Agile pipeline introduces computational stages beyond LLM synthesis.
-We analyse their cost to confirm that formal checking does not dominate
-overall runtime \citep{demoura2008z3, barrett2018smt}.
+Formal checking must not erase the prevention benefit by dominating runtime.
+The cost accounting below confirms that Z3 and pattern screening remain cheap
+relative to LLM inference \citep{demoura2008z3, barrett2018smt}.
 
 \paragraph{Case Generation.}
 For each of the $n$ scenarios, the Z3 solver is invoked with a linear
@@ -719,15 +776,14 @@ expression or a simple abstract-syntax-tree traversal.  The cost is $O(L
 this step completes in well under $0.01$ seconds.
 
 \paragraph{Total Pipeline Cost.}
-The dominant cost at every iteration is the LLM API call, which in our
-experiments takes approximately $10$ seconds per attempt.  The Z3 solving
-and conformance checking add less than $1$ second combined.  The pattern
-matching is negligible.  With a budget of $K = 3$ attempts, the expected
-total pipeline runtime is approximately $30$ seconds per task, of which more
-than $97\%$ is attributable to LLM inference.  The formal checking overhead
-is therefore not a bottleneck, and the pipeline could accommodate larger
-case sets or more elaborate pattern libraries without meaningful impact on
-throughput.
+The dominant cost at every iteration is the LLM API call, which takes
+approximately $10$ seconds per attempt in the reported experiments.
+Z3 solving and conformance checking add less than $1$ second combined;
+pattern matching is negligible.
+With budget $K = 3$, expected runtime is about $30$ seconds per task, of
+which more than $97\%$ is LLM inference.
+Formal checking is therefore not the bottleneck: larger case sets or richer
+pattern libraries would not meaningfully change throughput.
 
 \paragraph{Summary.}
 The cost structure can be written as
@@ -747,21 +803,18 @@ than a single LLM call.
 \section*{Chapter Summary}
 % ---------------------------------------------------------------------------
 
-This chapter has established the formal foundations of \textsc{SgDP}.  We
-defined the formal specification task model (Definition~\ref{def:task}), the SpecIR
-adapter layer (Definitions~\ref{def:specir}--\ref{def:fsf-lowering}), the FSF
-scenario and its semantics (Definitions \ref{def:scenario}--\ref{def:oracle}),
-and the SMT-based case generation procedure
-(Definition~\ref{def:test-suite}), proving that it achieves full scenario
-coverage (Lemma~\ref{lem:coverage}).  We formalised the Bounded
-Acceptance Problem (Definition~\ref{def:bap}), which captures the synthesis-and-repair
-loop as a budget-constrained search, and introduced the hybrid acceptance
-predicate that combines conformance checking with fault-pattern screening
-(Definition~\ref{def:accept}).  Prevention and quality metrics — PDR, FAR,
-and mutation kill rate — were defined to support empirical evaluation.  The
-benchmark formalisation demonstrated that every hard task requires strict
-scenario ordering (Proposition~\ref{prop:order-required}), and the
-complexity analysis confirmed that the formal checking overhead is negligible
-relative to LLM inference cost.  With these foundations in place, the
-following chapters describe the concrete system design (Chapter~\ref{ch:method})
-and its implementation (Chapter~\ref{ch:implementation}).
+The formal picture is now complete enough to build on.
+A task is an ordered scenario specification over typed domains; SpecIR is the
+shared hinge across notations; first-match semantics yield an executable
+oracle; SMT witnesses populate a finite case set with full scenario coverage
+(Lemma~\ref{lem:coverage}); and release is the conjunctive predicate
+$\mathrm{Accept}$ under a bounded search
+(Definition~\ref{def:bap}).
+PDR, FAR, and mutation kill rate measure prevention rather than generation
+success.
+Every hard benchmark task requires strict scenario ordering
+(Proposition~\ref{prop:order-required}), while formal checking remains cheap
+relative to LLM inference.
+What remains is operational: how an LLM participates in that loop, how
+failures become Semantic Feedback IR, and how the four stages assemble into a
+method.

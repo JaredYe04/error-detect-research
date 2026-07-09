@@ -8,10 +8,10 @@
 LLM-assisted development can accelerate Agile-SOFL workflows, but it also
 introduces specification-conformance defects: code that looks right on everyday
 inputs yet violates first-match guard order on thin boundary regions.
-This report asked whether we can prevent those defects by using the
+The question was whether those defects can be prevented by using the
 specification itself as evidence, without full deductive verification.
-Our answer is the \textbf{Specification-guided Defect Prevention Framework}
-(\textsc{SgDP}) and its SOFL/FSF instantiation \textbf{HSP-Agile}.
+The answer developed here is the \textbf{Specification-guided Defect Prevention
+Framework} (\textsc{SgDP}) and its SOFL/FSF instantiation \textbf{HSP-Agile}.
 
 
 %=============================================================================
@@ -54,22 +54,20 @@ Latency is the main cost (about $4.6\times$ vs.\ test-feedback).
 \label{sec:conc:findings}
 %=============================================================================
 
-\begin{enumerate}
-  \item \textbf{Conformance, not binary pass/fail, is the right primary metric.}
-        M leads on mean $\mathrm{Conf}$ while its strict-success rate is
-        slightly below B1/B2 because the conjunctive gate is intentionally
-        stricter (Section~\ref{sec:disc:paradox}).
-  \item \textbf{Repair is the largest ablation drop.}
-        Removing the CEGIS loop (A3) costs $-6.3$\,pp; removing the formal
-        checker (A1) costs $-3.9$\,pp.
-  \item \textbf{Structure in feedback matters more than prompt length.}
-        E6's full Semantic Feedback IR outperforms test-only and
-        test-plus-expected variants by more than 7\,pp.
-  \item \textbf{Harder specs amplify the method.}
-        The M--B1 gap is largest in the dense-overlap tertile (E3).
-  \item \textbf{The loop transfers across notations.}
-        Mini-Z and Mini-StateMachine improve with adapter-only changes (E8).
-\end{enumerate}
+Five results summarise the evidence.
+Conformance, not binary pass/fail, is the right primary metric: M leads on
+mean $\mathrm{Conf}$ while its slightly lower strict-success rate reflects
+the intentionally stricter conjunctive gate
+(Section~\ref{sec:disc:paradox})---the same selectivity that rejects a
+hard-coded \code{classify\_signal} even when most witnesses pass.
+Repair is the largest ablation drop (A3: $-6.3$\,pp; A1: $-3.9$\,pp).
+Structure in feedback matters more than prompt length: E6's full Semantic
+Feedback IR outperforms test-only and test-plus-expected variants by more
+than 7\,pp.
+Harder specifications amplify the method: the M--B1 gap is largest in the
+dense-overlap tertile (E3).
+Finally, the loop transfers across notations: Mini-Z and Mini-StateMachine
+improve with adapter-only changes (E8).
 
 
 %=============================================================================
@@ -107,7 +105,8 @@ whether the +7.7\,pp IR effect is model-agnostic.
 
 \textsc{SgDP} is not a substitute for full formal verification.
 It is a practical bridge: bounded formal checking, scenario-aware repair, and
-conjunctive acceptance that keep many specification-conformance defects out of
-release while remaining usable inside a sprint.
+conjunctive acceptance that keep many specification-conformance defects---the
+ordering failures illustrated by \code{classify\_signal}---out of release
+while remaining usable inside a sprint.
 How far that bridge extends depends on richer encodings, industrial tasks, and
 adaptive repair---the directions above.

@@ -4,11 +4,14 @@
 \chapter{Background and Related Work}
 \label{ch:background}
 
-This chapter gives the background a reader needs before the formalisation in
-Chapter~\ref{ch:formalization}.
-We start from SOFL/Agile-SOFL and the FSF first-match rule (using the same
-\code{classify\_signal} example as Chapter~\ref{ch:intro}), then review LLM
-code generation, CEGIS, SMT solving, pattern detection, and mutation testing.
+Preventing specification-conformance defects requires tools that already exist
+in formal methods and in LLM-based synthesis---but that have not been combined
+for this purpose.
+What follows is the background needed to see that gap clearly.
+The exposition begins with SOFL/Agile-SOFL and the FSF first-match rule
+(reusing \code{classify\_signal} from Chapter~\ref{ch:intro}), then reviews
+LLM code generation, CEGIS, SMT solving, pattern detection, and mutation
+testing.
 A closing comparison table positions \textsc{SgDP} against prior systems.
 
 % ─────────────────────────────────────────────────────────────────────────────
@@ -18,10 +21,13 @@ A closing comparison table positions \textsc{SgDP} against prior systems.
 
 \subsection{The SOFL Formal Method}
 
-Structured Object-Oriented Formal Language (SOFL) was introduced by
-\citet{liu1997sofl} as a \emph{process-oriented} formal method synthesising
-Z notation, data flow diagrams, and object-oriented structuring, bridging
-diagrammatic accessibility with verification-grade semantics.
+The prevention problem assumes a formal artefact that already names ordered
+scenarios.
+SOFL is that artefact's historical home.
+Structured Object-Oriented Formal Language~\citep{liu1997sofl} is a
+\emph{process-oriented} formal method synthesising Z notation, data flow
+diagrams, and object-oriented structuring, bridging diagrammatic accessibility
+with verification-grade semantics.
 SOFL's development paradigm is \emph{stepwise refinement}
 \citep{back1998refinement}: each refinement step must preserve abstract
 specification properties, preventing specification drift.
@@ -49,7 +55,10 @@ barrier identified by \citet{woodcock2009formalsurvey}.
 
 \subsection{Syntax and Structure}
 
-The Functional Specification Format is the primary artifact of an Agile-SOFL
+FSF is not a flat case statement.
+Guards are ordered: the first match wins, and that order is part of the
+contract.
+The Functional Specification Format is the primary artefact of an Agile-SOFL
 sprint \citep{li2022agilesofl, liu2014sofl}.
 An FSF document describes a single function $t$ by its \emph{name},
 \emph{parameter list}, \emph{external variables} (read/write), and an ordered
@@ -87,8 +96,8 @@ An input satisfying both $S_1$'s and $S_2$'s guards is handled exclusively
 by $S_1$; $S_2$ applies only to inputs not already covered by higher-priority
 scenarios.
 
-We illustrate with the running example \code{classify\_signal} from
-Chapter~\ref{ch:intro} (Listing~\ref{lst:fsf-spec}):
+The running example \code{classify\_signal} from Chapter~\ref{ch:intro}
+makes the rule concrete (Listing~\ref{lst:fsf-spec}):
 
 \begin{center}
 \small\ttfamily
@@ -113,14 +122,13 @@ $\mathit{level} < 0$ incorrectly returns \texttt{"Critical"}---a
 \emph{scenario-order violation} invisible to techniques that treat guards as
 a flat Boolean formula.
 
-Figure~\ref{fig:fsf-semantics} (Chapter~\ref{ch:formalization}) illustrates
-the input-space partition for this task: $S_1$ claims the negative-level
-region even when $S_2$'s threshold comparison would also hold; $S_3$ covers
-the remainder.
+Chapter~\ref{ch:formalization} returns to this partition in
+Figure~\ref{fig:fsf-semantics}: $S_1$ claims the negative-level region even
+when $S_2$'s threshold comparison would also hold; $S_3$ covers the remainder.
 The precedence relation $S_1 \succ S_2 \succ S_3$ is structural, not derived
 from the guards alone.
 
-As a secondary pattern (not our running example), multi-output tasks such as
+As a secondary pattern (not the running example), multi-output tasks such as
 \code{classify\_risk(a,b,c)} exhibit the same first-match rule when a nested
 guard ($a>10 \wedge b>5$) is a strict subset of a later guard ($a>5$).
 
@@ -158,14 +166,16 @@ automated test generation.
 
 \subsection{Foundation Models for Code}
 
-\citet{chen2021codex} introduced Codex and \emph{pass@k}:
-$\widehat{\mathrm{pass}@k} = 1 - \binom{n-c}{k}/\binom{n}{k}$ for $n$
-samples with $c$ passing all tests (Codex: 28.8\% pass@1 on HumanEval).
-\citet{openai2023gpt4} improved structured prompt-following, relevant to FSF
-synthesis requiring scenario ordering and correct Python syntax.
-Our setting requires \emph{guaranteed} specification conformance, not high
-probability on hidden tests as in contest-oriented systems
+Contest-style code generation optimises for high probability on hidden tests.
+FSF synthesis needs something stricter: \emph{guaranteed} conformance to an
+ordered scenario contract, not luck on a sampled suite
 \citep{li2022alphacode}.
+\citet{chen2021codex} introduced Codex and the \emph{pass@k} estimator
+$\widehat{\mathrm{pass}@k} = 1 - \binom{n-c}{k}/\binom{n}{k}$ for $n$ samples
+with $c$ fully passing (Codex: 28.8\% pass@1 on HumanEval).
+\citet{openai2023gpt4} improved structured prompt-following, which helps with
+scenario ordering and Python syntax---but does not by itself enforce
+first-match precedence.
 
 \subsection{Evaluation of Deployed Code Generation Tools}
 
@@ -182,8 +192,8 @@ LLM-based formal specification implementation.
 
 Three systematic failure modes arise without additional guidance
 \citep{dakhel2023copilot, lynn2024verifierloop}.
-We illustrate each with a short fragment of the kind our checker must catch
-on \code{classify\_signal}-style tasks:
+Each pattern is illustrated with a short fragment of the kind the checker
+must catch on \code{classify\_signal}-style tasks:
 
 \begin{enumerate}
   \item \textbf{Scenario-order blindness.}
@@ -218,7 +228,7 @@ return "Normal"
 
 \noindent
 Test-feedback repair loops \citep{chen2021codex} execute unit tests against
-each candidate and include failures in subsequent prompts (our B2 baseline).
+each candidate and include failures in subsequent prompts (the B2 baseline).
 In the FSF context, tests must be \emph{derived from} the specification; fixed
 test suites may miss scenario boundaries, allowing convergence on candidates
 that pass all tests yet violate uncovered inputs.
@@ -232,13 +242,17 @@ to expose scenario-order violations.
 
 \subsection{CEGIS and LLM-Augmented Variants}
 
-CEGIS decomposes synthesis into a \emph{synthesiser} and \emph{verifier}
-\citep{solarlezama2008sketching}: the verifier returns \emph{counterexamples}
-witnessing violations, which constrain subsequent iterations until success or
-budget exhaustion.
-LLM-augmented variants replace template synthesis with free-form code generation
-while retaining formal verification \citep{loughman2024dafnybench,lynn2024verifierloop},
-but prior systems lack FSF scenario-order semantics and pattern-guard pre-filters.
+A candidate can pass every unit test and still evaluate the wrong scenario
+first.
+Repair therefore needs counterexamples that name the violated region, not only
+a failing assertion.
+CEGIS decomposes synthesis into a \emph{synthesiser} and a \emph{verifier}
+\citep{solarlezama2008sketching}: the verifier returns counterexamples that
+constrain later iterations until success or budget exhaustion.
+LLM-augmented variants replace template synthesis with free-form generation
+while retaining formal verification
+\citep{loughman2024dafnybench,lynn2024verifierloop}, but prior systems lack
+FSF scenario-order semantics and pattern-guard pre-filters.
 
 \subsection{HSP-Agile's CEGIS Adaptation}
 
@@ -252,10 +266,10 @@ The \emph{feedback aggregator} packages counterexamples
 $(x^*, g_t(x^*), f_{c_k}(x^*))$ and high-severity requirement patterns into
 structured repair context.
 
-Figure~\ref{fig:cegis-loop} illustrates the loop.
-The key departure from prior LLM+verifier approaches is communicating
-\emph{both} formal counterexamples \emph{and} pattern-guard violations,
-enabling simultaneous correction of logical errors and structural anti-patterns.
+The departure from prior LLM+verifier systems is communicating \emph{both}
+formal counterexamples \emph{and} pattern-guard violations, so logical errors
+and structural anti-patterns can be corrected in the same iteration
+(Figure~\ref{fig:cegis-loop}).
 
 \begin{figure}[t]
   \centering
@@ -272,7 +286,7 @@ enabling simultaneous correction of logical errors and structural anti-patterns.
 \end{figure}
 
 \noindent
-Budget parameter $K$ limits repair iterations (we set $K = 3$ in experiments);
+Budget parameter $K$ limits repair iterations ($K = 3$ in the experiments);
 if no conforming candidate is found, the system returns the highest-scoring
 candidate as best-effort, consistent with budget-bounded CEGIS
 \citep{barrett2018smt}.
@@ -515,8 +529,8 @@ Recent coding agent frameworks---OpenHands~\citep{wang2024opendevin},
 SWE-agent~\citep{yang2024sweagent}, Codex CLI, and Claude Code---combine LLM
 synthesis with tool use to resolve repository tasks.  They address a different
 problem from \textsc{SgDP}: (i)~no specification oracle $g_t$;
-(ii)~no prevention metrics (PDR/FAR); (iii)~orthogonal to our contribution---a
-stronger model could serve as Stage~1 synthesis backbone.
+(ii)~no prevention metrics (PDR/FAR); (iii)~orthogonal to the present
+contribution---a stronger model could serve as Stage~1 synthesis backbone.
 B5 (Reflexion-lite) captures the verbal-memory dimension most relevant to repair.
 Full agent-oracle comparison is future work.
 
@@ -541,19 +555,19 @@ Full agent-oracle comparison is future work.
 \end{inlinetable}
 
 Unlike VerifierLoop-style test-feedback systems~\citep{lynn2024verifierloop},
-we do not treat failing unit tests as the primary signal: we encode guard
-precedence as SMT constraints~\citep{barrett2018smt} and feed the LLM a
-typed failure record that names the violated scenario.
+failing unit tests are not the primary signal: guard precedence is encoded as
+SMT constraints~\citep{barrett2018smt}, and the LLM receives a typed failure
+record that names the violated scenario.
 Unlike DafnyBench-style proof-oriented pipelines~\citep{loughman2024dafnybench},
-we do not ask the model for annotations it systematically fails to produce.
-Unlike Self-Refine / Self-Debug verbal loops, we ground every repair step in
-an executable specification oracle and measure \emph{prevention} (PDR/FAR),
-not only generation success.
+the model is not asked for annotations it systematically fails to produce.
+Unlike Self-Refine / Self-Debug verbal loops, every repair step is grounded in
+an executable specification oracle, and evaluation measures \emph{prevention}
+(PDR/FAR), not only generation success.
 
 The remaining gap that Table~\ref{tab:related-positioning} highlights is
 therefore practical: a middle ground with specification-semantic awareness,
 no proof obligation, and an evaluation protocol that asks whether
 non-conforming code is kept out of release.
 \Needspace{3\baselineskip}
-The following chapter establishes the mathematical foundations underpinning each
-pipeline component.
+That gap is what the formal problem statement in
+Chapter~\ref{ch:formalization} makes precise.

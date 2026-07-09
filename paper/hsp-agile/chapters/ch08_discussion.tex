@@ -5,15 +5,14 @@
 \chapter{Discussion and Threats to Validity}
 \label{ch:discussion}
 
-This chapter interprets the experimental results reported in
-Chapter~\ref{ch:results}, analyses the counter-intuitive relationship between
-formal conformance and strict success rate, examines residual failure modes
-through the E9 taxonomy, draws practical implications for integrating
-\textsc{SgDP}/HSP-Agile into sprint workflows, situates the approach within the
-broader verification landscape, and assesses limitations and threats to
-validity.
-A preview of the threats framework appeared in
-Section~\ref{sec:exp:threats-preview}; here we provide the full analysis.
+Empirical tables raise questions that numbers alone cannot settle.
+Why does higher conformance coexist with a lower strict-success rate?
+Which residual failures remain after budget~$K=3$?
+What should a sprint team actually change?
+The discussion below answers those questions, situates \textsc{SgDP} among
+related approaches, and states limitations and threats.
+A preview appeared in Section~\ref{sec:exp:threats-preview}; this chapter gives
+the full analysis.
 
 
 %=============================================================================
@@ -29,30 +28,28 @@ Not every task clears the conjunctive acceptance gate in three attempts;
 acceptance is best treated as a CI quality bar, with conformance as the
 primary quality signal.
 
-The central empirical finding is that the full HSP-Agile pipeline (mode~M)
-achieves \textbf{90.4\%} mean strict formal conformance on the 120-task hard
-benchmark---a gain of \textbf{6.2 percentage points} over one-shot LLM (B1:
-84.2\%) and \textbf{2.4 percentage points} over test-feedback repair (B2:
+The headline number is unchanged: mode~M reaches \textbf{90.4\%} mean strict
+formal conformance on the 120-task hard benchmark---\textbf{+6.2\,pp} over
+one-shot LLM (B1: 84.2\%) and \textbf{+2.4\,pp} over test-feedback (B2:
 88.0\%).
-Two interlocking mechanisms explain this improvement.
-First, Z3-driven witnesses target the ordering constraints encoded in each FSF
+
+Two mechanisms explain the gain.
+Z3-driven witnesses target the ordering constraints in each FSF
 specification~\citep{barrett2018smt,demoura2008z3,liu2014sofl}, exposing
 violations that coarser unit tests miss~\citep{zhu1997specification,ammann2016testing}.
-Second, the counterexample-guided repair loop~\citep{solarlezama2008sketching}
-converts witnessed failures into Semantic Feedback IR prompts that name the
-violated scenario and guard~\citep{lynn2024verifierloop,chen2021codex}.
+The CEGIS repair loop~\citep{solarlezama2008sketching} then turns those
+failures into Semantic Feedback IR prompts that name the violated scenario and
+guard~\citep{lynn2024verifierloop,chen2021codex}.
 
-The low conformance of the B0 reference mode (27.5\%) establishes a meaningful
-lower bound: template-based generation performs poorly on the hard partition and
-calibrates benchmark difficulty rather than representing a production baseline.
-Ablation results confirm independent contributions: removing the formal checker (A1)
-drops conformance to 86.5\% ($-3.9$\,pp vs.\ M); removing the repair loop (A3)
-drops it to 84.1\% ($-6.3$\,pp vs.\ M); removing the pattern guard (A2) yields a
-marginal $+0.5$\,pp gain, discussed in Section~\ref{sec:disc:implications}.
-Mechanism-level experiments (E3--E6) reinforce this interpretation: M's advantage
-grows with specification complexity, SMT witnesses maintain boundary coverage where
-random sampling fails, and E6 isolates a \textbf{+7.7\,pp} Semantic Feedback IR
-advantage over test-only repair prompts.
+B0's 27.5\% conformance is a difficulty calibration, not a production
+baseline: template generation fails on the hard partition by design.
+Ablations separate the contributions: A1 (no formal checker) drops to 86.5\%
+($-3.9$\,pp); A3 (no repair) drops to 84.1\% ($-6.3$\,pp); A2 (no pattern
+guard) yields a marginal $+0.5$\,pp on conformance, discussed in
+Section~\ref{sec:disc:implications}.
+E3--E6 reinforce the same story: the advantage grows with overlap, SMT keeps
+boundary coverage where random sampling fails, and the Semantic Feedback IR
+alone accounts for \textbf{+7.7\,pp} over test-only prompts.
 
 
 %=============================================================================
@@ -66,7 +63,7 @@ only 30 tasks (25.0\% strict success rate) are fully accepted.
 Experiment E9 classifies these 90 residual failures into \textbf{nine categories}
 derived from counterexample signals, pattern guard matches, and operator-level
 mutation labels.
-Figure~\ref{fig:failure-taxonomy} summarises the breakdown.
+The pie in Figure~\ref{fig:failure-taxonomy} is the map of that residual mass.
 
 \begin{figure}[t]
   \centering
@@ -80,11 +77,11 @@ Figure~\ref{fig:failure-taxonomy} summarises the breakdown.
   \label{fig:failure-taxonomy}
 \end{figure}
 
-Figure~\ref{fig:failure-taxonomy} breaks down the 90 remaining failures in
-M mode after repair budget $K=3$ by the nine E9 taxonomy categories.
-\emph{OrderingError} (31.1\%, $n=28$) is the single largest category: these tasks
-expose scenario-ordering violations that the repair loop cannot resolve because
-the LLM re-introduces the same ordering assumption after each witness.
+Among the 90 non-accepted tasks under mode~M after $K=3$,
+\emph{OrderingError} (31.1\%, $n=28$) is the largest slice.
+These tasks expose scenario-ordering violations that the repair loop cannot
+resolve because the LLM re-introduces the same ordering assumption after each
+witness.
 \emph{BoundaryError} (26.7\%, $n=24$) covers threshold-shift faults where the
 generated code deviates by at most one unit on a boundary condition---violations
 difficult to synthesise without dense boundary-value witnesses.
@@ -164,8 +161,8 @@ the repair prompt would break this cycle.
 \subsection{Failure Trace: Scenario Ordering}
 \label{subsec:failure-trace-ordering}
 
-Listing~\ref{lst:llm-incorrect} shows the \code{classify\_signal} LLM candidate from
-Section~\ref{sec:intro:problem} that evaluates Scenario~2 before Scenario~1.
+The failed \code{classify\_signal} candidate evaluates Scenario~2 before
+Scenario~1 (Listing~\ref{lst:llm-incorrect}, Section~\ref{sec:intro:problem}).
 Witness $\mathbf{x}^*=(\texttt{level}{=}{-3},\,\texttt{threshold}{=}{-10})$
 activates $S_1$ under first-match semantics; the checker emits:
 
@@ -287,7 +284,7 @@ A sprint team merging 20--30 LLM-assisted units per day would incur roughly
 Java project---while avoiding hours of downstream debugging from propagated
 conformance faults.
 
-We recommend deploying HSP-Agile as a background pre-merge quality gate rather than
+HSP-Agile is best deployed as a background pre-merge quality gate rather than
 an interactive code-completion tool, consistent with agile fitness-function
 practice~\citep{harman2012formalagile,beck2001xp}.
 The conjunctive acceptance predicate produces an auditable decision record---not
@@ -317,8 +314,8 @@ a \emph{filtering gate}: when it fires, it identifies the specific fault pattern
 (e.g.\ RF07 unconditional success; RF03 missing precedence guard), information not
 captured by the conformance metric.
 
-We recommend emitting \emph{advisory warnings} rather than hard rejections for most
-patterns, following static-analysis severity-modulated gating
+For most patterns, \emph{advisory warnings} are preferable to hard rejections,
+following static-analysis severity-modulated gating
 policy~\citep{hovemeyer2004findbugs,ayewah2008findbugs}, with hard rejection reserved
 for RF07.
 The pattern guard is most valuable as a \emph{living artefact}: new failure modes
@@ -433,7 +430,7 @@ real-time code-completion.
 \label{sec:disc:threats}
 %=============================================================================
 
-We structure the threats-to-validity analysis using the four-category framework
+Threats-to-validity analysis follows the four-category framework
 common in empirical software engineering~\citep{ammann2016testing,woodcock2009formalsurvey}.
 
 \paragraph{Construct validity.}
@@ -452,13 +449,13 @@ a single difficulty band.
 
 \paragraph{External validity.}
 Primary evaluation uses 120 synthetic numeric-domain Python tasks and one LLM.
-\emph{Mitigation:} E8 exercises Mini-Z and Mini-StateMachine via adapters; we
-do not claim language- or model-universal results beyond that evidence.
+\emph{Mitigation:} E8 exercises Mini-Z and Mini-StateMachine via adapters;
+language- or model-universal results are not claimed beyond that evidence.
 
 \paragraph{Conclusion validity.}
 All pairwise comparisons use Holm-Bonferroni correction.
-\emph{Mitigation:} we treat the non-significant strict-success comparison
-($p \approx 0.92$) as expected under the conjunctive gate, and report
+\emph{Mitigation:} the non-significant strict-success comparison
+($p \approx 0.92$) is treated as expected under the conjunctive gate, with
 conformance as the primary metric; full E2 supersedes preliminary $n=40$
 prevention numbers.
 
@@ -503,7 +500,9 @@ Section~\ref{sec:conc:future} prioritises these directions for future work.
 
 These assumptions are deliberate scoping choices for a first framework
 instantiation, not fundamental barriers.
-E8 generalisation across Mini-Z and Mini-StateMachine demonstrates that
-adapter-level extensions preserve the shared pipeline; temporal and
-probabilistic semantics would require new adapter and witness modules while
-retaining the Semantic Feedback IR and acceptance predicate structure.
+E8 generalisation across Mini-Z and Mini-StateMachine shows that adapter-level
+extensions preserve the shared pipeline; temporal and probabilistic semantics
+would need new adapter and witness modules while retaining the Semantic
+Feedback IR and acceptance predicate.
+What has been established, and what remains open for richer encodings and
+industrial tasks, is summarised next.
