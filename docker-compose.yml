@@ -1,0 +1,9 @@
+services:
+  sgdp:
+    build: .
+    volumes:
+      - ./.env:/workspace/.env:ro
+      - ./artifacts:/workspace/artifacts
+    environment:
+      - PYTHONPATH=/workspace
+    working_dir: /workspace

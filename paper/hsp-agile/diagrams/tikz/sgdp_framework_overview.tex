@@ -1,0 +1,67 @@
+%% diagrams/tikz/sgdp_framework_overview.tex
+%% Hero overview: Text_L -> Adapt -> SpecIR -> Witness -> Semantic IR -> LLM -> Verifier -> Accept
+
+\input{diagrams/tikz/_theme}
+
+\begin{tikzpicture}[
+  node distance=0.55cm and 0.42cm,
+]
+
+%% Main horizontal pipeline (top row)
+\node[sgdp/adapter, minimum width=1.65cm] (spec) at (0,0)
+  {\textbf{Spec}\\[-1pt]{\scriptsize Text$_L$}};
+\node[sgdp/adapter, minimum width=1.75cm, right=of spec] (adapt)
+  {\textbf{Adapter}\\[-1pt]{\scriptsize Adapt$_L$}};
+\node[sgdp/core, minimum width=1.55cm, right=of adapt] (specir)
+  {\textbf{SpecIR}};
+\node[sgdp/core, minimum width=1.85cm, right=of specir] (witness)
+  {\textbf{Witness}\\[-1pt]{\scriptsize SMT $\mathcal{W}$}};
+\node[sgdp/core, minimum width=1.55cm, right=of witness] (llm)
+  {\textbf{LLM}\\[-1pt]{\scriptsize synth / repair}};
+\node[sgdp/core, minimum width=1.85cm, right=of llm] (verifier)
+  {\textbf{Verifier}\\[-1pt]{\scriptsize oracle + guard}};
+\node[sgdp/accept, minimum width=1.55cm, right=of verifier] (accept)
+  {\textbf{Accept}\\[-1pt]{\scriptsize $\mathcal{A}$}};
+
+\draw[sgdp/arr] (spec) -- (adapt);
+\draw[sgdp/arr] (adapt) -- (specir);
+\draw[sgdp/arr] (specir) -- (witness);
+\draw[sgdp/arr] (witness) -- (llm);
+\draw[sgdp/arr] (llm) -- (verifier);
+\draw[sgdp/arr] (verifier) -- (accept);
+
+%% Semantic Feedback IR (repair path, below witness)
+\node[sgdp/core, minimum width=2.05cm, below=1.05cm of witness] (semir)
+  {\textbf{Semantic IR}\\[-1pt]{\scriptsize JSON $\to$ prompt}};
+
+\draw[sgdp/arr] (verifier.south) ++(0,-0.12) coordinate (failpt)
+  -- ++(0,-0.55) -| (semir.north);
+\draw[sgdp/arr] (semir.west) -| (llm.south);
+
+\node[sgdp/lbl] at ($(failpt)!0.5!(semir.north) + (-0.35,0)$) {fail};
+
+%% HSP-Agile instantiation branch (below SpecIR)
+\node[sgdp/lower, minimum width=1.55cm, below=0.95cm of specir] (lower)
+  {\textbf{Lower}$_{\text{FSF}}$};
+\node[sgdp/lower, minimum width=1.75cm, below=0.55cm of lower] (pguard)
+  {\textbf{Pattern Guard}};
+
+\draw[sgdp/arr] (specir.south) -- (lower.north);
+\draw[sgdp/arr] (lower.south) -- (pguard.north);
+\draw[sgdp/arr] (pguard.east) -| (verifier.south);
+
+\node[sgdp/lbl, left=0.02cm of lower] {inst.};
+
+%% K-iteration repair loop (above)
+\draw[sgdp/looparr, rounded corners=4pt]
+  (accept.north) -- ++(0,0.55) -| (llm.north);
+\node[sgdp/lbl, text=SpecOrange!90!black, above=0.42cm of llm, xshift=1.9cm]
+  {$K$-iteration repair loop};
+
+%% Sub-labels
+\node[sgdp/lbl, below=0.12cm of spec] {surface syntax};
+\node[sgdp/lbl, below=0.12cm of adapt] {notation-agnostic};
+\node[sgdp/lbl, below=0.12cm of witness] {boundary cases};
+\node[sgdp/lbl, below=0.12cm of accept] {$\mathrm{Conf}{=}1 \wedge P^H{=}0$};
+
+\end{tikzpicture}

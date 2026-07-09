@@ -1,0 +1,30 @@
+%% diagrams/tikz/_theme.tex — shared SgDP TikZ palette and node styles
+%% \input inside a tikzpicture after \usetikzlibrary{...}
+
+\colorlet{SpecBlue}{blue!55!cyan!85!white}
+\colorlet{SpecGreen}{green!45!black!70!white}
+\colorlet{SpecOrange}{orange!80!red}
+\colorlet{SpecGray}{black!38}
+
+\tikzset{
+  sgdp/box/.style={
+    draw=SpecGray!80!black,
+    fill=SpecGray!10,
+    rounded corners=3pt,
+    minimum height=0.78cm,
+    align=center,
+    inner sep=4pt,
+    drop shadow={shadow xshift=0.35ex, shadow yshift=-0.35ex, shadow opacity=0.22}
+  },
+  sgdp/adapter/.style={sgdp/box, fill=SpecBlue!16, draw=SpecBlue!75!black},
+  sgdp/core/.style={sgdp/box, fill=SpecGreen!14, draw=SpecGreen!70!black},
+  sgdp/lower/.style={sgdp/box, fill=SpecOrange!12, draw=SpecOrange!75!black},
+  sgdp/accept/.style={sgdp/box, fill=SpecGreen!20, draw=SpecGreen!80!black, line width=0.9pt},
+  sgdp/arr/.style={-{Stealth[length=5pt,width=3pt]}, thick, draw=black!65},
+  sgdp/looparr/.style={
+    -{Stealth[length=5pt,width=3pt]},
+    thick, dashed, draw=SpecOrange!85!black, line width=0.75pt
+  },
+  sgdp/lbl/.style={font=\scriptsize\sffamily, text=black!55},
+  every node/.style={font=\small\sffamily}
+}

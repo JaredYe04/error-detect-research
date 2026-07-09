@@ -41,9 +41,11 @@ advantage grows with specification complexity; E4 shows SMT witnesses maintain
 boundary coverage where random sampling fails; E5 shows repair trajectories improve
 over iterations; E6 isolates the Semantic Feedback IR contribution at
 \textbf{+7.7\,pp} over test-only feedback (86.9\% vs.\ 79.1\%, $n=120$ per variant).
-Theorem~1 establishes witness soundness; Proposition~2 provides a
-Finite-Sample FAR Bound on the acceptance predicate; and Hypothesis~3 captures
-the empirically supported improvement under structured feedback.
+Theorem~\ref{thm:witness-soundness} establishes witness soundness;
+Theorem~\ref{thm:far-bound} provides a finite-sample FAR bound on the
+acceptance predicate; Corollary~\ref{cor:random-vs-smt} quantifies the SMT
+advantage over random sampling; and Hypothesis~\ref{hyp:structured-feedback}
+captures the empirically supported improvement under structured feedback.
 
 Generalisation experiments (E8) demonstrate that the framework advantage holds
 across Mini-StateMachine and Mini-Z notations with only adapter-level changes,
@@ -128,7 +130,7 @@ The findings of this report open several avenues for future investigation.
 
 \paragraph{Richer specification support.}
 The current HSP-Agile pipeline targets FSF specifications with scenario-ordering
-constraints expressible as Z3 integer constraints.
+constraints expressible as Z3 integer constraints (Section~\ref{sec:disc:specir-scope}).
 Many real formal specifications additionally involve temporal properties
 (e.g.\ ``scenario A must always precede scenario B within the same session''),
 stateful behaviours (e.g.\ modifications to shared database tables), and composite

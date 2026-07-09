@@ -28,13 +28,17 @@ PAPER_ROOT = Path(__file__).resolve().parents[2]
 PROC_DIR = PAPER_ROOT / "data" / "processed"
 FIG_DIR = PAPER_ROOT / "figures"
 
-# Colorblind-safe palette (Paul Tol's "muted")
+# Colorblind-safe palette (Paul Tol's "muted") + SgDP accent colours
+# (aligned with diagrams/tikz/_theme.tex: SpecBlue, SpecGreen, SpecOrange)
+SGDP_BLUE   = "#6DB3D9"
+SGDP_GREEN  = "#5C8A6B"
+SGDP_ORANGE = "#E07B39"
 MODE_ORDER = ["B0", "B1", "B2", "M", "A1", "A2", "A3"]
 PALETTE = {
     "B0": "#CC6677",
     "B1": "#332288",
     "B2": "#88CCEE",
-    "M":  "#117733",
+    "M":  SGDP_GREEN,
     "A1": "#DDCC77",
     "A2": "#AA4499",
     "A3": "#44AA99",
@@ -1483,11 +1487,11 @@ def plot_ccf_b_mechanism_figures(formats: list[str], dpi: int) -> None:
         label_map = {"A": "A: test only", "B": "B: test+expected", "C": "C: semantic IR"}
         labels = [label_map.get(r, r) for r in e6["variant_label"]]
         conf = e6["mean_conf"].tolist()
-        colors = ["#332288", "#88CCEE", "#117733"][: len(conf)]
+        colors = [SGDP_BLUE, "#88CCEE", SGDP_GREEN][: len(conf)]
     else:
         labels = ["A: test only", "B: test+expected", "C: semantic IR"]
         conf = [0.0, 0.0, 0.0]
-        colors = ["#332288", "#88CCEE", "#117733"]
+        colors = [SGDP_BLUE, "#88CCEE", SGDP_GREEN]
     bars = ax.bar(labels, conf, color=colors, edgecolor="white", linewidth=0.8)
     ax.set_ylim(0.70, 1.0)
     ax.set_ylabel("Mean strict formal conformance")

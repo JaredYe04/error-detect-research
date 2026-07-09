@@ -22,10 +22,12 @@ separates language-specific parsing from shared pipeline logic.
 (FSF) via an FSF lowerer; Mini-Z and Mini-StateMachine adapters demonstrate cross-notation
 generalisation with only adapter-level changes.
 
-We establish three formal results: Scenario-aware Witness Soundness (Theorem~1),
-a Finite-Sample FAR Bound (Proposition~2), a Random-vs.-SMT boundary hit-rate
-corollary (Corollary~\ref{cor:random-vs-smt}), and an empirically supported hypothesis of
-improvement under structured feedback (Hypothesis~3).
+We establish three formal results: scenario-aware witness soundness
+(Theorem~\ref{thm:witness-soundness}), a finite-sample FAR bound on the
+acceptance predicate (Theorem~\ref{thm:far-bound}), and a random-vs.-SMT
+boundary hit-rate corollary (Corollary~\ref{cor:random-vs-smt}), together with
+an empirically supported hypothesis on structured feedback
+(Hypothesis~\ref{hyp:structured-feedback}).
 We evaluate on a benchmark of 120 precedence-sensitive hard tasks (plus 40 real-derived
 tasks from HumanEval/MBPP converted to FSF-style ordered scenarios) across nine execution
 modes (including Self-Refine and Self-Debug extended baselines), with a five-dimension

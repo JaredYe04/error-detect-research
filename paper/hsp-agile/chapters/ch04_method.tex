@@ -36,14 +36,8 @@ four language-independent components:
     oracle-grounded conformance and specification-derived quality criteria.
 \end{enumerate}
 
-\begin{figure}[t]
-  \centering
-  \tikzinput{diagrams/tikz/pipeline_architecture}
-  \caption{\textsc{SgDP} framework (outer box) and HSP-Agile instantiation (inner
-    labels).  Shadowed boxes are processing stages; the left arc is the repair loop
-    within budget~$K$.}
-  \label{fig:architecture}
-\end{figure}
+Figure~\ref{fig:sgdp-overview} (Chapter~\ref{ch:intro}) depicts the end-to-end
+\textsc{SgDP} pipeline; the present section details the instantiation interface.
 
 An instantiation for language $\mathcal{L}$ provides:
 (i)~Specification Adapter $\text{Adapt}_L : \text{Text}_L \to \text{SpecIR}$;
@@ -57,9 +51,10 @@ Synthesis, repair, pattern guard, and acceptance are shared core components.
 \begin{figure}[t]
   \centering
   \tikzinput{diagrams/tikz/sgdp_specir_architecture}
-  \caption{SpecIR-centric \textsc{SgDP} architecture.
-    Adapters unify SOFL/FSF, Mini-Z, and Mini-StateMachine; HSP-Agile applies
-    $\text{Lower}_{\text{FSF}}$ for pattern-guard screening.}
+  \caption{\textbf{SpecIR adapter layer (detail).}
+    Adapters unify SOFL/FSF, Mini-Z, and Mini-StateMachine into canonical SpecIR;
+    HSP-Agile applies $\text{Lower}_{\text{FSF}}$ for FSF-shaped screening.
+    See Figure~\ref{fig:sgdp-overview} for the full pipeline context.}
   \label{fig:specir-arch}
 \end{figure}
 
@@ -75,7 +70,7 @@ The FSF oracle requires no reference implementation:
   g_t(\mathbf{x}) = \phi_i(\mathbf{x}) \text{ where } i = \min\{j : g_j(\mathbf{x})\}.
 \end{equation}
 
-\subsection{Constraint-guided Witness Generation and Theorem~1}
+\subsection{Constraint-guided Witness Generation}
 \label{subsec:witness-gen}
 
 For scenario $s_i$, the witness generator solves the \emph{priority formula}
@@ -93,9 +88,10 @@ If $\hat{g}_i$ soundly encodes $g_i$ and Z3 returns model $\mathbf{x}^*$ satisfy
 $\Phi_i$, then $g_i(\mathbf{x}^*)$ holds and $g_j(\mathbf{x}^*)$ is false for all $j < i$;
 hence $g_t(\mathbf{x}^*) = \phi_i(\mathbf{x}^*)$.
 \end{theorem}
-\begin{proof}[Sketch]
+\begin{proof}
 Z3 soundness and encoding correctness give $g_i(\mathbf{x}^*)$ and $\lnot g_j(\mathbf{x}^*)$
 for $j < i$; first-match semantics yields $i = \min\{j : g_j(\mathbf{x}^*)\}$.
+(Proof sketch.)
 \end{proof}
 
 \subsection{Scenario-aware Semantic Feedback IR}
@@ -116,7 +112,7 @@ The IR serialises to JSON per \texttt{schemas/semantic\_feedback.schema.json};
 IR onto E6 render variants (test-only, test+expected, full semantic IR), demonstrating
 IR--prompt separation rather than ad-hoc prompt engineering.
 
-\subsection{Formal Conformance, Acceptance Predicate, and Proposition~2}
+\subsection{Formal Conformance and Acceptance Predicate}
 \label{subsec:conformance-acceptance}
 
 \begin{equation}
@@ -133,8 +129,8 @@ The conjunctive acceptance predicate is:
   \sum_{p \in \mathcal{P}^H} \mathbf{1}[p(c,t)] = 0.
 \end{equation}
 
-\begin{proposition}[Finite-Sample FAR Bound]
-\label{prop:far-bound}
+\begin{theorem}[Finite-Sample FAR Bound]
+\label{thm:far-bound}
 For a task $t$ with $|\mathcal{D}(t)| = n$ SMT-generated witnesses drawn
 independently, the false-acceptance rate satisfies
 $\mathrm{FAR} \leq (1-\varepsilon)^n$,
@@ -144,18 +140,19 @@ The bound holds under the assumption that witnesses are independently generated
 and not adversarially chosen.  It does not constitute full correctness: a
 candidate accepted under~$\mathrm{Accept}(c,t)$ may still fail on inputs outside
 $\mathcal{D}(t)$.
-\end{proposition}
-\begin{proof}[Sketch]
+\end{theorem}
+\begin{proof}
 Independence of witnesses gives $P(\text{all pass} \mid \text{faulty}) \leq
 (1-\varepsilon)^n$ by the union bound complement.  Witness soundness
 (Theorem~\ref{thm:witness-soundness}) ensures each witness $\mathbf{x} \in
 \mathcal{D}(t)$ exercises a non-trivial guard boundary, making $\varepsilon$
 bounded away from zero for the fault classes in the mutation operators
-(Table~\ref{tab:operators}); boundary placement
-(Proposition~\ref{prop:smt-advantage}) strengthens this argument.
+(Table~\ref{tab:operators}); Corollary~\ref{cor:random-vs-smt} strengthens
+this argument by placing witnesses on precedence-critical boundaries.
+(Proof sketch.)
 \end{proof}
 
-\subsection{Structured Feedback and Hypothesis~3}
+\subsection{Structured Feedback and Repair Hypothesis}
 \label{subsec:repair-monotonicity}
 
 \begin{hypothesis}[Expected Improvement under Structured Feedback]
@@ -178,7 +175,7 @@ supported hypothesis.
 \subsection{Empirical FAR Validation}
 \label{subsec:far-validation}
 
-To ground the Finite-Sample FAR Bound (Proposition~\ref{prop:far-bound})
+To ground the Finite-Sample FAR Bound (Theorem~\ref{thm:far-bound})
 empirically, we compare the theoretical upper bound $(1-\varepsilon)^n$ to
 the observed FAR measured in E2 (Section~\ref{sec:e2-prevention}).
 Using $\varepsilon = 0.08$ (estimated from the median per-witness detection
@@ -322,7 +319,7 @@ Per-task data flow:
   \label{eq:pipeline-flow}
 \end{equation}
 iterated until $\mathrm{Accept}(c_k, t) = 1$ or $k = K$.
-Figure~\ref{fig:architecture} shows the architecture; Figure~\ref{fig:pipeline-seq}
+Figure~\ref{fig:sgdp-overview} shows the architecture; Figure~\ref{fig:pipeline-seq}
 the message-level sequence.
 
 \begin{figure}[t]
@@ -526,7 +523,7 @@ predicate (equation~\eqref{eq:accept}) combines Stages~2 and~4 per Principle~P4.
     2     & Formal Check  & $c_k$, $t$          & $\mathrm{Conf}$, $\mathit{cexs}$ & sound (Thm.~\ref{thm:witness-soundness}) \\
     3     & Repair        & $\mathit{cexs}$, $\mathit{hits}$ & $\mathit{fb}_k$ & CEGIS bridge \\
     4     & Pattern Guard & $c_k$, $t$          & $\mathit{hits}$            & finite catalog \\
-    ---   & Accept        & $\mathrm{Conf}$, $\mathit{hits}$ & $\{0,1\}$     & conjunctive (Thm.~\ref{thm:acceptance-safety}) \\
+    ---   & Accept        & $\mathrm{Conf}$, $\mathit{hits}$ & $\{0,1\}$     & conjunctive (Thm.~\ref{thm:far-bound}) \\
     \bottomrule
   \end{tabularx}
 \end{inlinetable}

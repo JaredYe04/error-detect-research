@@ -60,6 +60,40 @@ For task $t$, $\text{SpecIR}(t) = (\Sigma_t,\; \Gamma_t,\; C_t,\; M_t)$, where
 $\Sigma_t$ is the typed I/O signature, $\Gamma_t$ the variable domain,
 $C_t = \langle c_1,\ldots,c_n\rangle$ an ordered list of guarded cases
 (first-match semantics), and $M_t$ notation-specific metadata.
+We write the abstract syntax as
+$\text{SpecIR} \triangleq \langle\Sigma_t, \Gamma_t, C_t, M_t\rangle$ or,
+equivalently, $\text{SpecIR} ::= \texttt{Signature}\;\texttt{Cases}\;[\texttt{Metadata}]$.
+\end{definition}
+
+\begin{definition}[SpecIR Surface Grammar (EBNF)]
+\label{def:specir-ebnf}
+The JSON serialisation aligns with \texttt{schemas/spec\_ir.schema.json} and
+\texttt{src/ir/spec\_ir.py}:
+\begin{lstlisting}[language={},basicstyle=\ttfamily\footnotesize]
+SpecIR      ::= task_id notation name Signature Cases surface_prompt [Metadata]
+Signature   ::= Inputs Outputs
+Inputs      ::= Param*          Outputs ::= Param*
+Param       ::= name type       (* nat | int | bool | string *)
+Cases       ::= GuardedCase+
+GuardedCase ::= index guard postcondition [guard_text] [post_text]
+Guard       ::= GuardAtom* | { var="" op="others" }
+GuardAtom   ::= var op [threshold]   (* op in eq,ne,lt,le,gt,ge,others *)
+\end{lstlisting}
+\end{definition}
+
+\begin{definition}[SpecIR Well-formedness]
+\label{def:specir-wf}
+A SpecIR document $d$ is \emph{well-formed} iff:
+(i)~$d.\texttt{notation}$ is one of \texttt{sofl}, \texttt{mini\_z},
+\texttt{mini\_statemachine}, or \texttt{real\_derived};
+(ii)~case indices are consecutive $1,\ldots,n$ with pairwise distinct guards;
+(iii)~every \texttt{guard} atom's \texttt{var} is declared in \texttt{inputs},
+    except the \texttt{others} sentinel;
+(iv)~every \texttt{postcondition} key is declared in \texttt{outputs}; and
+(v)~the final case is either an \texttt{others} sentinel or its guard is
+    logically equivalent to $\neg\bigvee_{i<n} g_i$.
+Validation is enforced by \texttt{src/ir/schema\_validate.py}
+(Appendix~\ref{sec:repro:schemas}).
 \end{definition}
 
 \begin{definition}[Specification Adapter]
@@ -164,12 +198,12 @@ prescribed output of exactly one scenario.
 The following proposition establishes that the procedure achieves full
 scenario coverage.
 
-\begin{proposition}[Scenario Coverage]
-\label{prop:coverage}
+\begin{lemma}[Scenario Coverage]
+\label{lem:coverage}
 If the SMT solver finds satisfying inputs for all $n$ scenarios, then
 $\mathcal{D}(t)$ contains at least one representative case per scenario,
 covering the entire precedence ordering $s_1 \succ s_2 \succ \cdots \succ s_n$.
-\end{proposition}
+\end{lemma}
 
 \begin{proof}
 By construction, each $x_i$ satisfies $g_i$ but not $g_1, \ldots, g_{i-1}$.
@@ -193,15 +227,6 @@ For faulty candidate $c$, $\varepsilon_c =
 $\varepsilon = \min_{c \in \mathcal{C}\setminus\{g_t\}} \varepsilon_c > 0$.
 \end{definition}
 
-\begin{proposition}[SMT Boundary Coverage Advantage]
-\label{prop:smt-advantage}
-Each SMT witness $\mathbf{x}_i^*$ lies on (or within numeric precision of) the
-boundary of $g_i$.  Uniform random sampling satisfies
-$\Pr[\mathbf{x} \in \mathcal{B}_\varepsilon(t)] =
-\mu(\mathcal{B}_\varepsilon(t))/\mu(\mathcal{X}_t)$, typically small for dense
-guard overlap; SMT achieves targeted boundary coverage deterministically.
-\end{proposition}
-
 \begin{corollary}[Random vs.\ SMT Fault-Exposure Hit Rate]
 \label{cor:random-vs-smt}
 Let $\varepsilon = \mu(\mathcal{B}_\varepsilon(t))/\mu(\mathcal{X}_t)$ denote the
@@ -209,28 +234,34 @@ measure of the boundary region relative to the input domain.
 For a faulty candidate $c$ with per-witness fault-exposure probability
 $\varepsilon_c \geq \varepsilon$ (Definition~\ref{def:fault-exposure}),
 a single uniform random sample detects the fault with probability at most
-$\varepsilon_c$.
+$\varepsilon_c$, because
+$\Pr[\mathbf{x} \in \mathcal{B}_\varepsilon(t)] =
+\mu(\mathcal{B}_\varepsilon(t))/\mu(\mathcal{X}_t)$ under uniform sampling---
+typically small when guard overlap is dense.
 The Constraint-guided Witness Generator produces one witness per strict
 scenario region via $\Phi_i$ (Equation~\eqref{eq:priority}); under sound
 encoding, each such witness activates scenario~$i$ with probability~$1$
-(Theorem~\ref{thm:witness-soundness}), yielding deterministic coverage of
-precedence-critical regions that random sampling reaches with probability
-$\mathcal{O}(\varepsilon)$.
+(Theorem~\ref{thm:witness-soundness}), lying on (or within numeric precision of)
+the boundary of~$g_i$.
+Random sampling therefore reaches precedence-critical regions with probability
+$\mathcal{O}(\varepsilon)$, whereas SMT achieves targeted boundary coverage
+deterministically.
 \end{corollary}
 
-\begin{proof}[Sketch]
+\begin{proof}
 Random sampling: $\Pr[f_c(\mathbf{x}) \neq g_t(\mathbf{x})] \leq
 \Pr[\mathbf{x} \in \mathcal{B}_\varepsilon(t)] = \varepsilon$ when faults
 manifest only on boundary inputs.
 SMT: satisfiability of $\Phi_i$ guarantees $g_i(\mathbf{x}_i^*) \land
 \bigwedge_{j<i}\neg g_j(\mathbf{x}_i^*)$, so the witness lies in the
 exclusive first-match region of~$s_i$.
+(Proof sketch.)
 \end{proof}
 
 \begin{figure}[t]
   \centering
   \tikzinput{diagrams/tikz/fsf_semantics}
-  \caption{FSF specification structure and evaluation semantics.
+  \caption{\textbf{FSF evaluation semantics (illustrative detail).}
     Left: a three-scenario FSF function definition.
     Right: the corresponding input-space partitioning with scenario
     priority $S_1 \succ S_2 \succ S_3$ and the oracle mapping.
@@ -645,7 +676,7 @@ adapter layer (Definitions~\ref{def:specir}--\ref{def:fsf-lowering}), the FSF
 scenario and its semantics (Definitions \ref{def:scenario}--\ref{def:oracle}),
 and the SMT-based case generation procedure
 (Definition~\ref{def:test-suite}), proving that it achieves full scenario
-coverage (Proposition~\ref{prop:coverage}).  We formalised the Bounded
+coverage (Lemma~\ref{lem:coverage}).  We formalised the Bounded
 Acceptance Problem (Definition~\ref{def:bap}), which captures the synthesis-and-repair
 loop as a budget-constrained search, and introduced the hybrid acceptance
 predicate that combines conformance checking with fault-pattern screening

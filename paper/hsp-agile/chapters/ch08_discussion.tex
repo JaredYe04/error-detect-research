@@ -21,20 +21,18 @@ Section~\ref{sec:exp:threats-preview}; here we provide the full analysis.
 \label{sec:disc:interpretation}
 %=============================================================================
 
-The central empirical finding of this report is that the full HSP-Agile pipeline
-(mode~M) achieves a mean strict formal conformance of \textbf{90.4\%} on the hard
-benchmark of 120 precedence-sensitive formal specification tasks---a gain of
-\textbf{6.2 percentage points} over the one-shot LLM baseline (B1: 84.2\%) and
-\textbf{2.4 percentage points} over the test-feedback loop baseline (B2: 88.0\%).
-
-Two interlocking mechanisms produce this improvement.
-First, the formal conformance checker generates Z3-driven test cases targeted at
-the ordering constraints encoded in each Functional Scenario Framework (FSF)
-specification~\citep{barrett2018smt,demoura2008z3,liu2014sofl}, exposing violations
-that coarser unit tests systematically miss~\citep{zhu1997specification,ammann2016testing}.
+The central empirical finding is that the full HSP-Agile pipeline (mode~M)
+achieves \textbf{90.4\%} mean strict formal conformance on the 120-task hard
+benchmark---a gain of \textbf{6.2 percentage points} over one-shot LLM (B1:
+84.2\%) and \textbf{2.4 percentage points} over test-feedback repair (B2:
+88.0\%).
+Two interlocking mechanisms explain this improvement.
+First, Z3-driven witnesses target the ordering constraints encoded in each FSF
+specification~\citep{barrett2018smt,demoura2008z3,liu2014sofl}, exposing
+violations that coarser unit tests miss~\citep{zhu1997specification,ammann2016testing}.
 Second, the counterexample-guided repair loop~\citep{solarlezama2008sketching}
-converts witnessed failures into structured repair prompts that direct the
-language model towards the violated constraint~\citep{lynn2024verifierloop,chen2021codex}.
+converts witnessed failures into Semantic Feedback IR prompts that name the
+violated scenario and guard~\citep{lynn2024verifierloop,chen2021codex}.
 
 The low conformance of the B0 reference mode (27.5\%) establishes a meaningful
 lower bound: template-based generation performs poorly on the hard partition and
@@ -442,7 +440,7 @@ common in empirical software engineering~\citep{ammann2016testing,woodcock2009fo
 \paragraph{Construct validity.}
 Formal conformance is approximated via a finite witness set $\mathcal{D}(t)$;
 candidates outside the checked space are not guaranteed correct.
-Theorem~\ref{thm:acceptance-safety} quantifies the FAR bound as a function of witness
+Theorem~\ref{thm:far-bound} quantifies the FAR bound as a function of witness
 count.
 The 14-pattern guard catalogue was derived from SOFL literature~\citep{li2023iet};
 novel fault classes may be missed.
@@ -479,3 +477,49 @@ Prevention comparisons require the full E2 dataset; preliminary results are supe
 by the full evaluation (120 tasks $\times$ 7 modes $\times$ 8 operators).
 The non-monotonic PDR pattern (B2 $>$ M on preliminary $n=40$) reflects
 complementary detection mechanisms, not M's inferiority as a prevention system.
+
+
+%=============================================================================
+\section{SpecIR Scope Assumptions and Future Extensions}
+\label{sec:disc:specir-scope}
+%=============================================================================
+
+The current SpecIR design (Definitions~\ref{def:specir}--\ref{def:specir-wf})
+makes explicit assumptions that bound framework generality.
+Table~\ref{tab:specir-scope} maps each assumption to a natural extension;
+Section~\ref{sec:conc:future} prioritises these directions for future work.
+
+\begin{table}[t]
+  \centering
+  \caption{\textbf{SpecIR scope assumptions and extension paths.}
+    Each row states a current design choice, its limitation, and a research
+    direction beyond the HSP-Agile evaluation.}
+  \label{tab:specir-scope}
+  \footnotesize
+  \renewcommand{\arraystretch}{1.15}
+  \begin{tabular}{@{}p{0.22\linewidth}p{0.30\linewidth}p{0.38\linewidth}@{}}
+    \toprule
+    \textbf{Assumption} & \textbf{Limitation} & \textbf{Extension} \\
+    \midrule
+    Deterministic guards &
+    Cannot express probabilistic thresholds or noisy sensors &
+    Probabilistic guards with confidence intervals \\
+    First-match ordering &
+    No temporal ``always/eventually'' constraints &
+    LTL/CTL adapters over transition systems \\
+    Single oracle $g_t$ &
+    No distributed or multi-service contracts &
+    Compositional oracles with interface contracts \\
+    Linear integer arithmetic (LIA) &
+    Non-linear and floating-point guards fail encoding &
+    NIA/QF\_FP backends with staged fallback \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+These assumptions are deliberate scoping choices for a first framework
+instantiation, not fundamental barriers.
+E8 generalisation across Mini-Z and Mini-StateMachine demonstrates that
+adapter-level extensions preserve the shared pipeline; temporal and
+probabilistic semantics would require new adapter and witness modules while
+retaining the Semantic Feedback IR and acceptance predicate structure.

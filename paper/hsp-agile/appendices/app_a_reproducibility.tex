@@ -15,13 +15,17 @@ components that mirror the structure of a conventional empirical
 software-engineering study:
 
 \paragraph{Machine-readable schemas.}
+\label{sec:repro:schemas}
 The artifact releases \texttt{schemas/spec\_ir.schema.json} (canonical SpecIR)
 and \texttt{schemas/semantic\_feedback.schema.json} (nine-field Semantic
-Feedback IR).  The adapter registry (\texttt{src/adapters/\_\_init\_\_.py}) and
+Feedback IR).
+The EBNF grammar and well-formedness conditions in
+Definitions~\ref{def:specir-ebnf}--\ref{def:specir-wf} are aligned with these
+schemas; \texttt{src/ir/schema\_validate.py} validates both at test time via
+\texttt{jsonschema} (see \texttt{tests/test\_schema\_validate.py}).
+The adapter registry (\texttt{src/adapters/\_\_init\_\_.py}) and
 FSF lowerer (\texttt{src/ir/lowerers/fsf\_lowerer.py}) support round-trip
 validation from SpecIR to legacy TaskSpec format.
-\texttt{src/ir/schema\_validate.py} validates both schemas at test time via
-\texttt{jsonschema} (see \texttt{tests/test\_schema\_validate.py}).
 
 \paragraph{Raw execution logs.}
 Append-only records of every pipeline invocation, one entry per
@@ -189,6 +193,19 @@ The dominant cost is language-model API latency during Stage~2; the full
 evaluation matrix (seven modes across 120 tasks) requires several hours of
 API time but can be parallelised across independent worker processes without
 affecting result validity.
+
+\paragraph{Docker reproduction.}
+A containerised path is provided for reviewers who prefer an isolated environment.
+From the repository root:
+\begin{verbatim}
+docker compose build
+docker compose run --rm sgdp
+\end{verbatim}
+This runs unit tests, regenerates processed paper metrics from the bundled
+\texttt{artifacts/run\_feedback\_v2} snapshot (when present), and rebuilds
+matplotlib figures.
+Full LLM experiments require mounting a \texttt{.env} file with API credentials;
+see \texttt{ARTIFACT.md} for the ASE/SANER reproducibility checklist.
 
 % ---------------------------------------------------------------------------
 \section{Expected Outputs}
