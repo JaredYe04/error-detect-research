@@ -29,6 +29,7 @@ HardSynthetic.HardCase027,B0,0.0,medium
 HardSynthetic.HardCase028,B0,0.0,low
 HardSynthetic.HardCase029,B0,0.0,low
 HardSynthetic.HardCase030,B0,0.0,high
+HardSynthetic.HardCase031,B0,0.0,low
 HardSynthetic.HardCase032,B0,0.0,low
 HardSynthetic.HardCase033,B0,0.0,low
 HardSynthetic.HardCase034,B0,0.0,low
@@ -110,6 +111,7 @@ HardSynthetic.HardCase024,B1,0.8888888888888888,high
 HardSynthetic.HardCase023,B1,0.8888888888888888,high
 HardSynthetic.HardCase018,B1,0.8888888888888888,medium
 HardSynthetic.HardCase027,B1,0.8888888888888888,medium
+HardSynthetic.HardCase031,B1,0.0,low
 HardSynthetic.HardCase019,B1,0.8888888888888888,high
 HardSynthetic.HardCase033,B1,0.0,low
 HardSynthetic.HardCase029,B1,0.9629629629629629,low
@@ -200,6 +202,7 @@ HardSynthetic.HardCase024,B2,0.8888888888888888,high
 HardSynthetic.HardCase028,B2,0.8888888888888888,low
 HardSynthetic.HardCase027,B2,0.8888888888888888,medium
 HardSynthetic.HardCase029,B2,0.9629629629629629,low
+HardSynthetic.HardCase031,B2,0.8888888888888888,low
 HardSynthetic.HardCase033,B2,0.8888888888888888,low
 HardSynthetic.HardCase030,B2,0.8888888888888888,high
 HardSynthetic.HardCase032,B2,0.9629629629629629,low
@@ -283,6 +286,7 @@ HardSynthetic.HardCase020,M,0.8888888888888888,medium
 HardSynthetic.HardCase024,M,0.8888888888888888,high
 HardSynthetic.HardCase025,M,0.9629629629629629,low
 HardSynthetic.HardCase026,M,0.8888888888888888,medium
+HardSynthetic.HardCase031,M,0.8888888888888888,low
 HardSynthetic.HardCase027,M,0.8888888888888888,medium
 HardSynthetic.HardCase030,M,0.8888888888888888,high
 HardSynthetic.HardCase032,M,0.9629629629629629,low
@@ -372,6 +376,7 @@ HardSynthetic.HardCase029,A1,0.9629629629629629,low
 HardSynthetic.HardCase023,A1,0.8888888888888888,high
 HardSynthetic.HardCase026,A1,0.8888888888888888,medium
 HardSynthetic.HardCase030,A1,0.8888888888888888,high
+HardSynthetic.HardCase031,A1,0.8888888888888888,low
 HardSynthetic.HardCase032,A1,0.9629629629629629,low
 HardSynthetic.HardCase033,A1,0.8888888888888888,low
 HardSynthetic.HardCase028,A1,0.8888888888888888,low
@@ -464,6 +469,7 @@ HardSynthetic.HardCase033,A2,0.8888888888888888,low
 HardSynthetic.HardCase034,A2,0.9629629629629629,low
 HardSynthetic.HardCase036,A2,0.8888888888888888,high
 HardSynthetic.HardCase038,A2,0.8888888888888888,high
+HardSynthetic.HardCase031,A2,0.8888888888888888,low
 HardSynthetic.HardCase037,A2,0.9629629629629629,low
 HardSynthetic.HardCase042,A2,0.8888888888888888,high
 HardSynthetic.HardCase040,A2,0.8888888888888888,low
@@ -540,6 +546,7 @@ HardSynthetic.HardCase021,A3,0.8888888888888888,medium
 HardSynthetic.HardCase024,A3,0.8888888888888888,high
 HardSynthetic.HardCase025,A3,0.9629629629629629,low
 HardSynthetic.HardCase020,A3,0.8888888888888888,medium
+HardSynthetic.HardCase031,A3,0.0,low
 HardSynthetic.HardCase030,A3,0.8888888888888888,high
 HardSynthetic.HardCase026,A3,0.8888888888888888,medium
 HardSynthetic.HardCase033,A3,0.0,low

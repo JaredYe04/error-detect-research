@@ -191,6 +191,143 @@ class StateMachineAdapter(SpecAdapter):
 
 # ── Built-in Mini-StateMachine task corpus (18 machines) ─────────────────────
 
+# ── Built-in Mini-StateMachine task corpus (30 machines) ─────────────────────
+
+_EXTRA_STATEMACHINE_SPECS: list[str] = [
+    """\
+INPUTS: temp: int, humidity: int, fan: int
+OUTPUTS: mode: int, alert: int
+STATES: off, normal, dehumidify
+INITIAL: off
+
+off → dehumidify  IF humidity gt 80 && fan eq 1        DO mode eq 2 && alert eq 1
+off → normal      IF temp gt 0 && humidity le 80       DO mode eq 1 && alert eq 0
+normal → dehumidify IF humidity gt 70                  DO mode eq 2 && alert eq 1
+others                                                  DO mode eq 0 && alert eq 0
+""",
+    """\
+INPUTS: balance: int, withdraw: int, pin: int
+OUTPUTS: status: int, dispensed: int
+STATES: idle, active, error
+INITIAL: idle
+
+idle → error   IF pin eq 0 && withdraw gt 0             DO status eq 2 && dispensed eq 0
+idle → active  IF pin eq 1 && balance ge withdraw      DO status eq 1 && dispensed eq withdraw
+idle → error   IF pin eq 1 && balance lt withdraw      DO status eq 2 && dispensed eq 0
+others                                                  DO status eq 0 && dispensed eq 0
+""",
+    """\
+INPUTS: speed: int, distance: int, obstacle: int
+OUTPUTS: brake: int, steer: int
+STATES: cruise, slow, stop
+INITIAL: cruise
+
+cruise → stop IF obstacle eq 1 && distance lt 10       DO brake eq 1 && steer eq 0
+cruise → slow IF distance lt 30                        DO brake eq 1 && steer eq 1
+slow → cruise IF distance ge 50 && obstacle eq 0       DO brake eq 0 && steer eq 0
+others                                                  DO brake eq 0 && steer eq 0
+""",
+    """\
+INPUTS: requests: int, capacity: int, maintenance: int
+OUTPUTS: admit: int, queue: int
+STATES: open, limited, closed
+INITIAL: open
+
+open → closed   IF maintenance eq 1                      DO admit eq 0 && queue eq 0
+open → limited  IF requests gt capacity                DO admit eq 1 && queue eq 1
+limited → open  IF requests le capacity                DO admit eq 1 && queue eq 0
+others                                                  DO admit eq 0 && queue eq 1
+""",
+    """\
+INPUTS: smoke: int, heat: int, manual: int
+OUTPUTS: alarm: int, sprinkler: int
+STATES: safe, warning, fire
+INITIAL: safe
+
+safe → fire     IF smoke gt 50 && heat gt 80            DO alarm eq 1 && sprinkler eq 1
+safe → warning  IF smoke gt 30                          DO alarm eq 1 && sprinkler eq 0
+warning → fire  IF heat gt 70                           DO alarm eq 1 && sprinkler eq 1
+others                                                  DO alarm eq 0 && sprinkler eq 0
+""",
+    """\
+INPUTS: rpm: int, load: int, temp: int
+OUTPUTS: throttle: int, shutdown: int
+STATES: run, stress, halt
+INITIAL: run
+
+run → halt    IF temp gt 100                            DO throttle eq 0 && shutdown eq 1
+run → stress  IF load gt 90 && rpm gt 5000             DO throttle eq 50 && shutdown eq 0
+stress → run  IF load lt 70 && temp lt 90              DO throttle eq 80 && shutdown eq 0
+others                                                  DO throttle eq 60 && shutdown eq 0
+""",
+    """\
+INPUTS: items: int, express: int, weight: int
+OUTPUTS: lane: int, fee: int
+STATES: standard, express_lane, reject
+INITIAL: standard
+
+standard → reject       IF weight gt 50                   DO lane eq 0 && fee eq 0
+standard → express_lane IF express eq 1 && items le 15  DO lane eq 2 && fee eq 5
+standard → express_lane IF items le 10                  DO lane eq 1 && fee eq 2
+others                                                  DO lane eq 1 && fee eq 1
+""",
+    """\
+INPUTS: heart: int, spo2: int, alarm_ack: int
+OUTPUTS: beep: int, escalate: int
+STATES: monitor, alert, critical
+INITIAL: monitor
+
+monitor → critical IF heart lt 40 || spo2 lt 85         DO beep eq 2 && escalate eq 1
+monitor → alert      IF heart lt 50 || spo2 lt 90         DO beep eq 1 && escalate eq 0
+alert → monitor      IF alarm_ack eq 1                    DO beep eq 0 && escalate eq 0
+others                                                  DO beep eq 0 && escalate eq 0
+""",
+    """\
+INPUTS: pressure: int, flow: int, leak: int
+OUTPUTS: valve: int, warn: int
+STATES: ok, warn_state, shutdown
+INITIAL: ok
+
+ok → shutdown   IF leak eq 1 && pressure lt 20           DO valve eq 0 && warn eq 2
+ok → warn_state IF pressure gt 90                        DO valve eq 1 && warn eq 1
+warn_state → ok IF pressure le 80 && leak eq 0           DO valve eq 1 && warn eq 0
+others                                                  DO valve eq 1 && warn eq 0
+""",
+    """\
+INPUTS: credits: int, bill: int, autopay: int
+OUTPUTS: charge: int, suspend: int
+STATES: active, grace, suspended
+INITIAL: active
+
+active → suspended IF credits le 0 && bill gt 0          DO charge eq 0 && suspend eq 1
+active → grace       IF credits lt bill && autopay eq 0  DO charge eq 0 && suspend eq 0
+grace → active       IF autopay eq 1                     DO charge eq bill && suspend eq 0
+others                                                  DO charge eq 0 && suspend eq 0
+""",
+    """\
+INPUTS: occupancy: int, co2: int, hour: int
+OUTPUTS: vent: int, heat: int
+STATES: eco, comfort, boost
+INITIAL: eco
+
+eco → boost    IF co2 gt 1200 && occupancy gt 10        DO vent eq 2 && heat eq 0
+eco → comfort  IF occupancy gt 5 && hour ge 8            DO vent eq 1 && heat eq 1
+comfort → eco  IF occupancy le 2                         DO vent eq 0 && heat eq 0
+others                                                  DO vent eq 1 && heat eq 1
+""",
+    """\
+INPUTS: packets: int, errors: int, reset: int
+OUTPUTS: forward: int, reset_out: int
+STATES: up, degraded, down
+INITIAL: up
+
+up → down       IF errors gt 10 && reset eq 0            DO forward eq 0 && reset_out eq 1
+up → degraded   IF errors gt 3                           DO forward eq 1 && reset_out eq 0
+degraded → up   IF errors eq 0 && packets gt 0           DO forward eq 1 && reset_out eq 0
+others                                                  DO forward eq 0 && reset_out eq 0
+""",
+]
+
 BUILTIN_STATEMACHINE_TASKS_SPEC: list[str] = [
     """\
 INPUTS: level: int, threshold: int
@@ -419,9 +556,11 @@ others                                                              DO order_sta
 """,
 ]
 
+BUILTIN_STATEMACHINE_TASKS_SPEC = BUILTIN_STATEMACHINE_TASKS_SPEC + _EXTRA_STATEMACHINE_SPECS
+
 
 def load_builtin_statemachine_tasks() -> list[dict[str, Any]]:
-    """Return the 18 built-in Mini-StateMachine tasks as TaskSpec dicts."""
+    """Return the 30 built-in Mini-StateMachine tasks as TaskSpec dicts."""
     from src.ir.lowerers.fsf_lowerer import FSFLowerer
     adapter = StateMachineAdapter()
     tasks = []

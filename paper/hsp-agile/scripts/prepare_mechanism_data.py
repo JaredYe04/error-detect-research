@@ -33,7 +33,7 @@ PROC_DIR = PAPER_ROOT / "data" / "processed"
 DEFAULT_RUN = ROOT / "artifacts" / "run_hard_full_parallel_v1"
 DEFAULT_PREVENTION = ROOT / "artifacts" / "prevention_eval" / "prevention_full_v1" / "prevention_summary.json"
 DEFAULT_FEEDBACK_RUN = ROOT / "artifacts" / "run_feedback_v2" / "feedback_variants"
-DEFAULT_GENERALISATION_RUN = ROOT / "artifacts" / "run_generalisation_v1"
+DEFAULT_GENERALISATION_RUN = ROOT / "artifacts" / "run_e8b_expanded_v1"
 HARD_TASKS = ROOT / "benchmarks" / "hard_tasks.json"
 
 
@@ -390,7 +390,9 @@ def compute_e8c_benchmark_by_source(main_run_dir: Path) -> pd.DataFrame:
             "m_strict_pct": round(float(m_main["strict_success"].mean()) * 100, 1),
         })
 
-    rd_summary = ROOT / "artifacts" / "run_real_derived_v1" / "real_derived_summary.json"
+    rd_summary = ROOT / "artifacts" / "run_e8c_full_v1" / "real_derived_summary.json"
+    if not rd_summary.exists():
+        rd_summary = ROOT / "artifacts" / "run_real_derived_v1" / "real_derived_summary.json"
     if rd_summary.exists():
         data = json.loads(rd_summary.read_text(encoding="utf-8"))
         for source, label in [("humaneval", "HumanEval-FSF (E8c)"), ("mbpp", "MBPP-FSF (E8c)")]:
@@ -406,7 +408,7 @@ def compute_e8c_benchmark_by_source(main_run_dir: Path) -> pd.DataFrame:
     gen_path = PROC_DIR / "generalisation_summary.csv"
     if gen_path.exists():
         gen_df = pd.read_csv(gen_path)
-        for notation, label in [("Mini-Z", "Mini-Z (E8a)"), ("Mini-StateMachine", "Mini-StateMachine (E8b)")]:
+        for notation, label in [("Mini-Z", "Mini-Z (E8b)"), ("Mini-StateMachine", "Mini-StateMachine (E8b)")]:
             sub = gen_df[(gen_df["notation"] == notation) & (gen_df["mode"] == "M")]
             if not sub.empty:
                 row = sub.iloc[0]

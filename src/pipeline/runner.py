@@ -79,11 +79,16 @@ def build_repair_feedback(
     *,
     variant: str,
     pattern_matches: list[Any] | None = None,
+    reflexion_memory: list[str] | None = None,
 ) -> tuple[str, list[dict[str, Any]]]:
     """Construct repair prompt via Semantic Feedback IR (JSON then render)."""
     ir = SemanticFeedbackIR.from_counterexamples(counterexamples, task=task)
     feedback_json = ir.to_json_list()
-    parts = [FeedbackRenderer.render(ir.records, variant=variant)]
+    if variant == "reflexion":
+        rendered = FeedbackRenderer._render_reflexion(ir.records, memory=reflexion_memory)
+    else:
+        rendered = FeedbackRenderer.render(ir.records, variant=variant)
+    parts = [rendered]
     if pattern_matches:
         parts.append(
             "Pattern violations: "
@@ -111,6 +116,34 @@ def config_for_mode(mode: str) -> PipelineConfig:
         cfg.max_attempts = 3
         cfg.formal_max_cases = 8
         cfg.feedback_variant = "test_only"
+    elif mode == "B3":
+        cfg.enable_formal = False
+        cfg.enable_patterns = False
+        cfg.enable_repair = True
+        cfg.max_attempts = 3
+        cfg.formal_max_cases = 8
+        cfg.feedback_variant = "self_critique"
+    elif mode == "B4":
+        cfg.enable_formal = False
+        cfg.enable_patterns = False
+        cfg.enable_repair = True
+        cfg.max_attempts = 3
+        cfg.formal_max_cases = 8
+        cfg.feedback_variant = "execution_trace"
+    elif mode == "B5":
+        cfg.enable_formal = False
+        cfg.enable_patterns = False
+        cfg.enable_repair = True
+        cfg.max_attempts = 3
+        cfg.formal_max_cases = 8
+        cfg.feedback_variant = "reflexion"
+    elif mode == "B6":
+        cfg.enable_formal = True
+        cfg.enable_patterns = False
+        cfg.enable_repair = True
+        cfg.max_attempts = 3
+        cfg.formal_max_cases = 24
+        cfg.feedback_variant = "verifier_loop"
     elif mode == "A1":
         cfg.enable_formal = False
         cfg.enable_patterns = True
@@ -208,6 +241,7 @@ class ErrorPreventionPipeline:
         attempt_history: list[dict[str, Any]] = []
         last_feedback_json: list[dict[str, Any]] = []
         feedback_variant = resolve_feedback_variant(cfg)
+        reflexion_memory: list[str] = []
 
         for attempt in range(1, cfg.max_attempts + 1):
             messages = build_prompt(task, feedback)
@@ -227,7 +261,7 @@ class ErrorPreventionPipeline:
             last_formal = test_result if cfg.enable_formal else last_formal
 
             formal_ok = True if not cfg.enable_formal else test_result.passed
-            if cfg.mode == "B2":
+            if cfg.mode in {"B2", "B3", "B4", "B5", "B6"}:
                 formal_ok = test_result.passed
 
             pattern_ok = True
@@ -252,21 +286,39 @@ class ErrorPreventionPipeline:
                 attempt_history.append(attempt_entry)
                 break
 
-            if not cfg.enable_repair and cfg.mode != "B2":
+            if not cfg.enable_repair and cfg.mode not in {"B2", "B3", "B4", "B5", "B6"}:
                 attempt_history.append(attempt_entry)
                 break
-            if cfg.mode == "B2" and attempt >= cfg.max_attempts:
+            if cfg.mode in {"B2", "B3", "B4", "B5", "B6"} and attempt >= cfg.max_attempts:
                 attempt_history.append(attempt_entry)
                 break
 
-            if test_result.counterexamples:
+            if cfg.mode == "B3" and test_result.counterexamples:
                 feedback, last_feedback_json = build_repair_feedback(
                     task,
                     test_result.counterexamples,
                     variant=feedback_variant,
                     pattern_matches=last_patterns,
                 )
+                feedback = (
+                    "Self-critique: identify logical errors in your previous implementation before revising.\n"
+                    + feedback
+                )
                 attempt_entry["semantic_feedback"] = last_feedback_json
+            elif test_result.counterexamples:
+                feedback, last_feedback_json = build_repair_feedback(
+                    task,
+                    test_result.counterexamples,
+                    variant=feedback_variant,
+                    pattern_matches=last_patterns,
+                    reflexion_memory=reflexion_memory if cfg.mode == "B5" else None,
+                )
+                attempt_entry["semantic_feedback"] = last_feedback_json
+                if cfg.mode == "B5":
+                    reflexion_memory.append(
+                        f"attempt {attempt}: scenario "
+                        f"{test_result.counterexamples[0].scenario_index} failed"
+                    )
             elif last_patterns:
                 feedback = (
                     "Pattern violations: "
@@ -279,7 +331,7 @@ class ErrorPreventionPipeline:
             attempt_history.append(attempt_entry)
 
         formal_result = last_formal or run_formal_check(code, task, max_cases=cfg.formal_max_cases)
-        if cfg.mode == "B2":
+        if cfg.mode in {"B2", "B3", "B4", "B5", "B6"}:
             formal_result = run_formal_check(code, task, max_cases=cfg.formal_max_cases)
         pattern_matches = last_patterns if last_patterns else (
             self.pattern_guard.check(code, task) if cfg.enable_patterns else []
@@ -287,7 +339,7 @@ class ErrorPreventionPipeline:
         high_violations = sum(1 for m in pattern_matches if m.severity in {"high", "critical"})
 
         success = formal_result.passed
-        if cfg.mode == "B2":
+        if cfg.mode in {"B2", "B3", "B4", "B5", "B6"}:
             success = formal_result.passed
         if cfg.enable_patterns:
             success = success and high_violations <= cfg.pattern_max_high

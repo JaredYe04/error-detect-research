@@ -1,55 +1,55 @@
 {
   "Ordering": {
-    "RF08": {
-      "precision": 0.5,
-      "recall": 1.0,
-      "f1": 0.6667,
-      "TP": 240,
-      "FP": 240,
-      "FN": 0
-    },
     "RF06": {
       "precision": 0.5,
       "recall": 1.0,
       "f1": 0.6667,
-      "TP": 186,
-      "FP": 186,
+      "TP": 152,
+      "FP": 152,
+      "FN": 0
+    },
+    "RF08": {
+      "precision": 0.5,
+      "recall": 1.0,
+      "f1": 0.6667,
+      "TP": 200,
+      "FP": 200,
       "FN": 0
     }
   },
   "MissingPrecond": {
-    "RF08": {
-      "precision": 0.5,
-      "recall": 1.0,
-      "f1": 0.6667,
-      "TP": 120,
-      "FP": 120,
-      "FN": 0
-    },
     "RF06": {
       "precision": 0.5,
       "recall": 1.0,
       "f1": 0.6667,
-      "TP": 93,
-      "FP": 93,
+      "TP": 76,
+      "FP": 76,
+      "FN": 0
+    },
+    "RF08": {
+      "precision": 0.5,
+      "recall": 1.0,
+      "f1": 0.6667,
+      "TP": 100,
+      "FP": 100,
       "FN": 0
     }
   },
   "OutputDep": {
-    "RF08": {
-      "precision": 0.5,
-      "recall": 1.0,
-      "f1": 0.6667,
-      "TP": 120,
-      "FP": 120,
-      "FN": 0
-    },
     "RF06": {
       "precision": 0.5,
       "recall": 1.0,
       "f1": 0.6667,
-      "TP": 93,
-      "FP": 93,
+      "TP": 76,
+      "FP": 76,
+      "FN": 0
+    },
+    "RF08": {
+      "precision": 0.5,
+      "recall": 1.0,
+      "f1": 0.6667,
+      "TP": 100,
+      "FP": 100,
       "FN": 0
     }
   }

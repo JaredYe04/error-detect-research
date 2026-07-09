@@ -17,11 +17,11 @@ position \textsc{SgDP}; formal objects wait for Chapter~\ref{ch:formalization}.
 % ─────────────────────────────────────────────────────────────────────────────
 
 SOFL combines Z, data-flow diagrams, and OO structuring under stepwise
-refinement~\citep{liu1997sofl,back1998refinement}; its guarded process
+refinement~\citep{liu1998sofl,back1998refinement}; its guarded process
 scenarios are the historical ancestor of FSF (Section~\ref{sec:bg:fsf}).
-\emph{Agile-SOFL}~\citep{li2022agilesofl} applies that rigour inside sprints:
+\emph{Agile-SOFL}~\citep{li2022qrs_companion} applies that rigour inside sprints:
 FSF contracts, automatic conformance checking, and SMT test generation before
-review~\citep{li2023iet,beck2001xp}.
+review~\citep{li2023iet_faultprevention,beck2001xp}.
 HSP-Agile adds an LLM-driven synthesis--repair loop on top of that toolchain,
 addressing the workflow-integration barrier noted by
 \citet{woodcock2009formalsurvey}.
@@ -31,7 +31,7 @@ addressing the workflow-integration barrier noted by
 \label{sec:bg:fsf}
 % ─────────────────────────────────────────────────────────────────────────────
 
-FSF is the primary sprint artefact of Agile-SOFL~\citep{li2022agilesofl,liu2014sofl}.
+FSF is the primary sprint artefact of Agile-SOFL~\citep{li2022qrs_companion,liu2004soflbook}.
 A task names parameters, readable/writable externals, and an \emph{ordered}
 sequence of scenario clauses---each a Boolean guard plus an assignment block;
 the final clause may be an \texttt{others} catch-all and must appear last.
@@ -68,7 +68,7 @@ fails at boundaries and multi-condition
 logic~\citep{dakhel2023copilot}---exactly what FSF guards encode.
 
 Without additional guidance, three failure modes recur
-\citep{dakhel2023copilot,lynn2024verifierloop}:
+\citep{dakhel2023copilot,sun2024clover}:
 (i)~\emph{scenario-order blindness}---overlapping guards bias the model toward
 ``natural'' \texttt{if} order rather than mandated precedence;
 (ii)~\emph{boundary hallucination}---confused relational operators at
@@ -91,7 +91,7 @@ CEGIS splits synthesis into a synthesiser and a verifier that returns
 counterexamples until success or budget exhaustion
 \citep{solarlezama2008sketching}.
 LLM-augmented variants replace templates with free-form generation while
-retaining formal checks~\citep{loughman2024dafnybench,lynn2024verifierloop},
+retaining formal checks~\citep{loughman2024dafnybench,sun2024clover},
 but prior systems lack FSF first-match semantics and pattern-guard pre-filters.
 
 HSP-Agile instantiates the \textsc{SgDP} loop with an LLM synthesiser, a
@@ -140,7 +140,7 @@ Static analysers encode recurring structural bug
 patterns~\citep{hovemeyer2004findbugs,cousot1977abstract}.
 HSP-Agile's pattern guard lifts the idea to \emph{requirements-level}
 violations: signatures that cannot conform to FSF regardless of tested inputs.
-Catalogue RF01--RF14~\citep{li2023iet} (Appendix~\ref{app:patterns}) includes
+Catalogue RF01--RF14~\citep{li2023iet_faultprevention} (Appendix~\ref{app:patterns}) includes
 missing preconditions, wrong defaults, swapped comparisons, and unconditional
 success (RF07); high-severity hits ($\mathcal{P}^H$) block acceptance and enter
 CEGIS repair context even when all formal tests pass.
@@ -151,13 +151,13 @@ CEGIS repair context even when all formal tests pass.
 % ─────────────────────────────────────────────────────────────────────────────
 
 Mutation testing injects syntactic faults; survivors indicate inadequate
-coverage~\citep{demillo1978mutation,offutt1992mutation,ammann2016testing}.
+coverage~\citep{demillo1978mutation,offutt2001mutation2000,ammann2016testing}.
 HSP-Agile uses two operator families (details in Chapter~\ref{ch:experiments}):
 specification-level SNO, ORO, SPO; implementation-level ICO, WRO, BCO.
 Prevention quality is scored as \emph{Prevention Detection Rate} (PDR: fraction
 of injected faults correctly rejected) and \emph{False Accept Rate} (FAR:
 fraction of conforming candidates incorrectly rejected), analogous to
-sensitivity--specificity~\citep{okun2007mutation}.
+sensitivity--specificity~\citep{okun2013sate4}.
 
 % ─────────────────────────────────────────────────────────────────────────────
 \section{Related Work}
@@ -178,7 +178,7 @@ first-match order, whether repair carries scenario structure, and whether
 prevention (not only pass@k) is measured.
 DafnyBench~\citep{loughman2024dafnybench} uses full deductive verification but
 repairs from compiler messages, with no pattern guard and pass@k evaluation.
-Lynn et al.~\citep{lynn2024verifierloop} is the closest verifier-in-the-loop
+Sun et al.\ (Clover)~\citep{sun2024clover} is the closest verifier-in-the-loop
 design, yet lacks FSF ordering, pattern guards, and PDR/FAR.
 Baselines B1 (one-shot LLM) and B2 (test-feedback without SMT witnesses)
 isolate those two ingredients.
@@ -207,7 +207,7 @@ isolate those two ingredients.
       & partial
       & --
       & pass@k \\
-    Lynn et al.\ TOSEM \citep{lynn2024verifierloop}
+    Sun et al.\ (Clover) \citep{sun2024clover}
       & \checkmark
       & \checkmark
       & partial
@@ -249,13 +249,13 @@ metrics~\citep{chen2021codex,loughman2024dafnybench}.
 LLM suggestions still harbour subtle semantic defects that coarse suites miss
 \citep{chen2021codex,openai2023gpt4,dakhel2023copilot}.
 Prior SOFL prevention work assumed human-written
-implementations~\citep{li2022qrs,li2023iet}; LLM synthesis creates failure
+implementations~\citep{li2022qrs_companion,li2023iet_faultprevention}; LLM synthesis creates failure
 modes neither human-process prevention nor test-only post-processing alone
 addresses.
 Coding agents (OpenHands, SWE-agent, and similar)~\citep{wang2024opendevin,yang2024sweagent}
 target repository tasks without a specification oracle $g_t$ or PDR/FAR;
-they are orthogonal to \textsc{SgDP} (B5 captures the verbal-memory dimension
-most relevant to repair).
+they are orthogonal to \textsc{SgDP} (Reflexion-style verbal memory captures a
+dimension most relevant to repair but is not evaluated here).
 
 Table~\ref{tab:related-positioning} positions \textsc{SgDP} on the dimensions
 that matter for specification-conformance defect prevention.
@@ -270,10 +270,10 @@ that matter for specification-conformance defect prevention.
     Approach & witnesses & SpecIR & feedback IR & protocol & framework \\
     \midrule
     CEGIS (Solar-Lezama)          & ---  & --- & --- & ---  & \checkmark \\
-    DafnyBench~\citep{dafnybench2024}     & \checkmark & --- & --- & --- & --- \\
+    DafnyBench~\citep{loughman2024dafnybench}     & \checkmark & --- & --- & --- & --- \\
     Self-Refine~\citep{madaan2023selfrefine}   & --- & --- & --- & --- & \checkmark \\
     Self-Debug~\citep{chen2023selfdebug}    & --- & --- & --- & --- & \checkmark \\
-    Reflexion~\citep{shinn2023reflexion} (B5) & --- & --- & --- & --- & \checkmark \\
+    Reflexion~\citep{shinn2023reflexion} & --- & --- & --- & --- & \checkmark \\
     CodeT~\citep{chen2022codet}           & --- & --- & --- & --- & --- \\
     OpenHands / SWE-agent       & --- & --- & --- & --- & \checkmark \\
     \textsc{SgDP} (this report)    & \checkmark & \checkmark & \checkmark & \checkmark & \checkmark \\
@@ -281,7 +281,7 @@ that matter for specification-conformance defect prevention.
   \end{tabular}
 \end{inlinetable}
 
-Unlike VerifierLoop-style test feedback~\citep{lynn2024verifierloop},
+Unlike Clover-style closed-loop verifier feedback~\citep{sun2024clover},
 failing unit tests are not the primary signal: guard precedence is encoded as
 SMT constraints, and the LLM receives a typed failure record that names the
 violated scenario.

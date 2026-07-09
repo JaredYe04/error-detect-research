@@ -2,9 +2,9 @@ notation,mode,mean_conf,n_tasks,source
 SOFL/FSF,B1,84.2,120,main_run
 SOFL/FSF,B2,88.0,120,main_run
 SOFL/FSF,M,90.4,120,main_run
-Mini-StateMachine,B1,85.5,10,llm_generalisation
-Mini-StateMachine,B2,90.0,10,llm_generalisation
-Mini-StateMachine,M,92.2,10,llm_generalisation
-Mini-Z,B1,94.2,10,llm_generalisation
-Mini-Z,B2,97.5,10,llm_generalisation
-Mini-Z,M,94.2,10,llm_generalisation
+Mini-StateMachine,B1,24.7,30,llm_generalisation
+Mini-StateMachine,B2,40.8,30,llm_generalisation
+Mini-StateMachine,M,41.6,30,llm_generalisation
+Mini-Z,B1,5.8,30,llm_generalisation
+Mini-Z,B2,18.3,30,llm_generalisation
+Mini-Z,M,23.3,30,llm_generalisation

@@ -146,7 +146,7 @@ Synthesis, repair, pattern guard, and acceptance are shared core components.
 \subsection{HSP-Agile: SOFL/FSF Instantiation}
 \label{subsec:hsp-agile}
 
-HSP-Agile instantiates \textsc{SgDP} over FSF~\cite{liu2014sofl,li2022agilesofl}.
+HSP-Agile instantiates \textsc{SgDP} over FSF~\cite{liu2004soflbook,li2022qrs_companion}.
 Each scenario $s_i = (g_i, \phi_i)$ pairs a guard with a postcondition; under
 \emph{first-match semantics} the output for $\mathbf{x}$ is $\phi_i(\mathbf{x})$ where
 $i = \min\{j : g_j(\mathbf{x})\}$.
@@ -500,7 +500,7 @@ Stage~3 builds the Semantic Feedback IR
 Figure~\ref{fig:repair-feedback} shows the
 \code{classify\_signal} arc (quote in Section~\ref{sec:method:worked}).
 This is CEGIS with the LLM as synthesiser and the checker as
-verifier~\citep{lynn2024verifierloop, solarlezama2008sketching}.
+verifier~\citep{sun2024clover, solarlezama2008sketching}.
 
 \begin{figure}[t]
   \centering
@@ -515,7 +515,7 @@ verifier~\citep{lynn2024verifierloop, solarlezama2008sketching}.
 \section{Stage 4: Requirement Pattern Guard}
 \label{sec:method:guard}
 
-Witness agreement alone is insufficient~\citep{hovemeyer2004findbugs, li2023iet}.
+Witness agreement alone is insufficient~\citep{hovemeyer2004findbugs, li2023iet_faultprevention}.
 Stage~4 applies Table~\ref{tab:patterns}; nine high-severity patterns form
 $\mathcal{P}^H$ in equation~\eqref{eq:accept}.
 

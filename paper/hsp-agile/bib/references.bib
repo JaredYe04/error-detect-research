@@ -1,60 +1,50 @@
-%% references.bib — Bibliography for HSP-Agile Thesis
+%% references.bib ? Bibliography for HSP-Agile Thesis
 %% Ye Xujun, East China Normal University, July 2026
 
-%% ??? SOFL / Agile-SOFL ????????????????????????????????????????????????????????
+%% --- SOFL / Agile-SOFL foundations ------------------------------------------
 
-@book{liu1997sofl,
-  author    = {Liu, Shaoying},
-  title     = {SOFL: A Formal Engineering Methodology for Industrial Applications},
-  publisher = {IEEE Computer Society Press},
-  year      = {1997},
-  address   = {Los Alamitos, CA}
-}
-
-@article{liu2004sofl,
-  author  = {Liu, Shaoying},
-  title   = {A Practical Formal Method Based on {SOFL} for Software Development},
-  journal = {Formal Aspects of Computing},
-  volume  = {16},
+@article{liu1998sofl,
+  author  = {Liu, Shaoying and Offutt, A. Jefferson and Ho-Stuart, Chris and Sun, Yong and Ohba, Mitsuru},
+  title   = {{SOFL}: A Formal Engineering Methodology for Industrial Applications},
+  journal = {IEEE Transactions on Software Engineering},
+  volume  = {24},
   number  = {1},
-  pages   = {44--66},
-  year    = {2004},
-  doi     = {10.1007/s00165-003-0022-9}
+  pages   = {24--45},
+  year    = {1998},
+  doi     = {10.1109/32.663996}
 }
 
-@book{liu2014sofl,
+@book{liu2004soflbook,
   author    = {Liu, Shaoying},
-  title     = {Formal Engineering for Industrial Software Development: Using the
-               {SOFL} Method},
+  title     = {Formal Engineering for Industrial Software Development: Using the {SOFL} Method},
   publisher = {Springer},
-  year      = {2014},
+  year      = {2004},
   address   = {Berlin, Heidelberg},
-  doi       = {10.1007/978-3-642-54233-7}
+  doi       = {10.1007/978-3-662-07287-5}
 }
 
-@article{li2022agilesofl,
-  author  = {Li, Xiaohong and Liu, Shaoying},
-  title   = {Fault Prevention in Agile-{SOFL}: A Test-Driven Conformance Approach},
-  journal = {Proceedings of the 22nd {IEEE} International Conference on Software
-             Quality, Reliability and Security ({QRS})},
-  pages   = {312--322},
-  year    = {2022},
-  doi     = {10.1109/QRS57517.2022.00041}
-}
-
-@article{li2023iet,
-  author  = {Li, Xiaohong and Liu, Shaoying},
-  title   = {An Automated Fault-Detection Framework for Agile-{SOFL} Formal
-             Specifications Using Mutation-Based Oracles},
+@article{li2023iet_faultprevention,
+  author  = {Li, Jiandong and Liu, Shaoying},
+  title   = {Requirements-Related Fault Prevention during the Transformation from Formal Specifications to Programs},
   journal = {{IET} Software},
   volume  = {17},
-  number  = {4},
-  pages   = {389--403},
+  number  = {3},
+  pages   = {316--332},
   year    = {2023},
-  doi     = {10.1049/sfw2.12091}
+  doi     = {10.1049/sfw2.12126}
 }
 
-%% ??? LLM code generation ??????????????????????????????????????????????????????
+@inproceedings{li2022qrs_companion,
+  author    = {Li, Jiandong and Liu, Shaoying},
+  title     = {Requirements-Related Fault Prevention Mechanism for {SOFL} Formal Specification-Based Programming},
+  booktitle = {Proc.\ 22nd {IEEE} Int.\ Conf.\ Software Quality, Reliability and Security Companion ({QRS-C})},
+  pages     = {359--367},
+  year      = {2022},
+  publisher = {{IEEE}},
+  doi       = {10.1109/QRS-C57518.2022.00060}
+}
+
+%% --- LLM code generation -----------------------------------------------------
 
 @article{chen2021codex,
   author  = {Chen, Mark and Tworek, Jerry and Jun, Heewoo and Yuan, Qiming and
@@ -79,7 +69,7 @@
 
 @article{li2022alphacode,
   author  = {Li, Yujia and Choi, David and Chung, Junyoung and Kushman, Nate and
-             Schrittwieser, Julian and Leblond, Rémi and Eccles, Tom and
+             Schrittwieser, Julian and Leblond, R?mi and Eccles, Tom and
              Keeling, James and Gimeno, Felix and Dal Lago, Agustin and others},
   title   = {Competition-Level Code Generation with {AlphaCode}},
   journal = {Science},
@@ -98,16 +88,14 @@
   note        = {arXiv:2303.08774}
 }
 
-@article{lynn2024verifierloop,
-  author  = {Lynn, Tomas and Sheridan, Paul and Guerin, Frank and Duan, Xiangwei},
-  title   = {Verifier-in-the-Loop {LLM} Code Synthesis: Closing the Formal
-             Specification Gap},
-  journal = {{ACM} Transactions on Software Engineering and Methodology},
-  volume  = {33},
-  number  = {5},
-  pages   = {1--34},
-  year    = {2024},
-  doi     = {10.1145/3640340}
+@inproceedings{sun2024clover,
+  author    = {Sun, Chuyue and Sheng, Ying and Padon, Oded and Barrett, Clark},
+  title     = {Clover: Closed-Loop Verifiable Code Generation},
+  booktitle = {Proc.\ 1st Int.\ Symp.\ {AI} Verification ({SAIV} 2024)},
+  series    = {Lecture Notes in Computer Science},
+  year      = {2024},
+  eprint    = {2310.17807},
+  archivePrefix = {arXiv}
 }
 
 @article{loughman2024dafnybench,
@@ -117,7 +105,23 @@
   year    = {2024}
 }
 
-%% ??? Formal methods ???????????????????????????????????????????????????????????
+@article{yang2024qwen25,
+  author  = {Yang, An and Yang, Baosong and Zhang, Beichen and Hui, Binyuan and
+             Zheng, Bo and Yu, Bowen and Li, Chengyuan and Liu, Dayiheng and
+             Huang, Fei and Wei, Haoran and Lin, Huan and Yang, Jian and Tu, Jianhong
+             and Zhang, Jianwei and Yang, Jianxin and Yang, Jiaxi and Zhou, Jingren
+             and Lin, Junyang and Dang, Kai and Lu, Keming and Bao, Keqin and
+             Yang, Kexin and Yu, Le and Li, Mei and Xue, Mingfeng and Zhang, Pei and
+             Zhu, Qin and Men, Rui and Lin, Runji and Li, Tianhao and Xia, Tingyu and
+             Ren, Xingzhang and Ren, Xuancheng and Fan, Yang and Su, Yang and
+             Zhang, Yichang and Wan, Yu and Liu, Yuqiong and Cui, Zeyu and
+             Zhang, Zhenru and Qiu, Zihan},
+  title   = {{Qwen2.5} Technical Report},
+  journal = {arXiv preprint arXiv:2412.15115},
+  year    = {2024}
+}
+
+%% --- Formal methods ----------------------------------------------------------
 
 @inproceedings{demoura2008z3,
   author    = {de Moura, Leonardo and Bj{\o}rner, Nikolaj},
@@ -152,15 +156,16 @@
   doi       = {10.1007/978-3-642-17511-4_20}
 }
 
-@article{harman2012formalagile,
-  author  = {Harman, Mark and Clark, John},
-  title   = {Metrics Are Fitness Functions Too},
-  journal = {10th {IEEE} International Software Metrics Symposium},
-  pages   = {58--69},
-  year    = {2004}
+@inproceedings{harman2004maff,
+  author    = {Harman, Mark and Clark, John A.},
+  title     = {Metrics Are Fitness Functions Too},
+  booktitle = {Proc.\ 10th {IEEE} Int.\ Symp.\ Software Metrics},
+  pages     = {58--69},
+  year      = {2004},
+  doi       = {10.1109/metrics.2004.30}
 }
 
-%% ??? Static analysis ??????????????????????????????????????????????????????????
+%% --- Static analysis ---------------------------------------------------------
 
 @inproceedings{hovemeyer2004findbugs,
   author    = {Hovemeyer, David and Pugh, William},
@@ -171,18 +176,17 @@
   doi       = {10.1145/1052883.1052895}
 }
 
-@article{ayewah2008findbugs,
-  author  = {Ayewah, Nathaniel and Pugh, William and Morgenthaler, J. David and
-             Penix, John and Zhou, YuQian},
-  title   = {Evaluating Static Analysis Defect Warnings on Production Software},
-  journal = {{ACM SIGPLAN} Workshop on Program Analysis for Software Tools and
-             Engineering ({PASTE})},
-  pages   = {1--8},
-  year    = {2007},
-  doi     = {10.1145/1251535.1251536}
+@inproceedings{ayewah2007findbugs,
+  author    = {Ayewah, Nathaniel and Pugh, William and Morgenthaler, J. David and
+               Penix, John and Zhou, YuQian},
+  title     = {Evaluating Static Analysis Defect Warnings on Production Software},
+  booktitle = {Proc.\ {ACM SIGPLAN}-{SIGSOFT} Workshop on Program Analysis for Software Tools and Engineering ({PASTE})},
+  pages     = {1--8},
+  year      = {2007},
+  doi       = {10.1145/1251535.1251536}
 }
 
-%% ??? Mutation testing ?????????????????????????????????????????????????????????
+%% --- Mutation testing ------------------------------------------------------
 
 @article{demillo1978mutation,
   author  = {DeMillo, Richard A. and Lipton, Richard J. and Sayward, Frederick G.},
@@ -195,25 +199,26 @@
   doi     = {10.1109/C-M.1978.218136}
 }
 
-@article{offutt1992mutation,
-  author  = {Offutt, A. Jefferson and Untch, Roland H.},
-  title   = {Mutation Testing Enters the Twenty-First Century},
-  journal = {Mutation 2000: Mutation Testing in the Twentieth and Twenty-First
-             Centuries},
-  pages   = {34--44},
-  year    = {2001}
+@incollection{offutt2001mutation2000,
+  author    = {Offutt, A. Jefferson and Untch, Roland H.},
+  title     = {Mutation 2000: Uniting the Orthogonal},
+  booktitle = {Mutation Testing for the New Century},
+  pages     = {34--44},
+  year      = {2001},
+  publisher = {Kluwer},
+  doi       = {10.1007/978-1-4757-5939-6_7}
 }
 
-@article{okun2007mutation,
-  author  = {Okun, Vadim and Delaitre, Aurelien and Black, Paul E.},
-  title   = {Report on the Static Analysis Tool Exposition ({SATE}) {IV}},
-  journal = {{NIST} Special Publication},
-  volume  = {500},
-  number  = {297},
-  year    = {2007}
+@techreport{okun2013sate4,
+  author      = {Okun, Vadim and Delaitre, Aur{\'e}lien and Black, Paul E.},
+  title       = {Report on the Static Analysis Tool Exposition ({SATE}) {IV}},
+  institution = {{NIST}},
+  number      = {NIST SP 500-297},
+  year        = {2013},
+  doi         = {10.6028/NIST.SP.500-297}
 }
 
-%% ??? Testing & specification ??????????????????????????????????????????????????
+%% --- Testing and specification -----------------------------------------------
 
 @article{zhu1997specification,
   author  = {Zhu, Hong and Hall, Patrick A. V. and May, John H. R.},
@@ -246,7 +251,7 @@
   doi       = {10.1017/9781316771273}
 }
 
-%% ??? Agile methods ????????????????????????????????????????????????????????????
+%% --- Agile methods -----------------------------------------------------------
 
 @book{beck2001xp,
   author    = {Beck, Kent},
@@ -257,7 +262,7 @@
   address   = {Boston, MA}
 }
 
-%% ??? Requirements engineering ?????????????????????????????????????????????????
+%% --- Requirements engineering ------------------------------------------------
 
 @book{pohl2010requirements,
   author    = {Pohl, Klaus},
@@ -268,7 +273,7 @@
   doi       = {10.1007/978-3-642-12578-2}
 }
 
-%% ??? Supplementary references ?????????????????????????????????????????????????
+%% --- Supplementary references ----------------------------------------------
 
 @article{barrett2018smt,
   author  = {Barrett, Clark and Tinelli, Cesare},
@@ -337,23 +342,6 @@
 }
 
 %% --- Extended baselines / positioning ---------------------------------------
-
-@inproceedings{li2022qrs,
-  author    = {Li, Xiaohong and Liu, Shaoying},
-  title     = {Early Fault Prevention in Formal Agile Development},
-  booktitle = {Proceedings of the 22nd {IEEE} International Conference on Software
-               Quality, Reliability and Security ({QRS})},
-  pages     = {301--311},
-  year      = {2022},
-  publisher = {{IEEE}}
-}
-
-@article{dafnybench2024,
-  author  = {Loughman, Jacob and Ringer, Talia},
-  title   = {{DafnyBench}: A Benchmark for Formal Software Verification},
-  journal = {arXiv preprint arXiv:2406.08467},
-  year    = {2024}
-}
 
 @inproceedings{madaan2023selfrefine,
   author    = {Madaan, Aman and others},

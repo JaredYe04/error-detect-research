@@ -8,8 +8,15 @@ import sys
 from pathlib import Path
 
 PAPER_ROOT = Path(__file__).resolve().parents[1]
+REPO_ROOT = PAPER_ROOT.parents[1]
 PREPARE_SCRIPT = PAPER_ROOT / "scripts" / "prepare_paper_data.py"
 MECHANISM_SCRIPT = PAPER_ROOT / "scripts" / "prepare_mechanism_data.py"
+DEFAULT_EXTENDED_RUN = REPO_ROOT / "artifacts" / "run_ccf_b_extended_v1"
+DEFAULT_E10_RUN = REPO_ROOT / "artifacts" / "run_e10_random_v1"
+DEFAULT_E11_RUN = REPO_ROOT / "artifacts" / "run_e11_external_v1"
+DEFAULT_E8B_RUN = REPO_ROOT / "artifacts" / "run_e8b_expanded_v1"
+DEFAULT_B6_RUN = REPO_ROOT / "artifacts" / "run_b6_full_v1"
+DEFAULT_B6_STRAT_RUN = REPO_ROOT / "artifacts" / "run_b6_stratified_v1"
 # Prefer the matplotlib-based generator (no Kaleido/Chrome dependency)
 PLOT_SCRIPT = PAPER_ROOT / "figures" / "scripts" / "plot_mpl_figures.py"
 PLOT_SCRIPT_FALLBACK = PAPER_ROOT / "figures" / "scripts" / "plot_paper_figures.py"
@@ -71,6 +78,16 @@ def main() -> None:
             prep_cmd.extend(["--run-dir", str(args.run_dir)])
         if args.prevention_summary is not None:
             prep_cmd.extend(["--prevention-summary", str(args.prevention_summary)])
+        if DEFAULT_EXTENDED_RUN.exists():
+            prep_cmd.extend(["--extended-run-dir", str(DEFAULT_EXTENDED_RUN), "--extended-repeat", "0"])
+        if DEFAULT_E10_RUN.exists():
+            prep_cmd.extend(["--e10-run-dir", str(DEFAULT_E10_RUN)])
+        if DEFAULT_E11_RUN.exists():
+            prep_cmd.extend(["--e11-run-dir", str(DEFAULT_E11_RUN)])
+        if DEFAULT_B6_RUN.exists():
+            prep_cmd.extend(["--b6-run-dir", str(DEFAULT_B6_RUN)])
+        if DEFAULT_B6_STRAT_RUN.exists():
+            prep_cmd.extend(["--b6-stratified-run-dir", str(DEFAULT_B6_STRAT_RUN)])
         _run(prep_cmd)
 
         mech_cmd = [python, str(MECHANISM_SCRIPT)]
@@ -78,6 +95,8 @@ def main() -> None:
             mech_cmd.extend(["--run-dir", str(args.run_dir)])
         if args.prevention_summary is not None:
             mech_cmd.extend(["--prevention-dir", str(args.prevention_summary)])
+        if DEFAULT_E8B_RUN.exists():
+            mech_cmd.extend(["--generalisation-dir", str(DEFAULT_E8B_RUN)])
         _run(mech_cmd)
 
     active_plot_script = PLOT_SCRIPT if PLOT_SCRIPT.exists() else PLOT_SCRIPT_FALLBACK

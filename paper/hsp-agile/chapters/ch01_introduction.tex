@@ -23,15 +23,15 @@ The vehicle is the \textbf{Specification-guided Defect Prevention Framework}
 \label{sec:intro:problem}
 
 \subsection{Setting}
-SOFL \citep{liu1997sofl,liu2014sofl} provides the Functional Specification
+SOFL \citep{liu1998sofl,liu2004soflbook} provides the Functional Specification
 Format (FSF): an ordered list of scenarios, each pairing a guard with a
 postcondition under first-match precedence.
-Agile-SOFL \citep{li2022agilesofl} embeds those artefacts in sprint workflows
+Agile-SOFL \citep{li2022qrs_companion} embeds those artefacts in sprint workflows
 as design documents, oracles, and acceptance criteria.
 LLM-assisted generation accelerates that workflow
 \cite{chen2021codex,openai2023gpt4}, but synthesises by pattern completion
 rather than by respecting guard order
-\cite{dakhel2023copilot,lynn2024verifierloop}.
+\cite{dakhel2023copilot,sun2024clover}.
 Overlapping guards therefore expose precedence-sensitive faults that standard
 test suites miss \citep{zhu1997specification}.
 
@@ -116,7 +116,7 @@ The check must be notation-agnostic yet preserve first-match partitions
 
 \subsection{Typed Failures for Repair}
 Test-feedback loops lack specification-level structure
-\cite{lynn2024verifierloop}: the model may patch one counterexample without
+\cite{sun2024clover}: the model may patch one counterexample without
 fixing guard precedence.
 Repair needs a record that names the violated scenario and witness
 \emph{before} any natural-language prompt is rendered
@@ -127,7 +127,7 @@ Full verification is impractical for unannotated LLM output
 \cite{leino2010dafny,loughman2024dafnybench}.
 What is needed is calibrated prevention: stronger than test-feedback
 \cite{chen2021codex}, weaker than deductive proof, and fast enough for sprint
-budgets \citep{beck2001xp,li2022agilesofl}---a conjunctive gate under
+budgets \citep{beck2001xp,li2022qrs_companion}---a conjunctive gate under
 hard budget~$K$ ($K=3$ in the experiments).
 
 
@@ -192,8 +192,15 @@ engineering; they support the claims but are not advertised as contributions.
     release.
 \end{enumerate}
 
-On the 120-task hard benchmark these three ideas yield 90.4\% mean strict
+On the 120-task hard benchmark these three ideas yield 90.4\% mean
 conformance (+6.2\,pp over one-shot LLM; Feedback IR alone +7.7\,pp in E6).
+M wins 6/120 paired tasks against test-feedback B2 ($\approx$5\%), but the
+aggregate M--B2 conformance gap is not significant after Holm correction
+($p{=}0.811$); claims are scoped to overlap-intensive specifications
+(Chapter~\ref{ch:discussion}).\footnote{Primary evaluation (E1) uses 120
+Z3-filtered synthetic tasks biased toward guard overlap; E10 samples uniformly
+without that filter; E8/E11 probe adapter and held-out external validity.
+Headline gains should not be read as universal LLM codegen superiority.}
 Evaluation protocol details appear in Chapters~\ref{ch:experiments}
 and~\ref{ch:results}.
 

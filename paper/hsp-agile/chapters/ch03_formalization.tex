@@ -43,7 +43,7 @@ Release decisions need a precise unit of work: what must the pipeline know
 about a sprint artefact before it can judge a candidate?
 That unit is a \emph{formal specification task}---a single function whose
 behaviour is described entirely by an ordered scenario specification.
-HSP-Agile instantiates the model over SOFL/FSF~\citep{li2022agilesofl,liu2014sofl};
+HSP-Agile instantiates the model over SOFL/FSF~\citep{li2022qrs_companion,liu2004soflbook};
 every later stage consumes one such task.
 
 \begin{definition}[Formal Specification Task]
@@ -197,7 +197,7 @@ A \emph{concrete case} is $(x,\,g_t(x))$ for $x\in\mathcal{X}_t$;
 the \emph{case set} is $\mathcal{D}(t)$.
 \end{definition}
 
-\begin{definition}[SMT-Generated Test Suite]
+\begin{definition}[SMT-Generated Witness Suite]
 \label{def:test-suite}
 For each scenario $s_i = (g_i, \phi_i)$, solve
 \[
@@ -404,7 +404,7 @@ budget is exhausted.
 Semantic feedback on attempt~$k{+}1$ is a structured JSON record
 (counterexamples, pattern hits, attempt index); Chapter~\ref{ch:method}
 details its fields.
-The search is CEGIS-shaped~\citep{solarlezama2008sketching,lynn2024verifierloop}
+The search is CEGIS-shaped~\citep{solarlezama2008sketching,sun2024clover}
 with a stochastic synthesiser---hence the explicit fallback.
 
 \begin{definition}[Bounded Acceptance Problem]
@@ -437,7 +437,7 @@ $\mathrm{Faulty}(m)=1$ when the pair is genuinely faulty.
 
 PDR is recall-like (of all mutants, how many does the pipeline refuse?);
 FAR is precision-like (of genuinely faulty mutants, how many still slip
-through $\mathrm{Accept}$?)~\citep{okun2007mutation}.
+through $\mathrm{Accept}$?)~\citep{okun2013sate4}.
 
 \begin{definition}[Prevention Detection Rate]
 \label{def:pdr}
@@ -474,7 +474,7 @@ the gap $\mathrm{PDR}-\mu_k$ is the additive value of pattern screening.
 % ---------------------------------------------------------------------------
 
 The evaluation uses a synthetic benchmark of hard tasks built to stress FSF
-precedence sensitivity~\citep{li2023iet}.
+precedence sensitivity~\citep{li2023iet_faultprevention}.
 
 \begin{definition}[Precedence-Sensitive Task]
 \label{def:prec-sensitive}
