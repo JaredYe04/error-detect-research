@@ -8,8 +8,7 @@
 The industrial-monitoring contract \code{classify\_signal} asked a practical
 question: can first-match ordering defects be prevented by using the
 specification itself as evidence, without full deductive verification?
-The answer is the \textbf{Specification-guided Defect Prevention Framework}
-(\textsc{SgDP}) and its SOFL/FSF instantiation \textbf{HSP-Agile}.
+Three insights answer yes; \textsc{SgDP} / HSP-Agile is how they are realised.
 
 
 %=============================================================================
@@ -21,36 +20,39 @@ The answer is the \textbf{Specification-guided Defect Prevention Framework}
 Test-based repair does not know which input regions the specification treats
 as critical.
 
-\paragraph{Insight.}
-SMT witnesses for first-match priority, a typed failure record for repair, and
-a conjunctive release gate---not denser unit tests.
+\paragraph{Three insights.}
+(1)~Prevention should depend on semantic regions, not surface syntax---SpecIR
+is the hinge.
+(2)~Repair needs a typed scenario failure (Semantic Feedback IR), not raw
+test bits.
+(3)~Release is conjunctive: full witness conformance \emph{and} a clear
+high-severity pattern screen.
 
 \paragraph{Evidence.}
 90.4\% mean Conf.\ (+6.2\,pp / +2.4\,pp over one-shot / test-feedback);
-gain grows with overlap (E3); SMT keeps boundary coverage (E4); Semantic
-Feedback IR alone +7.7\,pp (E6); adapters transfer to Mini-Z and
-Mini-StateMachine (E8).
-Theorems~\ref{thm:witness-soundness} and~\ref{thm:far-bound} bound the
-formal claims; Hypothesis~\ref{hyp:structured-feedback} is the repair claim.
+gain grows with overlap (E3); Feedback IR alone +7.7\,pp (E6); adapters
+transfer to Mini-Z and Mini-StateMachine (E8).
 
 \paragraph{Limitation.}
-Under $K{=}3$, acceptance stays selective (25.0\% strict success); E9 residues
-are mostly ordering and boundary/arithmetic; latency is $\approx 4.6\times$
-vs.\ test-feedback.
+Under $K{=}3$, acceptance stays selective (25.0\% strict success); residual
+failures are mostly ordering and boundary/arithmetic; latency is
+$\approx 4.6\times$ vs.\ test-feedback.
 
 
 %=============================================================================
-\section{Key Empirical Findings}
-\label{sec:conc:findings}
+\section{What to Remember}
+\label{sec:conc:remember}
 %=============================================================================
 
-Conformance, not binary pass/fail, is the right primary metric---the same
-selectivity that rejects a hard-coded \code{classify\_signal} even when most
-witnesses pass (Section~\ref{sec:disc:paradox}).
-Repair is the largest ablation drop (A3 $-$6.3\,pp; A1 $-$3.9\,pp).
-Structure in feedback beats prompt length (E6 $>$7\,pp).
-Dense overlap amplifies the M--B1 gap (E3).
-The loop transfers with adapter-only changes (E8).
+If only three facts survive:
+\begin{enumerate}
+  \item SpecIR matters because the prevention loop must be notation-agnostic
+        while preserving first-match regions.
+  \item Semantic Feedback IR matters because structure in the repair prompt
+        beats longer unstructured test dumps.
+  \item The acceptance gate matters because high mean conformance is not
+        release---witnesses and patterns must both clear.
+\end{enumerate}
 
 
 %=============================================================================
@@ -58,15 +60,14 @@ The loop transfers with adapter-only changes (E8).
 \label{sec:conc:future}
 %=============================================================================
 
-\paragraph{Richer specification support.}
-Extend beyond linear integer guards to temporal properties, stateful behaviours,
-and non-linear arithmetic---directly targeting the ArithmeticError and
+\paragraph{Richer encodings.}
+Extend beyond linear integer guards to temporal properties, stateful
+behaviours, and non-linear arithmetic---targeting ArithmeticError and
 StateError residues in E9.
 
 \paragraph{Stronger backends.}
-Augment the finite witness suite with theorem-prover certificates
-(e.g.\ Dafny~\citep{leino2010dafny}) for candidates that already clear
-$\mathrm{Accept}$.
+Augment the finite witness suite with theorem-prover certificates for
+candidates that already clear $\mathrm{Accept}$.
 
 \paragraph{Adaptive budgets.}
 Replace fixed $K=3$ with early stopping on easy tasks and extra iterations on
@@ -76,10 +77,6 @@ dense-overlap ordering failures.
 Apply HSP-Agile to practitioner SOFL/FSF specifications and measure prevention
 against project acceptance criteria.
 
-\paragraph{Model comparison.}
-Re-run the 120-task matrix across stronger instruction-following models to test
-whether the +7.7\,pp IR effect is model-agnostic.
-
 
 %=============================================================================
 \section{Closing Remarks}
@@ -87,9 +84,9 @@ whether the +7.7\,pp IR effect is model-agnostic.
 %=============================================================================
 
 \textsc{SgDP} is not a substitute for full formal verification.
-It is a practical bridge: bounded formal checking, scenario-aware repair, and
-conjunctive acceptance that keep many specification-conformance defects---the
-ordering failures illustrated by \code{classify\_signal}---out of release
-while remaining usable inside a sprint.
+It is a practical bridge built on three ideas---shared semantic regions,
+typed repair feedback, and conjunctive acceptance---that keep many
+specification-conformance defects out of release while remaining usable inside
+a sprint.
 How far that bridge extends depends on richer encodings, industrial tasks, and
-adaptive repair---the directions above.
+adaptive repair.

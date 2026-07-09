@@ -5,48 +5,56 @@
 \chapter{Experimental Setup}
 \label{ch:experiments}
 
-This chapter is the measurement protocol.
-It fixes what is compared, under which oracle conditions, and how prevention
-is scored---so Chapter~\ref{ch:results} can report evidence without reopening
-design choices.
-Five research questions, hardware, benchmark, modes, metrics, and E1--E9
-tracks are stated once; threats are previewed here and analysed in
-Chapter~\ref{ch:discussion}.
+This chapter is the measurement protocol for the three Tier-1 claims.
+It fixes what is compared and how prevention is scored so
+Chapter~\ref{ch:results} can answer \emph{why we should believe the ideas},
+not merely that a system runs.
+Hardware, modes, metrics, and E1--E9 tracks are stated once; threats are
+previewed here and analysed in Chapter~\ref{ch:discussion}.
+
+\begin{inlinetable}{Claim-to-experiment map (Tier-1 focus).}
+  \label{tab:claim-map}
+  \footnotesize
+  \begin{tabular}{llp{0.42\linewidth}}
+    \toprule
+    Claim & Experiments & What would falsify it \\
+    \midrule
+    C1 (semantic regions) & E3, E4, E8 & Gap vanishes under dense overlap;
+      adapters fail to transfer \\
+    C2 (typed feedback) & E5, E6, A3 & Full IR $\not>$ test-only; repair
+      unused \\
+    C3 (conjunctive gate) & E1 Strict, E2 PDR/FAR, A2 & High Conf.\ with
+      high FAR; guard adds nothing \\
+    \bottomrule
+  \end{tabular}
+\end{inlinetable}
 
 %=============================================================================
 \section{Research Questions}
 \label{sec:exp:rq}
 %=============================================================================
 
-Each question answers a reviewer concern: does it work, on which faults, by
-which component, under what complexity, at what cost?
+Each RQ answers a reviewer concern and maps to the claims above.
 
 \paragraph{RQ1 (Overall Effectiveness).}
-Does specification-guided prevention significantly improve formal correctness over pure
-LLM synthesis?
-Evaluated via strict formal conformance and PDR/FAR on the 120-task hard benchmark
-(E1, E2).
+Does the three-insight loop improve formal conformance over one-shot and
+test-feedback baselines? (E1, E2; supports C1--C3 jointly.)
 
 \paragraph{RQ2 (Fault Class Prevention).}
-What specification defect classes does the framework prevent, and which remain outside
-its reach?
-Evaluated via per-operator PDR heatmap (E2), per-pattern P/R/F1 (E7), and failure
-taxonomy (E9).
+Which defect classes does the conjunctive gate catch, and which remain?
+(E2, E7, E9; primarily C3, residual analysis for C1/C2.)
 
 \paragraph{RQ3 (Component Attribution).}
-How much does each semantic component (formal checker, Semantic Feedback IR, pattern
-guard) contribute independently?
-Evaluated via ablation (A1/A2/A3 vs.\ M, E1), repair dynamics (E5), and feedback
-variant comparison (E6).
+How much do typed feedback and the formal checker contribute independently?
+(E5, E6, A1--A3; primarily C2, with C3 via A2/PDR.)
 
 \paragraph{RQ4 (Complexity Scaling).}
-How does the framework's advantage scale across specification complexity dimensions?
-Evaluated via overlap density tertiles and guard complexity stratification (E3).
+Does the advantage grow where semantic regions are hardest to sample?
+(E3, E4; primarily C1.)
 
 \paragraph{RQ5 (Quality--Overhead Trade-off).}
-What is the quality gain per unit of latency and LLM calls relative to the strongest
-baseline?
-Evaluated via latency analysis and Pareto comparison (E1).
+Is the latency cost justified by the conformance gain?
+(E1 Pareto; practical bound on all three claims.)
 
 %=============================================================================
 \section{Hardware and Software Environment}

@@ -4,8 +4,9 @@
 \chapter{Experimental Results}
 \label{ch:results}
 
-This chapter is evidence, not method restatement.
-Mechanism first (E3--E6: where and why the gain appears), then aggregates
+This chapter is evidence for the three Tier-1 claims
+(Table~\ref{tab:claim-map}), not method restatement.
+Mechanism first (E3--E6: where and why the ideas work), then aggregates
 (E1/E2), then cost and transfer.
 Table~\ref{tab:results-roadmap} is the map; unless noted, $n{=}120$ hard tasks
 and the seven primary modes apply.
@@ -31,9 +32,9 @@ and the seven primary modes apply.
 \label{sec:results:rq4}
 %=============================================================================
 
-\textbf{Answer in one sentence.}
-The conformance gap between M and the baselines grows with guard-overlap density:
-SMT witnesses matter most where random tests fail.
+\textbf{Claim (C1).}
+If prevention depends on semantic regions, the M--baseline gap should grow
+with guard-overlap density---where random tests fail.
 
 \begin{figure}[t]
   \centering
@@ -54,10 +55,10 @@ $a>80\land b<20$ before $a>50$.
 Under B1 the broader guard wins; under M the Semantic Feedback IR names S1 and
 the second attempt restores order.
 
-\paragraph{Answer to RQ4.}
-The framework's conformance advantage scales with specification complexity, with the
-largest gains ($\geq$3\,pp over B2, $\geq$8\,pp over B1) in the dense-overlap tier
-where specification-conformance defects are most likely to occur.
+\paragraph{Answer to RQ4 / C1.}
+The advantage scales with overlap density ($\geq$3\,pp over B2, $\geq$8\,pp
+over B1 in the dense tier): semantic-region witnesses matter most where
+sampling fails.
 
 %=============================================================================
 \section{RQ3: Component Attribution (E5, E6, Ablation)}
@@ -158,19 +159,20 @@ conformance alone misses (Section~\ref{sec:results:rq2}).
 Repair $>$ checker $\gg$ pattern guard on Conf.\ (A3/A1/A2);
 the guard's value shows up in structural PDR, not in mean Conf.
 
-\paragraph{Answer to RQ3.}
-Semantic Feedback IR (+7.7\,pp, E6) and the formal checker (A1/A3) dominate;
-measure the pattern guard via PDR.
+\paragraph{Answer to RQ3 / C2--C3.}
+Typed feedback is the largest repair lever (+7.7\,pp, E6; A3 $-$6.3\,pp);
+the checker is next (A1 $-$3.9\,pp); measure the pattern guard via PDR (C3),
+not mean Conf.
 
 %=============================================================================
 \section{RQ1: Overall Effectiveness (E1)}
 \label{sec:results:rq1}
 %=============================================================================
 
-\textbf{Answer in one sentence.}
-HSP-Agile (mode~M) reaches 90.4\% mean strict formal conformance---+6.2\,pp over
-one-shot LLM and +2.4\,pp over test-feedback---while its lower strict-success
-rate reflects a stricter acceptance gate, not weaker code.
+\textbf{Claim (C1--C3 jointly).}
+The three-insight loop should raise mean Conf.\ over one-shot and
+test-feedback baselines; a lower Strict rate under M would support C3
+(conjunctive gate), not weaker code.
 
 \subsection{Main Results}
 
@@ -287,20 +289,18 @@ requires a clear pattern screen, so the accepted set is cleaner.
 Mutation kill rate measures checker quality; B0's 79.0\% exceeds LLM modes
 (60--63\%), and inter-LLM gaps ($\le$2.6\,pp) should not be over-read.
 
-\paragraph{Answer to RQ1.}
-Conformance, not strict success, discriminates on this benchmark: +6.2\,pp
-over one-shot, +2.4\,pp over test-feedback; the slightly lower acceptance rate
-is selectivity.
+\paragraph{Answer to RQ1 / C1--C3.}
+Conformance discriminates (+6.2\,pp / +2.4\,pp over B1/B2); the slightly
+lower Strict rate is C3 selectivity, not weaker code.
 
 %=============================================================================
 \section{RQ2: Fault Class Prevention (E2, E7)}
 \label{sec:results:rq2}
 %=============================================================================
 
-\textbf{Answer in one sentence.}
-M and B2 prevent different fault classes: SMT witnesses catch ordering
-violations; unit-test feedback catches some boundary shifts; neither alone
-covers the full mutant catalogue.
+\textbf{Claim (C3, with C1).}
+The conjunctive gate plus region witnesses should catch ordering/guard
+faults that unit-test feedback misses; residual classes name the limits.
 
 \begin{figure}[t]
   \centering
@@ -387,21 +387,19 @@ rule set.
 The full prevention evaluation across all seven modes and 1200 mutants is
 still ongoing, so these findings remain exploratory pending completion.
 
-\paragraph{Answer to RQ2.}
-The framework prevents ordering and guard-inversion defects most effectively (via both
-the formal checker and pattern guard).
-Boundary-shift defects are better detected by test-feedback baselines.
-Output-dependency and arithmetic defects remain partially outside current coverage
-(see failure analysis in Chapter~\ref{ch:discussion}).
+\paragraph{Answer to RQ2 / C3.}
+Ordering and guard-inversion defects are prevented most effectively;
+boundary shifts favour B2; arithmetic/output residues remain
+(Chapter~\ref{ch:discussion}).
 
 %=============================================================================
 \section{RQ5: Quality--Overhead Trade-off (E1)}
 \label{sec:results:rq5}
 %=============================================================================
 
-\textbf{Answer in one sentence.}
-M buys the highest mean conformance at roughly $4.6\times$ B2 latency; A2 is
-the low-latency near-Pareto alternative when pattern screening is optional.
+\textbf{Claim (practical bound).}
+The three insights should buy Conf.\ at a measurable latency premium; a
+near-Pareto alternative should exist when the C3 pattern screen is optional.
 
 \begin{figure}[t]
   \centering
@@ -434,7 +432,8 @@ Mann-Whitney confirms the latency gap is not a sampling artefact
 ($p{=}0.9999$).
 
 \paragraph{Answer to RQ5.}
-Best quality at $\approx$4$\times$ latency vs.\ B2; use A2 when latency binds.
+Best quality at $\approx$4.6$\times$ B2 latency; use A2 when latency binds
+and the pattern screen is optional.
 
 %=============================================================================
 \section{RQ4 Extended: Boundary Density (E4)}

@@ -4,9 +4,13 @@
 \chapter{The \textsc{SgDP} Framework and HSP-Agile Instantiation}
 \label{ch:method}
 
-This chapter is the design document.
+This chapter realises the three insights of Chapter~\ref{ch:intro}:
+SpecIR semantic regions (C1), Semantic Feedback IR (C2), and conjunctive
+acceptance (C3).
 Chapter~\ref{ch:formalization} fixed the objects; here they become a loop an
 LLM can participate in.
+Adapters and FSF lowering are necessary engineering for the HSP-Agile
+instantiation, not claimed contributions.
 The industrial-monitoring example \code{classify\_signal} is run end to end
 \emph{before} the interfaces are stated---so the four stages are seen as
 artefact transforms, not as a taxonomy.
@@ -118,10 +122,7 @@ Those ideas are the language-independent core of \textsc{SgDP}.
     specification-derived quality criteria.
 \end{enumerate}
 
-The end-to-end map remains Figure~\ref{fig:sgdp-overview}
-(Chapter~\ref{ch:intro}); the remainder of this section details the
-instantiation interface.
-
+Figure~\ref{fig:sgdp-overview} (Chapter~\ref{ch:intro}) remains the map.
 An instantiation for language $\mathcal{L}$ provides:
 (i)~Specification Adapter $\text{Adapt}_L : \text{Text}_L \to \text{SpecIR}$;
 (ii)~oracle $g_t$ derived from $\text{SpecIR}(t).\text{cases}$ under first-match;
@@ -296,25 +297,16 @@ by plain test-pass/fail feedback.
 
 \noindent
 Figures~\ref{fig:convergence} and~\ref{fig:feedback-variant}
-(Chapter~\ref{ch:results}) support the hypothesis: mode~M with structured IR
-reaches higher $\mu_k$ in fewer iterations than B2 (test-feedback), and the
-E6 full-IR variant outperforms test-only and test-plus-expected prompts by
-more than 7\,pp.
-A fully formal proof would need a stochastic model of LLM repair that is
-beyond current theory, so the claim is treated as an empirically supported
-hypothesis.
+(Chapter~\ref{ch:results}) support the claim empirically; a fully formal
+stochastic model of LLM repair is beyond current theory.
 
 \subsection{Empirical FAR Validation}
 \label{subsec:far-validation}
 
-To ground Theorem~\ref{thm:far-bound} empirically, the theoretical upper bound
-$(1-\varepsilon)^n$ is compared with the observed FAR in E2
+With $\varepsilon = 0.08$ and $n = 9$, Theorem~\ref{thm:far-bound} predicts
+$\mathrm{FAR} \leq (0.92)^9 \approx 0.473$; mode~M in E2 measures $0.14$
+(Table~\ref{tab:far-validation}), well inside the conservative bound
 (Section~\ref{sec:results:rq2}).
-With $\varepsilon = 0.08$ (median per-witness detection probability of
-implementation-level mutants) and $n = 9$ (average witnesses per task), the
-bound predicts $\mathrm{FAR} \leq (0.92)^9 \approx 0.473$.
-Mode~M's measured FAR in E2 is $0.14$ (Table~\ref{tab:far-validation}), well
-within that bound.
 
 \begin{inlinetable}{Theoretical FAR bound vs.\ empirical FAR (mode M, E2).}
   \label{tab:far-validation}
@@ -330,12 +322,6 @@ within that bound.
   \end{tabular}
 \end{inlinetable}
 
-The empirical FAR (0.14) is substantially below the theoretical bound (0.47),
-which is expected since the bound is conservative: witnesses are targeted at
-boundary regions rather than drawn uniformly at random, making the per-witness
-detection probability $\varepsilon$ higher in practice than the conservative
-estimate used in the bound.
-
 \subsection{Prevention-Oriented Metrics}
 \label{subsec:metrics}
 
@@ -350,20 +336,12 @@ PDR, FAR, strict formal conformance, and latency are reported jointly.
 \subsection{Pipeline Complexity Cost Model}
 \label{subsec:complexity-cost}
 
-Let $n = |\mathcal{S}_t|$ denote the number of ordered scenarios in
-$\text{SpecIR}(t)$ and $K$ the repair budget.
-Witness generation solves $n$ priority formulas $\Phi_i$, each a conjunction of
-$O(i)$ guard literals, giving per-task witness cost
-$\mathcal{O}\bigl(\sum_{i=1}^{n} T_{\text{SMT}}(|\Phi_i|)\bigr)$ where
-$T_{\text{SMT}}$ is solver time on linear integer arithmetic.
-Formal checking executes $|\mathcal{D}(t)| \leq n$ concrete cases per
-candidate; repair multiplies LLM and checker cost by up to~$K$.
-The dominant term in mode~M is therefore
-$\mathcal{O}(K \cdot (T_{\text{LLM}} + n \cdot T_{\text{exec}}))$ with
-$T_{\text{SMT}}$ amortised once per task.
-E3--E4 empirically confirm that this cost scales sub-linearly in conformance
-gain: overlap density increases $n$ and tightens $\mathcal{B}_\varepsilon(t)$,
-widening the random-vs.-SMT hit-rate gap of Corollary~\ref{cor:random-vs-smt}.
+With $n=|\mathcal{S}_t|$ scenarios and budget~$K$, witness generation costs
+$\mathcal{O}(\sum_{i=1}^{n} T_{\text{SMT}}(|\Phi_i|))$ once per task; the
+dominant per-run term is
+$\mathcal{O}(K \cdot (T_{\text{LLM}} + n \cdot T_{\text{exec}}))$.
+E3--E4 confirm sub-linear cost relative to conformance gain
+(Corollary~\ref{cor:random-vs-smt}).
 
 \begin{figure}[t]
   \centering
@@ -401,9 +379,9 @@ widening the random-vs.-SMT hit-rate gap of Corollary~\ref{cor:random-vs-smt}.
 \end{algorithmic}
 \end{algorithm}
 
-Every iteration appends $\langle k, \mathrm{Conf}(c_k,t), |\text{failures}_k|,
-|\text{patterns}_k|\rangle$ to \texttt{attempt\_history} in the output JSONL,
-supporting repair-dynamics (E5) and feedback-quality (E6) analyses.
+Each iteration logs
+$\langle k, \mathrm{Conf}(c_k,t), |\text{failures}_k|, |\text{patterns}_k|\rangle$
+to \texttt{attempt\_history} for E5--E6 analyses.
 
 \input{tables/symbols}
 \input{tables/glossary}
@@ -411,50 +389,19 @@ supporting repair-dynamics (E5) and feedback-quality (E6) analyses.
 \section{Design Principles}
 \label{sec:method:principles}
 
-Five principles shaped every architectural decision~\citep{woodcock2009formalsurvey, chen2021codex}:
-
-\paragraph{P1 --- Precision over approximation.}
-Conformance is decided by an SMT solver and oracle $g_t$, not learned heuristics
-or hand-annotated expected values.
-
-\paragraph{P2 --- Bounded budget with guaranteed termination.}
-A hard budget $K$ caps synthesis-check iterations ($K = 3$ in experiments).
-
-\paragraph{P3 --- Counterexample specificity via Semantic Feedback IR.}
-Repair feedback is constructed as JSON-serialised Semantic Feedback records
-(\texttt{schemas/semantic\_feedback.schema.json}) and \emph{then} projected to
-natural language; each record carries failing input~$\mathbf{x}^*$, oracle output
-$g_t(\mathbf{x}^*)$, candidate output $f_c(\mathbf{x}^*)$, violated scenario index,
-guard text, violation type, and optional fix hint.
-
-\paragraph{P4 --- Conservative acceptance.}
-Release requires both formal conformance and pattern safety
-(equation~\eqref{eq:accept}); neither stage alone suffices.
-
-\paragraph{P5 --- Modularity and ablation transparency.}
-Boolean flags enable or disable Stages~2--4 independently for ablation
-(Chapter~\ref{ch:experiments}).
+Five principles~\citep{woodcock2009formalsurvey, chen2021codex}:
+(P1)~oracle/SMT precision over heuristics;
+(P2)~hard budget~$K$ with guaranteed termination;
+(P3)~JSON Semantic Feedback IR before natural-language projection;
+(P4)~conjunctive acceptance (equation~\eqref{eq:accept});
+(P5)~modular stage flags for ablation (Chapter~\ref{ch:experiments}).
 
 \section{Pipeline Overview}
 \label{sec:method:overview}
 
-After the worked example, the same four artefacts appear on every task:
-specification text, candidate, witnesses, and a typed failure record.
-The per-task data flow is
-\begin{equation}
-  \mathcal{S}_t
-  \;\xrightarrow{\text{Stage 1}}\;
-  c_k
-  \;\xrightarrow{\text{Stage 2}}\;
-  (\mathrm{Conf}(c_k,t),\;\mathit{cexs}_k)
-  \;\xrightarrow{\text{Stage 3}}\;
-  \mathit{feedback}_k
-  \;\xrightarrow{\text{Stage 4}}\;
-  \mathrm{Accept}(c_k,t),
-  \label{eq:pipeline-flow}
-\end{equation}
-iterated until $\mathrm{Accept}(c_k, t) = 1$ or $k = K$.
-Figure~\ref{fig:sgdp-overview} remains the architectural map;
+The four stages of Algorithm~\ref{alg:sgdp} iterate until
+$\mathrm{Accept}(c_k,t)=1$ or $k=K$.
+Figure~\ref{fig:sgdp-overview} is the architectural map;
 Figure~\ref{fig:pipeline-seq} is the message-level sequence of one run.
 
 \begin{figure}[t]
@@ -479,42 +426,22 @@ Figure~\ref{fig:pipeline-seq} is the message-level sequence of one run.
 \section{Stage 1: LLM-Based Candidate Synthesis}
 \label{sec:method:synthesis}
 
-Stage~1 maps $(t, \mathit{feedback}_{k-1})$ to candidate Python $c_k$; it is the
-only non-deterministic stage.
+Stage~1 maps $(t, \mathit{feedback}_{k-1})$ to candidate $c_k$ (the only
+non-deterministic stage).
 
 \subsection{Prompt Structure}
 \label{subsec:method:prompt}
 
-The synthesis prompt $\mathcal{P}(t,k)$ follows the OpenAI chat format~\citep{openai2023gpt4, chen2021codex}:
-a fixed \emph{system} message plus a \emph{user} message carrying $(\mathcal{S}_t,
-\mathit{sig}(t))$ and, when $k > 1$, $(\mathit{cexs}_{k-1}, \mathit{hits}_{k-1})$.
-
-\begin{figure}[t]
-  \centering
-  \tikzinput{diagrams/tikz/synthesis_prompt_chat}
-  \caption{Synthesis prompt transcript: system message enforces top-to-bottom guard
-    evaluation; user messages carry FSF spec and, when $k > 1$, repair feedback
-    (orange accent).}
-  \label{fig:synthesis-prompt-chat}
-\end{figure}
-
-\begin{figure}[t]
-  \centering
-  \tikzinput{diagrams/tikz/prompt_design_cards}
-  \caption{Three prompt-design mechanisms~\citep{li2022agilesofl}: scenario ordering,
-    signature injection, and feedback context.}
-  \label{fig:prompt-design-cards}
-\end{figure}
+Prompt $\mathcal{P}(t,k)$ uses a fixed system message plus a user message with
+$(\mathcal{S}_t, \mathit{sig}(t))$ and, when $k>1$, the rendered Feedback IR
+\citep{openai2023gpt4, chen2021codex}.
 
 \subsection{Model Configuration and Parsing}
 \label{subsec:method:model}
 
-The synthesiser is Qwen2.5-27B-Instruct with dual temperatures matching the
-experimental protocol (Chapter~\ref{ch:experiments}): $T_\text{gen} = 0.7$ for
-the first synthesis call and $T_\text{repair} = 0.0$ for subsequent repair
-calls (max 2048 output tokens).
-The parser extracts one \code{```python} fenced block, compiles it, and on failure
-sets $c_k = \bot$ (conformance 0).
+Qwen2.5-27B-Instruct with $T_\text{gen}=0.7$ then $T_\text{repair}=0.0$
+(Chapter~\ref{ch:experiments}); the parser extracts one fenced Python block
+or sets $c_k=\bot$.
 \begin{equation}
   c_k \;=\; \mathrm{LLM}\!\left(t,\;\mathit{feedback}_{k-1}\right).
   \label{eq:synthesis}
@@ -523,13 +450,12 @@ sets $c_k = \bot$ (conformance 0).
 \section{Stage 2: SMT-Driven Formal Conformance Checking}
 \label{sec:method:checker}
 
-Stage~2 computes $\mathrm{Conf}(c_k, t)$ and counterexamples $\mathit{cexs}_k$
-via four steps~\citep{demoura2008z3, barrett2018smt} (Algorithm~\ref{alg:checker}):
-\textbf{(1)} translate each guard $g_i$ to Z3 $\hat{g}_i$ and form $\Phi_i$
-(equation~\eqref{eq:priority});
-\textbf{(2)} solve $\Phi_i$ per scenario (Listing~\ref{lst:z3-gen});
-\textbf{(3)} compute oracle outputs $y_i^* = g_t(x_i)$ by substituting into $\phi_i$;
-\textbf{(4)} execute $c_k$ in a sandbox and compare field-by-field with type normalisation.
+Stage~2 realises $\mathcal{W}$ and $\mathrm{Conf}$
+(equations~\eqref{eq:priority}--\eqref{eq:conformance}):
+solve each $\Phi_i$, evaluate $g_t$ on the model, execute $c_k$ in a sandbox,
+and collect mismatches as $\mathit{cexs}_k$~\citep{demoura2008z3, barrett2018smt}.
+Algorithm~\ref{alg:checker} is the procedure; Listing~\ref{lst:z3-gen} shows
+the Z3 encoding for one scenario.
 
 \inputpython{listings/z3_gen.py}{Z3 test-case generation for scenario~$i$.}{lst:z3-gen}
 
@@ -561,53 +487,37 @@ via four steps~\citep{demoura2008z3, barrett2018smt} (Algorithm~\ref{alg:checker
 \subsection{Why SMT Over Random Testing}
 \label{subsec:method:smt-rationale}
 
-Random or boundary-value sampling rarely hits multi-conjunct guard regions
+Random sampling rarely hits multi-conjunct first-match regions
 \citep{claessen2000quickcheck, zhu1997specification}.
-$\Phi_i$ guarantees each witness lies in scenario $i$'s exclusive first-match
-region, realising Theorem~\ref{thm:witness-soundness} and eliminating oracle ambiguity.
+$\Phi_i$ places each witness in scenario~$i$'s exclusive region
+(Theorem~\ref{thm:witness-soundness}), so oracle labels are unambiguous.
 
 \section{Stage 3: Counterexample-Guided Repair}
 \label{sec:method:repair}
 
-When $\mathrm{Conf}(c_k, t) < 1$ or pattern violations occur, Stage~3 assembles
-$\mathit{fb}_k$ mapping $\mathit{cexs}_k$, $\mathit{hits}_k$, attempt $k$, and
-$\mathrm{Conf}(c_k,t)$~\citep{lynn2024verifierloop, solarlezama2008sketching}.
-Each counterexample $(x^*, y^*, y^c, i^*)$ is verbalised.
-For the running example (Section~\ref{sec:method:worked}):
-
-\begin{quote}
-  \textit{``For inputs $(\mathit{level}{=}{-}3,\;\mathit{threshold}{=}{-}10)$,
-  your code returned \code{Critical}, but the specification requires
-  \code{Error}.
-  This input satisfies Scenario~S1 ($\mathit{level}<0$), which should be
-  matched first.''}
-\end{quote}
+Stage~3 builds the Semantic Feedback IR
+(Section~\ref{subsec:feedback-ir}) and renders it via $\rho$;
+Figure~\ref{fig:repair-feedback} shows the
+\code{classify\_signal} arc (quote in Section~\ref{sec:method:worked}).
+This is CEGIS with the LLM as synthesiser and the checker as
+verifier~\citep{lynn2024verifierloop, solarlezama2008sketching}.
 
 \begin{figure}[t]
   \centering
   \tikzinput{diagrams/tikz/repair_feedback}
-  \caption{Counterexample-guided repair for \code{classify\_signal}: failed
-    attempts yield structured feedback (counterexamples + pattern violations)
-    for the next synthesis call.
-    Takeaway: the feedback names the violated scenario, not only the raw I/O.}
+  \caption{\textbf{Key observation (C2):} repair names the violated scenario,
+    not only raw I/O.
+    \textbf{How to read:} failed attempt $\to$ Semantic Feedback IR $\to$ next
+    synthesis.}
   \label{fig:repair-feedback}
 \end{figure}
-
-Stage~3 instantiates CEGIS~\citep{solarlezama2008sketching}: the LLM is the synthesiser,
-the formal checker the verifier, and the Semantic Feedback IR (Section~\ref{subsec:feedback-ir})
-the feedback bridge.
 
 \section{Stage 4: Requirement Pattern Guard}
 \label{sec:method:guard}
 
-Witness agreement is necessary but not sufficient.
-A candidate can match every point in $\mathcal{D}(t)$ and still hard-code a
-success path, drop an output field, or ignore a precondition that the finite
-witness set never exercised~\citep{hovemeyer2004findbugs, li2023iet}.
-Stage~4 therefore applies a finite catalogue of requirement-fault patterns
-before release.
-Fourteen RF patterns appear in Table~\ref{tab:patterns}; nine high-severity
-patterns form $\mathcal{P}^H$ in equation~\eqref{eq:accept}.
+Witness agreement alone is insufficient~\citep{hovemeyer2004findbugs, li2023iet}.
+Stage~4 applies Table~\ref{tab:patterns}; nine high-severity patterns form
+$\mathcal{P}^H$ in equation~\eqref{eq:accept}.
 
 \begin{table}[H]
   \caption{HSP-Agile Error Pattern Catalog ($|\mathcal{P}| = 14$).
@@ -644,20 +554,18 @@ patterns form $\mathcal{P}^H$ in equation~\eqref{eq:accept}.
 \subsection{Detection Method}
 \label{subsec:method:detection}
 
-Each pattern $p \in \mathcal{P}$ has detector $\delta_p : \mathcal{C} \times \mathcal{T} \to \{0,1\}$.
-Structural patterns (RF04, RF07, RF09, RF13) use AST analysis;
-surface patterns (RF03, RF08, RF14) use regex;
-guard-comparison patterns (RF01, RF02, RF05, RF06, RF11) cross-reference FSF guards
-with candidate conditionals.
-The hit set is $\mathrm{Hits}(c,t) = \{p \in \mathcal{P} : \delta_p(c,t) = 1\}$.
-Medium/low-severity hits inform feedback but do not block acceptance.
+Each $p \in \mathcal{P}$ has detector $\delta_p$; structural patterns use AST
+analysis, surface patterns use regex, and guard-comparison patterns
+cross-reference FSF guards with candidate conditionals.
+$\mathrm{Hits}(c,t) = \{p : \delta_p(c,t)=1\}$; only $\mathcal{P}^H$ blocks
+acceptance.
 
 \section{Pipeline Stage Summary}
 \label{sec:method:summary}
 
-Table~\ref{tab:stage-summary} summarises all stages.
-Algorithm~\ref{alg:sgdp} unifies them under the \textsc{SgDP} interface; the conjunctive
-predicate (equation~\eqref{eq:accept}) combines Stages~2 and~4 per Principle~P4.
+Table~\ref{tab:stage-summary} contracts the stages under Algorithm~\ref{alg:sgdp}.
+The Tier-1 claims realised here are SpecIR semantic regions~(C1), Semantic
+Feedback IR~(C2), and conjunctive acceptance~(C3).
 
 \begin{inlinetable}{Summary of HSP-Agile pipeline stages.}
   \label{tab:stage-summary}
@@ -675,9 +583,3 @@ predicate (equation~\eqref{eq:accept}) combines Stages~2 and~4 per Principle~P4.
     \bottomrule
   \end{tabularx}
 \end{inlinetable}
-
-\enlargethispage{1\baselineskip}
-Table~\ref{tab:stage-summary} is the contract that the software realisation
-must honour.
-How that contract is implemented, and how it is measured, occupy the next two
-chapters.

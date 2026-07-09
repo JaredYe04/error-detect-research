@@ -5,11 +5,14 @@
 \chapter{Implementation}
 \label{ch:implementation}
 
-This chapter is engineering, not re-derivation.
-Reviewers who already accept the method need to know which module owns which
-failure mode, what can be swapped for ablation, and where latency is spent.
-Algorithms stay in Chapter~\ref{ch:method}; here the concern is modules,
-control flow, and trade-offs.
+This chapter is engineering that realises the three Tier-1 insights of
+Chapter~\ref{ch:intro}---not a contribution catalogue.
+C1 needs SpecIR adapters and FSF lowering; C2 needs Semantic Feedback IR and
+the repair loop; C3 needs the conformance checker, pattern guard, and
+conjunctive $\mathrm{Accept}$ gate.
+Algorithms stay in Chapter~\ref{ch:method}; here the concern is which module
+owns which failure mode, what can be swapped for ablation, and where latency
+is spent.
 On \code{classify\_signal}, the same modules emit the witness $(-3,-10)$,
 serialise the Semantic Feedback IR record, and decide $\mathrm{Accept}$.
 
@@ -21,10 +24,9 @@ $\mathrm{Conf}(c,t)$, $\mathrm{Accept}(c,t)$ from~\eqref{eq:accept}.
 \label{sec:impl:architecture}
 % ---------------------------------------------------------------------------
 
-Why separate modules?
-Because Stages~1--4 must be ablatable and auditable without rewriting the
-rest (Chapter~\ref{ch:experiments}).
-Ingestion, orchestration, and external services therefore stay apart.
+Stages~1--4 must be ablatable and auditable without rewriting the rest
+(Chapter~\ref{ch:experiments}), so ingestion, orchestration, and external
+services stay apart.
 
 For the monitoring alert \code{classify\_signal}, the path is: adapter
 $\to$ SpecIR $\to$ LLM candidate $\to$ Z3 witness $(-3,-10)$ $\to$ Semantic
@@ -74,15 +76,15 @@ Value objects carry serialisable audit traces.
 \end{figure}
 
 \paragraph{What each subsystem prevents.}
-Adapters keep notation changes out of the core: SOFL, Mini-Z, and
+Adapters keep notation changes out of the core (C1): SOFL, Mini-Z, and
 Mini-StateMachine each implement \texttt{SpecAdapter.parse() $\to$ SpecIR},
 then lower via \texttt{FSFLowerer}.
 The pipeline runner realises Algorithm~\ref{alg:sgdp}, including early exit on
 $\mathrm{Accept}(c_k,t)=1$ and best-effort fallback when $k > K$.
 The formal checker builds Z3 queries, executes candidates in a sandbox, and
-assembles counterexamples.
+assembles counterexamples (C3).
 The pattern guard applies catalogue $\mathcal{P}$ (Table~\ref{tab:patterns})
-with AST and regex detectors.
+with AST and regex detectors (C3).
 The experiment orchestrator schedules mode--task pairs across a process pool
 with resume-safe logs.
 
@@ -91,18 +93,18 @@ with resume-safe logs.
 \label{sec:impl:ingestion}
 % ---------------------------------------------------------------------------
 
-The checker must never see raw SOFL, Mini-Z, or Mini-StateMachine text.
-Ingestion therefore parses each surface notation into SpecIR
+The checker must never see raw SOFL, Mini-Z, or Mini-StateMachine text
+(C1).
+Ingestion parses each surface notation into SpecIR
 (Chapter~\ref{ch:formalization}) and lowers it to the FSF-shaped
-\texttt{TaskSpec} consumed by Stages~2--4.
-Three phases do the work: notation-specific parsing via a registered
-\texttt{SpecAdapter}; canonicalisation into ordered \texttt{GuardedCase}
-records; and lowering via \texttt{FSFLowerer}.
+\texttt{TaskSpec} consumed by Stages~2--4:
+notation-specific parsing via a registered \texttt{SpecAdapter};
+canonicalisation into ordered \texttt{GuardedCase} records; and lowering via
+\texttt{FSFLowerer}.
 The primary SOFL path uses the Agile-SOFL
 toolchain~\citep{li2022agilesofl,liu2014sofl}; E8 adapters bypass SOFL
 syntax while producing the same SpecIR structure.
-On the SOFL path, the parser classes in Figure~\ref{fig:fsf-parser-class}
-are what keep surface syntax from leaking into the checker.
+Figure~\ref{fig:fsf-parser-class} shows the SOFL-side bridge classes.
 
 \subsection{SpecIR Adapter Registry}
 \label{sec:impl:specir-adapters}
@@ -112,19 +114,18 @@ concrete \texttt{SpecAdapter} subclasses.
 Each adapter implements \texttt{parse(spec\_text, task\_id) $\to$ SpecIR},
 populating \texttt{GuardedCase} objects with normalised \texttt{GuardAtom}
 predicates, postconditions, and surface-text fields for prompting.
-\texttt{SpecIR.to\_dict()} and \texttt{SpecIR.from\_dict()} round-trip through
-\path{schemas/spec_ir.schema.json}, enabling audit logging and cross-notation
-benchmark interchange.
+\texttt{SpecIR.to\_dict()} / \texttt{from\_dict()} round-trip through
+\path{schemas/spec_ir.schema.json} for audit logging and cross-notation
+interchange.
 
-\texttt{FSFLowerer.lower(spec)} projects \texttt{SpecIR} onto the legacy
-\texttt{TaskSpec} schema: ordered scenario list, I/O signatures, prompt text,
-and metadata required by the pattern guard.
+\texttt{FSFLowerer.lower(spec)} projects SpecIR onto the legacy
+\texttt{TaskSpec} schema (ordered scenarios, I/O signatures, prompt text,
+pattern-guard metadata).
 \texttt{PipelineRunner.run()} accepts either a \texttt{TaskSpec} dict or a
 \texttt{SpecIR} instance (\path{src/pipeline/task_input.py}), normalising
 through the lowerer when needed.
-This separation keeps oracle construction, witness generation, and repair
-feedback notation-agnostic while preserving backward compatibility with the
-120-task FSF benchmark and existing experiment scripts.
+Oracle construction, witness generation, and repair feedback therefore stay
+notation-agnostic while remaining compatible with the 120-task FSF benchmark.
 
 \begin{figure}[t]
   \centering
@@ -136,87 +137,29 @@ feedback notation-agnostic while preserving backward compatibility with the
       FSF specification parsing and test-case generation class diagram.
       \vspace{1.2cm}}}%
   }
-  \caption{FSF parsing and downstream translation (Stage~2 inputs of
-           Chapter~\ref{ch:method}).
+  \caption{\textbf{Key observation:} surface syntax stops at SpecIR;
+           Stages~2--4 consume only the lowered \texttt{TaskSpec}.
            For \code{classify\_signal}, the bridge yields a three-scenario
-           \texttt{TaskSpec}; the Z3 translator emits \texttt{ConcreteCase}
-           witnesses such as $(-3,-10)$.}
+           task; the Z3 translator emits witnesses such as $(-3,-10)$.}
   \label{fig:fsf-parser-class}
 \end{figure}
 
-\subsection{Parsing and TaskSpec Construction}
-
-The Agile-SOFL parser performs lexical and syntactic analysis of module
-definitions, extracting process and function bodies together with their
-associated FSF blocks.  For each process~$p$ that declares a non-empty FSF
-specification, the bridge constructs a \texttt{TaskSpec} record containing:
-\begin{itemize}
-  \item \textbf{Task identifier} --- a stable string key derived from module
-        and process names;
-  \item \textbf{Function signature} --- ordered input parameter names and
-        types, output variable declarations, and the callable name used in
-        candidate execution;
-  \item \textbf{Scenario list} --- an ordered sequence of
-        \texttt{FSFScenario} objects, one per FSF clause;
-  \item \textbf{External variable map} --- read/write declarations from the
-        \texttt{ext rd}/\texttt{ext wr} blocks of the process body;
-  \item \textbf{Prompt specification} --- a human-readable rendering of the
-        FSF text, injected verbatim into the LLM synthesis prompt.
-\end{itemize}
-
-Each \texttt{FSFScenario} stores three fields aligned with
-Definition~\ref{def:scenario}: a guard condition string (\texttt{test}),
-an output assignment block (\texttt{def}), and a scenario kind flag
-(\texttt{scenario} or \texttt{others}).  Scenario indices preserve the
-first-match ordering $s_1 \succ s_2 \succ \cdots \succ s_n$ that governs
-the specification oracle~$g_t$, following guarded-command
-semantics~\citep{dijkstra1975guarded}.
-
-\subsection{FSF Scenario Extraction}
-
-Scenario extraction walks the parser's concrete syntax tree for FSF
-expressions.  A standard FSF block chains scenarios as
-\[
-  \begin{aligned}
-    &\mathit{guard}_1 \;\&\&\; \mathit{assign}_1
-    \;\|\|\; \mathit{guard}_2 \;\&\&\; \mathit{assign}_2
-    \;\|\|\; \cdots \\
-    &\|\|\; \mathit{others} \;\&\&\; \mathit{default\_assignments}.
-  \end{aligned}
-\]
-The extractor splits on \code{||} to obtain individual scenarios, then
-separates each scenario's guard predicate from its output mapping at the
-\code{\&\&} delimiter.
-
-Guards are stored in a normalised relational atom syntax (e.g.\
-\texttt{a gt 10} for $a > 10$) that is shared across three consumers: the
-LLM prompt renderer, the Z3 translator, and the pattern guard's
-guard-comparison detectors.  Output assignments are parsed into dictionaries
-mapping output variable names to integer constants or symbolic references to
-input variables, enabling both oracle evaluation and prompt signature
-injection.
-
-\subsection{External Variable Handling}
-
-Agile-SOFL processes may declare \emph{external variables}---module-level
-state that a process reads or writes during execution.  The ingestion layer
-records these as a typed map $\mathit{ext} : \mathit{Name} \to
-\{\textsc{rd}, \textsc{wr}\}$.  When the prompt is assembled, readable
-external variables are listed alongside input parameters so that the LLM is
-aware of the full variable environment.  The pattern guard subsequently
-verifies that declared external variables appear in the candidate's name
-reference set (pattern RF10), closing a common gap where the model ignores
-SOFL state variables entirely.
-
-\subsection{Output Inference}
-
-Output variable names are inferred from two sources: the explicit output
-parameter declarations in the process signature, and the left-hand sides of
-assignment atoms in each scenario's \texttt{def} block.  The union of these
-sets defines the output domain~$\mathcal{Y}_t$ for conformance comparison.
-Requiring the candidate to return a dictionary keyed by exactly these names
-eliminates ambiguity during field-by-field oracle comparison in Stage~2 and
-enables RF04 (missing output field) detection in Stage~4.
+\paragraph{Parsing sketch.}
+The Agile-SOFL bridge extracts, per process with a non-empty FSF block, a
+\texttt{TaskSpec}: task id, callable signature, ordered
+\texttt{FSFScenario} list (guard \texttt{test}, assignment \texttt{def},
+kind \texttt{scenario}/\texttt{others}), external-variable map, and rendered
+prompt text.
+Scenario indices preserve first-match order
+$s_1 \succ \cdots \succ s_n$~\citep{dijkstra1975guarded}
+(Definition~\ref{def:scenario}).
+Guards are normalised to a shared relational-atom syntax consumed by the
+prompt renderer, Z3 translator, and pattern guard; output names define
+$\mathcal{Y}_t$ for field-wise oracle comparison and RF04 detection.
+External \texttt{ext rd}/\texttt{ext wr} names are listed in the prompt and
+checked by RF10 when relevant.
+Parser and AST minutiae are omitted here; they do not alter the C1 claim that
+checking depends on SpecIR regions, not surface notation.
 
 % ---------------------------------------------------------------------------
 \section{LLM Integration Layer}
@@ -228,117 +171,61 @@ replayable.
 The LLM layer wraps an OpenAI-compatible gateway
 (\texttt{ECNUClient}, \path{src/llm/ecnu_client.py}) for auth, retry, timeout,
 token accounting, and audit logs---the name is historical, not a coupling.
+Production runs use Qwen2.5-27B-Instruct (\textsf{Qwen-27B}) with exponential
+backoff (up to three retries), a 90\,s request timeout, and optional JSON
+audit of message history and token counts~\citep{openai2023gpt4,chen2021codex}.
 
-\subsection{LLM Client Adapter Design}
-
-The LLM client adapter (\texttt{ECNUClient}) exposes a single \texttt{chat(messages)}
-method that accepts a list of role--content message pairs and returns the
-model's completion text together with usage metadata (prompt tokens,
-completion tokens, wall-clock latency).  Three resilience mechanisms are
-built in:
-
-\begin{enumerate}
-  \item \textbf{Exponential backoff retry.}  Transient network failures and
-        HTTP 5xx responses trigger up to three retry attempts with backoff
-        interval $2^{\mathit{attempt}}$ seconds, preventing a single timeout
-        from aborting an entire experiment batch.
-  \item \textbf{Request timeout.}  Each API call is bounded by a
-        90-second wall-clock timeout.  Calls exceeding this limit are
-        treated as failures and retried; persistent timeout triggers
-        escalation to the repair loop's best-effort exit.
-  \item \textbf{Model selection.}  All production experiments use
-        Qwen2.5-27B-Instruct (\textsf{Qwen-27B}), which provides strong code
-        generation capability on structured specification prompts while
-        remaining accessible through the standard chat-completions API
-        surface, consistent with GPT-class code models~\citep{openai2023gpt4,chen2021codex}.
-\end{enumerate}
-
-Every successful call is optionally serialised to a JSON audit log containing
-the full message history, response text, token counts, and task metadata
-(task identifier, mode, attempt index).  This design supports cost tracking
-and enables manual inspection of failure cases without re-invoking the API.
-
-\subsection{Prompt Template Structure}
-
-Prompt construction follows the Stage~1 template of
-Section~\ref{subsec:method:prompt}.  The adapter does not embed domain logic; instead,
-the pipeline runner assembles a two-message chat completion request:
-
-\begin{itemize}
-  \item \textbf{System message.}  Establishes the role (expert Agile-SOFL
-        Python programmer), output format constraints (single fenced code
-        block, dictionary return type, integer-only arithmetic), and the
-        critical instruction to evaluate FSF guards in listed order.
-  \item \textbf{User message.}  Concatenates the rendered FSF specification
-        (\texttt{promptSpec}), the extracted function signature, the list of
-        required output keys, and---on repair iterations $k > 1$---the
-        verbalised feedback from the previous attempt.
-\end{itemize}
-
-System messages stay fixed; user messages grow with counterexamples
-\cite{chen2021codex,lynn2024verifierloop}.
-
-\subsection{Temperature and Top-$p$ Configuration}
-
-$T_\text{gen}{=}0.7$ for first attempts, $T_\text{repair}{=}0.0$ for repair,
-$\mathit{top\_p}{=}0.95$---explore once, then exploit under a deterministic
-checker (Chapter~\ref{ch:experiments}).
+Prompt assembly follows Section~\ref{subsec:method:prompt}: a fixed system
+message (role, fenced-code output, first-match guard order) plus a user
+message carrying the rendered FSF text, signature, required output keys, and---on
+repair iterations---verbalised feedback.
+Sampling uses $T_\text{gen}{=}0.7$ on the first attempt and
+$T_\text{repair}{=}0.0$ thereafter ($\mathit{top\_p}{=}0.95$): explore once,
+then exploit under a deterministic checker.
+Responses are scanned for the last fenced Python block (or a conservative
+line heuristic); \texttt{compile()} failure yields a sentinel~$\bot$ that
+scores zero and triggers repair without crashing the pipeline.
 
 \subsection{Semantic Feedback IR and Two-Layer Repair Prompting}
 \label{sec:impl:repair-feedback}
 
-When iteration $k$ fails formal checking or pattern screening, the repair engine
-constructs a \texttt{SemanticFeedbackIR} (\path{src/repair/feedback_ir.py})
-from checker counterexamples and the active \texttt{TaskSpec}.
+When iteration $k$ fails formal checking or pattern screening, the repair
+engine constructs a \texttt{SemanticFeedbackIR}
+(\path{src/repair/feedback_ir.py}) from checker counterexamples and the
+active \texttt{TaskSpec}---the C2 hinge.
 Each record serialises to JSON per
-\texttt{schemas/semantic\_feedback.schema.json} \emph{before} any natural-language
-rendering, establishing a machine-readable intermediate layer distinct from the
-repair prompt:
+\texttt{schemas/semantic\_feedback.schema.json} \emph{before} any
+natural-language rendering:
 \begin{enumerate}
-  \item \textbf{IR construction} --- nine typed fields (\texttt{violation\_type},
-        \texttt{scenario\_index}, \texttt{constraint\_text}, \texttt{inputs},
-        \texttt{expected}, \texttt{observed}, \texttt{reason}, \texttt{priority},
-        \texttt{suggested\_fix}) populated from witness and scenario metadata;
-  \item \textbf{JSON serialisation} --- \texttt{SemanticFeedbackIR.to\_json\_list()}
-        emits schema-compliant records logged in \texttt{PipelineResult.semantic\_feedback};
-  \item \textbf{Prompt projection} --- \texttt{FeedbackRenderer.render()} maps the
-        same IR to one of three surfaces: \texttt{test\_only} (mode~B2 / E6-A),
-        \texttt{test\_expected} (E6-B), or \texttt{semantic\_ir} (mode~M / E6-C).
+  \item \textbf{IR construction} --- nine typed fields
+        (\texttt{violation\_type}, \texttt{scenario\_index},
+        \texttt{constraint\_text}, \texttt{inputs}, \texttt{expected},
+        \texttt{observed}, \texttt{reason}, \texttt{priority},
+        \texttt{suggested\_fix}) from witness and scenario metadata;
+  \item \textbf{JSON serialisation} --- schema-compliant records logged in
+        \texttt{PipelineResult.semantic\_feedback};
+  \item \textbf{Prompt projection} --- \texttt{FeedbackRenderer.render()}
+        maps the same IR to \texttt{test\_only} (B2 / E6-A),
+        \texttt{test\_expected} (E6-B), or \texttt{semantic\_ir} (M / E6-C).
 \end{enumerate}
 
-Pattern violations are appended as a semicolon-separated list of
-\texttt{pattern\_id:name} pairs (capped at five entries).
-The complete feedback block is injected into the user message under a
-\emph{``Previous attempt failed''} header.
-This IR$\to$JSON$\to$Prompt pipeline proves that Semantic Feedback is a genuine
-intermediate representation, not merely a prompt template; E6 varies only the
-renderer while holding IR construction fixed.
-
-\subsection{Output Parsing}
-
-The model response is scanned for fenced Python code blocks.  When multiple
-blocks are present, the last block is taken as the candidate implementation
-(a conservative choice that discards explanatory preamble).  If no fenced
-block is found, a heuristic line filter retains lines beginning with
-\texttt{def}, \texttt{import}, \texttt{return}, or continuation lines of an
-already-started block.  The extracted source is compiled via Python's
-\texttt{compile()} primitive; compilation failure yields a sentinel
-candidate~$\bot$ that fails all conformance cases with score zero, triggering
-repair on the next iteration without crashing the pipeline.
+Pattern violations append as a capped list of \texttt{pattern\_id:name}
+pairs under a \emph{``Previous attempt failed''} header.
+E6 varies only the renderer while holding IR construction fixed, proving
+that Semantic Feedback is a genuine intermediate representation rather than
+a prompt template.
 
 % ---------------------------------------------------------------------------
 \section{Formal Conformance Checker}
 \label{sec:impl:checker}
 % ---------------------------------------------------------------------------
 
-Acceptance must not rest on lucky unit tests.
+Acceptance must not rest on lucky unit tests (C3).
 The formal checker is the deterministic oracle that grounds release decisions
 in SMT-backed witnesses rather than heuristic
 sampling~\citep{claessen2000quickcheck}.
 Given candidate~$c$ and task~$t$, it computes $\mathrm{Conf}(c,t)$ and
-assembles the counterexample set $\mathit{cexs}$ for repair.
-Case generation and evaluation are the two partitions in
-Figure~\ref{fig:checker-activity}.
+assembles $\mathit{cexs}$ for repair (Figure~\ref{fig:checker-activity}).
 
 \begin{figure}[t]
   \centering
@@ -350,134 +237,58 @@ Figure~\ref{fig:checker-activity}.
       Formal conformance checker activity diagram.
       \vspace{1.2cm}}}%
   }
-  \caption{Activity diagram of the formal conformance checker (Stage~2,
-           Algorithm~\ref{alg:checker}).
-           Case generation and candidate evaluation are separate partitions;
-           counterexamples feed Stage~3 repair on the next synthesis iteration.}
+  \caption{\textbf{Key observation:} case generation and evaluation are
+           separate partitions; counterexamples feed Stage~3 repair
+           (Algorithm~\ref{alg:checker}).}
   \label{fig:checker-activity}
 \end{figure}
 
-\subsection{FSF-to-Z3 Translation Strategy}
-
-Guard predicates from each \texttt{FSFScenario} are translated into Z3
-integer constraints following the priority encoding of
-equation~\eqref{eq:priority}.  The translator
-maintains a symbol table mapping each variable name in $\mathcal{X}_t \cup
-\mathcal{Y}_t$ to a Z3 \texttt{Int} constant.  Relational atoms in the
-normalised syntax (\texttt{gt}, \texttt{lt}, \texttt{eq}, etc.) are mapped
-to the corresponding Z3 arithmetic predicates.  Conjunctions and disjunctions
-in guard expressions are recursively translated to \texttt{And} and
-\texttt{Or} nodes.
-
-To prevent unbounded solver search, integer variables are constrained to a
-finite domain $[-5, 20]$ during model generation.  This domain is sufficient
-for the benchmark tasks in Chapter~\ref{ch:experiments}, whose inputs lie in
-$[0, 100]^5$ but whose guard thresholds are small integers; the constraint
-primarily serves as a solver termination guarantee rather than a semantic
-restriction on $\mathcal{X}_t$.
-
-\subsection{Scenario Precedence Encoding}
-
-First-match semantics require that a test case for scenario~$s_i$ activate
-$s_i$ and no higher-priority scenario.  The implementation encodes this as
-the priority-constrained formula $\Phi_i$ from
-equation~\eqref{eq:priority}:
-\[
-  \Phi_i \;\equiv\; \widehat{g}_i \;\land\;
-    \bigwedge_{j=1}^{i-1} \lnot\,\widehat{g}_j.
-\]
-For the final \texttt{others} scenario, $\widehat{g}_n$ is encoded as the
-negation of the disjunction of all preceding guards, matching
-Definition~\ref{def:oracle}.  Each $\Phi_i$ is submitted to an independent
-Z3 \texttt{Solver} instance, ensuring that solver state from one scenario
-does not contaminate another.
-
-\subsection{Concrete Case Generation Algorithm}
-
-Algorithm~\ref{alg:case-gen} presents the case generation procedure used
-both during repair-loop iterations and for final strict evaluation.  The
-algorithm supports a \texttt{max\_cases} parameter that controls how many
-witnesses are produced per scenario through model blocking: after extracting
-a satisfying model, the solver adds a disjunctive constraint excluding that
-model, then re-queries for an alternative witness.
+\paragraph{Role, not Z3 minutiae.}
+Guards lower to Z3 integer constraints under the priority encoding
+\eqref{eq:priority}:
+$\Phi_i \equiv \widehat{g}_i \land \bigwedge_{j<i}\lnot\widehat{g}_j$,
+with \texttt{others} as the negation of preceding guards
+(Definition~\ref{def:oracle}).
+Each $\Phi_i$ uses a fresh solver; integer variables are bounded to
+$[-5,20]$ for termination (sufficient for the Chapter~\ref{ch:experiments}
+thresholds).
+Satisfying models become concrete witnesses $(x,y,i)$; model blocking yields
+up to a few alternatives per scenario (Algorithm~\ref{alg:case-gen}).
+Candidates run in an isolated namespace; field-wise integer equality against
+the oracle yields
+$\mathrm{Conf}(c,t) = |\mathit{passed}| / |\mathcal{D}(t)|$
+\eqref{eq:conformance}.
+Repair iterations use a 16-case budget; post-pipeline strict scoring uses 64
+cases (\texttt{PipelineConfig}; sensitivity in
+Section~\ref{sec:results:sensitivity}).
 
 \begin{algorithm}[t]
-\caption{Z3-Based Concrete Case Generation}
+\caption{Z3-Based Concrete Case Generation (sketch)}
 \label{alg:case-gen}
 \begin{algorithmic}[1]
-\Require ordered scenarios $\mathcal{S}_t = \langle s_1,\ldots,s_n\rangle$,
-         variable set $V$, budget $N$
+\Require ordered scenarios $\mathcal{S}_t$, variables $V$, budget $N$
 \Ensure case set $\mathcal{D}(t)$ with $|\mathcal{D}(t)| \le N$
-\State $\mathcal{D}(t) \leftarrow \emptyset$
-\State $\mathit{sym} \leftarrow \{v \mapsto \ProcCall{Z3Int}{v} : v \in V\}$
 \For{$i = 1$ \textbf{to} $n$}
-  \State $\Phi_i \leftarrow \ProcCall{GuardToZ3}{g_i} \land
-         \bigwedge_{j<i} \lnot\,\ProcCall{GuardToZ3}{g_j}$
-         \Comment{eq.~\eqref{eq:priority}}
-  \State $\mathit{solver} \leftarrow \ProcCall{FreshSolver}{}$
-  \State $\ProcCall{Add}{\mathit{solver},\,\Phi_i}$
-  \State $\ProcCall{Add}{\mathit{solver},\,
-         \bigwedge_{v \in V} -5 \le \mathit{sym}[v] \le 20}$
-  \State $\mathit{attempts} \leftarrow 0$
-  \While{$\ProcCall{Check}{\mathit{solver}} = \mathit{sat}$
-         \textbf{and} $\mathit{attempts} < 3$
-         \textbf{and} $|\mathcal{D}(t)| < N$}
-    \State $x \leftarrow \ProcCall{ExtractModel}{\mathit{solver}}$
-    \State $y \leftarrow \phi_i(x)$ \Comment{evaluate output mapping}
-    \State $\mathcal{D}(t) \leftarrow \mathcal{D}(t) \cup \{(x, y, i)\}$
-    \State $\ProcCall{Add}{\mathit{solver},\,
-           \bigvee_{v \in V} \mathit{sym}[v] \ne x[v]}$
-    \State $\mathit{attempts} \leftarrow \mathit{attempts} + 1$
+  \State build $\Phi_i$ per~\eqref{eq:priority}; solve under domain bounds
+  \While{$\mathit{sat}$ \textbf{and} budget remains}
+    \State extract model $x$; set $y \leftarrow \phi_i(x)$;
+           record $(x,y,i)$; block model and re-query
   \EndWhile
 \EndFor
 \State \Return $\mathcal{D}(t)$
 \end{algorithmic}
 \end{algorithm}
 
-\subsection{Candidate Execution and Conformance Scoring}
-
-After case generation, the checker compiles the candidate into an isolated
-namespace, invokes it with each witness input as keyword arguments, and
-compares the returned dictionary against the oracle output field-by-field
-using integer equality.  Runtime exceptions are recorded as counterexamples
-with an empty actual-output field and an error annotation.
-
-The conformance score follows equation~\eqref{eq:conformance}:
-$\mathrm{Conf}(c,t) = |\mathit{passed}| / |\mathcal{D}(t)|$.
-A candidate achieves \emph{strict formal pass} when
-$\mathrm{Conf}(c,t) = 1$ and $|\mathcal{D}(t)| > 0$.
-
-\subsection{Strict vs.\ Standard Evaluation Case Counts}
-
-The checker is invoked at two distinct granularities, reflecting a deliberate
-latency--coverage trade-off:
-
-\begin{itemize}
-  \item \textbf{Standard (repair-loop) evaluation} uses a budget of
-        16 cases per task during repair iterations.
-  \item \textbf{Strict (final) evaluation} uses a budget of
-        64 cases per task for the post-pipeline strict conformance score
-        reported in Chapter~\ref{ch:experiments}.
-\end{itemize}
-
-The 16-case internal budget and 64-case strict budget are configuration
-parameters on \texttt{PipelineConfig}; neither is hard-coded, allowing
-sensitivity analysis over case-count settings (reported in
-Section~\ref{sec:results:sensitivity} of Chapter~\ref{ch:results}).
-
 % ---------------------------------------------------------------------------
 \section{Counterexample-Guided Repair Engine}
 \label{sec:impl:repair}
 % ---------------------------------------------------------------------------
 
-Without careful state management, a repair loop either loops forever or
-forgets why the previous candidate failed.
-The repair engine adapts CEGIS~\citep{solarlezama2008sketching} to an
-LLM synthesiser: it keeps the feedback buffer, increments the attempt
-counter, and decides whether to continue or exit with a best-effort
-candidate.
-Figure~\ref{fig:pipeline-state} makes those control states explicit; the
-data that flows on each repair arc is Figure~\ref{fig:repair-feedback}
+The repair engine adapts CEGIS~\citep{solarlezama2008sketching} to an LLM
+synthesiser (C2): it keeps the feedback buffer, increments the attempt
+counter, and exits on $\mathrm{Accept}$ or best-effort when $k > K$.
+Figure~\ref{fig:pipeline-state} makes the control states explicit; the data
+on each repair arc is Figure~\ref{fig:repair-feedback}
 (Chapter~\ref{ch:method}).
 
 \begin{figure}[t]
@@ -490,98 +301,44 @@ data that flows on each repair arc is Figure~\ref{fig:repair-feedback}
       HSP-Agile pipeline state machine.
       \vspace{1.2cm}}}%
   }
-  \caption{Pipeline state machine (implements Stage~3 of
-           Chapter~\ref{ch:method}).  The repair state aggregates
-           counterexamples and pattern hits into the feedback buffer before
-           returning to synthesis.  Acceptance requires both formal
-           conformance and a clear high-severity pattern screen.}
+  \caption{\textbf{Key observation:} repair aggregates counterexamples and
+           pattern hits into Semantic Feedback IR before re-synthesis.
+           Acceptance requires both formal conformance and a clear
+           high-severity pattern screen (C3).}
   \label{fig:pipeline-state}
 \end{figure}
 
-\subsection{Feedback State Machine}
-
-The pipeline state machine (Figure~\ref{fig:pipeline-state}) has six states:
-\textsc{Init}, \textsc{Synthesizing}, \textsc{FormalChecking},
-\textsc{PatternChecking}, \textsc{Repairing}, and terminal states
-\textsc{Accepted} or \textsc{Exhausted}.  Transitions are governed by the
-intermediate predicates:
-\begin{align*}
-  \textsc{FormalChecking} \to \textsc{PatternChecking}
-    &\quad\text{when } \mathrm{Conf}(c_k, t) = 1, \\
-  \textsc{FormalChecking} \to \textsc{Repairing}
-    &\quad\text{when } \mathrm{Conf}(c_k, t) < 1, \\
-  \textsc{PatternChecking} \to \textsc{Accepted}
-    &\quad\text{when } {\textstyle\sum_{p \in \mathcal{P}^H}} \delta_p(c_k,t) = 0, \\
-  \textsc{PatternChecking} \to \textsc{Repairing}
-    &\quad\text{when any } p \in \mathcal{P}^H \text{ fires}.
-\end{align*}
-
-The \textsc{Repairing} state assembles $\mathit{feedback}_k$ from
-$\mathit{cexs}_k$ and $\mathit{hits}_k$, increments $k$, and returns to
-\textsc{Synthesizing} if $k \le K$.
-
-\subsection{Budget $K$ and Early Termination}
-
-The repair budget $K$ is a hard upper bound on LLM invocations per task,
-enforcing design principle~P2 from Chapter~\ref{ch:method}.  In the
-experimental configuration, $K = 3$: the pipeline makes at most three LLM
-calls regardless of task difficulty.  Two early-exit conditions can
-terminate the loop before $K$ is reached:
-
-\begin{enumerate}
-  \item \textbf{Acceptance exit.}  When $\mathrm{Accept}(c_k, t) = 1$,
-        the current candidate is returned immediately with status
-        \textsc{Accept}.  No further LLM calls are made.
-  \item \textbf{Non-repairable exit.}  When \texttt{enable\_repair} is
-        \textit{false} (mode A3), the pipeline performs a single synthesis
-        call and proceeds directly to evaluation without feedback, regardless
-        of the conformance outcome.
-\end{enumerate}
-
-If the budget is exhausted without acceptance, the pipeline returns the
-candidate with the highest observed $\mathrm{Conf}(c_k, t)$ across all
-iterations, annotated with status \textsc{Best-Effort}.  This fallback
-ensures that the system always produces an auditable artefact even on tasks
-where the LLM cannot fully repair within the allotted budget.
-
-Algorithm~\ref{alg:repair-loop} formalises the repair engine control logic.
+States are \textsc{Init}, \textsc{Synthesizing}, \textsc{FormalChecking},
+\textsc{PatternChecking}, \textsc{Repairing}, and terminal
+\textsc{Accepted}/\textsc{Exhausted}.
+Formal failure or any high-severity pattern hit routes to repair; both
+$\mathrm{Conf}=1$ and a clear $\mathcal{P}^H$ screen yield acceptance.
+Budget $K{=}3$ (principle~P2) caps LLM calls; mode~A3 disables repair for a
+single-shot path.
+On exhaustion the pipeline returns the highest-$\mathrm{Conf}$ candidate as
+\textsc{Best-Effort}.
+Algorithm~\ref{alg:repair-loop} summarises the control logic.
 
 \begin{algorithm}[t]
-\caption{Counterexample-Guided Repair Loop}
+\caption{Counterexample-Guided Repair Loop (sketch)}
 \label{alg:repair-loop}
 \begin{algorithmic}[1]
-\Require task $t$, config with budget $K$, flags
+\Require task $t$, budget $K$, flags
          $(\mathit{enable\_formal}, \mathit{enable\_patterns}, \mathit{enable\_repair})$
-\Ensure accepted candidate $c^*$, status $\in \{\textsc{Accept}, \textsc{Best-Effort}\}$
+\Ensure $c^*$, status $\in \{\textsc{Accept}, \textsc{Best-Effort}\}$
 \State $\mathit{feedback} \leftarrow \emptyset$;\quad
        $\mathit{best} \leftarrow (\bot, 0)$
 \For{$k = 1$ \textbf{to} $K$}
   \State $c_k \leftarrow \ProcCall{LLM}{t,\, \mathit{feedback}}$
-  \If{$\mathit{enable\_formal}$}
-    \State $(\mathit{conf}_k, \mathit{cexs}_k) \leftarrow
-           \ProcCall{FormalCheck}{c_k,\, t,\, 16}$
-  \Else
-    \State $(\mathit{conf}_k, \mathit{cexs}_k) \leftarrow
-           \ProcCall{UnitTestScore}{c_k,\, t}$
-  \EndIf
-  \If{$\mathit{enable\_patterns}$}
-    \State $\mathit{hits}_k \leftarrow \ProcCall{PatternGuard}{c_k,\, t}$
-  \Else
-    \State $\mathit{hits}_k \leftarrow \emptyset$
-  \EndIf
-  \If{$\mathit{conf}_k > \mathit{best}.\mathit{score}$}
-    \State $\mathit{best} \leftarrow (c_k, \mathit{conf}_k)$
-  \EndIf
-  \If{$\ProcCall{Accept}{c_k,\, t} = 1$}
-    \State \Return $c_k$,\enspace \textsc{Accept}
-  \EndIf
-  \If{$\mathit{enable\_repair}$}
-    \State $\mathit{feedback} \leftarrow
-           \ProcCall{BuildFeedback}{\mathit{cexs}_k,\, \mathit{hits}_k,\, k}$
-           \Comment{Stage 3}
-  \EndIf
+  \State evaluate $\mathrm{Conf}$ / $\mathit{cexs}$ and $\mathit{hits}$
+        under the enabled flags
+  \State update $\mathit{best}$; \textbf{if}
+        $\mathrm{Accept}(c_k,t)=1$ \textbf{then return} Accept
+  \State \textbf{if} repair enabled \textbf{then}
+        $\mathit{feedback} \leftarrow
+        \ProcCall{BuildFeedback}{\mathit{cexs}_k,\, \mathit{hits}_k,\, k}$
 \EndFor
-\State \Return $\mathit{best}.\mathit{candidate}$,\enspace \textsc{Best-Effort}
+\State \Return $\mathit{best}$, Best-Effort
 \end{algorithmic}
 \end{algorithm}
 
@@ -592,57 +349,23 @@ Algorithm~\ref{alg:repair-loop} formalises the repair engine control logic.
 
 A candidate can match every witness and still hard-code success or drop an
 output field that the finite case set never exercised.
-Stage~4 therefore screens structural anti-patterns before release.
-The module evaluates catalogue $\mathcal{P}$ (RF01--RF14) and returns
-$\mathrm{Hits}(c,t)$ as in Section~\ref{subsec:method:detection}, using a
-hybrid AST/regex strategy in the spirit of FindBugs
-\citep{hovemeyer2004findbugs,ayewah2008findbugs}.
+Stage~4 therefore screens structural anti-patterns before release (C3).
+The module evaluates catalogue $\mathcal{P}$ (RF01--RF14;
+Table~\ref{tab:patterns}) and returns $\mathrm{Hits}(c,t)$ as in
+Section~\ref{subsec:method:detection}, using a hybrid AST/regex strategy in
+the spirit of FindBugs~\citep{hovemeyer2004findbugs,ayewah2008findbugs}.
 
-\subsection{Pattern Catalogue and High-Severity Subset}
-
-Table~\ref{tab:patterns} (Chapter~\ref{ch:method}) lists the full catalogue.
-Patterns are classified by severity:
-\emph{critical} (RF07), \emph{high}, \emph{medium}, and \emph{low}.
-The high-severity subset $\mathcal{P}^H$ used in
-equation~\eqref{eq:accept} comprises nine patterns whose detection
-immediately blocks acceptance:
+The high-severity subset that gates acceptance is
 \[
   \mathcal{P}^H = \{\text{RF01}, \text{RF02}, \text{RF04}, \text{RF05},
-    \text{RF06}, \text{RF07}, \text{RF09}, \text{RF11}, \text{RF13}\}.
+    \text{RF06}, \text{RF07}, \text{RF09}, \text{RF11}, \text{RF13}\};
 \]
-Medium- and low-severity hits (RF03, RF08, RF10, RF12, RF14) are recorded in
-the audit trace and included in repair feedback but do not gate acceptance.
-
-\subsection{AST-Based and Regex-Based Matching Strategy}
-
-Detection follows a hybrid strategy keyed by pattern type:
-
-\begin{itemize}
-  \item \textbf{AST-based detectors} parse the candidate into a Python
-        abstract syntax tree and traverse it for structural properties.
-        RF04 counts return-statement dictionary keys against the declared
-        output domain.  RF07 detects unconditional success returns on code
-        paths with no conditional branches.  RF09 compares the number of
-        \texttt{if} branches against the non-default scenario count.
-        RF13 identifies empty \texttt{else} bodies containing only
-        \texttt{pass}.
-  \item \textbf{Regex-based detectors} scan the raw source text for surface
-        patterns.  RF03 matches hardcoded numeric literals not present in
-        the specification.  RF08 detects float-return annotations where
-        integer output is required.  RF14 compares docstring scenario
-        references against actual guard conditions.
-  \item \textbf{Cross-reference detectors} combine extracted FSF guard
-        predicates with the candidate's conditional structure.  RF01, RF02,
-        RF05, RF06, and RF11 compare threshold literals and comparison
-        operators in the implementation against the specification's guard
-        atoms, detecting missing preconditions, wrong default branches,
-        swapped comparisons, and off-by-one boundary errors.
-\end{itemize}
-
-Each detector is a pure function $\delta_p : \mathcal{C} \times \mathcal{T}
-\to \{0,1\}$; the guard module evaluates all 14 detectors sequentially and
-collects firing patterns into a list of \texttt{PatternHit} records, each
-carrying pattern identifier, severity, source location, and evidentiary
+medium/low hits are logged and fed to repair but do not block release.
+AST detectors catch structural faults (e.g.\ RF04 missing outputs, RF07
+unconditional success, RF09 branch-count mismatch); regex and
+cross-reference detectors catch surface and guard-literal mismatches
+(RF01--RF02, RF05--RF06, RF11, etc.).
+Each $\delta_p$ is a pure predicate; hits carry id, severity, location, and
 message.
 
 \subsection{Conjunctive Acceptance Gate Role}
@@ -654,51 +377,30 @@ The pattern guard is the second conjunct of $\mathrm{Accept}(c,t)$:
     \land
     \mathbf{1}\!\left[\sum_{p \in \mathcal{P}^H} \delta_p(c, t) = 0\right].
 \]
-In the implementation, the guard is consulted \emph{after} formal checking
-on each iteration.  A candidate that passes all Z3-generated cases but
-triggers RF07 (unconditional success) is routed to the repair state rather
-than accepted, and the pattern violation is verbalised alongside any
-counterexamples in the feedback buffer.  This ordering ensures that the
-formal checker and pattern guard operate as complementary filters rather
-than redundant substitutes, as argued in
-Section~\ref{subsec:conformance-acceptance}.
+The guard runs \emph{after} formal checking on each iteration.
+A candidate that passes all Z3 cases but triggers RF07 is routed to repair,
+with the pattern violation verbalised alongside any counterexamples.
+Checker and guard are complementary filters, not substitutes
+(Section~\ref{subsec:conformance-acceptance}).
 
 % ---------------------------------------------------------------------------
 \section{Experiment Orchestration}
 \label{sec:impl:orchestration}
 % ---------------------------------------------------------------------------
 
-An 840-run matrix is useless if a mid-batch crash forces a full restart, or
-if Z3 races corrupt results.
-The orchestrator therefore prioritises parallel throughput, crash-safe
-resumption, and live progress visibility---fitness-function concerns for
-sprint-cycle formal methods~\citep{harman2012formalagile,beck2001xp}.
+The orchestrator prioritises parallel throughput, crash-safe resumption, and
+live progress for the 840-run matrix (7 modes $\times$ 120
+tasks)~\citep{harman2012formalagile,beck2001xp}.
+Jobs run in a \emph{process pool} (one worker per core) because Z3's native
+global state is not thread-safe; each worker owns its own client, config, and
+pipeline, then appends a strict 64-case evaluation (and optional mutation
+score~\citep{demillo1978mutation,li2023iet}) to a shared JSONL log.
+Incremental persistence plus a \texttt{progress.json} sidecar make mid-batch
+restarts resume-safe without re-running finished keys.
 
-\subsection{Parallel Execution Design}
-
-Each mode--task combination is dispatched as an independent job to a
-\emph{process pool}.  Process-level isolation is essential because the Z3
-solver maintains global state in its native library; concurrent threads
-sharing a single Z3 context have been observed to produce race-induced
-\texttt{unknown} results.  By assigning one worker process per CPU core,
-the orchestrator achieves near-linear speedup on the 840-run benchmark
-(7 modes $\times$ 120 tasks) while preserving solver correctness.
-
-Each worker process constructs its own LLM client adapter (\texttt{ECNUClient}) (with a
-process-specific audit log directory), \texttt{PipelineConfig} derived from
-the mode identifier, and \texttt{ErrorPreventionPipeline} instance.  After
-the pipeline returns, the worker performs a separate strict evaluation pass
-with a 64-case budget and optionally evaluates mutation
-kill rate~\citep{demillo1978mutation,li2023iet}, then serialises the complete
-record to the shared results file.
-
-\subsection{Seven Execution Modes}
-
-Table~\ref{tab:impl-modes} summarises the seven evaluation modes and their
-component configurations.  Each mode is realised by setting the three
-boolean feature flags (\texttt{enable\_formal}, \texttt{enable\_patterns},
-\texttt{enable\_repair}) and associated numeric parameters on
-\texttt{PipelineConfig}.
+Table~\ref{tab:impl-modes} lists the seven modes; flags on
+\texttt{PipelineConfig} enable ablations A1--A3 and baselines B0--B2 against
+full mode~M (Chapter~\ref{ch:experiments}).
 
 \begin{table}[H]
   \caption{Execution mode configuration matrix.  Flags control which
@@ -731,121 +433,63 @@ boolean feature flags (\texttt{enable\_formal}, \texttt{enable\_patterns},
   B0 uses a deterministic template renderer; no LLM calls are made.
 \end{table}
 
-Mode~\textbf{M} activates all three boolean flags and represents the
-complete HSP-Agile configuration.  Ablation modes A1--A3 each disable
-exactly one component, enabling the contribution decomposition reported in
-Chapter~\ref{ch:experiments}.  Baselines B0--B2 anchor the comparison
-against non-LLM, non-iterative, and test-only-feedback approaches
-respectively.
-
-\subsection{Resume-Safe Execution and Progress Monitoring}
-
-Long-running experiment batches support \emph{incremental persistence}:
-each completed job is appended as a single JSONL record to the results file
-immediately upon completion, and the file is flushed to disk before the
-worker accepts its next assignment.  On restart, the orchestrator reads
-existing records, reconstructs the set of completed task keys, and schedules
-only pending jobs.  This design allows interrupted runs---whether from API
-rate limits, machine reboot, or manual cancellation---to resume without
-re-executing finished work.
-
-A companion \texttt{progress.json} file is updated after every job completion
-with: completed count, total count, percentage, elapsed time, estimated time
-remaining (computed from the observed completion rate), and the message from
-the most recently finished job.  External monitoring tools can poll this
-file for live dashboard display without parsing the full results log.
-
 % ---------------------------------------------------------------------------
 \section{Design Decisions and Trade-offs}
 \label{sec:impl:tradeoffs}
 % ---------------------------------------------------------------------------
 
-Every implementation choice trades correctness guarantees against latency and
-complexity~\citep{woodcock2009formalsurvey}.
-Three decisions dominate the rest.
+Three decisions dominate the rest~\citep{woodcock2009formalsurvey}.
 
 \subsection{Z3 Over Random Testing}
 
-The formal checker uses Z3~\citep{demoura2008z3} rather than random or
-property-based testing~\citep{claessen2000quickcheck,ammann2016testing} for
-three reasons grounded in the FSF semantics of Chapter~\ref{ch:formalization}.
-
-First, \emph{guard satisfiability}: random sampling over $\mathcal{X}_t =
-\mathbb{Z}^5$ has negligible probability of landing inside a guard region
-defined by conjunctions of strict inequalities.  Z3 guarantees that a
-witness is found whenever one exists, or reports \textsf{unsat} otherwise.
-
-Second, \emph{precedence correctness}: the priority-constrained formula
-$\Phi_i$ produces inputs in scenario~$i$'s \emph{exclusive} region.  A
-random input satisfying $g_i$ but also $g_j$ for $j < i$ would be attributed
-to scenario~$j$ by the first-match oracle, yielding a misleading test case.
-Priority encoding eliminates this ambiguity by construction.
-
-Third, \emph{counterexample minimality}: when a candidate fails, Z3 returns
-a concrete witness input that the repair engine can present directly to the
-LLM.  Random testing produces failure messages without the scenario-index
-context that makes CEGIS feedback effective~\citep{lynn2024verifierloop}.
-
-The cost is solver latency: each Z3 query incurs 50--200\,ms of wall-clock
-time, and the strict evaluation pass with 64 cases adds approximately
-6--8\,s per task.  The 16-case internal budget during repair limits this
-overhead to roughly 2\,s per iteration.
+Z3~\citep{demoura2008z3} is preferred to random or property-based
+testing~\citep{claessen2000quickcheck,ammann2016testing} because
+(i)~guard regions under conjunctions of inequalities are rarely hit by
+uniform sampling over $\mathbb{Z}^5$;
+(ii)~priority encoding $\Phi_i$ yields exclusive first-match witnesses,
+avoiding mis-attributed overlap inputs; and
+(iii)~failures arrive as scenario-indexed concrete counterexamples usable by
+CEGIS repair~\citep{lynn2024verifierloop}.
+The cost is solver latency ($\sim$50--200\,ms per query; $\sim$2\,s per
+16-case repair iteration; $\sim$6--8\,s for 64-case strict scoring).
 
 \subsection{Conjunctive Acceptance Over Single-Metric Gating}
 
-An alternative design would accept a candidate when \emph{either}
-$\mathrm{Conf}(c,t) = 1$ \emph{or} the pattern guard is clear---a
-disjunctive predicate that maximises throughput by accepting on the first
-passing criterion.  HSP-Agile rejects this design in favour of the
-conjunctive $\mathrm{Accept}(c,t)$ of equation~\eqref{eq:accept} because
-the two criteria detect qualitatively different fault classes.
-
-Formal conformance certifies pointwise correctness on the generated test
-suite; the pattern guard certifies structural soundness (guard coverage,
-output completeness, absence of unconditional returns).  Neither criterion
-implies the other: a candidate can achieve $\mathrm{Conf}(c,t) = 1$ by
-hard-coding correct outputs at the $n$ witness points while violating RF07
-on all other inputs, and conversely a candidate can pass all pattern
-detectors while evaluating guards in the wrong order and failing on
-overlap-region inputs.
-
-The conjunctive gate is therefore \emph{conservative}: it accepts fewer
-candidates than either criterion alone would, but each accepted candidate
-satisfies both pointwise and structural requirements.  The experimental
-results in Chapter~\ref{ch:experiments} confirm that this selectivity
-manifests as a lower strict success rate for mode~M compared to B2, coupled
-with higher mean conformance on accepted candidates.
+A disjunctive gate (accept on $\mathrm{Conf}=1$ \emph{or} a clear pattern
+screen) would maximise throughput but conflate distinct fault classes.
+Formal conformance certifies pointwise witness correctness; the pattern guard
+certifies structural soundness.
+Neither implies the other: hard-coded outputs can pass sparse witnesses while
+violating RF07, and a structurally clean candidate can still fail on
+overlap-region ordering.
+The conjunctive $\mathrm{Accept}$ of~\eqref{eq:accept} is therefore
+conservative---fewer accepts, but each satisfies both criteria---as confirmed
+by mode~M versus B2 in Chapter~\ref{ch:experiments}.
 
 \subsection{Latency vs.\ Quality Trade-off}
 
-The two-tier case-count strategy (16 internal, 64 strict) embodies the
-central latency--quality trade-off of the implementation.  Increasing the
-internal case count improves per-iteration fault detection at the cost of
-proportional Z3 overhead; decreasing it speeds the repair loop but risks
-accepting candidates that pass sparse witnesses yet fail on unprobed inputs.
-
-The chosen 16/64 split was calibrated on the development set: 16 cases
-provide at least two witnesses per scenario on eight-scenario tasks (sufficient
-for counterexample-guided repair), while 64 cases provide eight witnesses
-per scenario for final scoring (sufficient to detect ordering faults in
-guard-overlap regions).  Sensitivity analysis in
-Chapter~\ref{ch:experiments} shows diminishing conformance returns beyond
-32 internal cases, validating the chosen operating point.
-
-Similarly, the repair budget $K = 3$ balances correction opportunity against
-API cost: empirical observation shows that most repairable faults are resolved
-within two iterations, while tasks requiring more than three calls rarely
-converge even with additional budget.  The bounded budget ensures
-predictable per-task cost in sprint-cycle deployments, consistent with
-principle~P2.
+The 16/64 case split and $K{=}3$ bound per-task cost for sprint-cycle use
+(P2).
+Sixteen internal cases give at least two witnesses per scenario on
+eight-scenario tasks; sixty-four strict cases probe overlap regions more
+densely.
+Sensitivity analysis (Chapter~\ref{ch:experiments}) shows diminishing
+conformance returns beyond 32 internal cases; most repairable faults resolve
+within two iterations, so larger $K$ rarely pays off.
 
 % ---------------------------------------------------------------------------
 \section*{Chapter Summary}
 \addcontentsline{toc}{section}{Chapter Summary}
 % ---------------------------------------------------------------------------
 
-Modules own failure modes: adapters keep surface syntax out; Z3 owns
-witnesses (16 repair / 64 strict); Semantic Feedback IR owns repair state;
-RF01--RF14 own the structural gate; the orchestrator owns crash-safe
-throughput.
+Modules map to the three insights only:
+\begin{itemize}
+  \item \textbf{C1} --- SpecIR adapter registry and FSF lowering keep surface
+        syntax out of the checker.
+  \item \textbf{C2} --- Semantic Feedback IR and the repair state machine own
+        typed failure state across iterations.
+  \item \textbf{C3} --- Z3 conformance, $\mathcal{P}^H$ pattern guard, and the
+        conjunctive $\mathrm{Accept}$ gate decide release.
+\end{itemize}
+Orchestration and sampling parameters are supporting engineering.
 Whether those choices pay off is empirical---Chapter~\ref{ch:experiments}.

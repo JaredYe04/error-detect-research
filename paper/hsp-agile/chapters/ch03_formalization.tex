@@ -78,11 +78,14 @@ definitions apply.
 
 The prevention pipeline should not be rewritten for every surface notation.
 What is needed is a shared hinge: a notation-agnostic form that still preserves
-ordered guarded cases.
+ordered guarded cases---\textbf{semantic regions}, not surface syntax.
 That hinge is the \textbf{Specification Intermediate Representation}
 (\textbf{SpecIR}).
-Adapters map SOFL/FSF, Mini-Z, or Mini-StateMachine text into SpecIR; the rest
-of the pipeline depends only on SpecIR.
+Adapters (Chapter~\ref{ch:intro}; implementation in Chapter~\ref{ch:method})
+map SOFL/FSF, Mini-Z, or Mini-StateMachine text into SpecIR; after that step
+the shared pipeline never sees the original syntax.
+Witness generation, conformance, and acceptance all consume SpecIR cases as
+first-match regions, not as notation-specific text.
 
 \begin{definition}[Specification Intermediate Representation]
 \label{def:specir}
@@ -101,89 +104,58 @@ For \code{classify\_signal}, $\Sigma_t$ declares inputs
 $C_t$ holds three guarded cases whose first guard atom is
 $\{\texttt{var}{=}\texttt{level},\;\texttt{op}{=}\texttt{lt},\;
 \texttt{threshold}{=}0\}$ (Figure~\ref{fig:specir-walkthrough}).
-
-The abstract tuple is not yet checkable.
-Adapters and validators need a concrete surface form that matches the JSON
-schema used in the implementation.
+Each case is one FSF scenario $s_i=(g_i,\phi_i)$: a Boolean guard
+$g_i:\mathcal{X}_t\to\{0,1\}$ and a total output mapping
+$\phi_i:\mathcal{X}_t\to\mathcal{Y}_t$
+(Definition~\ref{def:scenario}).
 
 \begin{definition}[SpecIR Surface Grammar (EBNF)]
 \label{def:specir-ebnf}
-The JSON serialisation aligns with \texttt{schemas/spec\_ir.schema.json} and
-\texttt{src/ir/spec\_ir.py}:
-\begin{lstlisting}[language={},basicstyle=\ttfamily\footnotesize]
-SpecIR      ::= task_id notation name Signature Cases surface_prompt [Metadata]
-Signature   ::= Inputs Outputs
-Inputs      ::= Param*          Outputs ::= Param*
-Param       ::= name type       (* nat | int | bool | string *)
-Cases       ::= GuardedCase+
-GuardedCase ::= index guard postcondition [guard_text] [post_text]
-Guard       ::= GuardAtom* | { var="" op="others" }
-GuardAtom   ::= var op [threshold]   (* op in eq,ne,lt,le,gt,ge,others *)
-\end{lstlisting}
+The JSON serialisation
+(\texttt{schemas/spec\_ir.schema.json}, \texttt{src/ir/spec\_ir.py})
+is $\texttt{SpecIR}::=\texttt{task\_id}\;\texttt{notation}\;\texttt{name}\;
+\texttt{Signature}\;\texttt{Cases}\;[\texttt{Metadata}]$, with
+$\texttt{GuardedCase}::=\texttt{index}\;\texttt{guard}\;\texttt{postcondition}$
+and $\texttt{GuardAtom}::=\texttt{var}\;\texttt{op}\;[\texttt{threshold}]$
+($\texttt{op}\in\{\texttt{eq},\texttt{ne},\texttt{lt},\texttt{le},\texttt{gt},
+\texttt{ge},\texttt{others}\}$).
 \end{definition}
-
-Parsing alone is not enough: a document can parse and still omit variables,
-skip indices, or leave residual inputs uncovered.
-Well-formedness rules those cases out.
 
 \begin{definition}[SpecIR Well-formedness]
 \label{def:specir-wf}
 A SpecIR document $d$ is \emph{well-formed} iff:
-(i)~$d.\texttt{notation}$ is one of \texttt{sofl}, \texttt{mini\_z},
-\texttt{mini\_statemachine}, or \texttt{real\_derived};
+(i)~$\texttt{notation}\in\{\texttt{sofl},\texttt{mini\_z},
+\texttt{mini\_statemachine},\texttt{real\_derived}\}$;
 (ii)~case indices are consecutive $1,\ldots,n$ with pairwise distinct guards;
-(iii)~every \texttt{guard} atom's \texttt{var} is declared in \texttt{inputs},
-    except the \texttt{others} sentinel;
-(iv)~every \texttt{postcondition} key is declared in \texttt{outputs}; and
-(v)~the final case is either an \texttt{others} sentinel or its guard is
-    logically equivalent to $\neg\bigvee_{i<n} g_i$.
-Validation is enforced by \texttt{src/ir/schema\_validate.py}
+(iii)~every guard $\texttt{var}$ (except $\texttt{others}$) is declared in
+\texttt{inputs}, and every postcondition key in \texttt{outputs}; and
+(iv)~the final case is $\texttt{others}$ or equivalent to
+$\neg\bigvee_{i<n} g_i$.
+Enforced by \texttt{src/ir/schema\_validate.py}
 (Appendix~\ref{sec:repro:schemas}).
 \end{definition}
 
-\paragraph{Why adapters and lowering exist.}
-Surface notations still differ.
-A thin map turns notation-specific text into well-formed SpecIR; after that
-step the shared pipeline never sees the original syntax.
-HSP-Agile optionally projects SpecIR back onto an FSF-shaped view for
-screening that still speaks in scenarios.
-
 \begin{definition}[Specification Adapter]
 \label{def:spec-adapter}
-A \emph{Specification Adapter} is $\text{Adapt}_L : \text{Text}_L \longrightarrow \text{SpecIR}$.
+$\text{Adapt}_L : \text{Text}_L \longrightarrow \text{SpecIR}$
+(Chapter~\ref{ch:method}).
 \end{definition}
-
-On the SOFL path, screening still speaks in scenarios, so SpecIR is projected
-onto an FSF-shaped \texttt{TaskSpec}; the core stages continue to depend only
-on SpecIR.
 
 \begin{definition}[FSF Lowering (HSP-Agile Instantiation)]
 \label{def:fsf-lowering}
 $\text{Lower}_{\text{FSF}} : \text{SpecIR} \longrightarrow \text{TaskSpec}_{\text{FSF}}$
-projects SpecIR onto the FSF view; the pipeline core depends only on SpecIR.
+projects SpecIR onto an FSF-shaped view for screening; the pipeline core
+depends only on SpecIR.
 \end{definition}
-
-Each ordered SpecIR case is one FSF scenario: a guard that selects a region,
-and an output mapping that says what must be returned there.
 
 \begin{definition}[FSF Scenario]
 \label{def:scenario}
-A \emph{Functional Scenario Framework (FSF) scenario} is a pair
-$s_i = (g_i,\;\phi_i)$, where $g_i : \mathcal{X}_t \to \{0, 1\}$ is a Boolean
-guard and $\phi_i : \mathcal{X}_t \to \mathcal{Y}_t$ is a total output mapping.
+$s_i = (g_i,\;\phi_i)$ with $g_i : \mathcal{X}_t \to \{0, 1\}$ and
+$\phi_i : \mathcal{X}_t \to \mathcal{Y}_t$.
 \end{definition}
 
-\paragraph{Example.}
-$s_1=(\mathit{level}<0,\;\phi_1)$ with $\phi_1\equiv\texttt{"Error"}$;
-$s_2=(\mathit{level}\ge\mathit{threshold},\;\phi_2)$ with
-$\phi_2\equiv\texttt{"Critical"}$; $s_3$ is the \texttt{others} case with
-$\phi_3\equiv\texttt{"Normal"}$.
-Guards are linear arithmetic predicates over $\mathcal{X}_t$; each scenario is
-a self-contained input--output contract.
-
-Priority is not an implementation detail.
-It is part of the specification, and the oracle is the function that enforces
-it~\citep{dijkstra1975guarded}.
+Priority is not an implementation detail: it is part of the specification, and
+the oracle is the function that enforces it~\citep{dijkstra1975guarded}.
 
 \begin{definition}[Scenario Ordering and Specification Oracle]
 \label{def:oracle}
@@ -200,8 +172,10 @@ exactly one scenario.
 \end{definition}
 
 \paragraph{Example.}
-On $(-3,-10)$, both $g_1$ and $g_2$ hold, so
-$g_t(-3,-10)=\phi_1(-3,-10)=\texttt{"Error"}$.
+On $(-3,-10)$, both $g_1$ ($\mathit{level}<0$) and $g_2$
+($\mathit{level}\ge\mathit{threshold}$) hold, so
+$g_t(-3,-10)=\phi_1(-3,-10)=\texttt{"Error"}$
+(with $\phi_2\equiv\texttt{"Critical"}$, $\phi_3\equiv\texttt{"Normal"}$).
 An implementation that checks $g_2$ first returns \texttt{"Critical"} and
 fails the oracle---correct on most disjoint inputs, wrong wherever both
 guards hold.
@@ -214,49 +188,34 @@ guards hold.
 The oracle in Definition~\ref{def:oracle} is a mathematical object.
 The pipeline must make it operational: it needs concrete inputs on which to
 execute candidates and compare outputs.
-Those inputs are the concrete cases below, generated by SMT solving rather than
-by random sampling.
+Those inputs are SMT-generated witnesses rather than random samples---one
+representative per strict first-match region.
 
 \begin{definition}[Concrete Case]
 \label{def:concrete-case}
-A \emph{concrete case} for task $t$ is a pair
-\[
-  (x,\;y) \;=\; \bigl(x,\;g_t(x)\bigr),
-  \qquad x \in \mathcal{X}_t.
-\]
-The set of all concrete cases is called the \emph{case set} $\mathcal{D}(t)$.
+A \emph{concrete case} is $(x,\,g_t(x))$ for $x\in\mathcal{X}_t$;
+the \emph{case set} is $\mathcal{D}(t)$.
 \end{definition}
-
-In practice $\mathcal{X}_t$ is too large for exhaustive enumeration, so
-$\mathcal{D}(t)$ is constructed by targeted SMT sampling \citep{demoura2008z3, barrett2018smt}:
-one representative input per scenario.
 
 \begin{definition}[SMT-Generated Test Suite]
 \label{def:test-suite}
-The case set $\mathcal{D}(t)$ is generated by the Z3 SMT solver as
-follows.  For each scenario $s_i = (g_i, \phi_i)$, solve the satisfiability
-query
+For each scenario $s_i = (g_i, \phi_i)$, solve
 \[
-  x_i \;\models\; g_i(x) \;\land\; \bigwedge_{j < i} \neg\,g_j(x).
+  x_i \;\models\; g_i(x) \;\land\; \bigwedge_{j < i} \neg\,g_j(x)
 \]
-If satisfiable, add $\bigl(x_i,\;g_t(x_i)\bigr)$ to $\mathcal{D}(t)$.
+with Z3~\citep{demoura2008z3, barrett2018smt}; if satisfiable, add
+$\bigl(x_i,\;g_t(x_i)\bigr)$ to $\mathcal{D}(t)$.
+The conjunct $\bigwedge_{j < i} \neg\,g_j(x)$ enforces strict scenario
+membership: $x_i$ activates $s_i$ and no higher-priority scenario, so each
+case is a direct witness to $\phi_i$.
 \end{definition}
 
 \paragraph{Example.}
-For $s_1$ the query is simply $\mathit{level}<0$; a model is $(-3,-10)$ with
+For $s_1$ the query is $\mathit{level}<0$; a model is $(-3,-10)$ with
 oracle output \texttt{"Error"}.
-For $s_2$ the query is
+For $s_2$:
 $\mathit{level}\ge\mathit{threshold}\land\neg(\mathit{level}<0)$; a model
 might be $(5,3)$ with oracle output \texttt{"Critical"}.
-
-The conjunct $\bigwedge_{j < i} \neg\,g_j(x)$ enforces strict scenario
-membership: $x_i$ activates $s_i$ \emph{and no higher-priority scenario}.
-This guarantees that the oracle maps $x_i$ through $\phi_i$ and not through
-any $\phi_j$ with $j < i$, making each case a direct witness to the
-prescribed output of exactly one scenario.
-
-The following proposition establishes that the procedure achieves full
-scenario coverage.
 
 \begin{lemma}[Scenario Coverage]
 \label{lem:coverage}
@@ -277,25 +236,22 @@ Precedence defects concentrate near guard boundaries---the thin set where
 one scenario yields to another.
 Random tests rarely land there; when they miss, unit-test repair looks
 healthy while ordering bugs remain.
+The corollary below makes the random-vs-SMT contrast quantitative.
 
 \begin{definition}[Boundary Region]
 \label{def:boundary-region}
-For margin $\varepsilon > 0$, the \emph{boundary region} is
 $\mathcal{B}_\varepsilon(t) = \{\mathbf{x} \in \mathcal{X}_t :
-  \exists i,\; \partial g_i(\mathbf{x}) < \varepsilon\}$.
+  \exists i,\; \partial g_i(\mathbf{x}) < \varepsilon\}$ for margin
+$\varepsilon > 0$.
 \end{definition}
-
-Fault-exposure probability is how often a faulty candidate fails on a
-randomly drawn witness; when it is small, denser unit tests still look fine.
 
 \begin{definition}[Per-witness Fault-Exposure Probability]
 \label{def:fault-exposure}
-For faulty candidate $c$, $\varepsilon_c =
-\Pr_{\mathbf{x} \sim \mathcal{D}(t)}[\,f_c(\mathbf{x}) \neq g_t(\mathbf{x})\,]$;
-$\varepsilon = \min_{c \in \mathcal{C}\setminus\{g_t\}} \varepsilon_c > 0$.
+$\varepsilon_c =
+\Pr_{\mathbf{x} \sim \mathcal{D}(t)}[\,f_c(\mathbf{x}) \neq g_t(\mathbf{x})\,]$
+for faulty $c$; $\varepsilon = \min_{c \in \mathcal{C}\setminus\{g_t\}}
+\varepsilon_c > 0$.
 \end{definition}
-
-The corollary makes the random-vs-SMT contrast quantitative.
 
 \begin{corollary}[Random vs.\ SMT Fault-Exposure Hit Rate]
 \label{cor:random-vs-smt}
@@ -345,40 +301,24 @@ $\mathcal{O}(\varepsilon)$, while SMT hits them deterministically.
   \label{fig:fsf-semantics}
 \end{figure}
 
-The point of Figure~\ref{fig:fsf-semantics} is the green witness $(-3,-10)$:
-geometrically it also satisfies $S_2$'s guard, yet first-match assigns it to
-$S_1$.
-SMT case generation places one such witness in each strict scenario region.
-
-Pass/fail alone is not enough for repair.
-The pipeline also needs a counterexample that names the violated scenario,
-so the model can localise the bug inside the ordered specification.
+Figure~\ref{fig:fsf-semantics} makes the point geometrically: $(-3,-10)$ also
+satisfies $S_2$'s guard, yet first-match assigns it to $S_1$.
+SMT places one such witness in each strict scenario region.
 
 \begin{definition}[Strict Scenario Violation]
 \label{def:violation}
-A candidate $c$ \emph{violates scenario $s_i$} on the concrete case
-$(x_i, y_i) \in \mathcal{D}(t)$ if
-\[
-  f_c(x_i) \;\neq\; y_i \;=\; g_t(x_i),
-\]
-where $f_c : \mathcal{X}_t \to \mathcal{Y}_t$ denotes the observable
-behaviour of $c$.  The associated \emph{counterexample} is the triple
-\[
-  (x_i,\;g_t(x_i),\;f_c(x_i)),
-\]
-comprising the failing input, the expected output, and the actual output
-produced by $c$.
+Candidate $c$ \emph{violates} $s_i$ on $(x_i, y_i) \in \mathcal{D}(t)$ if
+$f_c(x_i) \neq y_i = g_t(x_i)$; the \emph{counterexample} is
+$(x_i,\,g_t(x_i),\,f_c(x_i))$.
 \end{definition}
 
 \paragraph{Example.}
 For Listing~\ref{lst:llm-incorrect} on $(-3,-10)$, the counterexample is
 $\bigl((-3,-10),\;\texttt{Error},\;\texttt{Critical}\bigr)$ and the violated
 scenario is $s_1$.
-
-Counterexamples are the primary feedback signal returned to the LLM.
-They are structured: the pipeline identifies not only that the candidate
-produced a wrong answer, but \emph{which scenario} was active, allowing the
-language model to localise the bug within the FSF specification.
+Counterexamples name the active scenario, so the model can localise the bug
+inside the ordered specification
+(Feedback IR fields in Chapter~\ref{ch:method}).
 
 % ---------------------------------------------------------------------------
 \section{The Bounded Acceptance Problem}
@@ -392,14 +332,9 @@ within a fixed LLM budget.
 
 \begin{definition}[Candidate Implementation]
 \label{def:candidate}
-A \emph{candidate implementation} for task $t$ is any computable function
-$c : \mathcal{X}_t \to \mathcal{Y}_t$.
-Write $f_c$ for its observable input-output behaviour.
+Any computable $c : \mathcal{X}_t \to \mathcal{Y}_t$; write $f_c$ for its
+observable behaviour.
 \end{definition}
-
-The natural quality score is the fraction of witnesses on which $c$ matches
-the oracle---continuous, so repair progress remains visible, and grounded in
-the specification rather than an arbitrary unit-test suite.
 
 \begin{definition}[Strict Formal Conformance]
 \label{def:conformance}
@@ -411,6 +346,10 @@ the specification rather than an arbitrary unit-test suite.
   \mathbf{1}\bigl[f_c(x) = y\bigr]
   \;\in\; [0,1].
 \]
+\emph{Strict success} (Definition~\ref{def:strict-success}) is
+$\mathrm{Conf}(c,t)\ge\tau$ with $\tau=1$; a lower $\tau$ would mask ordering
+violations that pass most cases where overlapping guards prescribe identical
+outputs~\citep{zhu1997specification}.
 \end{definition}
 
 \paragraph{Example.}
@@ -418,28 +357,20 @@ If $\mathcal{D}(t)$ has three witnesses and the buggy
 \code{classify\_signal} fails only on $(-3,-10)$, then
 $\mathrm{Conf}(c,t)=2/3$.
 
-\emph{Strict success} is the thresholded form: $\mathrm{Conf}(c,t)\ge\tau$
-with $\tau=1$ (Definition~\ref{def:strict-success}).
-A lower $\tau$ would mask ordering violations that pass most cases where
-overlapping guards prescribe identical outputs~\citep{zhu1997specification}.
-
 \begin{definition}[Strict Success]
 \label{def:strict-success}
-Candidate $c$ \emph{strictly succeeds} on task $t$ iff
 $\mathrm{Conf}(c,\,t) \ge \tau$ with $\tau = 1$.
 \end{definition}
 
-Conformance alone is still insufficient: structural anti-patterns (hard-coded
-returns, unconditional success) can clear every witness.
-The high-severity screen $\mathcal{P}^H$ (nine patterns in
-Table~\ref{tab:patterns}; Appendix~\ref{app:patterns}) blocks those cases;
-medium/low patterns inform repair without gating release.
+Conformance alone is still insufficient: structural anti-patterns can clear
+every witness.
+The high-severity screen $\mathcal{P}^H$ (Table~\ref{tab:patterns};
+Appendix~\ref{app:patterns}) blocks those cases.
 
 \begin{definition}[High-Severity Pattern Violation]
 \label{def:pattern-violation}
-Candidate $c$ is \emph{pattern-safe} iff
-$\forall p \in \mathcal{P}^H : p(c,\,t) = 0$, where each checker
-$p : (c, t) \mapsto \{0, 1\}$ returns $1$ on a hit.
+$c$ is \emph{pattern-safe} iff
+$\forall p \in \mathcal{P}^H : p(c,\,t) = 0$.
 \end{definition}
 
 Release is the conjunction of the two checks---neither alone is enough.
@@ -470,7 +401,7 @@ selective.
 Those pieces assemble into the computational problem: find an acceptable
 candidate within budget~$K$, or return the best-effort candidate when the
 budget is exhausted.
-The feedback object on attempt~$k{+}1$ is a structured JSON record
+Semantic feedback on attempt~$k{+}1$ is a structured JSON record
 (counterexamples, pattern hits, attempt index); Chapter~\ref{ch:method}
 details its fields.
 The search is CEGIS-shaped~\citep{solarlezama2008sketching,lynn2024verifierloop}
@@ -494,26 +425,19 @@ where $C_K$ is the set of candidates generated in the $K$ attempts.
 
 Generation success is the wrong primary metric for a prevention system.
 What matters is whether faulty candidates are kept out of release, and whether
-correct ones are not rejected by accident.
-Both rates are measured over a mutant population
-\citep{demillo1978mutation,ammann2016testing}.
+correct ones are not rejected by accident---both measured over a mutant
+population~\citep{demillo1978mutation,ammann2016testing}.
 
 \begin{definition}[Mutant Population]
 \label{def:mutants}
-A \emph{mutant population} $\mathcal{M}$ is a finite set of pairs
-$(c_m, t_m)$ where at least one of the two has been artificially perturbed.
-\emph{Specification-confusion} mutants $\mathcal{M}^S$ mutate the task
-(guards or outputs) while keeping a correct implementation of the original;
-\emph{implementation-screening} mutants $\mathcal{M}^I$ mutate the candidate
-(e.g.\ guard-order swap) while keeping the task.
-Write $\mathrm{Faulty}(m)=1$ when the pair is genuinely faulty.
+$\mathcal{M}$ is a finite set of pairs $(c_m, t_m)$ with at least one side
+perturbed: $\mathcal{M}^S$ mutates the task, $\mathcal{M}^I$ the candidate;
+$\mathrm{Faulty}(m)=1$ when the pair is genuinely faulty.
 \end{definition}
 
-PDR is recall-like: of all mutants, how many does the pipeline refuse?
-FAR is precision-like: of genuinely faulty mutants, how many still slip
-through $\mathrm{Accept}$?
-In a sprint review, high PDR and low FAR mean the gate is selective without
-rubber-stamping~\citep{okun2007mutation}.
+PDR is recall-like (of all mutants, how many does the pipeline refuse?);
+FAR is precision-like (of genuinely faulty mutants, how many still slip
+through $\mathrm{Accept}$?)~\citep{okun2007mutation}.
 
 \begin{definition}[Prevention Detection Rate]
 \label{def:pdr}
@@ -524,8 +448,6 @@ rubber-stamping~\citep{okun2007mutation}.
        {|\mathcal{M}|}.
 \]
 \end{definition}
-
-FAR is the complementary slip-through rate.
 
 \begin{definition}[False Accept Rate]
 \label{def:far}
@@ -540,20 +462,10 @@ FAR is the complementary slip-through rate.
 \]
 \end{definition}
 
-Mutation kill rate $\mu_k$ isolates the formal check alone
-(Definition~\ref{def:mkr}): the fraction of mutants with
-$\mathrm{Conf}<1$.
-The gap $\mathrm{PDR}-\mu_k$ is the additive value of pattern screening---mutants
-that clear every witness yet still fail $\mathrm{Accept}$.
-
 \begin{definition}[Mutation Kill Rate]
 \label{def:mkr}
-\[
-  \mu_k
-  \;=\;
-  \frac{\bigl|\bigl\{m \in \mathcal{M} : \mathrm{Conf}(c_m,\,t_m) < 1\bigr\}\bigr|}
-       {|\mathcal{M}|}.
-\]
+$\mu_k = |\{m\in\mathcal{M}:\mathrm{Conf}(c_m,t_m)<1\}|/|\mathcal{M}|$;
+the gap $\mathrm{PDR}-\mu_k$ is the additive value of pattern screening.
 \end{definition}
 
 % ---------------------------------------------------------------------------
@@ -562,29 +474,16 @@ that clear every witness yet still fail $\mathrm{Accept}$.
 % ---------------------------------------------------------------------------
 
 The evaluation uses a synthetic benchmark of hard tasks built to stress FSF
-precedence sensitivity \citep{li2023iet}.
-The construction below makes that stress precise and proves that correct
-solutions must respect scenario ordering.
+precedence sensitivity~\citep{li2023iet}.
 
 \begin{definition}[Precedence-Sensitive Task]
 \label{def:prec-sensitive}
-A task $t$ is \emph{precedence-sensitive} if there exist two scenarios
-$s_i, s_j$ with $i < j$ such that their guard regions overlap:
-\[
-  \bigl\{x \in \mathcal{X}_t : g_i(x) = 1\bigr\}
-  \;\cap\;
-  \bigl\{x \in \mathcal{X}_t : g_j(x) = 1\bigr\}
-  \;\neq\; \emptyset.
-\]
+$t$ is \emph{precedence-sensitive} if there exist $s_i,s_j$ with $i<j$ and
+overlapping guards:
+$\{x:g_i(x)=1\}\cap\{x:g_j(x)=1\}\neq\emptyset$.
+On the overlap, output depends entirely on evaluation order---the class of
+error naive LLM synthesis frequently introduces.
 \end{definition}
-
-In a precedence-sensitive task, the output on inputs in the overlapping region
-depends entirely on which guard is evaluated first.  An implementation that
-checks $g_j$ before $g_i$ will, on those inputs, return $\phi_j(x)$ rather
-than the correct $\phi_i(x)$.  This is precisely the class of error that
-naive LLM synthesis frequently introduces: the model may faithfully reproduce
-all guard conditions and output mappings from the specification text, while
-inadvertently evaluating them in a different order.
 
 \begin{proposition}
 \label{prop:order-required}
@@ -601,42 +500,18 @@ before $g_i$.  Since $g_j(x^*) = 1$, the implementation returns
 $\phi_j(x^*)$.  Because the task is precedence-sensitive (the two scenarios
 cover an overlapping region of the input space), the specification is
 non-trivially ordered, and it need not be the case that $\phi_i(x^*) =
-\phi_j(x^*)$ — indeed, if they were always equal on the overlap, the overlap
+\phi_j(x^*)$ --- indeed, if they were always equal on the overlap, the overlap
 would be semantically irrelevant and the task would not test ordering at all.
 Hence $f_c(x^*) \neq g_t(x^*)$, and $c$ does not strictly succeed.
 \end{proof}
 
-Hard synthetic tasks are constructed as follows.
-Each task $t^H$ has the following structure:
-
-\begin{itemize}
-  \item \textbf{Input variables}: five non-negative integers
-        $a, b, c, d, e \in \mathbb{N}$.
-  \item \textbf{Output variables}: three integer quantities —
-        $\mathit{risk} \in \{0,1,2\}$,
-        $\mathit{action} \in \{0,1,2\}$, and
-        $\mathit{score} \in [0, 100]$ — giving $\mathcal{Y}_t \subseteq
-        \{0,1,2\}^2 \times [0,100]$.
-  \item \textbf{Scenario count}: up to $n = 9$ ordered scenarios.
-  \item \textbf{Threshold parameters}: seven threshold values
-        $\theta_1, \ldots, \theta_7$ sampled uniformly at random from
-        $[1, 100] \cap \mathbb{Z}$, used to construct the guard predicates
-        (e.g., $a > \theta_1$, $b \leq \theta_2 \land c > \theta_3$).
-  \item \textbf{Feasibility guarantee}: all scenarios are satisfiable, verified
-        by a Z3 feasibility check during task generation.  Any candidate
-        $\theta$ vector that renders a scenario unsatisfiable is discarded
-        and resampled.
-  \item \textbf{Consistency validation}: the generated task passes a
-        scenario-consistency validator that confirms each generated case
-        belongs to exactly one scenario and that the ``others'' guard
-        correctly covers all remaining inputs.
-\end{itemize}
-
-By Proposition~\ref{prop:order-required}, every hard task in the benchmark
-requires an implementation to evaluate guards in the specified order.  An
-LLM that does not attend to the ordering of scenarios in the prompt will
-therefore produce incorrect implementations, which are caught by the
-SMT-generated test suite.
+Hard tasks $t^H$ use five non-negative inputs, three integer outputs
+($\mathit{risk},\mathit{action},\mathit{score}$), up to $n=9$ ordered
+scenarios, and seven random thresholds $\theta_1,\ldots,\theta_7\in[1,100]$;
+Z3 feasibility and a scenario-consistency validator discard unsatisfiable or
+ill-covered $\theta$ vectors.
+By Proposition~\ref{prop:order-required}, every hard task requires ordered
+guard evaluation; SMT witnesses catch order-insensitive LLM outputs.
 
 % ---------------------------------------------------------------------------
 \section{Computational Considerations}
@@ -644,67 +519,26 @@ SMT-generated test suite.
 % ---------------------------------------------------------------------------
 
 Formal checking must not erase the prevention benefit by dominating runtime.
-The cost accounting below confirms that Z3 and pattern screening remain cheap
-relative to LLM inference \citep{demoura2008z3, barrett2018smt}.
-
-\paragraph{Case Generation.}
-For each of the $n$ scenarios, the Z3 solver is invoked with a linear
-arithmetic formula over $d$ integer variables.  Linear integer arithmetic
-(LIA) is decidable, and Z3's LIA solver runs in time that is polynomial in
-the formula size for the types of constraints that arise from threshold-based
-FSF guards.  In practice, with $n \leq 9$ and $d = 5$, each call to Z3
-completes in under $0.1$ seconds, giving a total case generation time of
-$O(n \cdot d^2)$ solver steps in the worst case, or approximately
-$0.5$--$1$ seconds per task.
-
-\paragraph{Conformance Checking.}
-Given the case set $\mathcal{D}(t)$ of size $n$, checking conformance
-requires executing the candidate $c$ on each input $x_i$ and comparing the
-output to $g_t(x_i)$.  This is a simple lookup-and-compare operation with
-cost $O(n)$ function evaluations and $O(n)$ comparisons.  For $n \leq 9$,
-this step is effectively instantaneous.
-
-\paragraph{Pattern Matching.}
-The pattern screening layer applies $|\mathcal{P}^H| = 14$ pattern checkers
-to the source code of candidate $c$.  Each pattern is encoded as a regular
-expression or a simple abstract-syntax-tree traversal.  The cost is $O(L
-\cdot P)$ where $L$ is the length of the candidate source code and $P =
-|\mathcal{P}^H|$.  For typical LLM-generated functions of 30--80 lines,
-this step completes in well under $0.01$ seconds.
-
-\paragraph{Total Pipeline Cost.}
-The dominant cost at every iteration is the LLM API call, which takes
-approximately $10$ seconds per attempt in the reported experiments.
-Z3 solving and conformance checking add less than $1$ second combined;
-pattern matching is negligible.
-With budget $K = 3$, expected runtime is about $30$ seconds per task, of
-which more than $97\%$ is LLM inference.
-Formal checking is therefore not the bottleneck: larger case sets or richer
-pattern libraries would not meaningfully change throughput.
-
-\paragraph{Summary.}
-The cost structure can be written as
-\[
-  T_{\mathrm{pipeline}}
-  \;\approx\;
-  K \cdot T_{\mathrm{LLM}}
-  \;+\; O(n \cdot d^2) \cdot T_{\mathrm{Z3}}
-  \;+\; O(n) \cdot T_{\mathrm{exec}}
-  \;+\; O(L \cdot P) \cdot T_{\mathrm{pattern}},
-\]
-where $T_{\mathrm{LLM}} \gg T_{\mathrm{Z3}} \gg T_{\mathrm{exec}} \approx
-T_{\mathrm{pattern}}$, confirming that formal checking adds less overhead
-than a single LLM call.
+With $n\le 9$ and $d=5$, Z3 case generation is
+$O(n\cdot d^2)$ and finishes in $\sim$1\,s; conformance is $O(n)$ lookups;
+pattern screening is $O(L\cdot|\mathcal{P}^H|)$ and negligible
+($\ll$0.01\,s)~\citep{demoura2008z3, barrett2018smt}.
+The dominant cost is the LLM call ($\sim$10\,s/attempt): with $K=3$,
+expected runtime is $\sim$30\,s/task, of which $>97\%$ is LLM inference.
+In short,
+$T_{\mathrm{pipeline}}\approx K\cdot T_{\mathrm{LLM}}+O(n\cdot d^2)\,T_{\mathrm{Z3}}
++O(n)\,T_{\mathrm{exec}}+O(L\cdot P)\,T_{\mathrm{pattern}}$
+with $T_{\mathrm{LLM}}\gg T_{\mathrm{Z3}}\gg T_{\mathrm{exec}}\approx
+T_{\mathrm{pattern}}$.
 
 % ---------------------------------------------------------------------------
 \section*{Chapter Summary}
 % ---------------------------------------------------------------------------
 
-What must be true is now fixed: ordered tasks, SpecIR as the shared hinge,
-first-match oracles, SMT witnesses with full scenario coverage
-(Lemma~\ref{lem:coverage}), and $\mathrm{Accept}$ under budget~$K$
-(Definition~\ref{def:bap}).
-PDR/FAR measure prevention; every hard task requires ordering
-(Proposition~\ref{prop:order-required}); formal checking stays cheap relative
+Three objects dominate: \textbf{SpecIR} as the shared semantic hinge,
+the first-match \textbf{oracle} operationalised by SMT witnesses
+(Lemma~\ref{lem:coverage}), and the conjunctive gate $\mathrm{Accept}$
+under budget~$K$ (Definition~\ref{def:bap}).
+PDR/FAR support the prevention claim; formal checking stays cheap relative
 to LLM inference.
 Chapter~\ref{ch:method} turns these objects into a runnable loop.

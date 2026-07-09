@@ -105,36 +105,30 @@ random tests do not help; a specification-aware witness does.
 \section{Research Challenges}
 \label{sec:intro:challenges}
 
-Three obstacles stand between the example above and a usable prevention
-pipeline.
+Three obstacles map directly to the three insights below.
 
-\subsection{Closing the Specification--Code Semantic Gap}
+\subsection{Semantic Regions, Not Surface Syntax}
 Checking scenario~$S_i$ requires inputs in
-$G_i \wedge \bigwedge_{j<i}\neg G_j$, often a low-measure region missed by
-random sampling.
-SMT solvers \citep{demoura2008z3,barrett2018smt} can generate such witnesses,
-but only if the FSF encoding is faithful.
-The response in \textsc{SgDP} is a constraint-guided witness generator that
-encodes guard precedence as SMT constraints (Chapter~\ref{ch:method}).
+$G_i \wedge \bigwedge_{j<i}\neg G_j$---regions random tests miss
+\cite{barrett2018smt}.
+The check must be notation-agnostic yet preserve first-match partitions
+(Chapter~\ref{ch:formalization}).
 
-\subsection{Structured Counterexample-Guided Repair}
+\subsection{Typed Failures for Repair}
 Test-feedback loops lack specification-level structure
 \cite{lynn2024verifierloop}: the model may patch one counterexample without
 fixing guard precedence.
-Effective repair needs prompts that name the violated scenario, state the
-ordering constraint, and include the SMT witness.
-\textsc{SgDP} therefore structures each failure into a scenario-aware record
-\emph{before} rendering natural-language prompts---the Semantic Feedback IR
-introduced in Chapter~\ref{ch:method}.
+Repair needs a record that names the violated scenario and witness
+\emph{before} any natural-language prompt is rendered
+(Chapter~\ref{ch:method}).
 
-\subsection{Operationalising Prevention within a Bounded Budget}
+\subsection{Conjunctive Release under Budget~$K$}
 Full verification is impractical for unannotated LLM output
 \cite{leino2010dafny,loughman2024dafnybench}.
 What is needed is calibrated prevention: stronger than test-feedback
 \cite{chen2021codex}, weaker than deductive proof, and fast enough for sprint
-budgets \citep{beck2001xp,li2022agilesofl}.
-\textsc{SgDP} answers with a conjunctive acceptance predicate and a hard repair
-budget~$K$ ($K=3$ in the experiments).
+budgets \citep{beck2001xp,li2022agilesofl}---a conjunctive gate under
+hard budget~$K$ ($K=3$ in the experiments).
 
 
 \section{Proposed Approach}
@@ -142,23 +136,21 @@ budget~$K$ ($K=3$ in the experiments).
 
 Why continue past the problem statement?
 Because the same specification that exposes the defect can also drive
-prevention.
-HSP-Agile synthesises from FSF text, checks on first-match SMT witnesses,
-repairs from a typed failure record, and gates release with a pattern screen.
-Figure~\ref{fig:sgdp-overview} is the map.
-Chapter~\ref{ch:method} states the \textsc{SgDP} interface and walks
-\code{classify\_signal} end to end; Chapter~\ref{ch:results} shows adapter
-transfer to Mini-Z and Mini-StateMachine.
+prevention---if three ideas hold: shared semantic regions, typed repair
+feedback, and conjunctive acceptance.
+Figure~\ref{fig:sgdp-overview} is the map; adapters and SMT lowering are
+necessary engineering behind that map, not separate contributions.
+Chapter~\ref{ch:method} walks \code{classify\_signal} end to end;
+Chapter~\ref{ch:results} shows the ideas transfer with adapter-level changes.
 
 \begin{figure}[t]
   \centering
   \tikzinput{diagrams/tikz/sgdp_framework_overview}
-  \caption{\textbf{Key observation:} prevention is a four-stage loop under
-    budget~$K$, not a one-shot generator---adapters feed SpecIR; witnesses and
-    Semantic Feedback IR drive repair; acceptance is conjunctive.
+  \caption{\textbf{Key observation:} three ideas, one loop---SpecIR regions,
+    Semantic Feedback IR, conjunctive $\mathrm{Accept}$ under budget~$K$.
     \textbf{How to read:} left to right for one attempt; dashed orange arc is
-    the repair loop; dashed branch is the HSP-Agile FSF lowerer and pattern
-    guard.}
+    repair; dashed branch is FSF lowering and pattern screen (supporting
+    engineering).}
   \label{fig:sgdp-overview}
 \end{figure}
 
@@ -166,46 +158,44 @@ transfer to Mini-Z and Mini-StateMachine.
 \section{Contributions}
 \label{sec:intro:contributions}
 
-Five research insights structure the rest of the report
+Three insights---and only three---are what a reviewer should remember
 (Figure~\ref{fig:contribution-map}).
-Each insight is what a reviewer should remember; the artefacts merely realise it.
+Adapters, SMT lowering, the hard benchmark, and PDR/FAR are necessary
+engineering; they support the claims but are not advertised as contributions.
 
 \begin{figure}[t]
   \centering
   \tikzinput{diagrams/tikz/contribution_map}
-  \caption{\textbf{Key observation:} the five contributions are one causal chain,
-    not a feature list---from shared intermediate form through acceptance and
-    prevention metrics to measured gain.
-    \textbf{How to read:} follow C1$\to$C5 left to right; each box enables the next.}
+  \caption{\textbf{Key observation:} three Tier-1 insights, not a feature list.
+    SpecIR, Semantic Feedback IR, and the conjunctive gate are the memorable
+    core; everything else is supporting mechanism.
+    \textbf{How to read:} C1 enables shared checking; C2 enables repair; C3
+    gates release.}
   \label{fig:contribution-map}
 \end{figure}
 
 \begin{enumerate}
-  \item[\textbf{C1.}] \textbf{Insight:} prevention can be notation-agnostic if
-    ordered guarded cases are factored into a shared intermediate form.
-    SpecIR and the four-stage \textsc{SgDP} loop realise that insight; HSP-Agile
-    is the SOFL/FSF instance.
+  \item[\textbf{C1.}] \textbf{Insight:} prevention should depend on
+    \emph{semantic regions} (first-match partitions), not on the surface syntax
+    of any one notation.
+    SpecIR realises that insight; HSP-Agile is the SOFL/FSF instance.
 
-  \item[\textbf{C2.}] \textbf{Insight:} release and repair need different
-    artefacts---a conjunctive gate for shipping, and a typed failure record for
-    the next LLM call.
-    $\mathrm{Accept}(c,t)$ and the Semantic Feedback IR separate those concerns.
+  \item[\textbf{C2.}] \textbf{Insight:} repair needs a \emph{typed scenario
+    failure}, not raw pass/fail bits.
+    The Semantic Feedback IR names the violated scenario, witness, and expected
+    output before any natural-language prompt is rendered.
 
-  \item[\textbf{C3.}] \textbf{Insight:} ordinary unit-test suites understate the
-    problem; evaluation needs tasks where guard overlap is the point.
-    The 120-task hard benchmark, plus real-derived and multi-notation subsets,
-    operationalises that stress.
-
-  \item[\textbf{C4.}] \textbf{Insight:} generation success is the wrong primary
-    metric for a prevention system.
-    PDR/FAR over specification-confusion and implementation-screening mutants
-    measure whether faulty candidates are kept out of release.
-
-  \item[\textbf{C5.}] \textbf{Insight:} the loop is worth the latency where
-    overlap is dense.
-    On the hard benchmark, HSP-Agile reaches 90.4\% mean strict conformance
-    (+6.2\,pp over one-shot LLM); logs and scripts are released.
+  \item[\textbf{C3.}] \textbf{Insight:} release must be \emph{conjunctive}:
+    every specification-derived witness matches \emph{and} no high-severity
+    structural pattern remains.
+    $\mathrm{Accept}(c,t)$ is that gate; high mean conformance alone is not
+    release.
 \end{enumerate}
+
+On the 120-task hard benchmark these three ideas yield 90.4\% mean strict
+conformance (+6.2\,pp over one-shot LLM; Feedback IR alone +7.7\,pp in E6).
+Evaluation protocol details appear in Chapters~\ref{ch:experiments}
+and~\ref{ch:results}.
 
 
 \section{Research Questions}
@@ -226,16 +216,14 @@ follows the experimental logic of Chapter~\ref{ch:experiments}.
 \section{Report Organisation}
 \label{sec:intro:organisation}
 
-Chapters are paced differently on purpose.
-Chapter~\ref{ch:background} is a short survey of the pieces that already exist.
-Chapter~\ref{ch:formalization} is the mathematical core: what must be true for
-\code{classify\_signal} before any pipeline is built.
-Chapter~\ref{ch:method} is the design document---intuition and a full run first,
-then interfaces and theorems.
-Chapters~\ref{ch:implementation} and~\ref{ch:experiments} are engineering and
-protocol: modules, modes, and measurement.
-Chapter~\ref{ch:results} leads with mechanism evidence, then aggregates;
-Chapter~\ref{ch:discussion} reflects on paradoxes, practice, and threats.
-Chapter~\ref{ch:conclusion} restates the insight chain.
+Chapters are paced to keep Method and Evaluation dominant.
+Chapter~\ref{ch:background} is a short survey.
+Chapter~\ref{ch:formalization} is the mathematical core for
+\code{classify\_signal}.
+Chapter~\ref{ch:method} is the design document for C1--C3.
+Chapter~\ref{ch:implementation} is supporting engineering.
+Chapters~\ref{ch:experiments}--\ref{ch:results} are the evidence story;
+Chapter~\ref{ch:discussion} reflects; Chapter~\ref{ch:conclusion} restates
+the three insights only.
 Appendices cover reproducibility, benchmark construction, and the pattern
 catalogue.

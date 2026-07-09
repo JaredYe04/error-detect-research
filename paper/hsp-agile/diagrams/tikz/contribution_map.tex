@@ -1,7 +1,5 @@
-% Research Contribution Map — Ch. 1
+% Research Contribution Map — Ch. 1 (V4: three Tier-1 insights only)
 % Fragment: \input{diagrams/tikz/contribution_map} inside a figure environment.
-% Required TikZ libraries (add to document preamble):
-%   \usetikzlibrary{arrows.meta,shadows}
 \usetikzlibrary{arrows.meta,shadows}
 
 \begin{tikzpicture}[
@@ -10,57 +8,37 @@
   cnode/.style={
     draw=#1!55!black, fill=#1!15,
     rounded corners=5pt,
-    minimum width=4.0cm, minimum height=1.5cm,
-    align=center, text width=3.6cm, inner sep=6pt,
+    minimum width=4.2cm, minimum height=1.6cm,
+    align=center, text width=3.8cm, inner sep=6pt,
     drop shadow={shadow xshift=0.4ex, shadow yshift=-0.4ex,
                  shadow opacity=0.30}
   }
 ]
 
-%----------------------------------------------------------------
-% Center node
-%----------------------------------------------------------------
 \node[
   draw=blue!70!black, fill=blue!75!black, text=white,
   rounded corners=7pt,
-  minimum width=3.8cm, minimum height=1.3cm,
+  minimum width=3.6cm, minimum height=1.2cm,
   align=center, inner sep=8pt,
   font=\normalsize\sffamily\bfseries,
   drop shadow={shadow xshift=0.4ex, shadow yshift=-0.4ex,
                shadow opacity=0.30}
-] (hsp) at (0,0) {HSP-Agile};
+] (hsp) at (0,0) {Three insights};
 
-%----------------------------------------------------------------
-% Five contribution nodes radiating outward
-%----------------------------------------------------------------
-\node[cnode=blue]   (c1) at (-5.2,  3.0) {%
-  \textbf{C1: Pipeline Design}\\[3pt]
-  Formal 4-stage hybrid\\prevention pipeline};
+\node[cnode=blue]   (c1) at (-4.8,  2.4) {%
+  \textbf{C1: SpecIR}\\[2pt]
+  Prevention depends on\\semantic regions,\\not surface syntax};
 
-\node[cnode=green]  (c2) at ( 5.2,  3.0) {%
-  \textbf{C2: Strict Acceptance}\\[3pt]
-  $\mathrm{Conf}(c,t)\geq\tau$\\
-  $\wedge\;P^H = 0$};
+\node[cnode=green]  (c2) at ( 4.8,  2.4) {%
+  \textbf{C2: Feedback IR}\\[2pt]
+  Repair needs a typed\\scenario failure,\\not raw test bits};
 
-\node[cnode=orange] (c3) at ( 6.5,  0.0) {%
-  \textbf{C3: Hard Benchmark}\\[3pt]
-  120 precedence-sensitive\\synthetic tasks};
+\node[cnode=orange] (c3) at ( 0.0, -2.8) {%
+  \textbf{C3: Accept gate}\\[2pt]
+  Release $=$ full witness\\conformance $\wedge$\\clear pattern screen};
 
-\node[cnode=purple] (c4) at ( 5.2, -3.0) {%
-  \textbf{C4: Prevention Protocol}\\[3pt]
-  Two-layer mutation\\evaluation (PDR/FAR)};
-
-\node[cnode=teal]   (c5) at (-5.2, -3.0) {%
-  \textbf{C5: Reproducible Artifacts}\\[3pt]
-  Open-source pipeline\\\& datasets};
-
-%----------------------------------------------------------------
-% Ultra-thick arrows from center to each contribution
-%----------------------------------------------------------------
 \draw[->, ultra thick, blue!55!black]   (hsp) -- (c1);
 \draw[->, ultra thick, green!55!black]  (hsp) -- (c2);
 \draw[->, ultra thick, orange!65!black] (hsp) -- (c3);
-\draw[->, ultra thick, purple!55!black] (hsp) -- (c4);
-\draw[->, ultra thick, teal!55!black]   (hsp) -- (c5);
 
 \end{tikzpicture}

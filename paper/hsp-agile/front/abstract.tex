@@ -8,20 +8,24 @@ inputs and fail on the thin overlaps that formal contracts are meant to pin
 down.
 Unit tests almost never sample those regions, so test-based repair leaves the
 defects in place.
-That failure class is \emph{specification-conformance defects}.
 
-The key insight is to treat the specification itself as the evidence source.
+Three insights drive prevention.
+First, the check should depend on \emph{semantic regions} (first-match
+partitions), not on the surface syntax of any one notation---a shared
+intermediate form realises that idea.
+Second, repair needs a \emph{typed failure record} that names the violated
+scenario and witness, not raw pass/fail bits.
+Third, release must be \emph{conjunctive}: every witness matches \emph{and} no
+high-severity structural pattern remains.
 The \textbf{Specification-guided Defect Prevention Framework} (\textsc{SgDP}),
-instantiated as \textbf{HSP-Agile} for SOFL/FSF, builds first-match SMT
-witnesses, turns each failure into a typed repair record, and releases a
-candidate only when every witness matches and no high-severity pattern remains.
+instantiated as \textbf{HSP-Agile} for SOFL/FSF, is the vehicle for those
+three ideas.
 
 On a 120-task precedence-sensitive benchmark, HSP-Agile reaches 90.4\% mean
 strict formal conformance (+6.2\,pp over one-shot LLM, +2.4\,pp over
 test-feedback).
-The advantage grows with guard overlap; SMT keeps boundary coverage where
-random sampling fails; the typed repair record alone accounts for +7.7\,pp
-over test-only prompts (E6).
+The advantage grows with guard overlap; the typed repair record alone accounts
+for +7.7\,pp over test-only prompts.
 The same loop transfers to Mini-Z and Mini-StateMachine with adapter-level
 changes.
 Tasks, logs, and scripts are released.

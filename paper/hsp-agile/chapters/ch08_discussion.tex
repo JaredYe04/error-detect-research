@@ -19,23 +19,21 @@ analysis is below.
 %=============================================================================
 
 \paragraph{Practical takeaway.}
-When ordered guard specifications already exist, an SMT-backed loop is worth
-the latency: the gain is largest where guards overlap, and acceptance is best
-treated as a CI bar with conformance as the primary quality signal.
+Remember three facts: SpecIR regions beat surface syntax; typed feedback
+beats raw tests; conjunctive acceptance beats high mean Conf.\ alone.
+When ordered guard specifications already exist, that loop is worth the
+latency---especially where guards overlap.
 
-The headline stands: M at \textbf{90.4\%} Conf.\ (+6.2\,pp over B1, +2.4\,pp
-over B2).
-Two mechanisms: Z3 witnesses hit ordering constraints that unit tests
-miss~\citep{barrett2018smt,demoura2008z3,zhu1997specification}; Semantic
-Feedback IR then names the violated scenario for the next
-call~\citep{solarlezama2008sketching,lynn2024verifierloop}.
+The headline stands: M at 90.4\% Conf.\ (+6.2\,pp over B1, +2.4\,pp over B2).
+Mapped to insights: E3/E4 support C1 (gap grows with overlap; SMT keeps
+boundary coverage); E6 supports C2 (+7.7\,pp for full Semantic Feedback IR);
+E1 Strict / E2 PDR--FAR support C3 (acceptance stays selective while
+prevention improves).
 
 B0's 27.5\% is difficulty calibration, not a production baseline.
-Ablations: A3 $-$6.3\,pp (no repair), A1 $-$3.9\,pp (no checker), A2
-$+$0.5\,pp on Conf.\ (pattern guard is a gate, not a conformance booster;
+Ablations: A3 $-$6.3\,pp (no repair / C2), A1 $-$3.9\,pp (no checker), A2
+$+$0.5\,pp on Conf.\ (pattern guard is a C3 gate, not a Conf.\ booster;
 Section~\ref{sec:disc:implications}).
-E3--E6 agree: overlap amplifies the gap; SMT keeps boundary coverage; the
-typed feedback record alone is \textbf{+7.7\,pp} over test-only prompts.
 
 
 %=============================================================================
