@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import hashlib
 import argparse
 import copy
 import json
@@ -22,7 +23,7 @@ from src.llm.ecnu_client import ECNUClient
 from src.mutation.injectors import apply_mutant_to_task, generate_mutants
 from src.pipeline.runner import ErrorPreventionPipeline, config_for_mode
 
-MODES = ["B0", "B1", "B2", "B3", "B4", "B5", "M", "A1", "A2", "A3"]
+MODES = ["B0", "B1", "B2", "B3", "B4", "B4M", "B5", "B6", "M", "M_lite", "M_adv", "A1", "A2", "A3"]
 SENSITIVITY_GRID = [
     {"temperature": 0.0, "max_attempts": 1},
     {"temperature": 0.2, "max_attempts": 3},
@@ -92,6 +93,7 @@ def _run_one_job(
     use_llm: bool,
     mutation_eval: bool,
     seed: int,
+    model: str | None = None,
 ) -> tuple[str, dict, str]:
     mode = job["mode"]
     rep = job["rep"]
@@ -103,6 +105,8 @@ def _run_one_job(
     cfg = config_for_mode(mode)
     cfg.temperature = params["temperature"]
     cfg.max_attempts = params["max_attempts"]
+    if model:
+        cfg.model = model
     cfg = copy.deepcopy(cfg)
     llm = ECNUClient(log_dir=Path(run_dir_str) / "llm_logs" / f"proc-{mode}-{rep}-{grid_idx}") if use_llm else None
     pipeline = ErrorPreventionPipeline(config=cfg, llm=llm)
@@ -165,6 +169,7 @@ def run_experiment(
     task_subset_path: Path | None = None,
     run_name: str | None = None,
     parallelism: int = 1,
+    model: str | None = None,
 ) -> Path:
     tasks = load_benchmark(benchmark_path, include_hard=False) if benchmark_path else load_benchmark()
     if task_subset_path:
@@ -225,6 +230,7 @@ def run_experiment(
                     use_llm=use_llm,
                     mutation_eval=mutation_eval,
                     seed=seed,
+                    model=model,
                 )
                 records.append(record)
                 writer.write(json.dumps(record, ensure_ascii=False) + "\n")
@@ -255,6 +261,7 @@ def run_experiment(
                         use_llm=use_llm,
                         mutation_eval=mutation_eval,
                         seed=seed,
+                        model=model,
                     )
                     for job in pending
                 ]
@@ -281,6 +288,11 @@ def run_experiment(
     finally:
         writer.close()
 
+    task_ids = sorted(t.get("taskId") or t.get("task_id", "") for t in tasks)
+    benchmark_fingerprint = hashlib.sha256(
+        json.dumps(task_ids, separators=(",", ":")).encode()
+    ).hexdigest()[:16]
+
     meta = {
         "modes": modes,
         "repeats": repeats,
@@ -290,6 +302,9 @@ def run_experiment(
         "parallelism": parallelism,
         "benchmark_path": str(benchmark_path) if benchmark_path else None,
         "task_subset_path": str(task_subset_path) if task_subset_path else None,
+        "benchmark_fingerprint": benchmark_fingerprint,
+        "seed": seed,
+        "model": model,
         "completed": len(done_keys),
         "total": total,
     }
@@ -319,6 +334,8 @@ def main() -> None:
     parser.add_argument("--quick", action="store_true", help="Fast smoke: B0,B1,M only, 1 repeat")
     parser.add_argument("--run-name", type=str, default=None, help="Reuse/append named run directory")
     parser.add_argument("--parallelism", type=int, default=10, help="Number of parallel workers")
+    parser.add_argument("--seed", type=int, default=42, help="Base RNG seed for mutation eval and run metadata")
+    parser.add_argument("--model", type=str, default=None, help="Override LLM model id (e.g. ecnu-plus, ecnu-max)")
     args = parser.parse_args()
 
     modes = args.modes
@@ -338,6 +355,8 @@ def main() -> None:
         sensitivity=args.sensitivity,
         run_name=args.run_name,
         parallelism=args.parallelism,
+        seed=args.seed,
+        model=args.model,
     )
     print(f"Results written to {run_dir}")
 

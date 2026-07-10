@@ -14,7 +14,11 @@ The question that drives this report is therefore practical:
 \emph{can specification-conformance defects in LLM-generated code be prevented
 by using the specification itself as the primary evidence source, without full
 deductive verification?}
-The answer developed below is affirmative.
+The answer developed below is that such prevention is \emph{feasible} when
+specification structure---especially dense guard overlap or conjunctive release
+requirements---warrants SMT witnesses and typed repair feedback; it is
+\emph{not} a universal substitute for test-feedback repair on sparse-overlap
+specifications (Chapters~\ref{ch:results}--\ref{ch:discussion}).
 The vehicle is the \textbf{Specification-guided Defect Prevention Framework}
 (\textsc{SgDP}), with \textbf{HSP-Agile} as its SOFL/FSF instantiation.
 
@@ -158,8 +162,8 @@ Chapter~\ref{ch:results} shows the ideas transfer with adapter-level changes.
 \section{Contributions}
 \label{sec:intro:contributions}
 
-Three insights---and only three---are what a reviewer should remember
-(Figure~\ref{fig:contribution-map}).
+Four insights---and the deployment rule that follows---are what a reviewer
+should remember (Figure~\ref{fig:contribution-map}).
 Adapters, SMT lowering, the hard benchmark, and PDR/FAR are necessary
 engineering; they support the claims but are not advertised as contributions.
 
@@ -180,27 +184,31 @@ engineering; they support the claims but are not advertised as contributions.
     of any one notation.
     SpecIR realises that insight; HSP-Agile is the SOFL/FSF instance.
 
-  \item[\textbf{C2.}] \textbf{Insight:} repair needs a \emph{typed scenario
+  \item[\textbf{C2.}] \textbf{Lead insight:} repair needs a \emph{typed scenario
     failure}, not raw pass/fail bits.
     The Semantic Feedback IR names the violated scenario, witness, and expected
-    output before any natural-language prompt is rendered.
+    output before any natural-language prompt is rendered
+    (+7.7\,pp over test-only feedback in E6).
 
   \item[\textbf{C3.}] \textbf{Insight:} release must be \emph{conjunctive}:
     every specification-derived witness matches \emph{and} no high-severity
     structural pattern remains.
     $\mathrm{Accept}(c,t)$ is that gate; high mean conformance alone is not
     release.
+
+  \item[\textbf{C4.}] \textbf{Deployment boundary:} practitioners should
+    match feedback depth to release requirements---test-feedback (B2) as the
+    default for mean conformance and latency; full HSP-Agile (M) when conjunctive
+    release or prevention (PDR/FAR) is required, with E6 typed IR as the
+    mechanism anchor (Table~\ref{tab:deployment-boundary}).
 \end{enumerate}
 
-On the 120-task hard benchmark these three ideas yield 90.4\% mean
-conformance (+6.2\,pp over one-shot LLM; Feedback IR alone +7.7\,pp in E6).
-M wins 6/120 paired tasks against test-feedback B2 ($\approx$5\%), but the
-aggregate M--B2 conformance gap is not significant after Holm correction
-($p{=}0.811$); claims are scoped to overlap-intensive specifications
-(Chapter~\ref{ch:discussion}).\footnote{Primary evaluation (E1) uses 120
-Z3-filtered synthetic tasks biased toward guard overlap; E10 samples uniformly
-without that filter; E8/E11 probe adapter and held-out external validity.
-Headline gains should not be read as universal LLM codegen superiority.}
+On the current 120-task hard benchmark, canonical E1 (seed~0) reports B1 at
+89.2\%, B2 at 87.7\%, and M at 86.3\%---gaps are not Holm-significant.
+E12-full (three seeds) is authoritative for ranking stability: B2 leads every
+seed (mean 88.0\% vs.\ M 86.0\%; Friedman $p{=}0.077$, B2 first every seed).\footnote{Prior E1 runs on a superseded
+86-task-overlapping corpus reported M at 90.4\%; all canonical numbers use
+\texttt{run\_e1\_canonical\_v1} on \texttt{benchmarks/tasks.json}.}
 Evaluation protocol details appear in Chapters~\ref{ch:experiments}
 and~\ref{ch:results}.
 
@@ -213,11 +221,15 @@ Results appear in \emph{mechanism-first} order in Chapter~\ref{ch:results}
 (why the framework works, then that it works overall); the numbering below
 follows the experimental logic of Chapter~\ref{ch:experiments}.
 
-\textbf{RQ1}---overall effectiveness of specification-guided prevention (E1, E2);
-\textbf{RQ2}---fault-class coverage and residual failure modes (E2, E7, E9);
-\textbf{RQ3}---component attribution via ablation and feedback variants (E1, E5, E6);
-\textbf{RQ4}---scaling across complexity dimensions (E3, E4);
-\textbf{RQ5}---quality--overhead trade-off (E1).
+\textbf{RQ1}---does typed Semantic Feedback IR improve repair beyond test-only
+feedback? (E6, A3);
+\textbf{RQ2}---does the M--baseline gap grow monotonically with guard-overlap
+density? (E3, E10);
+\textbf{RQ3}---does conjunctive $\mathrm{Accept}$ improve prevention vs.\
+mean conformance alone? (E2, A2 vs.\ M);
+\textbf{RQ4}---under what conditions should practitioners deploy M vs.\ B2?
+(E3, E10, E11, deployment boundary);
+\textbf{RQ5}---quality--overhead trade-off (E1 Pareto, A2 operating point).
 
 
 \section{Report Organisation}

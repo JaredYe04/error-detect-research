@@ -38,6 +38,7 @@ class PipelineConfig:
     enable_patterns: bool = True
     enable_repair: bool = True
     pattern_max_high: int = 0
+    pattern_guard_mode: str = "hard"  # hard | advisory (RF07/critical only blocks)
     formal_max_cases: int = 16
     strict_eval_cases: int = 64
     feedback_variant: str = ""  # test_only | test_expected | semantic_ir (E6)
@@ -68,6 +69,8 @@ def resolve_feedback_variant(cfg: PipelineConfig) -> str:
         return cfg.feedback_variant
     if cfg.mode == "B2":
         return "test_only"
+    if cfg.mode == "B4M":
+        return "execution_trace_matched"
     if cfg.enable_formal:
         return "semantic_ir"
     return "test_expected"
@@ -169,7 +172,39 @@ def config_for_mode(mode: str) -> PipelineConfig:
         cfg.thinking = False
         cfg.model = "ecnu-plus"
         cfg.feedback_variant = "semantic_ir"
+    elif mode == "M_adv":
+        cfg.enable_formal = True
+        cfg.enable_patterns = True
+        cfg.enable_repair = True
+        cfg.max_attempts = 3
+        cfg.formal_max_cases = 24
+        cfg.thinking = False
+        cfg.model = "ecnu-plus"
+        cfg.feedback_variant = "semantic_ir"
+        cfg.pattern_guard_mode = "advisory"
+    elif mode == "B4M":
+        cfg.enable_formal = False
+        cfg.enable_patterns = False
+        cfg.enable_repair = True
+        cfg.max_attempts = 3
+        cfg.formal_max_cases = 8
+        cfg.feedback_variant = "execution_trace_matched"
+    elif mode == "M_lite":
+        # Witness-guided repair + Semantic IR, no pattern guard (P1 reviewer ask)
+        cfg.enable_formal = True
+        cfg.enable_patterns = False
+        cfg.enable_repair = True
+        cfg.max_attempts = 3
+        cfg.formal_max_cases = 24
+        cfg.feedback_variant = "semantic_ir"
     return cfg
+
+
+def _blocking_pattern_violations(matches: list, cfg: PipelineConfig) -> int:
+    """Count pattern hits that block acceptance under the configured guard mode."""
+    if cfg.pattern_guard_mode == "advisory":
+        return sum(1 for m in matches if m.severity == "critical")
+    return sum(1 for m in matches if m.severity in {"high", "critical"})
 
 
 def build_prompt(task: dict[str, Any], feedback: str | None = None) -> list[dict[str, str]]:
@@ -261,14 +296,14 @@ class ErrorPreventionPipeline:
             last_formal = test_result if cfg.enable_formal else last_formal
 
             formal_ok = True if not cfg.enable_formal else test_result.passed
-            if cfg.mode in {"B2", "B3", "B4", "B5", "B6"}:
+            if cfg.mode in {"B2", "B3", "B4", "B4M", "B5", "B6"}:
                 formal_ok = test_result.passed
 
             pattern_ok = True
             if cfg.enable_patterns:
                 last_patterns = self.pattern_guard.check(code, task)
-                high = sum(1 for m in last_patterns if m.severity in {"high", "critical"})
-                pattern_ok = high <= cfg.pattern_max_high
+                blocking = _blocking_pattern_violations(last_patterns, cfg)
+                pattern_ok = blocking <= cfg.pattern_max_high
             else:
                 last_patterns = []
 
@@ -276,9 +311,9 @@ class ErrorPreventionPipeline:
                 "attempt": attempt,
                 "formal_conformance": test_result.conformance_rate,
                 "formal_passed": test_result.passed,
-                "pattern_violations": sum(
-                    1 for m in last_patterns if m.severity in {"high", "critical"}
-                ),
+                "pattern_violations": _blocking_pattern_violations(last_patterns, cfg)
+                if cfg.enable_patterns
+                else 0,
                 "feedback_variant": feedback_variant,
             }
 
@@ -289,7 +324,7 @@ class ErrorPreventionPipeline:
             if not cfg.enable_repair and cfg.mode not in {"B2", "B3", "B4", "B5", "B6"}:
                 attempt_history.append(attempt_entry)
                 break
-            if cfg.mode in {"B2", "B3", "B4", "B5", "B6"} and attempt >= cfg.max_attempts:
+            if cfg.mode in {"B2", "B3", "B4", "B4M", "B5", "B6"} and attempt >= cfg.max_attempts:
                 attempt_history.append(attempt_entry)
                 break
 
@@ -331,15 +366,15 @@ class ErrorPreventionPipeline:
             attempt_history.append(attempt_entry)
 
         formal_result = last_formal or run_formal_check(code, task, max_cases=cfg.formal_max_cases)
-        if cfg.mode in {"B2", "B3", "B4", "B5", "B6"}:
+        if cfg.mode in {"B2", "B3", "B4", "B4M", "B5", "B6"}:
             formal_result = run_formal_check(code, task, max_cases=cfg.formal_max_cases)
         pattern_matches = last_patterns if last_patterns else (
             self.pattern_guard.check(code, task) if cfg.enable_patterns else []
         )
-        high_violations = sum(1 for m in pattern_matches if m.severity in {"high", "critical"})
+        high_violations = _blocking_pattern_violations(pattern_matches, cfg)
 
         success = formal_result.passed
-        if cfg.mode in {"B2", "B3", "B4", "B5", "B6"}:
+        if cfg.mode in {"B2", "B3", "B4", "B4M", "B5", "B6"}:
             success = formal_result.passed
         if cfg.enable_patterns:
             success = success and high_violations <= cfg.pattern_max_high

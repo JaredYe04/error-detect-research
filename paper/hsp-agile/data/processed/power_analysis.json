@@ -2,16 +2,16 @@
   "n": 120,
   "comparisons": {
     "M_vs_B1": {
-      "cliffs_delta": 0.03576388888888889,
-      "wilcoxon_p": 0.009937802142708833,
-      "observed_power_approx": 0.05841837414661625,
-      "n_for_80pct_power": 6137
+      "cliffs_delta": -0.035694444444444445,
+      "wilcoxon_p": 0.05878172135535886,
+      "observed_power_approx": 0.058329685877815486,
+      "n_for_80pct_power": 6161
     },
     "M_vs_B2": {
-      "cliffs_delta": 0.00020833333333333335,
-      "wilcoxon_p": 0.12482245661031346,
-      "observed_power_approx": 0.025133680649943545,
-      "n_for_80pct_power": 180838190
+      "cliffs_delta": -0.014166666666666666,
+      "wilcoxon_p": 0.5886881339518899,
+      "observed_power_approx": 0.03555487647373478,
+      "n_for_80pct_power": 39109
     }
   }
 }

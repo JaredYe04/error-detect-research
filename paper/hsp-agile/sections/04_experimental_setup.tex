@@ -42,7 +42,10 @@ Tasks are annotated with three complexity metadata fields: (i)~\emph{overlap den
 (fraction of input space where multiple guards are simultaneously satisfiable);
 (ii)~\emph{guard complexity label} (Simple/AND/Nested/Arithmetic/Mixed);
 (iii)~\emph{scenario count}.
-The template baseline B0 scores 27.5\% strict success, confirming genuine difficulty.
+The template baseline B0 reaches 89.2\% mean formal conformance in one shot
+($\approx$0.2\,s per task) on canonical E1---matching B1 at seed~0 and
+confirming that strict success (5.0\% under conjunctive Accept) and
+prevention metrics, not aggregate mean Conf., discriminate modes on this slice.
 
 An additional 20--30 tasks derived from HumanEval and MBPP problems with multi-case
 conditional logic are converted to FSF-style ordered scenarios following a documented

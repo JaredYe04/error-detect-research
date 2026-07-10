@@ -3,39 +3,37 @@
 
 Ordered guard specifications say which scenario must fire first when several
 guards hold.
-Large language models rarely obey that rule: they look right on everyday
-inputs and fail on the thin overlaps that formal contracts are meant to pin
-down.
-Unit tests almost never sample those regions, so test-based repair leaves the
-defects in place.
+Large language models rarely obey that rule on thin overlap regions that
+formal contracts pin down; unit tests almost never sample those regions, so
+test-based repair leaves ordering defects in place.
 
-Three insights drive prevention.
-First, the check should depend on \emph{semantic regions} (first-match
-partitions), not on the surface syntax of any one notation---a shared
-intermediate form realises that idea.
-Second, repair needs a \emph{typed failure record} that names the violated
-scenario and witness, not raw pass/fail bits.
-Third, release must be \emph{conjunctive}: every witness matches \emph{and} no
-high-severity structural pattern remains.
-The \textbf{Specification-guided Defect Prevention Framework} (\textsc{SgDP}),
-instantiated as \textbf{HSP-Agile} for SOFL/FSF, is the vehicle for those
-three ideas.
+We present \textbf{deployment-aware specification-guided repair} via the
+\textsc{SgDP} framework, instantiated as \textbf{HSP-Agile} for SOFL/FSF.
+Three mechanisms address that gap: \emph{SpecIR} semantic regions (first-match
+partitions), a typed \emph{Semantic Feedback IR} for repair, and a
+\emph{conjunctive} release gate (full witness conformance $\wedge$ no
+high-severity structural pattern).
 
-On a 120-task overlap-intensive benchmark, HSP-Agile reaches 90.4\% mean
-formal conformance (+6.2\,pp over one-shot LLM).
-Against test-feedback (B2), the aggregate gap is modest and \emph{not
-significant} after Holm--Bonferroni correction ($p{=}0.811$); M wins 6/120
-paired tasks ($\approx$5\%), with the margin concentrating where guard regions
-overlap.
-Structured Semantic Feedback IR alone accounts for +7.7\,pp over test-only
-prompts (E6); conjunctive acceptance trades a lower strict-success rate
-(25.0\%) for fewer escaped defects.
-Extended self-refinement baselines (B3--B5, evaluated) and uniform random (E10)
-and external SOFL (E11) benchmarks bound external validity.
-The same loop transfers to Mini-Z and Mini-StateMachine with adapter-level
-changes.
+\textbf{Lead empirical result:} under identical repair budget $K{=}3$, full
+Semantic Feedback IR improves mean formal conformance by \textbf{+7.7\,pp}
+over test-only feedback (E6) on the same 120 tasks under a controlled
+feedback-variant comparison.
+We provide a \textbf{deployment boundary table} (C4): test-feedback B2 is the
+default on aggregate conformance and unfiltered corpora (E10: B2 89.1\% vs.\ M
+83.1\%; E12: B2 leads all seeds); full mode~M is warranted when conjunctive
+$\mathrm{Accept}$ or prevention (PDR/FAR) is required, not from overlap
+tertiles alone (canonical E3 is non-monotone).
+
+On the current 120-task hard benchmark (E1 canonical, seed~0), B1 reaches
+89.2\% mean conformance versus M at 86.3\%---single-repeat ranking is
+seed-sensitive; E12-full (120 tasks $\times$ 3 seeds) shows B2 leads every seed
+(M wins 4/120 on mean-across-seeds pairing; Friedman $p{=}0.077$; B2 ranks
+first on all three seeds).
+M vs.\ B2 on E1 canonical is not Holm-significant ($p{=}1.0$).
+Conjunctive acceptance yields 5.0\% strict success on current BENCH-120 but lower escaped defects
+(PDR 95.0\%, FAR 5.0\% vs.\ B2).
 Tasks, logs, and scripts are released.
 
 \paragraph{Keywords.}
-Specification-guided defect prevention; formal specification; LLM synthesis; SOFL;
-counterexample-guided repair; SMT verification; mutation testing.
+Specification-guided repair; ordered guard specifications; LLM synthesis; SOFL;
+counterexample-guided repair; SMT verification; deployment boundary.

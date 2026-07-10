@@ -1,0 +1,25 @@
+Ordered guard specifications (first-match semantics) partition the input
+domain into semantic regions; LLM-generated code often violates precedence on
+\emph{thin overlap} where several guards hold simultaneously---regions that
+random unit tests rarely sample~\citep{ammann2016testing}.
+
+We study \emph{when} specification-guided repair pays off, not whether one
+pipeline universally beats test feedback.
+\textbf{HSP-Agile} instantiates the \textsc{SgDP} framework for SOFL/FSF with:
+(i)~SpecIR overlap witnesses, (ii)~a typed \textbf{Semantic Feedback IR}, and
+(iii)~conjunctive $\mathrm{Accept}$ (full witness conformance $\wedge$ clear
+high-severity pattern screen).
+
+\textbf{Contributions.}
+\textbf{(C2)} Typed Semantic Feedback IR improves repair by \textbf{+7.7\,pp}
+over test-only feedback under controlled comparison (E6, $n{=}120$, $K{=}3$).
+\textbf{(C3)} Conjunctive release lowers escaped defects (PDR 95.0\%/FAR 5.0\%
+vs.\ B2 91.2\%/8.8\%).
+\textbf{(C4)} A \textbf{deployment boundary table} prescribes B2 by default and
+full M when conjunctive $\mathrm{Accept}$ or prevention metrics matter.
+
+We do \emph{not} claim M beats B2 on aggregate: canonical E1 reports B1
+89.2\%, B2 87.7\%, M 86.3\% (all Holm n.s.); E12-canonical shows B2 leads every
+seed (mean 88.0\% vs.\ M 86.0\%; Friedman $p{=}0.077$).
+The running example \texttt{classify\_signal} illustrates an ordering defect
+invisible to tests but repaired via typed IR.
