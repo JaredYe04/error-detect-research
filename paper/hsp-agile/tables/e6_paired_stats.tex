@@ -1,0 +1,19 @@
+% Auto-generated from e6_paired_summary.json — refresh via e6_paired_analysis.py
+\begin{table}[t]
+  \centering
+  \caption{E6 paired per-task statistics under full~M ($K{=}3$, $n{=}120$).
+    Bootstrap 95\% CI on mean paired $\Delta$Conf.\ ($B{=}5{,}000$, seed~42);
+    Wilcoxon signed-rank on nonzero paired deltas.}
+  \label{tab:e6-paired}
+  \footnotesize
+  \begin{tabular}{lcccc}
+    \toprule
+    Comparison & W/L/T & $\Delta$ (pp) & 95\% CI (pp) & Wilcoxon $p$ \\
+    \midrule
+    C (\texttt{semantic\_ir}) $-$ A (test-only)
+      & 14/4/102 & $+7.7$ & $[2.3,\,13.6]$ & $0.018$ \\
+    C $-$ B (test+expected)
+      & 14/4/102 & $+8.0$ & $[2.2,\,14.0]$ & $0.027$ \\
+    \bottomrule
+  \end{tabular}
+\end{table}

@@ -178,12 +178,19 @@ class FeedbackRenderer:
     @staticmethod
     def _render_execution_trace_matched(records: list[SemanticFeedback]) -> str:
         """E14: execution-trace surface with semantic fields for length-fair comparison."""
-        lines = ["Execution trace on failing witnesses (length-matched semantic detail):"]
+        lines = [
+            "Execution trace on failing witnesses (length-matched semantic detail):",
+            "Repair rules: keep first-match guard order; for each failing scenario below,",
+            "the function MUST return exactly the oracle expected dict on that witness.",
+        ]
         for r in records:
             lines.append(f"  Scenario {r.scenario_index}: guard ({r.constraint_text})")
             lines.append(f"    inputs={r.inputs}")
             lines.append(f"    execute → return {r.observed}")
             lines.append(f"    oracle expected={r.expected}")
+            field_diffs = _field_diffs(r.expected, r.observed)
+            if field_diffs:
+                lines.append(f"    field diffs: {field_diffs}")
             lines.append(f"    violation_type={r.violation_type}; reason: {r.reason}")
             if r.suggested_fix:
                 lines.append(f"    suggested_fix: {r.suggested_fix}")
@@ -306,6 +313,17 @@ class SemanticFeedbackIR:
         return cls([SemanticFeedback.from_json(d) for d in data])
 
 
+def _field_diffs(expected: dict[str, Any], observed: dict[str, Any]) -> dict[str, str]:
+    """Return per-key expected→observed diffs for repair prompts."""
+    diffs: dict[str, str] = {}
+    keys = sorted(set(expected.keys()) | set(observed.keys()))
+    for k in keys:
+        ev, ov = expected.get(k, "<missing>"), observed.get(k, "<missing>")
+        if ev != ov:
+            diffs[k] = f"{ov} → should be {ev}"
+    return diffs
+
+
 def _classify_violation(
     *,
     message: str,
@@ -315,17 +333,21 @@ def _classify_violation(
 ) -> tuple[str, str, str | None]:
     """Heuristic violation classifier for Semantic Feedback IR records."""
     msg = (message or "").lower()
+    diffs = _field_diffs(expected or {}, observed or {})
+    diff_hint = "; ".join(f"{k}: {v}" for k, v in list(diffs.items())[:6])
+    is_others = "others" in msg or scenario_index >= 8
     if "ordering" in msg or "precedence" in msg or "first-match" in msg:
         return (
             "ordering",
             f"Scenario {scenario_index} violated under first-match guard precedence.",
-            "reorder guard evaluation to match specification precedence",
+            "reorder guard evaluation to match specification precedence; "
+            "test higher-priority guards before lower ones",
         )
     if "boundary" in msg or "threshold" in msg or "off-by" in msg:
         return (
             "boundary",
             f"Boundary witness for scenario {scenario_index} exposed a threshold mismatch.",
-            "adjust boundary comparison to match guard threshold",
+            "adjust boundary comparison (< vs <=, > vs >=) to match the guard threshold",
         )
     if expected and observed and expected != observed:
         exp_keys = set(expected.keys())
@@ -336,22 +358,31 @@ def _classify_violation(
                 f"Scenario {scenario_index}: output field mismatch ({obs_keys} vs {exp_keys}).",
                 "return all required output fields for the active scenario",
             )
+        if is_others:
+            return (
+                "output",
+                f"Scenario {scenario_index} (others/default): observed {observed} != expected {expected}.",
+                f"fix the final else/others branch to return exactly {expected}"
+                + (f" ({diff_hint})" if diff_hint else ""),
+            )
         numeric_delta = any(
             isinstance(expected.get(k), (int, float))
             and isinstance(observed.get(k), (int, float))
-            and abs(float(expected[k]) - float(observed[k])) > 1
+            and abs(float(expected[k]) - float(observed[k])) >= 1
             for k in exp_keys
         )
         if numeric_delta:
             return (
                 "arithmetic",
-                f"Scenario {scenario_index}: arithmetic expression inconsistent with oracle.",
-                "correct the output expression for the active scenario",
+                f"Scenario {scenario_index}: arithmetic/output inconsistent with oracle "
+                f"({diff_hint or expected}).",
+                f"set outputs to exactly {expected} when this scenario's guard matches"
+                + (f" ({diff_hint})" if diff_hint else ""),
             )
         return (
             "output",
-            f"Scenario {scenario_index}: observed output differs from oracle.",
-            "align output assignment with the active scenario postcondition",
+            f"Scenario {scenario_index}: observed output differs from oracle ({diff_hint}).",
+            f"align the active scenario postcondition to return exactly {expected}",
         )
     return (
         "unknown",

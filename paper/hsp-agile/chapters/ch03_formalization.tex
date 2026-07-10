@@ -265,9 +265,9 @@ $\Pr[\mathbf{x} \in \mathcal{B}_\varepsilon(t)] =
 \mu(\mathcal{B}_\varepsilon(t))/\mu(\mathcal{X}_t)$ under uniform sampling---
 typically small when guard overlap is dense.
 The Constraint-guided Witness Generator produces one witness per strict
-scenario region via $\Phi_i$ (Equation~\eqref{eq:priority}); under sound
-encoding, each such witness activates scenario~$i$ with probability~$1$
-(Theorem~\ref{thm:witness-soundness}), lying on (or within numeric precision of)
+scenario region via $\Phi_i$ (Equation~\eqref{eq:priority}); under a faithful
+SMT encoding, each such witness activates scenario~$i$ with probability~$1$
+(Proposition~\ref{thm:witness-soundness}), lying on (or within numeric precision of)
 the boundary of~$g_i$.
 Random sampling therefore reaches precedence-critical regions with probability
 $\mathcal{O}(\varepsilon)$, whereas SMT achieves targeted boundary coverage
@@ -283,8 +283,8 @@ $\Pr[f_c(\mathbf{x})\neq g_t(\mathbf{x})]
 For SMT, satisfiability of $\Phi_i$ yields
 $g_i(\mathbf{x}_i^*)\land\bigwedge_{j<i}\neg g_j(\mathbf{x}_i^*)$, so
 $\mathbf{x}_i^*$ lies in the exclusive first-match region of~$s_i$ and
-activates that region with probability~$1$ under a sound encoding
-(Theorem~\ref{thm:witness-soundness}).
+activates that region with probability~$1$ under a faithful SMT encoding
+(Proposition~\ref{thm:witness-soundness}).
 Hence random sampling hits precedence-critical regions with probability
 $\mathcal{O}(\varepsilon)$, while SMT hits them deterministically.
 \end{proof}
@@ -435,17 +435,20 @@ perturbed: $\mathcal{M}^S$ mutates the task, $\mathcal{M}^I$ the candidate;
 $\mathrm{Faulty}(m)=1$ when the pair is genuinely faulty.
 \end{definition}
 
-PDR is recall-like (of all mutants, how many does the pipeline refuse?);
-FAR is precision-like (of genuinely faulty mutants, how many still slip
-through $\mathrm{Accept}$?)~\citep{okun2013sate4}.
+Let $\mathcal{M}^F = \{m \in \mathcal{M} : \mathrm{Faulty}(m)=1\}$ be the
+faulty-mutant subset.
+Both prevention metrics use $|\mathcal{M}^F|$ as denominator:
+PDR is the fraction of faulty mutants correctly rejected;
+FAR is the escape rate among faulty mutants (false-accept rate),
+\emph{not} a precision analogue~\citep{okun2013sate4}.
 
 \begin{definition}[Prevention Detection Rate]
 \label{def:pdr}
 \[
   \mathrm{PDR}
   \;=\;
-  \frac{\bigl|\bigl\{m \in \mathcal{M} : \neg\,\mathrm{Accept}(c_m,\,t_m)\bigr\}\bigr|}
-       {|\mathcal{M}|}.
+  \frac{\bigl|\bigl\{m \in \mathcal{M}^F : \neg\,\mathrm{Accept}(c_m,\,t_m)\bigr\}\bigr|}
+       {|\mathcal{M}^F|}.
 \]
 \end{definition}
 
@@ -454,13 +457,14 @@ through $\mathrm{Accept}$?)~\citep{okun2013sate4}.
 \[
   \mathrm{FAR}
   \;=\;
-  \frac{\bigl|\bigl\{m \in \mathcal{M} :
+  \frac{\bigl|\bigl\{m \in \mathcal{M}^F :
       \mathrm{Accept}(c_m,\,t_m) = 1
-      \;\land\; \mathrm{Faulty}(m) = 1
     \bigr\}\bigr|}
-       {|\mathcal{M}|}.
+       {|\mathcal{M}^F|}.
 \]
 \end{definition}
+
+On a fixed faulty-mutant set, $\mathrm{PDR}+\mathrm{FAR}=1$.
 
 \begin{definition}[Mutation Kill Rate]
 \label{def:mkr}

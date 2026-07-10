@@ -1,33 +1,17 @@
 \textbf{Benchmark.}
-BENCH-120 is a synthetic \emph{hard} corpus (\texttt{benchmarks/tasks.json},
-overlap-filtered stress-test; fingerprint \texttt{322157816b37c34e}).
-Mitigations: E10 (100 uniform random tasks), E11 (22-task external SOFL
-corpus), E8c (HumanEval/MBPP FSF adapters).
+BENCH-120: synthetic hard FSF tasks (5 inputs, 8 ordered scenarios) retained by
+a Z3 overlap filter; E10 removes the filter ($n{=}100$) as a negative control.
+Primary LLM: \texttt{ecnu-plus} (Qwen-family); secondary endpoints in the
+cross-model subsection.
 
-\textbf{Modes (main text).}
-B1 one-shot; B2 test-feedback ($K{=}3$); M full \textsc{SgDP};
-A1 no formal checker; A3 no repair loop.
-B3--B5 (Self-Refine / Self-Debug / Reflexion-lite) and B6 (VerifierLoop-FSF)
-appear in the supplementary material; A2 (no pattern guard) is cited for
-ablation deltas only.
-
-\textbf{Model.}
-Qwen2.5-27B-Instruct~\citep{yang2024qwen25} ($T_{\mathrm{gen}}{=}0.7$,
-$T_{\mathrm{repair}}{=}0$).
-E16-canonical replicates 120 tasks with \texttt{ecnu-max} (all modes 89.2\%;
-no ranking reversal).
+\textbf{Modes.}
+B1 one-shot; B2 test-feedback ($K{=}3$); M full loop.
+E6 holds mode~M fixed and sweeps feedback content at $K{=}3$.
+Fixed-oracle stress-tests use strengthened~M ($K{=}5$ bundle); Conf.\ ranking
+claims that require equal~$K$ use \texttt{M\_eq} ($K{=}3$).
 
 \textbf{Metrics.}
-Mean formal conformance (Conf.); Strict success under conjunctive
-$\mathrm{Accept}$; prevention PDR/FAR (E2); wall-clock latency.
-
-\textbf{Statistics.}
-Paired Wilcoxon tests with Holm correction on per-task metrics; Friedman
-test across E12 seeds for ranking stability.
-Canonical runs: \texttt{run\_e1\_canonical\_v1},
-\texttt{run\_e12\_canonical\_v1}.
-
-\textbf{Power.}
-Post-hoc: $n{=}120$ is under-powered for M vs.\ B2 aggregate Conf.\
-($|\delta|{=}0.014$, observed power ${\approx}3.6\%$); we foreground E6
-mechanism evidence and the deployment boundary over aggregate ranking.
+Mean formal Conf.; Strict / $\mathrm{Accept}$; PDR/FAR on mutants; latency and
+LLM calls.
+Threats preview: synthetic construction, LLM non-determinism
+($T_\text{repair}{=}0$), model headroom dependence.

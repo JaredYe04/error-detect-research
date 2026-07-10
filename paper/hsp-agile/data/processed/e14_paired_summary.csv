@@ -1,0 +1,5 @@
+metric,focal,comparator,n_paired,wins,losses,ties,mean_focal,mean_comparator,delta_pp,mean_delta
+mean_conf,semantic_ir,execution_trace_matched,120,5,19,96,0.751140873015873,0.854265873015873,-10.312500000000002,-0.103125
+mean_conf,semantic_ir,test_only,120,18,16,86,0.751140873015873,0.7379464285714286,1.3194444444444398,0.013194444444444444
+strict_conf,semantic_ir,execution_trace_matched,120,1,0,119,0.05,0.041666666666666664,0.8333333333333338,0.008333333333333333
+strict_conf,semantic_ir,test_only,120,0,0,120,0.05,0.05,0.0,0.0

@@ -1,12 +1,31 @@
-\begin{table}[t]
-\caption{Statistical test summary for E1 (120-task hard benchmark, repeat~0). Wilcoxon signed-rank for per-task strict success and conformance; Mann--Whitney~U for latency. Holm--Bonferroni correction within each metric family. Cliff's $\delta$: positive favours the first mode in each pair.}
-\label{tab:stats}
-\centering
-\small
-\begin{tabular}{lccc}
+\footnotesize
+\begin{longtable}{lccc}
+\caption{Statistical test summary for \emph{pre-fix} multi-mode E1
+  (\texttt{run\_e1\_canonical\_v1} / hard\_full; 120-task hard benchmark,
+  repeat~0).
+  Wilcoxon signed-rank for per-task strict success and conformance;
+  Mann--Whitney~U for latency.
+  Holm--Bonferroni correction within each metric family.
+  Cliff's $\delta$: positive favours the first mode in each pair.
+  \emph{Note:} this Holm table applies only to the pre-fix multi-mode
+  corpus; fixed-oracle E1 (\texttt{run\_e1\_m\_win\_v2}) reports M vs.\ B2
+  as win rate and means only (2/120 wins, ${+}1.7$\,pp) and asserts
+  \emph{no} Holm claim.}
+\label{tab:stats} \\
 \toprule
 Comparison & $p$ (Holm) & Significant ($\alpha{=}0.05$) & Cliff's $\delta$ / ratio \\
 \midrule
+\endfirsthead
+\multicolumn{4}{c}{\tablename~\thetable{} --- \textit{continued from previous page}} \\
+\toprule
+Comparison & $p$ (Holm) & Significant ($\alpha{=}0.05$) & Cliff's $\delta$ / ratio \\
+\midrule
+\endhead
+\midrule
+\multicolumn{4}{r}{\textit{Continued on next page}} \\
+\endfoot
+\bottomrule
+\endlastfoot
 \multicolumn{4}{l}{\textit{Primary comparisons}} \\
 \addlinespace
 \texttt{M} vs \texttt{B1} (strict success) & 1.0000 & No & +0.0000 \\
@@ -62,6 +81,5 @@ Comparison & $p$ (Holm) & Significant ($\alpha{=}0.05$) & Cliff's $\delta$ / rat
 \texttt{M} vs \texttt{B0} (strict) & 1.0000 & No & +0.0000 \\
 \texttt{M} vs \texttt{B1} (strict) & 1.0000 & No & +0.0000 \\
 \texttt{M} vs \texttt{B2} (strict) & 1.0000 & No & +0.0000 \\
-\bottomrule
-\end{tabular}
-\end{table}
+\end{longtable}
+\normalsize

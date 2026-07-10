@@ -132,7 +132,7 @@ Full verification is impractical for unannotated LLM output
 What is needed is calibrated prevention: stronger than test-feedback
 \cite{chen2021codex}, weaker than deductive proof, and fast enough for sprint
 budgets \citep{beck2001xp,li2022qrs_companion}---a conjunctive gate under
-hard budget~$K$ ($K=3$ in the experiments).
+hard budget~$K$ ($K{=}5$ for strengthened mode~M; $K{=}3$ in controlled E6).
 
 
 \section{Proposed Approach}
@@ -179,38 +179,54 @@ engineering; they support the claims but are not advertised as contributions.
 \end{figure}
 
 \begin{enumerate}
-  \item[\textbf{C1.}] \textbf{Insight:} prevention should depend on
-    \emph{semantic regions} (first-match partitions), not on the surface syntax
-    of any one notation.
-    SpecIR realises that insight; HSP-Agile is the SOFL/FSF instance.
+  \item[\textbf{C1.}] \textbf{Engineering hinge:} prevention should depend on
+    \emph{semantic regions} (first-match partitions), not surface syntax.
+    SpecIR realises that hinge; HSP-Agile is the SOFL/FSF instance.
+    Overlap tertiles on canonical E3 are \emph{non-monotone}---C1 does
+    \emph{not} claim that the M--B2 gap grows with overlap density.
 
   \item[\textbf{C2.}] \textbf{Lead insight:} repair needs a \emph{typed scenario
     failure}, not raw pass/fail bits.
     The Semantic Feedback IR names the violated scenario, witness, and expected
-    output before any natural-language prompt is rendered
-    (+7.7\,pp vs.\ test-only under controlled E6; not vs.\ every structured
-    trace---E14 length-matched \texttt{execution\_trace} can exceed bare
-    \texttt{semantic\_ir}).
+    output before any natural-language prompt is rendered.
+    \textbf{Primary causal evidence} is E6 (feedback content isolated under
+    full~M, equal $K{=}3$): +7.7\,pp vs.\ unstructured test-only
+    (paired 14/4/102; 95\% CI $[2.3,\,13.6]$\,pp; Wilcoxon $p{=}0.018$)---
+    \emph{not} a claim that typed IR uniquely beats every structured trace.
+    E14 length-matched \texttt{execution\_trace\_matched} exceeds bare
+    \texttt{semantic\_ir} on mean Conf.\ (85.4\% vs.\ 75.1\%; paired 5/19/96).
+    Fixed-oracle E1 M vs.\ B2 is a deployment \emph{bundle} ($K{=}5$), not
+    single-factor C2.
 
   \item[\textbf{C3.}] \textbf{Insight:} release must be \emph{conjunctive}:
     every specification-derived witness matches \emph{and} no high-severity
     structural pattern remains.
     $\mathrm{Accept}(c,t)$ is that gate; high mean conformance alone is not
     release.
+    Pattern-guard value is measured by E2 PDR/FAR (and E17 advisory), not by
+    mean-Conf.\ ablation under an advisory gate.
 
-  \item[\textbf{C4.}] \textbf{Deployment boundary:} practitioners should
-    match feedback depth to release requirements---test-feedback (B2) as the
-    default for mean conformance and latency; full HSP-Agile (M) when conjunctive
-    release or prevention (PDR/FAR) is required, with E6 typed IR as the
-    mechanism anchor (Table~\ref{tab:deployment-boundary}).
+  \item[\textbf{C4.}] \textbf{Deployment boundary:} prefer test-feedback (B2)
+    by default for mean conformance and latency; escalate to full HSP-Agile (M)
+    \emph{iff} release requires $\mathrm{Accept}{=}1$ or target FAR${\le}5\%$
+    (Table~\ref{tab:deployment-boundary})---not from overlap tertiles alone.
 \end{enumerate}
 
-On the current 120-task hard benchmark, canonical E1 (seed~0) reports B1 at
-89.2\%, B2 at 87.7\%, and M at 86.3\%---gaps are not Holm-significant.
-E12-full (three seeds) is authoritative for ranking stability: B2 leads every
-seed (mean 88.0\% vs.\ M 86.0\%; Friedman $p{=}0.077$, B2 first every seed).\footnote{Prior E1 runs on a superseded
-86-task-overlapping corpus reported M at 90.4\%; all canonical numbers use
-\texttt{run\_e1\_canonical\_v1} on \texttt{benchmarks/tasks.json}.}
+The primary evidence for C2--C4 is controlled E6 (+7.7\,pp; CI excludes zero),
+E2 prevention (M PDR 95.0\% / FAR 5.0\% vs.\ B2; bootstrap CIs exclude zero),
+and the deployment boundary in
+Table~\ref{tab:deployment-boundary}---not fixed-oracle aggregate Conf.
+As a secondary near-ceiling stress-test under strengthened mode~M ($K{=}5$,
+etc.) and the fixed first-match others-witness oracle
+(\texttt{run\_e1\_m\_win\_v2}), E1 reports B1 84.2\%, B2 98.3\%, M 100.0\%
+mean Conf.\ / Strict (M vs.\ B2 ${+}1.7$\,pp; wins 2/120, losses~0,
+ties~118)---a stress-test aggregate, not the contribution headline.\footnote{A
+prior others-witness bug (others encoded as True without $\neg$prior guards)
+inflated false failures (${\approx}5\%$ Strict / ${\approx}86$--$89\%$ Conf.\
+on \texttt{run\_e1\_canonical\_v1}); fixing first-match others witnesses is a
+measurement correction, not a hidden quality claim.
+Fixed-oracle E10: M ${+}1.0$\,pp near ceiling; E12: B2 100.0\% / M 99.7\%
+(B2 first every seed---do not claim M dominates all seeds).}
 Evaluation protocol details appear in Chapters~\ref{ch:experiments}
 and~\ref{ch:results}.
 
@@ -219,9 +235,10 @@ and~\ref{ch:results}.
 \label{sec:intro:rq}
 
 Five research questions organise the evaluation.
-Results appear in \emph{mechanism-first} order in Chapter~\ref{ch:results}
-(why the framework works, then that it works overall); the numbering below
-follows the experimental logic of Chapter~\ref{ch:experiments}.
+The same \emph{mechanism-first} numbering is used in
+Chapters~\ref{ch:experiments} and~\ref{ch:results}
+(typed feedback and overlap structure first; aggregate E1 ranking is an
+RQ5 stress-test, not a universal-effectiveness headline).
 
 \textbf{RQ1}---does typed Semantic Feedback IR improve repair beyond test-only
 feedback? (E6, A3);
@@ -230,7 +247,7 @@ density? (E3, E10);
 \textbf{RQ3}---does conjunctive $\mathrm{Accept}$ improve prevention vs.\
 mean conformance alone? (E2, A2 vs.\ M);
 \textbf{RQ4}---under what conditions should practitioners deploy M vs.\ B2?
-(E3, E10, E11, deployment boundary);
+(E3, E10, E11, E8c; deployment boundary);
 \textbf{RQ5}---quality--overhead trade-off (E1 Pareto, A2 operating point).
 
 

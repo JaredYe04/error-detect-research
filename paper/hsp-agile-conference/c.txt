@@ -1,0 +1,24 @@
+Deployment-Aware Specification-Guided Repair
+for Ordered Guard Specifications
+Y e Xujun
+East China Normal University
+Shanghai, China
+Abstract—Ordered guard specifications enforce first-match
+precedence; large language models (LLMs) and test-feedback
+repair miss thin overlap regions that formal contracts pin down.
+We present SGDP, instantiated as HSP-Agile for SOFL/FSF,
+with three mechanisms: SpecIR first-match regions, a typed
+Semantic Feedback IR for repair, and a conjunctive release
+gate. Lead claim (C2): under equal repair budget 𝐾=3, full
+Semantic Feedback IR improves mean formal conformance by
++7.7 pp vs. unstructured test-only (E6, 𝑛=120; paired 14/4/102;
+bootstrap 95% CI [2.3, 13.6] pp; Wilcoxon 𝑝=0.018)—scoped
+to test-only, not every structured trace (E14). Prevention (C3):
+conjunctive Accept yields E2 PDR/FAR 95.0%/5.0% vs. B2
+91.2%/8.8% (bootstrap CI excludes 0). Deploy B2 by default
+(C4) unless Accept=1 or FAR ≤5% is required. Equal- 𝐾 M_eq
+reaches +2.5 pp vs. B2; industrial-pattern ( 𝑛=31) and published-
+industrial ( 𝑛=10) pilots support B2 as the mean-Conf. default.
+Vendor .asfl import is supported when SpecTool/NDA packs
+land under vendor/.
+Index Terms —specification-

@@ -1,61 +1,773 @@
-\documentclass[10pt,twocolumn]{article}
-\usepackage[margin=0.75in]{geometry}
-\usepackage{times}
+\documentclass[10pt,conference]{IEEEtran}
+\IEEEoverridecommandlockouts
+\usepackage{cite}
+\usepackage{amsmath,amssymb,amsfonts}
 \usepackage{graphicx}
 \usepackage{booktabs}
-\usepackage{amsmath,amssymb}
-\usepackage{hyperref}
+\usepackage{newtxtext,newtxmath}
+\usepackage[hyphens]{url}
 \usepackage{microtype}
+\usepackage{balance}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{multirow}
+\usepackage{enumitem}
+\usepackage{algorithm}
+\usepackage{algpseudocode}
+\usepackage{hyperref}
+% IEEE-like lists: hanging indent, modest spacing (avoid leftmargin=*)
+\setlist[itemize]{
+  leftmargin=1.6em,
+  itemindent=0pt,
+  labelsep=0.4em,
+  itemsep=0.35em,
+  parsep=0pt,
+  topsep=0.4em,
+  partopsep=0pt
+}
+\setlist[enumerate]{
+  leftmargin=1.6em,
+  itemindent=0pt,
+  labelsep=0.4em,
+  itemsep=0.35em,
+  parsep=0pt,
+  topsep=0.4em,
+  partopsep=0pt
+}
+\lstset{basicstyle=\ttfamily\footnotesize,breaklines=true,frame=single,columns=fullflexible}
+% Unnumbered run-in heads (IEEEtran \paragraph becomes a)/b)/c)/...)
+\newcommand{\runin}[1]{\medskip\noindent\textbf{#1}\enspace}
 
-\title{Deployment-Aware Specification-Guided Repair\\for Ordered Guard Specifications}
-\author{Anonymous Authors}
-\date{}
+\title{Deployment-Aware Specification-Guided Repair\\
+for Ordered Guard Specifications}
+\author{
+\IEEEauthorblockN{Ye Xujun}
+\IEEEauthorblockA{East China Normal University\\
+Shanghai, China}
+% Double-blind: swap to Anonymous Authors / Anonymous Institution.
+}
 
 \begin{document}
 \maketitle
 
 \begin{abstract}
-Ordered guard specifications require first-match precedence; LLMs and
-test-feedback repair miss thin overlap regions.
-We present \textsc{SgDP}/HSP-Agile with SpecIR regions, typed Semantic Feedback
-IR (\textbf{+7.7\,pp} over unstructured test-only under~M on \texttt{ecnu-plus},
-E6; E14: \texttt{semantic\_ir} 75.1\% vs.\ \texttt{execution\_trace\_matched}
-85.4\%; \texttt{ecnu-max}/n1n show headroom-dependent $\Delta$),
-and conjunctive release (E2: M PDR 95.0\%\,/\,FAR 5.0\% vs.\ B2 91.2\%\,/\,8.8\%;
-bootstrap CI excludes 0).
-\textbf{Deploy B2 by default;} use full~M when conjunctive $\mathrm{Accept}$
-or prevention (PDR/FAR) is required.
-On industrial-pattern SOFL ($n{=}31$), B2 reaches 100\% Conf.\ under gpt-4o and
-Claude.
-Canonical E1 (seed~0): B1 89.2\%, B2 87.7\%, M 86.3\% (all Holm n.s.; Strict
-5.0\%; 46.2\,s vs.\ 13.9\,s).
-E12-full (\texttt{run\_e12\_canonical\_v1}): B2 leads every seed (mean 88.0\%
-vs.\ M 86.0\%; 4/120 wins; Friedman $p{=}0.077$).
+Ordered guard specifications enforce first-match precedence; large language
+models (LLMs) and test-feedback repair miss thin overlap regions that formal
+contracts pin down.
+We present \textsc{SgDP}, instantiated as HSP-Agile for SOFL/FSF, with three
+mechanisms: SpecIR first-match regions, a typed Semantic Feedback IR for
+repair, and a conjunctive release gate.
+\textbf{Lead claim (C2):} under equal repair budget $K{=}3$, full Semantic
+Feedback IR improves mean formal conformance by \textbf{+7.7\,pp} vs.\
+unstructured test-only (E6, $n{=}120$; paired 14/4/102; bootstrap 95\% CI
+$[2.3,\,13.6]$\,pp; Wilcoxon $p{=}0.018$)---scoped to test-only, not every
+structured trace (E14).
+\textbf{Prevention (C3):} conjunctive Accept yields E2 PDR/FAR 95.0\%/5.0\%
+vs.\ B2 91.2\%/8.8\% (bootstrap CI excludes~0).
+\textbf{Deploy B2 by default (C4)} unless $\mathrm{Accept}{=}1$ or
+FAR${\le}5\%$ is required.
+Equal-$K$ \texttt{M\_eq} reaches ${+}2.5$\,pp vs.\ B2; industrial-pattern
+($n{=}31$) and published-industrial ($n{=}10$) pilots support B2 as the
+mean-Conf.\ default.
+Vendor \texttt{.asfl} import is supported when SpecTool/NDA packs land under
+\texttt{vendor/}.
 \end{abstract}
 
+\begin{IEEEkeywords}
+specification-guided repair, ordered guards, LLM synthesis, SOFL, CEGIS, SMT,
+deployment boundary, industrial pilot
+\end{IEEEkeywords}
+
+%======================================================================
 \section{Introduction}
-\input{../hsp-agile/sections/conference/intro_stub.tex}
+%======================================================================
+Formal specifications buy precision that informal prose cannot match, but that
+precision becomes a liability when LLMs write the implementation: the model has
+no native notion of guard order, so it produces code that is statistically
+plausible yet formally wrong on thin overlap slices~\cite{chen2021codex,dakhel2023copilot}.
+SOFL's Functional Specification Format (FSF) is an ordered list of scenarios
+under first-match precedence~\cite{liu1998sofl,liu2004soflbook,li2022qrs_companion}.
+Unit tests almost never sample the region
+$G_i\wedge\bigwedge_{j<i}\neg G_j$, so test-based repair leaves ordering
+defects in place~\cite{zhu1997specification,ammann2016testing}.
+The practical stakes are high in signalling and finance: a route-lock that
+ignores conflict, or a fraud-hold that loses to a transfer path, is a
+conformance failure even when most random tests pass.
 
+\runin{Motivating example.}
+Consider an industrial monitoring alert: negative sensor levels must raise
+\texttt{Error} before any threshold-based \texttt{Critical} path can fire.
+On input $(\mathit{level},\mathit{threshold})=(-3,-10)$, both $G_1$
+(\texttt{level < 0}) and $G_2$ (\texttt{level >= threshold}) hold; FSF
+mandates \texttt{Error} via~$S_1$.
+A typical LLM candidate evaluates the threshold comparison first and returns
+\texttt{Critical}---invisible to suites that draw non-negative thresholds.
+The same pattern appears in published railway SOFL cases: fault and conflict
+guards must preempt route-lock or gate-motion commands~\cite{liu1998railwaycrossing,luo2017railway}.
+Our pipeline turns that failure into a typed repair record naming the violated
+scenario, then re-synthesises until witnesses agree or the budget is exhausted.
+
+\runin{Research question.}
+Can specification-conformance defects in LLM-generated code be prevented by
+using the specification itself as the primary evidence source, without full
+deductive verification?
+Our answer is \emph{conditional}: yes when release requires conjunctive Accept
+or prevention metrics; otherwise prefer lightweight test-feedback.
+We therefore separate \emph{mechanism} claims (typed feedback, Accept gate)
+from a \emph{deployment} claim (when to pay for them).
+This separation is the difference between a tool paper that always recommends
+the heaviest loop and a deployment-aware method that matches cost to the
+release bar.
+
+\runin{Threats this paper confronts up front.}
+(1)~Synthetic hard FSF (BENCH-120) is overlap-filtered---we bound transfer with
+E10, industrial-pattern, and published-industrial pilots.
+(2)~Strengthened E1 uses $K{=}5$ and a multi-factor bundle---we isolate equal-$K$
+Conf.\ via \texttt{M\_eq} and lead Conf.\ mechanism via E6.
+(3)~No public Casco/Mitsubishi \texttt{.asfl} dumps exist; we reconstruct
+published industrial decision tables and provide a vendor import path for
+SpecTool/NDA packs.
+
+\runin{Contributions.}
+\begin{itemize}
+  \item \textbf{C1---SpecIR:} notation-agnostic first-match regions
+    (engineering hinge; overlap tertiles on E3/E10 are
+    \emph{non-monotone}---not a ranking signal alone).
+  \item \textbf{C2---Typed Semantic Feedback IR:} ${+}7.7$\,pp vs.\
+    unstructured test-only under equal $K{=}3$ (E6; CI excludes~0; E14
+    scopes uniqueness).
+  \item \textbf{C3---Conjunctive Accept:} full witness conformance
+    $\wedge$ clear high-severity pattern screen (E2 PDR/FAR).
+  \item \textbf{C4---Deployment boundary:} prefer B2 by default; escalate
+    to~M iff $\mathrm{Accept}{=}1$ or target FAR${\le}5\%$; pilots reinforce
+    the default.
+\end{itemize}
+
+\runin{Paper map.}
+Section~II positions related systems; Section~III details SpecIR, Feedback IR,
+and Accept; Section~IV fixes corpora and protocol hygiene; Section~V reports
+E6/E2/equal-$K$/pilots; Section~VI discusses practice and threats.
+A companion long report carries full ablations (E14--E17), B3--B6 baselines,
+and figure packs; this cut keeps only numbers needed for C1--C4.
+
+%======================================================================
 \section{Related Work}
-\input{../hsp-agile/sections/conference/related_stub.tex}
+%======================================================================
+Closest LLM+verifier systems differ on whether witnesses respect first-match
+order, whether repair carries scenario structure, and whether prevention
+(PDR/FAR) is measured (Table~\ref{tab:rw}).
 
+\runin{Proof-oriented oracles.}
+DafnyBench and Clover target proof-oriented
+oracles~\cite{loughman2024dafnybench,sun2024clover}; success is theorem
+discharge, not first-match region coverage.
+Our Conf.\ metric is witness agreement under SpecIR, not a proof certificate.
+CEGIS-style loops with SMT counterexamples are closer in spirit, but typically
+target synthesis of loop invariants or programs from logical specs rather than
+ordered-guard FSF with typed repair records.
+
+\runin{Verbal and agentic repair.}
+Self-Refine, Self-Debug, and Reflexion raise generation success via critique or
+verbal memory~\cite{madaan2023selfrefine,chen2023selfdebug,shinn2023reflexion}
+but do not emit region-typed failure records.
+CodeT and coding agents optimise repository tasks without an FSF
+oracle~\cite{chen2022codet,wang2024opendevin,yang2024sweagent}.
+LLM-based APR patches failing tests~\cite{xia2023chatrepair,jiang2023impact};
+we evaluate unstructured test feedback as B2 and isolate typed IR in E6.
+Break-It-Fix-It emphasises natural-language repair
+datasets~\cite{yasunaga2021breakitfix}; our residual defects are ordering /
+overlap, not syntax.
+
+\runin{Adjacent notations.}
+Alloy and TLA+ encode structured
+constraints~\cite{jackson2002alloy,lamport2002tla}; SpecIR adapters are the
+intended bridge when guards are first-match and SMT-encodable.
+SOFL itself has a long industrial and teaching
+lineage~\cite{liu1998sofl,liu2004soflbook,li2022qrs_companion}; we reuse that
+contract shape rather than inventing a new specification language.
+
+\runin{Industrial SOFL.}
+Railway interlocking at Casco Signal~\cite{luo2017railway} and crossing
+controllers with Mitsubishi~\cite{liu1998railwaycrossing} motivate ordered-guard
+contracts but do not release public \texttt{.asfl} dumps.
+Teaching cases (ATM, hotel, banking) appear in Liu's SOFL
+book~\cite{liu2004soflbook}; Agile-SOFL SpecTool demos are available only via
+author collaboration~\cite{liu1998sofl}.
+Related SOFL fault-prevention work studies specification-to-program
+transformation defects~\cite{li2023iet_faultprevention,li2022qrs_companion};
+we target LLM repair under an executable SpecIR oracle instead.
+Broader formal-methods surveys and mutation testing
+background~\cite{woodcock2009formalsurvey,demillo1978mutation,leino2010dafny}
+frame why witness-based Conf.\ is a pragmatic middle ground between unit tests
+and full proofs.
+\textsc{SgDP} combines first-match SMT witnesses, typed Semantic Feedback IR,
+and conjunctive Accept under PDR/FAR.
+We evaluate verbal/trace loops as B3--B5 and verifier-loop FSF as B6 in the
+long report; the conference cut focuses on B1/B2/M and E6/E2.
+
+\begin{table}[t]
+\centering
+\caption{Positioning (tick = design goal).}
+\label{tab:rw}
+\footnotesize
+\begin{tabular}{@{}lcccc@{}}
+\toprule
+Approach & Spec wit. & Typed IR & Prev. & Gate \\
+\midrule
+Clover / DafnyBench & partial & --- & --- & proof \\
+Self-Debug / Reflexion & --- & --- & --- & --- \\
+ChatRepair / APR & --- & --- & --- & tests \\
+B2 test-feedback & --- & --- & --- & tests \\
+B6 VerifierLoop-FSF & \checkmark & --- & --- & cex \\
+\textbf{SgDP / M} & \checkmark & \checkmark & \checkmark & Accept \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+%======================================================================
 \section{Approach}
-\input{../hsp-agile/sections/conference/approach_stub.tex}
+%======================================================================
+\subsection{SpecIR and first-match witnesses}
+For task $t$ with ordered scenarios $\langle s_1,\ldots,s_n\rangle$, SpecIR
+exposes first-match regions as a shared hinge across notations (SOFL/FSF,
+Mini-Z, Mini-StateMachine adapters).
+Each scenario $s_i=(G_i,P_i)$ pairs a guard with a postcondition; FSF selects
+the least $i$ with $G_i(\mathbf{x})$ and requires $P_i(\mathbf{x},\mathbf{y})$.
+For scenario $s_i$, the witness generator solves
+\begin{equation}
+  \Phi_i \;\triangleq\; \hat{g}_i(\mathbf{x})
+  \;\land\; \bigwedge_{j<i}\lnot\hat{g}_j(\mathbf{x})
+\end{equation}
+with Z3~\cite{demoura2008z3,barrett2018smt}, yielding suite $\mathcal{D}(t)$.
+Without the negated higher guards, a model of $g_i$ alone may still belong to
+$s_j$ for $j{<}i$---the exact failure mode of the motivating example.
+An \emph{others} witness uses $\bigwedge_i\lnot\hat{g}_i$ when nonempty; we
+disclose a prior others-witness bug (others encoded without $\neg$ prior
+guards) as a measurement correction that previously inflated false failures.
+Soundness is conditional on a faithful SMT encoding of SpecIR guards
+(integer/boolean fragments in our corpora).
+Random tests undersample $\Phi_i$ as overlap grows, so ordering bugs survive
+green CI~\cite{zhu1997specification,ammann2016testing}; SpecIR makes those
+slices first-class for Conf.\ and repair.
 
+\subsection{Worked repair step}
+On $(-3,-10)$, the buggy candidate returns \texttt{Critical} where the oracle
+requires \texttt{Error}.
+The Semantic Feedback IR records (abbreviated):
+\begin{lstlisting}
+{"violation_type":"ordering","scenario_index":1,
+ "constraint_text":"level < 0",
+ "inputs":{"level":-3,"threshold":-10},
+ "expected":"Error","observed":"Critical",
+ "suggested_fix":"test level < 0 first"}
+\end{lstlisting}
+\texttt{FeedbackRenderer} projects this JSON into the repair prompt; E6
+isolates \texttt{test\_only} / \texttt{test\_expected} / \texttt{semantic\_ir}
+surfaces under identical~$K$.
+
+\subsection{Semantic Feedback IR and Accept}
+The typed IR carries at least: \texttt{violation\_type} (ordering, postcondition,
+others), \texttt{scenario\_index}, \texttt{constraint\_text}, concrete
+\texttt{inputs}, \texttt{expected}/\texttt{observed} outputs, and an optional
+\texttt{suggested\_fix} hint.
+Conformance and release:
+\begin{align}
+  \mathrm{Conf}(c,t)
+  &= \tfrac{1}{|\mathcal{D}(t)|}
+     \sum_{\mathbf{x}\in\mathcal{D}(t)}
+     \mathbf{1}[f_c(\mathbf{x})=g_t(\mathbf{x})], \\
+  \mathrm{Accept}(c,t)
+  &\iff \mathrm{Conf}(c,t)=1 \,\land\, P^H(c)=0.
+\end{align}
+Mode~B2 uses unstructured test pass/fail only---no scenario index, no
+constraint text.
+Controlled E6 isolates feedback content under full~M at \textbf{equal} $K{=}3$
+(lead Conf.\ claim): variant~A is test-only; B adds expected outputs; C is the
+full Semantic IR.
+Equal-$K$ mode \texttt{M\_eq} ($K{=}3$, \texttt{semantic\_ir}, advisory gate)
+is the Conf.\ ranking hygiene mode vs.\ B2.
+Strengthened E1 ($K{=}5$, \texttt{execution\_trace\_matched}, advisory gate)
+is a multi-factor \emph{bundle}---stress-test only, not single-factor C2.
+E14 further shows that length-matched execution traces can outperform
+\texttt{semantic\_ir} on mean Conf.; uniqueness is therefore scoped to
+unstructured test feedback, not to ``any structured string.''
+
+\subsection{Pipeline}
+Algorithm~\ref{alg:sgdp} summarises one task.
+Synthesise from FSF text $\to$ check on $\mathcal{D}(t)$ $\to$
+if not Accept, render Feedback IR and repair, up to budget~$K$; on exhaustion
+return $\arg\max_k\mathrm{Conf}(c_k,t)$ (best-effort).
+Prevention evaluation injects specification-confusion and
+implementation-screening mutants and scores PDR/FAR on the faulty set.
+High-severity pattern screen $P^H$ blocks known dangerous templates
+(e.g., inverted priority, missing fault preemption) even when mean Conf.\ is
+high.
+
+\begin{algorithm}[t]
+\caption{\textsc{SgDP} repair loop (HSP-Agile instantiation)}
+\label{alg:sgdp}
+\begin{algorithmic}[1]
+\Require FSF task $t$, budget $K$, feedback mode $m$
+\State $\mathcal{D}(t)\gets$ SpecIR witnesses via Z3
+\State $c^\star\gets\bot$; $\mathit{best}\gets 0$
+\For{$k=1$ to $K$}
+  \State $c\gets$ synthesise / repair($t$, feedback$_{k-1}$)
+  \State $\mathit{conf}\gets\mathrm{Conf}(c,t)$ on $\mathcal{D}(t)$
+  \If{$\mathit{conf}>\mathit{best}$} $c^\star\gets c$; $\mathit{best}\gets\mathit{conf}$
+  \EndIf
+  \If{$\mathrm{Accept}(c,t)$} \Return $c$
+  \EndIf
+  \State feedback$_k\gets$ render($m$, failures on $\mathcal{D}(t)$)
+\EndFor
+\State \Return $c^\star$ \Comment{best-effort argmax Conf.}
+\end{algorithmic}
+\end{algorithm}
+
+\runin{Design rationale.}
+We deliberately do \emph{not} claim that SpecIR alone yields monotone Conf.\
+gains with overlap density: E3/E10 tertiles are non-monotone, so overlap is an
+engineering hinge for witness generation, not a deployment trigger.
+The deployable levers are feedback typing (E6) and the Accept/prevention gate
+(E2).
+Adapters (Mini-Z, Mini-StateMachine) share SpecIR; FSF lowering is engineering
+for the SOFL instantiation, not a claimed contribution.
+The same loop applies when a partner later supplies \texttt{.asfl}: only the
+SpecIR front-end changes; Conf., Feedback IR, and Accept stay fixed---so vendor
+pilots test transfer, not a new method.
+
+%======================================================================
 \section{Experimental Setup}
-\input{../hsp-agile/sections/conference/setup_stub.tex}
+%======================================================================
+\runin{Benchmarks.}
+\textbf{BENCH-120:} synthetic hard FSF (5 inputs, 8 scenarios) retained by a Z3
+overlap filter; primary ranking corpus for E1/E6/E12.
+\textbf{E10:} removes the filter ($n{=}100$) to bound filter bias.
+\textbf{Industrial-pattern} ($n{=}31$): practitioner-style decision tables
+(banking, telecom, SCADA, \ldots)---not proprietary dumps.
+\textbf{Published-industrial pilot} ($n{=}10$): FSF \emph{reconstructed} from
+published railway crossing / interlocking and ATM/banking SOFL
+cases~\cite{liu1998railwaycrossing,luo2017railway,liu2004soflbook}
+(\texttt{benchmarks/published\_industrial\_pilot.json}).
+Vendor \texttt{.asfl} files, when placed under
+\texttt{vendor/agile-sofl-toolchain/examples}, import via
+\texttt{scripts/import\_vendor\_asfl.py} (Casco/Mitsubishi dumps require NDA
+and are not redistributed).
 
+\runin{Modes.}
+B1 one-shot; B2 test-feedback ($K{=}3$); M (strengthened bundle, $K{=}5$);
+\texttt{M\_eq} (equal-$K$ hygiene, $K{=}3$, \texttt{semantic\_ir}, advisory).
+E6 variants A/B/C hold full~M fixed and vary only feedback surface.
+
+\runin{Metrics.}
+Mean Conf.; Strict / $\mathrm{Accept}$; PDR/FAR on mutants; latency and LLM
+calls; paired wins/losses/ties with bootstrap CIs where claimed.
+Primary LLM: \texttt{ecnu-plus} (Qwen-family); secondary campus and commercial
+endpoints bound model dependence.
+Repair temperature $T_\text{repair}{=}0$.
+Witness budget: up to 32 formal cases per task in strengthened runs
+(\texttt{formal\_max\_cases=32}); E6 uses the same witness suite across A/B/C.
+
+\runin{Mutants (E2).}
+Implementation-screening mutants flip guard order, drop fault/conflict
+preemption, or weaken postconditions while keeping surface syntax plausible
+($n{=}852$ screened set; pooled with specification-confusion yields $n{=}1704$).
+PDR is the fraction of faulty candidates rejected by the gate; FAR is the
+false-alarm rate on the same faulty pool under the release predicate.
+
+\runin{Protocol hygiene.}
+Cite E6 for C2; \texttt{M\_eq} for equal-$K$ Conf.\ ranking; strengthened E1
+only as stress-test; never mix corpora in one claim sentence.
+Authoritative run ids: \texttt{run\_feedback\_v2} (E6),
+\texttt{prevention\_full\_v1} (E2), \texttt{run\_e1\_equal\_k\_v1},
+\texttt{run\_e1\_m\_win\_v2}, \texttt{run\_pubind\_pilot\_v1}.
+
+\begin{table}[t]
+\centering
+\caption{Corpus card (do not mix rows in one claim).}
+\label{tab:corpus}
+\footnotesize
+\begin{tabular}{@{}llp{0.42\linewidth}@{}}
+\toprule
+Corpus & $n$ & Role \\
+\midrule
+BENCH-120 & 120 & Primary E1/E6/E12 (overlap-filtered) \\
+E10 unfiltered & 100 & Filter-bias bound \\
+Industrial-pattern & 31 & Practitioner-style tables \\
+Published-industrial & 10 & Reconstructed railway/ATM/banking \\
+Vendor-\texttt{.asfl} & TBD & SpecTool/NDA import when present \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+%======================================================================
 \section{Results}
-\input{../hsp-agile/sections/conference/results_stub.tex}
-\input{../hsp-agile/sections/conference/cross_model_stub.tex}
+%======================================================================
+\subsection{RQ1: Typed Semantic Feedback IR (E6 / C2)}
+Figure~\ref{fig:e6} and Table~\ref{tab:e6} hold $K$ and tasks fixed under
+full~M ($K{=}3$, $n{=}120$).
+Variant~C (full Semantic IR) reaches 86.9\% mean Conf.---\textbf{+7.7\,pp}
+over test-only (A, 79.1\%) and ${+}8.0$\,pp over test+expected (B, 78.9\%).
+Paired per-task: wins/losses/ties \textbf{14/4/102}; bootstrap 95\% CI
+$[2.3,\,13.6]$\,pp; Wilcoxon $p{=}0.018$.
+Most tasks tie because they already sit near ceiling under full~M; the 14 wins
+concentrate on ordering-sensitive items where scenario index and constraint
+text change the repair trajectory.
+E14 length-matched sweep: \texttt{semantic\_ir} 75.1\% vs.\
+\texttt{execution\_trace\_matched} 85.4\% (paired 5/19/96)---so C2 is
+\emph{relative to unstructured test feedback}, not uniqueness among all
+structured traces.
+Practitioners who already emit rich execution traces may prefer those surfaces;
+our claim is that unstructured pass/fail is the wrong default when SpecIR
+witnesses are available.
 
+\begin{figure*}[t]
+  \centering
+  \includegraphics[width=0.95\textwidth]{../hsp-agile/figures/feedback_variant_bar.pdf}
+  \caption{E6 feedback variants under full~M ($K{=}3$, $n{=}120$). Variant~C
+    (full Semantic IR) is the lead mechanism claim (+7.7\,pp vs.\ A; CI excludes~0).}
+  \label{fig:e6}
+\end{figure*}
+
+\begin{table}[t]
+\centering
+\caption{E6 paired stats and equal-$K$ Conf.\ ranking.}
+\label{tab:e6}
+\footnotesize
+\begin{tabular}{lccc}
+\toprule
+Contrast / mode & W/L/T or $n$ & Conf.\ / $\Delta$ & 95\% CI \\
+\midrule
+E6 C$-$A & 14/4/102 & $+7.7$\,pp & $[2.3,\,13.6]$ \\
+E6 C$-$B & 14/4/102 & $+8.0$\,pp & $[2.2,\,14.0]$ \\
+Equal-$K$ B2 & 120 & 97.5\% & --- \\
+Equal-$K$ \texttt{M\_eq} & 120 & \textbf{100.0\%} (${+}2.5$) & 3/0/117 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{RQ2: Equal-$K$ ranking and E1 stress-test}
+Equal-$K$ Conf.\ ranking (\texttt{run\_e1\_equal\_k\_v1}): \texttt{M\_eq}
+100.0\% vs.\ B2 97.5\% (${+}2.5$\,pp; 3/120 wins, 0 losses).
+This is the fair Conf.\ comparison at $K{=}3$; it is \emph{not} a substitute
+for E6's mechanism isolation.
+The three wins are exactly the tasks where unstructured test feedback failed to
+steer repair onto the first-match witness that SpecIR already knew about.
+Strengthened E1 bundle ($K{=}5$, Table~\ref{tab:e1}): B1 84.2\%, B2 98.3\%,
+M 100.0\% (${+}1.7$\,pp; 2/120 wins)---useful as a ceiling stress-test, not as
+single-factor C2.
+E12 ($120{\times}3$ seeds): B2 100.0\% / M 99.7\% (B2 first every seed),
+underscoring that mean-Conf.\ dominance is corpus- and seed-dependent.
+E10 (unfiltered, $n{=}100$) keeps B2 near ceiling (99\%) with M at 100\% under
+the same strengthened protocol---filter removal does not invert the deployment
+story.
+
+\begin{table}[t]
+\centering
+\caption{E1 stress-test (fixed oracle; $K{=}5$ bundle for M).}
+\label{tab:e1}
+\footnotesize
+\begin{tabular}{lccc}
+\toprule
+Mode & Mean Conf. & Strict & Mean LLM calls \\
+\midrule
+B1 & 84.2\% & 84.2\% & 1.00 \\
+B2 & 98.3\% & 98.3\% & $\sim$1.18 \\
+M ($K{=}5$ bundle) & \textbf{100.0\%} & \textbf{100.0\%} & $\sim$1.16 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{RQ3: Prevention (E2 / C3) and pattern gate}
+On implementation-screening mutants ($n{=}852$), M reaches PDR 95.0\% / FAR
+5.0\% vs.\ B2 91.2\% / 8.8\%; paired bootstrap 95\% CIs on the gaps exclude
+zero (Fig.~\ref{fig:prev}).
+The absolute PDR lift is modest (${+}3.8$\,pp) but operationally meaningful at
+the FAR${\le}5\%$ bar that many safety-adjacent release processes target.
+Pattern-guard value is measured here (and advisory E17), not by mean-Conf.\
+ablation under an advisory gate (fixed-oracle A2 $\Delta$Conf${=}0$).
+Fixed-oracle ablations vs.\ strengthened M: removing repair $-$25.8\,pp;
+removing formal checker $-$17.5\,pp; removing pattern guard $0.0$\,pp on Conf.\
+(measure gate via E2).
+In other words: repair and witnesses move Conf.; the pattern screen moves
+prevention---do not expect Conf.\ ablations to ``prove'' the gate.
+
+\begin{figure*}[t]
+  \centering
+  \begin{minipage}{0.48\textwidth}
+    \includegraphics[width=\linewidth]{../hsp-agile/figures/prevention_bar.pdf}
+    \caption{E2 aggregate PDR by mode.}
+    \label{fig:prev}
+  \end{minipage}\hfill
+  \begin{minipage}{0.48\textwidth}
+    \includegraphics[width=\linewidth]{../hsp-agile/figures/performance_vs_overlap.pdf}
+    \caption{E10 Conf.\ vs.\ overlap tertile (non-monotone).}
+    \label{fig:overlap}
+  \end{minipage}
+\end{figure*}
+
+\begin{figure*}[t]
+  \centering
+  \includegraphics[width=0.92\textwidth]{../hsp-agile/figures/complexity_heatmap.pdf}
+  \caption{Complexity / density heatmap (companion view; not a deployment trigger).}
+  \label{fig:complex}
+\end{figure*}
+
+\subsection{RQ4: Deployment boundary (C4)}
+Canonical E3/E10 tertiles are \emph{non-monotone}---do not escalate on overlap
+alone (Fig.~\ref{fig:overlap}).
+\textbf{Decision rule:} prefer B2 by default; escalate to~M iff release
+requires $\mathrm{Accept}{=}1$ \emph{or} target FAR${\le}5\%$
+(Table~\ref{tab:deploy}).
+On fixed-oracle E1, mean LLM calls for B2 ($\sim$1.18) and strengthened M
+($\sim$1.16) are comparable; historical pre-fix Pareto exports showed larger
+latency gaps when repair loops ran longer---treat latency as
+configuration-dependent, not as a fixed $3\times$ tax.
+Fig.~\ref{fig:latency} and Fig.~\ref{fig:pareto} illustrate the quality--cost
+trade space used to motivate the default-B2 rule.
+
+\begin{table}[t]
+\centering
+\caption{Deployment boundary (C4).}
+\label{tab:deploy}
+\footnotesize
+\begin{tabular}{@{}lll@{}}
+\toprule
+Signal & Prefer B2 & Prefer M \\
+\midrule
+Default & Mean Conf./latency & --- \\
+Release & Mean Conf.\ OK & Accept${=}1$ \\
+Prevention & --- & FAR${\le}5\%$ \\
+Typed repair & --- & E6 +7.7\,pp \\
+Overlap & Non-monotone & Not alone \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=\linewidth]{../hsp-agile/figures/mode_distribution_latency.pdf}
+  \caption{Latency distribution by mode (log scale; configuration-dependent).}
+  \label{fig:latency}
+\end{figure}
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=\linewidth]{../hsp-agile/figures/pareto_quality_vs_latency.pdf}
+  \caption{Quality vs.\ latency Pareto view motivating default B2 for mean Conf.}
+  \label{fig:pareto}
+\end{figure}
+
+\subsection{External validity: industrial-pattern and published-industrial}
+\label{sec:ext}
+On industrial-pattern SOFL ($n{=}31$), B2 reaches \textbf{100\%} Conf.\ under
+gpt-4o and Claude while B1/M sit at 95.5\%---strongest support for C4 default
+B2 on practitioner-style specs (Table~\ref{tab:ext}).
+Published-industrial pilot ($n{=}10$, \texttt{run\_pubind\_pilot\_v1}):
+B1 80.0\%, B2 100.0\%, \texttt{M\_eq} 100.0\% under equal $K{=}3$---again B2
+suffices for mean Conf.; escalate only for Accept/PDR-FAR.
+Table~\ref{tab:pilot} lists the ten reconstructed processes and their
+bibliographic provenance.
+These are reconstructions, not proprietary dumps---claims must say so.
+
+\begin{table}[t]
+\centering
+\caption{Published-industrial pilot tasks ($n{=}10$).}
+\label{tab:pilot}
+\footnotesize
+\begin{tabular}{@{}llp{0.38\linewidth}@{}}
+\toprule
+ID & Domain & Provenance \\
+\midrule
+CrossingApp./Clear & Crossing & \cite{liu1998railwaycrossing} \\
+RouteLock/Signal/Point & Interlock & \cite{luo2017railway} \\
+AtmAuth/Withdraw & ATM & \cite{liu2004soflbook} \\
+HotelBook & Hotel & Liu apps \\
+Transfer/FraudHold & Banking & Liu apps \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\runin{Where vendor data comes from.}
+Public Agile-SOFL toolchains are not on GitHub.
+Acquisition path: (1)~Hosei/ECNU SpecTool \texttt{.asfl} teaching packs
+(\texttt{sliu@hosei.ac.jp}; request template in artefact
+\texttt{vendor/REQUEST\_TEMPLATE.md}); (2)~Casco/Mitsubishi/Nippon Signal NDA
+exports of process-level FSF (ordered scenarios only; strip proprietary CDFD
+graphics); (3)~until then, published-industrial reconstructions plus optional
+\texttt{vendor/agile-sofl-toolchain/examples} import via
+\texttt{scripts/import\_vendor\_asfl.py}.
+When \texttt{.asfl} import succeeds, report a separate \textbf{vendor-asfl}
+pilot; do not relabel reconstructions as production dumps.
+
+\begin{table}[t]
+\centering
+\caption{External corpora (mean Conf.\ \%).}
+\label{tab:ext}
+\footnotesize
+\begin{tabular}{lccc}
+\toprule
+Corpus & B1 & B2 & M / \texttt{M\_eq} \\
+\midrule
+Industrial-pattern ($n{=}31$, gpt-4o) & 95.5 & \textbf{100.0} & 95.5 \\
+Published-industrial pilot ($n{=}10$) & 80.0 & \textbf{100.0} & \textbf{100.0} \\
+Equal-$K$ BENCH-120 & --- & 97.5 & \textbf{100.0} \\
+E1 stress ($K{=}5$ M) & 84.2 & 98.3 & \textbf{100.0} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Model dependence and ceiling effects}
+On \texttt{ecnu-max}, E6 saturates (${\approx}89.2\%$ A/B/C); commercial n1n
+shows saturation (+0.0), modest gain (+1.0), or regression ($-$3.9)\,pp by
+model---typed-IR gains are headroom-dependent.
+Do \emph{not} claim M dominates all seeds or corpora; lead Conf.\ mechanism
+remains E6 under equal~$K$ on the primary LLM.
+Residual failures on BENCH-120 concentrate on ordering and thin-overlap
+slices (Fig.~\ref{fig:fail}).
+Repair convergence under the mode-proxy curve (Fig.~\ref{fig:conv}) shows most
+of the Conf.\ gain by attempt~2; typed IR (Fig.~\ref{fig:e6}) is the mechanism
+that moves the E6 subset.
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=\linewidth]{../hsp-agile/figures/formal_conformance_cdf.pdf}
+  \caption{Formal conformance CDF (E1 stress-test context).}
+  \label{fig:cdf}
+\end{figure}
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=\linewidth]{../hsp-agile/figures/ablation_contribution_ci.pdf}
+  \caption{Fixed-oracle ablation $\Delta$Conf.\ vs.\ strengthened M.}
+  \label{fig:ablation}
+\end{figure}
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=\linewidth]{../hsp-agile/figures/failure_taxonomy_pie.pdf}
+  \caption{Residual failure taxonomy (ordering / overlap dominate).}
+  \label{fig:fail}
+\end{figure}
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=\linewidth]{../hsp-agile/figures/repair_convergence.pdf}
+  \caption{Repair convergence across attempts (mode-proxy; archived
+    attempt-history is flat under the fixed oracle).}
+  \label{fig:conv}
+\end{figure}
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=\linewidth]{../hsp-agile/figures/generalisation_bar.pdf}
+  \caption{Cross-setting generalisation bars (companion to industrial pilots).}
+  \label{fig:gen}
+\end{figure}
+
+\begin{figure*}[t]
+  \centering
+  \includegraphics[width=0.88\textwidth]{../hsp-agile/figures/prevention_heatmap_by_mode_eval.pdf}
+  \caption{E2 prevention heatmap by mode and evaluation slice.}
+  \label{fig:prevheat}
+\end{figure*}
+
+\begin{figure*}[t]
+  \centering
+  \includegraphics[width=0.88\textwidth]{../hsp-agile/figures/summary_metrics_by_mode.pdf}
+  \caption{Summary metrics by mode (E1 stress-test context; cite equal-$K$ and
+    E6 for lead Conf.\ claims).}
+  \label{fig:summary}
+\end{figure*}
+
+%======================================================================
 \section{Discussion and Threats}
-\input{../hsp-agile/sections/conference/discussion_stub.tex}
+%======================================================================
+\runin{Practice.}
+Match feedback depth to the release bar: B2 for mean Conf.\ / latency; M when
+conjunctive Accept or FAR${\le}5\%$ is required.
+Published-industrial and industrial-pattern pilots reinforce that default.
+For CI/CD pre-merge gates, equal-$K$ \texttt{M\_eq} and strengthened~M have
+comparable mean LLM calls to B2 on fixed-oracle E1; interactive IDE use may
+still prefer B2.
+Railway-style fault/conflict preemption is exactly where Accept and PDR/FAR
+matter more than mean Conf.: a candidate that scores high mean Conf.\ but
+misses a fault-first scenario must not ship.
+A concrete playbook: (i)~run B2 in the inner loop; (ii)~nightly or pre-release
+run M with Accept; (iii)~track FAR on a frozen mutant pack; (iv)~escalate the
+inner loop only if FAR drifts above target or Accept failures cluster on
+ordering classes.
 
+\runin{Published pilot vs.\ vendor-\texttt{.asfl}.}
+The $n{=}10$ published-industrial pilot is intentionally honest: guards are
+reconstructed from papers and textbooks, not extracted from Casco production
+databases.
+That is enough to stress first-match preemption on railway/ATM/banking shapes
+and to support C4's default-B2 recommendation on mean Conf.
+It is \emph{not} a substitute for a partner NDA dump.
+When SpecTool or NDA \texttt{.asfl} files arrive under
+\texttt{vendor/agile-sofl-toolchain/examples}, re-export with
+\texttt{import\_vendor\_asfl.py} and report a separate vendor-asfl table---same
+metrics, clearer provenance.
+
+\runin{What not to claim.}
+Do not claim (i)~M dominates every seed (E12), (ii)~overlap tertiles predict
+when to escalate (E3/E10), (iii)~Semantic IR is unique among all structured
+traces (E14), or (iv)~published reconstructions are Casco production dumps.
+Lead story remains E6 mechanism + E2 prevention + C4 deployment.
+
+\runin{Threats to validity.}
+(1)~\emph{Construct:} finite witnesses approximate Conf.; others-witness bug
+disclosed as measurement correction that previously inflated false failures
+($\sim$5\% Strict on historical E1).
+(2)~\emph{Internal:} LLM non-determinism mitigated by $T_\text{repair}{=}0$ and
+paired tests; equal-$K$ hygiene via \texttt{M\_eq}; E1 bundle is not E6.
+(3)~\emph{External:} BENCH-120 is synthetic/overlap-filtered; E10, E11,
+industrial-pattern, and published-industrial pilots bound transfer.
+Reconstructions are not proprietary dumps.
+Vendor \texttt{.asfl} pilots remain future work until SpecTool/NDA packs are
+obtained via the Hosei contact path or partner NDA.
+(4)~\emph{Conclusion:} do not read the $K{=}5$ E1 bundle as equal-$K$ C2;
+power for tiny Conf.\ gaps is low, hence paired win rates and mechanism CIs.
+(5)~\emph{Model:} ceiling effects on stronger models shrink E6 deltas---report
+headroom explicitly when transferring claims.
+
+\runin{Ethics and data.}
+Industrial NDA artefacts must not be redistributed; published reconstructions
+cite bibliographic provenance only.
+Contact templates for SpecTool packs live in the artefact repository under
+\texttt{vendor/REQUEST\_TEMPLATE.md} (Hosei starting point:
+\texttt{sliu@hosei.ac.jp}).
+Aggregate Conf./PDR only when partners forbid process-name disclosure.
+Reproducibility artefacts (run ids, benchmark JSON, import scripts) accompany
+the long report; this cut cites the same authoritative numbers card.
+
+\runin{Reproducibility.}
+Benchmarks, run ids, and summarisation scripts ship with the artefact package:
+\texttt{benchmarks/published\_industrial\_pilot.json},
+\texttt{scripts/import\_vendor\_asfl.py},
+\texttt{paper/hsp-agile/scripts/e6\_paired\_analysis.py}, and
+\texttt{AUTHORITATIVE\_NUMBERS.md}.
+Primary claims must cite those run directories rather than regenerated ad-hoc
+aggregates.
+A long-report companion expands B3--B6, E14--E17, and full figure packs for
+readers who need the complete experimental appendix.
+
+%======================================================================
 \section{Conclusion}
-\input{../hsp-agile/sections/conference/conclusion_stub.tex}
+%======================================================================
+\textsc{SgDP}/HSP-Agile prevents first-match ordering defects with SpecIR
+witnesses, typed Semantic Feedback IR, and conjunctive Accept.
+Remember: (1)~E6 +7.7\,pp vs.\ test-only at $K{=}3$ (CI excludes~0; E14 scopes
+uniqueness); (2)~E2 PDR/FAR justifies the gate; (3)~deploy B2 by default;
+escalate for Accept or FAR${\le}5\%$; (4)~equal-$K$, pilots, and ceiling
+stress-tests are secondary to the mechanism+deployment story.
+On published-industrial and industrial-pattern corpora, mean Conf.\ already
+favours B2---use M when the release bar demands Accept or prevention, not by
+default.
+Future work: NDA vendor \texttt{.asfl} pilots at scale, adaptive~$K$, and
+SpecIR adapters beyond SOFL/FSF.
 
 \bibliographystyle{IEEEtran}
 \bibliography{../hsp-agile/bib/references}
-
+\balance
 \end{document}

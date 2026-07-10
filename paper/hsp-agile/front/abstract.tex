@@ -1,52 +1,138 @@
 \chapter*{Abstract}
+
+
+
 \addcontentsline{toc}{chapter}{Abstract}
 
+
+
+
+
+
+
 Ordered guard specifications say which scenario must fire first when several
+
+
+
 guards hold.
+
 Large language models rarely obey that rule on thin overlap regions that
+
 formal contracts pin down; unit tests almost never sample those regions, so
+
 test-based repair leaves ordering defects in place.
 
+
+
+
+
+
+
 We present \textbf{deployment-aware specification-guided repair} via the
+
 \textsc{SgDP} framework, instantiated as \textbf{HSP-Agile} for SOFL/FSF.
+
 Three mechanisms address that gap: \emph{SpecIR} semantic regions (first-match
+
 partitions), a typed \emph{Semantic Feedback IR} for repair, and a
+
 \emph{conjunctive} release gate (full witness conformance $\wedge$ no
+
 high-severity structural pattern).
 
-\textbf{Lead empirical result:} under identical repair budget $K{=}3$, full
-Semantic Feedback IR improves mean formal conformance by \textbf{+7.7\,pp}
-vs.\ test-only under controlled E6 on the primary endpoint \texttt{ecnu-plus}
-(not vs.\ every structured trace; see E14)
-on the same 120 tasks; under length-matched E14,
-\texttt{execution\_trace} can exceed bare \texttt{semantic\_ir}.
-On the second endpoint \texttt{ecnu-max}, the same E6 protocol saturates
-(${\approx}89.2\%$ for A/B/C; C$-$A ${+}0.03$\,pp), so typed-IR gains are
-headroom-dependent.
-Commercial n1n replication (\texttt{gpt-4o}/\texttt{claude-sonnet-4-6}/
-\texttt{deepseek-v3.2}, $n{=}29$ stratified) shows saturation (+0.0\,pp),
-modest gain (+1.0\,pp), or regression ($-$3.9\,pp) respectively.
-On a curated industrial-pattern corpus ($n{=}31$), B2 reaches 100\% Conf.\
-under gpt-4o and Claude while B1/M sit at 95.5\%---reinforcing B2 as the
-default.
-We provide a \textbf{deployment boundary table} (C4): test-feedback B2 is the
-default on aggregate conformance and unfiltered corpora (E10: B2 89.1\% vs.\ M
-83.1\%; E12: B2 leads all seeds); full mode~M is warranted when conjunctive
-$\mathrm{Accept}$ or prevention (PDR/FAR) is required, not from overlap
-tertiles alone (canonical E3 is non-monotone).
-Paired bootstrap on E2 impl-screening ($n{=}852$) places the M--B2 PDR/FAR
-gaps' 95\% CIs away from zero.
 
-On the current 120-task hard benchmark (E1 canonical, seed~0), B1 reaches
-89.2\% mean conformance versus M at 86.3\%---single-repeat ranking is
-seed-sensitive; E12-full (120 tasks $\times$ 3 seeds) shows B2 leads every seed
-(M wins 4/120 on mean-across-seeds pairing; Friedman $p{=}0.077$; B2 ranks
-first on all three seeds).
-M vs.\ B2 on E1 canonical is not Holm-significant ($p{=}1.0$).
-Conjunctive acceptance yields 5.0\% strict success on current BENCH-120 but lower escaped defects
-(PDR 95.0\%, FAR 5.0\% vs.\ B2).
+
+
+
+
+
+\textbf{Lead empirical claim (C2):} under identical repair budget $K{=}3$,
+
+full Semantic Feedback IR improves mean formal conformance by
+
+\textbf{+7.7\,pp} vs.\ unstructured test-only on \texttt{ecnu-plus}
+
+(E6, $n{=}120$; paired wins/losses/ties 14/4/102; bootstrap 95\% CI
+
+$[2.3,\,13.6]$\,pp; Wilcoxon $p{=}0.018$).
+
+The claim is scoped to unstructured test-only---not uniqueness vs.\ every
+
+structured trace (E14: \texttt{semantic\_ir} 75.1\% $\neq$
+
+\texttt{execution\_trace\_matched} 85.4\%; paired 5/19/96).
+
+On \texttt{ecnu-max} the same E6 protocol saturates (${\approx}89.2\%$ A/B/C),
+
+so typed-IR gains are headroom-dependent.
+
+
+
+
+
+
+
+\textbf{Prevention (C3):} conjunctive $\mathrm{Accept}$ improves prevention:
+
+E2 impl-screening ($n{=}852$) gives mode~M PDR 95.0\% / FAR 5.0\% vs.\ B2
+
+91.2\% / 8.8\%; paired bootstrap 95\% CIs on the M--B2 gaps exclude zero.
+
+
+
+
+
+
+
+\textbf{Deployment boundary (C4):} prefer B2 by default when mean Conf.\ /
+
+latency suffice; escalate to full mode~M \emph{iff} release requires
+
+conjunctive $\mathrm{Accept}{=}1$ or target FAR${\le}5\%$---not from overlap
+
+tertiles alone (canonical E3 is non-monotone).
+
+On a curated industrial-pattern corpus ($n{=}31$), B2 reaches 100\% Conf.\
+
+under gpt-4o and Claude while B1/M sit at 95.5\%.
+
+
+
+
+
+
+
+As a near-ceiling stress-test under strengthened mode~M ($K{=}5$ multi-factor
+
+\emph{bundle}, not equal-$K$ C2) and the fixed first-match others-witness
+
+oracle, E1 M 100.0\% vs.\ B2 98.3\% (${+}1.7$\,pp; wins 2/120); E12 B2
+
+100.0\% / M 99.7\% (B2 first every seed)---do not claim M dominates all seeds.
+
+Under equal budget $K{=}3$ (\texttt{run\_e1\_equal\_k\_v1}), \texttt{M\_eq}
+
+reaches 100.0\% vs.\ B2 97.5\% (${+}2.5$\,pp; wins 3/120)---Conf.\ ranking
+
+hygiene, still secondary to E6.
+
+A prior others-witness bug is disclosed as a \emph{measurement correction}.
+
 Tasks, logs, and scripts are released.
 
+
+
+
+
+
+
 \paragraph{Keywords.}
+
+
+
 Specification-guided repair; ordered guard specifications; LLM synthesis; SOFL;
+
+
+
 counterexample-guided repair; SMT verification; deployment boundary.
+

@@ -1,0 +1,95 @@
+{
+  "equal_k_primary": {
+    "run": "run_e1_equal_k_v1",
+    "modes": {
+      "B2": {
+        "n": 120,
+        "mean_conf": 0.975,
+        "configured_max_attempts": 3,
+        "feedback_variant": null
+      },
+      "M_eq": {
+        "n": 120,
+        "mean_conf": 1.0,
+        "configured_max_attempts": 3,
+        "feedback_variant": null
+      }
+    },
+    "paired_wlt": {
+      "wins": 3,
+      "losses": 0,
+      "ties": 117,
+      "m_mode": "M_eq"
+    },
+    "delta_pp": 2.500000000000002
+  },
+  "historical_k3": {
+    "run": "run_hard_full_parallel_v1",
+    "modes": {
+      "B1": {
+        "n": 120,
+        "mean_conf": 0.8418981481481481,
+        "configured_max_attempts": 3,
+        "feedback_variant": null
+      },
+      "B2": {
+        "n": 120,
+        "mean_conf": 0.880054012345679,
+        "configured_max_attempts": 3,
+        "feedback_variant": null
+      },
+      "M": {
+        "n": 120,
+        "mean_conf": 0.9042438271604938,
+        "configured_max_attempts": 3,
+        "feedback_variant": null
+      }
+    }
+  },
+  "canonical_pre_fix_k3": {
+    "run": "run_e1_canonical_v1",
+    "modes": {
+      "B1": {
+        "n": 120,
+        "mean_conf": 0.8924603174603175,
+        "configured_max_attempts": 3,
+        "feedback_variant": null
+      },
+      "B2": {
+        "n": 120,
+        "mean_conf": 0.8771825396825397,
+        "configured_max_attempts": 3,
+        "feedback_variant": null
+      },
+      "M": {
+        "n": 120,
+        "mean_conf": 0.8625992063492063,
+        "configured_max_attempts": 3,
+        "feedback_variant": null
+      }
+    }
+  },
+  "proxy_truncate": {
+    "run": "run_e1_m_win_v2",
+    "protocol": "truncate_M_attempt_history_at_K=3 vs final B2",
+    "used_history_rows": 120,
+    "n_paired": 120,
+    "M_mean": 1.0,
+    "B2_mean": 0.9833333333333333,
+    "wins": 2,
+    "losses": 0,
+    "ties": 118,
+    "note": "Proxy equal-K only if attempt_history present; otherwise falls back to final M Conf (NOT equal-K)."
+  },
+  "m_win_attempt_history_sample": [
+    {
+      "attempt": 1,
+      "formal_conformance": 1.0,
+      "formal_passed": true,
+      "pattern_violations": 0,
+      "feedback_variant": "execution_trace_matched",
+      "is_best_so_far": true
+    }
+  ],
+  "recommendation": "Primary equal-K Conf ranking: run_e1_equal_k_v1 (B2 vs M_eq, K=3). Lead mechanism remains E6 (+7.7 pp). Strengthened E1 M-win (K=5) is stress-test only."
+}

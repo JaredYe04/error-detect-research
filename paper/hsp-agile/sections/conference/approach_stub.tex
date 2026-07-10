@@ -1,13 +1,11 @@
 Given an FSF specification, HSP-Agile parses \textbf{SpecIR} regions
 $R_i = G_i \wedge \bigwedge_{j<i}\neg G_j$, synthesises an LLM candidate, and
-iterates repair up to $K{=}3$ attempts.
+repairs under mode~M.
 Failed attempts emit a typed \textbf{Semantic Feedback IR}: scenario label,
-violated guard, SMT witness input, expected postcondition, and optional
-pattern-guard hits---rendered into the repair prompt without free-form
-verbal memory.
+violated guard, SMT witness, expected postcondition, and optional pattern
+hits---rendered into the repair prompt (no free-form verbal memory).
 
-Release is conjunctive. With $\tau{=}1$ and high-severity pattern count
-$P^H(c)$:
+Release is conjunctive ($\tau{=}1$, $P^H(c)$ high-severity pattern count):
 \begin{equation}
   \mathrm{Accept}(c,t)
   \;\iff\;
@@ -16,13 +14,20 @@ $P^H(c)$:
   P^H(c)=0.
   \label{eq:accept-conf}
 \end{equation}
-Mode~M applies hard pattern screening before Accept; B2 uses unstructured
-test pass/fail only.
-Ablations A1/A3 remove the formal checker or the repair loop (A2 removes the
-pattern guard; $\Delta\mathrm{Conf}$ reported in Results).
+Mode~M applies critical-only hard pattern screening before Accept; B2 uses
+unstructured test pass/fail only.
 
-The Semantic Feedback IR is the repair hinge: under E6 ($n{=}120$, $K{=}3$),
-full IR (variant~C) reaches 86.9\% mean Conf.\ vs.\ 79.1\% for test-only
-variant~A---isolating specification structure from prompt volume under the
-unstructured-test baseline (E14 scopes the claim against length-matched
-traces; see Results).
+\paragraph{Budgets (equal-$K$ hygiene).}
+Controlled E6 isolates feedback content under full~M at \textbf{equal} $K{=}3$
+and is the lead Conf.\ mechanism claim.
+Fixed-oracle E1/E10/E12 ranking uses a \emph{strengthened bundle} ($K{=}5$,
+best-effort $\arg\max$ Conf., \texttt{execution\_trace\_matched}, advisory
+gate)---report as stress-test only, not single-factor C2.
+Equal-$K$ mode \texttt{M\_eq} ($K{=}3$, \texttt{semantic\_ir}) exists for Conf.\
+ranking hygiene vs.\ B2.
+
+Under E6 ($n{=}120$, $K{=}3$), full IR (variant~C) reaches 86.9\% mean Conf.\
+vs.\ 79.1\% for test-only variant~A (+7.7\,pp; paired 14/4/102; 95\% CI
+$[2.3,\,13.6]$; Wilcoxon $p{=}0.018$).
+E14 scopes that claim against length-matched
+\texttt{execution\_trace\_matched} (see Results).

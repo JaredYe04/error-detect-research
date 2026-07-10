@@ -23,7 +23,7 @@ from src.llm.ecnu_client import ECNUClient
 from src.mutation.injectors import apply_mutant_to_task, generate_mutants
 from src.pipeline.runner import ErrorPreventionPipeline, config_for_mode
 
-MODES = ["B0", "B1", "B2", "B3", "B4", "B4M", "B5", "B6", "M", "M_lite", "M_adv", "A1", "A2", "A3"]
+MODES = ["B0", "B1", "B2", "B3", "B4", "B4M", "B5", "B6", "M", "M_hard", "M_lite", "M_adv", "A1", "A2", "A3"]
 SENSITIVITY_GRID = [
     {"temperature": 0.0, "max_attempts": 1},
     {"temperature": 0.2, "max_attempts": 3},
@@ -104,7 +104,12 @@ def _run_one_job(
 
     cfg = config_for_mode(mode)
     cfg.temperature = params["temperature"]
-    cfg.max_attempts = params["max_attempts"]
+    # Preserve mode-native budgets (e.g. M K=5) unless running sensitivity grid.
+    if "force_max_attempts" in params:
+        cfg.max_attempts = params["force_max_attempts"]
+    elif params.get("respect_mode_budget", True) is False:
+        cfg.max_attempts = params["max_attempts"]
+    # else: keep config_for_mode(mode).max_attempts
     if model:
         cfg.model = model
     cfg = copy.deepcopy(cfg)
@@ -140,7 +145,8 @@ def _run_one_job(
         "seed": seed + rep,
         "grid_idx": grid_idx,
         "temperature": params["temperature"],
-        "max_attempts": params["max_attempts"],
+        "max_attempts": result.attempts if hasattr(result, "attempts") else params.get("max_attempts"),
+        "configured_max_attempts": cfg.max_attempts,
         "mutation_kill_rate": mutant_kill / mutant_total if mutant_total else 0.0,
         "mutation_killed": mutant_kill,
         "mutation_total": mutant_total,
@@ -170,6 +176,7 @@ def run_experiment(
     run_name: str | None = None,
     parallelism: int = 1,
     model: str | None = None,
+    force_max_attempts: int | None = None,
 ) -> Path:
     tasks = load_benchmark(benchmark_path, include_hard=False) if benchmark_path else load_benchmark()
     if task_subset_path:
@@ -204,6 +211,10 @@ def run_experiment(
             done_keys.add(f"{row['mode']}|{row['repeat']}|{row['grid_idx']}|{row['task_id']}")
 
     grid = SENSITIVITY_GRID if sensitivity else [{"temperature": 0.2, "max_attempts": 3}]
+    if sensitivity:
+        grid = [{**g, "respect_mode_budget": False} for g in grid]
+    if force_max_attempts is not None:
+        grid = [{**g, "force_max_attempts": int(force_max_attempts)} for g in grid]
     all_jobs = _build_task_grid(modes=modes, repeats=repeats, tasks=tasks, grid=grid)
     pending = [job for job in all_jobs if job["task_key"] not in done_keys]
     total = len(all_jobs)
@@ -336,6 +347,12 @@ def main() -> None:
     parser.add_argument("--parallelism", type=int, default=10, help="Number of parallel workers")
     parser.add_argument("--seed", type=int, default=42, help="Base RNG seed for mutation eval and run metadata")
     parser.add_argument("--model", type=str, default=None, help="Override LLM model id (e.g. ecnu-plus, ecnu-max)")
+    parser.add_argument(
+        "--force-max-attempts",
+        type=int,
+        default=None,
+        help="Override max_attempts for all modes (equal-K hygiene; e.g. 3)",
+    )
     args = parser.parse_args()
 
     modes = args.modes
@@ -357,6 +374,7 @@ def main() -> None:
         parallelism=args.parallelism,
         seed=args.seed,
         model=args.model,
+        force_max_attempts=args.force_max_attempts,
     )
     print(f"Results written to {run_dir}")
 

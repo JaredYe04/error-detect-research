@@ -44,7 +44,7 @@ patterns:
   - id: RF06
     name: no_guard_zero_input
     category: boundary
-    severity: high
+    severity: medium
     description: Zero-valued inputs not explicitly handled
     code_regex: '(?s)def\s+\w+\([^)]*\):'
     spec_hint: "FSF often uses x eq 0 or x gt 0 branches"

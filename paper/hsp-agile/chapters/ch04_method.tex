@@ -173,12 +173,15 @@ The negated higher guards are not optional: without them, a model of $g_i$
 alone may still belong to $s_j$ for some $j<i$.
 The witness set is $\mathcal{D}(t) = \{\mathbf{x}_1^*, \ldots, \mathbf{x}_n^*\}$.
 
-\begin{theorem}[Scenario-aware Witness Soundness]
+\begin{proposition}[Scenario-aware Witness Soundness]
 \label{thm:witness-soundness}
 If $\hat{g}_i$ soundly encodes $g_i$ and Z3 returns model $\mathbf{x}^*$ satisfying
 $\Phi_i$, then $g_i(\mathbf{x}^*)$ holds and $g_j(\mathbf{x}^*)$ is false for all $j < i$;
 hence $g_t(\mathbf{x}^*) = \phi_i(\mathbf{x}^*)$.
-\end{theorem}
+Soundness is conditional on a faithful SMT encoding of the SpecIR guards;
+it is a corollary of that encoding assumption rather than an independent
+correctness theorem for the deployed pipeline.
+\end{proposition}
 \begin{proof}
 By assumption, $\hat{g}_i$ soundly encodes $g_i$ and Z3 returns a model
 $\mathbf{x}^*$ of $\Phi_i$.
@@ -227,8 +230,16 @@ natural-language quote of Section~\ref{sec:method:worked}:
 }
 \end{lstlisting}
 Serialisation follows \texttt{schemas/semantic\_feedback.schema.json};
-\texttt{FeedbackRenderer} projects the same IR onto E6 variants (test-only,
-test+expected, full semantic IR), separating failure structure from prompt text.
+\texttt{FeedbackRenderer} projects the same IR onto E6 variants
+(\texttt{test\_only}, \texttt{test\_expected}, full \texttt{semantic\_ir})
+and the E14 length-matched surface \texttt{execution\_trace\_matched},
+separating failure structure from prompt text.
+Default mode~M may render \texttt{execution\_trace\_matched} for repair;
+E6 holds the controlled isolation of \texttt{semantic\_ir} vs.\
+\texttt{test\_only} (primary C2 evidence).
+We do \emph{not} claim \texttt{semantic\_ir} is uniquely best among all
+structured traces---E14 shows length-matched
+\texttt{execution\_trace\_matched} can exceed it on mean Conf.
 
 \subsection{Formal Conformance and Acceptance Predicate}
 \label{subsec:conformance-acceptance}
@@ -259,10 +270,12 @@ independently, the false-acceptance rate satisfies
 $\mathrm{FAR} \leq (1-\varepsilon)^n$,
 where $\varepsilon > 0$ is the minimum per-witness fault-exposure probability
 (Definition~\ref{def:fault-exposure}).
-The bound holds under the assumption that witnesses are independently generated
-and not adversarially chosen.  It does not constitute full correctness: a
-candidate accepted under~$\mathrm{Accept}(c,t)$ may still fail on inputs outside
-$\mathcal{D}(t)$.
+The bound holds under independent (non-adversarial) witness draws and a
+faithful SMT encoding of first-match regions
+(Proposition~\ref{thm:witness-soundness}); it is motivational for the
+deployed deterministic $\Phi_i$ suite and does not constitute full
+correctness: a candidate accepted under~$\mathrm{Accept}(c,t)$ may still
+fail on inputs outside $\mathcal{D}(t)$.
 \end{theorem}
 \begin{proof}
 Fix a faulty candidate and write $E_i$ for the event that witness $i$ fails to
@@ -275,8 +288,9 @@ $\Pr[E_i]\le 1-\varepsilon$ give
   \;\le\; (1-\varepsilon)^n.
 \]
 Hence $\mathrm{FAR}\le(1-\varepsilon)^n$.
-Theorem~\ref{thm:witness-soundness} ensures each
-$\mathbf{x}\in\mathcal{D}(t)$ lies in a strict first-match region, so
+Proposition~\ref{thm:witness-soundness} ensures each
+$\mathbf{x}\in\mathcal{D}(t)$ lies in a strict first-match region under a
+faithful encoding, so
 $\varepsilon$ is bounded away from zero for the mutation operators of
 Section~\ref{sec:exp:mutants}; Corollary~\ref{cor:random-vs-smt} further places
 witnesses on precedence-critical boundaries.
@@ -316,7 +330,7 @@ With $\varepsilon = 0.08$ and illustrative $n = 9$ (not the pipeline's
 $N_{\max}{=}16$ or strict-eval 64), Theorem~\ref{thm:far-bound} predicts
 $\mathrm{FAR} \leq (0.92)^9 \approx 0.473$; mode~M in E2 measures $0.14$
 (Table~\ref{tab:far-validation}), well inside the conservative bound
-(Section~\ref{sec:results:rq2}).
+(Section~\ref{sec:results:rq3}).
 
 \begin{inlinetable}{Theoretical FAR bound vs.\ empirical FAR (mode M, E2).}
   \label{tab:far-validation}
@@ -335,13 +349,15 @@ $\mathrm{FAR} \leq (0.92)^9 \approx 0.473$; mode~M in E2 measures $0.14$
 \subsection{Prevention-Oriented Metrics}
 \label{subsec:metrics}
 
-For mutant set $\mathcal{M}$:
+For the faulty-mutant set $\mathcal{M}^F=\{m\in\mathcal{M}:\mathrm{Faulty}(m)=1\}$
+(Definitions~\ref{def:pdr}--\ref{def:far}):
 \begin{equation}
-  \mathrm{PDR} = \frac{|\{m \in \mathcal{M} : \neg\mathrm{Accept}(c_m, t_m)\}|}{|\mathcal{M}|},
+  \mathrm{PDR} = \frac{|\{m \in \mathcal{M}^F : \neg\mathrm{Accept}(c_m, t_m)\}|}{|\mathcal{M}^F|},
   \qquad
-  \mathrm{FAR} = \frac{|\{m \in \mathcal{M} : \mathrm{Accept}(c_m, t_m) \land \text{faulty}(m)\}|}{|\mathcal{M}|}.
+  \mathrm{FAR} = \frac{|\{m \in \mathcal{M}^F : \mathrm{Accept}(c_m, t_m)\}|}{|\mathcal{M}^F|}.
 \end{equation}
-PDR, FAR, strict formal conformance, and latency are reported jointly.
+PDR, FAR, strict formal conformance, and latency are reported jointly;
+on a fixed faulty set, $\mathrm{PDR}+\mathrm{FAR}=1$.
 
 \subsection{Pipeline Complexity Cost Model}
 \label{subsec:complexity-cost}
@@ -369,7 +385,7 @@ E3--E4 confirm sub-linear cost relative to conformance gain
 \label{alg:sgdp}
 \begin{algorithmic}[1]
 \Require task $t$, budget $K$
-\Ensure accepted candidate or best-effort fallback
+\Ensure accepted candidate or best-effort $\arg\max_k \mathrm{Conf}(c_k,t)$
 \State $\mathcal{D}(t) \leftarrow \mathcal{W}(t)$
 \State $\text{feedback}_0 \leftarrow \emptyset$; $\text{best} \leftarrow \mathtt{null}$
 \For{$k = 1$ to $K$}
@@ -380,16 +396,28 @@ E3--E4 confirm sub-linear cost relative to conformance gain
   \State $\mathcal{J}_k \leftarrow \textsc{ToJson}(\mathcal{F}(\text{failures}_k))$
         \Comment{schema: \texttt{semantic\_feedback.schema.json}}
   \State $\text{feedback}_k \leftarrow \rho(\mathcal{J}_k)$
-        \Comment{\texttt{FeedbackRenderer} projection (E6 variants)}
+        \Comment{\texttt{FeedbackRenderer} projection (E6 / E14 variants)}
   \State $\text{feedback}_k \mathrel{+}= \text{top-}5$ pattern violations from $\text{patterns}_k$
   \State update $\text{best}$ if $\mathrm{Conf}(c_k,t) > \mathrm{Conf}(\text{best},t)$
+        \Comment{track $\arg\max$ Conf.\ over attempts}
   \State log $\langle k, \mathrm{Conf}(c_k,t), |\text{failures}_k|, |\text{patterns}_k|\rangle$
 \EndFor
 \Return $\text{best}$, not-accepted
+        \Comment{best-effort: highest-Conf.\ candidate, not last}
 \end{algorithmic}
 \end{algorithm}
 
-Each iteration logs
+On budget exhaustion the implementation returns the best-effort candidate
+$\arg\max_{k\le K}\mathrm{Conf}(c_k,t)$ among attempts (ties broken by formal
+pass and fewer blocking pattern hits), not necessarily $c_K$.
+\texttt{FeedbackRenderer} projects the same IR onto E6 variants
+(\texttt{test\_only}, \texttt{test\_expected}, \texttt{semantic\_ir}) and the
+E14 length-matched surface \texttt{execution\_trace\_matched}; default mode~M
+may use \texttt{execution\_trace\_matched} for repair prompts, while E6
+isolates \texttt{semantic\_ir} vs.\ \texttt{test\_only} under controlled
+comparison (C2 vs.\ unstructured feedback, not uniqueness among structured
+surfaces).
+Each iteration also logs
 $\langle k, \mathrm{Conf}(c_k,t), |\text{failures}_k|, |\text{patterns}_k|\rangle$
 to \texttt{attempt\_history} for E5--E6 analyses.
 
@@ -500,7 +528,7 @@ the Z3 encoding for one scenario.
 Random sampling rarely hits multi-conjunct first-match regions
 \citep{claessen2000quickcheck, zhu1997specification}.
 $\Phi_i$ places each witness in scenario~$i$'s exclusive region
-(Theorem~\ref{thm:witness-soundness}), so oracle labels are unambiguous.
+(Proposition~\ref{thm:witness-soundness}), so oracle labels are unambiguous.
 
 \section{Stage 3: Counterexample-Guided Repair}
 \label{sec:method:repair}
@@ -516,7 +544,8 @@ verifier~\citep{sun2024clover, solarlezama2008sketching}.
   \centering
   \tikzinput{diagrams/tikz/repair_feedback}
   \caption{\textbf{Key observation (C2):} repair names the violated scenario,
-    not only raw I/O.
+    not only raw I/O (E6 vs.\ test-only; not a uniqueness claim vs.\ every
+    structured trace---see E14).
     \textbf{How to read:} failed attempt $\to$ Semantic Feedback IR $\to$ next
     synthesis.}
   \label{fig:repair-feedback}
@@ -586,10 +615,10 @@ Feedback IR~(C2), and conjunctive acceptance~(C3).
     Stage & Name          & Input               & Output                     & Property \\
     \midrule
     1     & Synthesis     & $t$, $\mathit{fb}$  & $c_k$                      & stochastic \\
-    2     & Formal Check  & $c_k$, $t$          & $\mathrm{Conf}$, $\mathit{cexs}$ & sound (Thm.~\ref{thm:witness-soundness}) \\
+    2     & Formal Check  & $c_k$, $t$          & $\mathrm{Conf}$, $\mathit{cexs}$ & sound (Prop.~\ref{thm:witness-soundness}) \\
     3     & Repair        & $\mathit{cexs}$, $\mathit{hits}$ & $\mathit{fb}_k$ & CEGIS bridge \\
     4     & Pattern Guard & $c_k$, $t$          & $\mathit{hits}$            & finite catalog \\
-    ---   & Accept        & $\mathrm{Conf}$, $\mathit{hits}$ & $\{0,1\}$     & conjunctive (Thm.~\ref{thm:far-bound}) \\
+    ---   & Accept        & $\mathrm{Conf}$, $\mathit{hits}$ & $\{0,1\}$     & conjunctive (motiv.\ bound~\ref{thm:far-bound}) \\
     \bottomrule
   \end{tabularx}
 \end{inlinetable}

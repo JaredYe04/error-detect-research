@@ -20,36 +20,66 @@ analysis is below.
 
 \paragraph{Practical takeaway.}
 \textbf{Tier-1 for practitioners:} Table~\ref{tab:deployment-boundary} is the
-primary deliverable---match feedback depth to specification structure.
-Mechanistically: E6 (+7.7\,pp typed feedback) and E4 (SMT boundary coverage)
-show where specification structure helps; conjunctive acceptance trades
-strict-success rate for lower escaped defects.
-On aggregate conformance and unfiltered corpora (E10, E12), test-feedback B2 is
-the default; full mode~M is warranted when conjunctive release or prevention
-(PDR/FAR) is required---not from overlap tertiles alone (canonical E3 is
-non-monotone).
+primary deliverable---match feedback depth to the release bar with one rule:
+escalate to~M \emph{iff} $\mathrm{Accept}{=}1$ or target FAR${\le}5\%$ is
+required; otherwise keep B2.
+Mechanistically: E6 (+7.7\,pp typed feedback; paired CI excludes zero) and E4
+(SMT boundary coverage) show where specification structure helps; conjunctive
+acceptance plus prevention (PDR/FAR) remain the release discriminators.
+Pattern-guard value is read from E2/E17, not from fixed-oracle A2 Conf.\
+($\Delta{=}0$ under advisory gate).
+On fixed-oracle hard BENCH-120 (\texttt{run\_e1\_m\_win\_v2}), mode~M reaches
+100.0\% Conf.\ / Strict vs.\ B2 98.3\% (${+}1.7$\,pp; 2/120 wins) under a
+$K{=}5$ \emph{bundle}---stress-test only;
+fixed-oracle E10 (\texttt{run\_e10\_m\_win\_v1}): M 100.0\% vs.\ B2 99.0\%
+(${+}1.0$\,pp); E12 (\texttt{run\_e12\_m\_win\_v1}): B2 100.0\% / M 99.7\%
+(B2 first every seed---both near ceiling; do not claim M dominates all seeds);
+prefer B2 when mean Conf.\ / latency suffice on industrial corpora; full
+mode~M when conjunctive release or prevention is required---not from overlap
+tertiles alone (canonical E3 is non-monotone; the monotone-overlap hypothesis
+is not supported).
 
 The central stress-test result is that \textbf{typed feedback} (E6) and
 \textbf{overlap-conditional} witness repair (E3, Table~\ref{tab:e3-tiers}) address
 ordered-guard defects tests miss.
-E1 canonical (seed~0): B1 89.2\%, B2 87.7\%, M 86.3\%---no mode beats another
-at Holm $p{<}0.05$.
-E12-full favours B2 on all three seeds (Section~\ref{sec:results:e12}); single-repeat
-E1 is not a ranking claim.
+Fixed-oracle E1: B1 84.2\%, B2 98.3\%, M 100.0\%---report win rate and means
+(M vs.\ B2: 2/120 wins, 0 losses, 118 ties); no Holm claim is asserted.
+Fixed-oracle E12-full: B2 first every seed (100.0\% mean; M 99.7\%; one M
+failure on seed~1 HardCase069; Section~\ref{sec:results:e12}).
 Mapped to insights: E3/E4 bound C1 (overlap tertiles are non-monotone on
 canonical E3; E4 shows SMT maintains higher boundary coverage than random
 sampling); E6 supports C2 (+7.7\,pp for full Semantic Feedback IR);
-E1 Strict / E2 PDR--FAR support C3 (acceptance stays selective while
-prevention improves).
+fixed-oracle E1 Strict / E2 PDR--FAR support C3 (acceptance clears on this
+corpus while prevention improves).
 
-B0 one-shot (89.2\% mean Conf., $\approx$0.2\,s) matches B1 at seed~0 on
-canonical E1---a one-call reference, not a production baseline.
-Ablations vs.\ M on Conf.: A1 $-$0.8\,pp (no checker), A2 $-$6.0\,pp
-(no pattern guard), A3 $-$3.9\,pp (no repair)---removing the guard hurts most
-on this corpus, then repair, then the checker.
-A2 ($-$6.0\,pp Conf.) shows the guard also affects scored candidates; its
-primary \emph{deployment} rationale remains prevention (E2), with E17 advisory
-as a latency-friendly alternative (Section~\ref{sec:disc:implications}).
+\paragraph{Strengthened mode~M (authoritative E1).}
+Default mode~M is strengthened along several implementation axes that do not
+change the E6 mechanism claim: (i)~\emph{best-effort selection} returns
+$\arg\max_k \mathrm{Conf}(c_k,t)$ among attempts when no candidate meets
+$\mathrm{Accept}$ within~$K$ (not the last attempt); (ii)~repair feedback
+defaults to length-matched \texttt{execution\_trace\_matched} (E14), while
+E6 continues to isolate \texttt{semantic\_ir} vs.\ unstructured
+\texttt{test\_only} under controlled comparison; (iii)~the pattern gate is
+\emph{advisory} for non-critical hits, with hard block reserved for
+critical-only severity (RF07), matching the E17 operating point;
+(iv)~$K{=}5$ and \texttt{formal\_max\_cases}${}{=}32$; (v)~stronger field-diff
+repair hints.
+Under this pipeline with the fixed others-witness oracle
+(\texttt{run\_e1\_m\_win\_v2}): M 100.0\% / B2 98.3\% / B1 84.2\% Conf.\ and
+Strict; M vs.\ B2 ${+}1.7$\,pp (wins 2/120, losses~0, ties~118); mean
+llm\_calls ${\approx}1.16$ vs.\ ${\approx}1.18$.
+Companion fixed-oracle runs: E10 M 100.0\% / B2 99.0\% (${+}1.0$\,pp);
+E12 B2 100.0\% / M 99.7\% (B2 first every seed).
+
+\paragraph{Oracle measurement correction.}
+A bug in others-witness generation previously encoded the catch-all
+\texttt{others} region as True without $\neg$prior guards, inflating false
+failures (${\approx}5\%$ Strict / ${\approx}86$--$89\%$ Conf.\ on
+\texttt{run\_e1\_canonical\_v1}).
+Fixing first-match others witnesses in \texttt{src/formal/fsf\_eval.py} and
+\texttt{first\_match\_oracle} in \texttt{checker.py} is a \emph{measurement
+correction} that enables fair evaluation---not a hidden quality claim---and
+must be disclosed in threats.
 
 
 %=============================================================================
@@ -57,10 +87,14 @@ as a latency-friendly alternative (Section~\ref{sec:disc:implications}).
 \label{sec:disc:failure-analysis}
 %=============================================================================
 
-Despite strong mean conformance on several tiers, \textbf{114 of 120 tasks
-(95.0\%)} do not reach the conjunctive acceptance threshold after repair budget
-$K{=}3$---only 6 tasks (5.0\% strict success rate) are fully accepted on the
-current BENCH-120 under mode~M.
+Despite strong mean conformance on several tiers, the E9 residual taxonomy
+was collected under the \emph{pre-fix} others-witness oracle, where
+\textbf{114 of 120 tasks (95.0\%)} did not reach conjunctive acceptance after
+repair budget $K{=}3$---only 6 tasks (5.0\% strict success) were fully
+accepted under mode~M.
+Under the fixed oracle with strengthened~M (\texttt{run\_e1\_m\_win\_v2}),
+Strict for~M is 100.0\%; the E9 pie therefore describes the historical
+residual mass, not the current primary Strict rate.
 Experiment E9 assigns a primary failure category to \textbf{90} of these
 114 non-accepted tasks with sufficient counterexample and pattern-guard signal;
 the remaining 24 lack extractable diagnostic labels under the E9 protocol.
@@ -69,8 +103,11 @@ The pie in Figure~\ref{fig:failure-taxonomy} is the map of that residual mass.
 \begin{figure}[t]
   \centering
   \thesisfig[max width=0.72\linewidth]{figures/failure_taxonomy_pie.pdf}
-  \caption{\textbf{Claim:} residual failures after $K=3$ are dominated by
-    ordering and boundary errors, not random noise.
+  \caption{\textbf{Claim (historical / pre-fix oracle):} residual failures
+    after $K=3$ on \texttt{run\_e1\_canonical\_v1} are dominated by ordering
+    and boundary errors, not random noise.
+    Under fixed-oracle E1, M Strict is 100.0\%---this pie is not the current
+    primary residual mass.
     \textbf{How to read:} slices are shares of the $n{=}90$ E9-labelled
     non-accepted tasks under mode~M (of 114 total non-accepted).}
   \label{fig:failure-taxonomy}
@@ -201,34 +238,33 @@ detection of shadow guards and unreachable paths beyond the 14-rule catalog.
 \label{sec:disc:paradox}
 %=============================================================================
 
-On current BENCH-120, \emph{strict success is uniformly low} across LLM repair
-modes (M/B2/B1 all at 5.0\%) and therefore does \emph{not} discriminate mode~M.
-\emph{Mean conformance} on canonical E1 (seed~0) orders
-B1 $\geq$ B2 $>$ M (89.2\% / 87.7\% / 86.3\%).
-The two metrics measure fundamentally different things.
+On fixed-oracle BENCH-120 (\texttt{run\_e1\_m\_win\_v2}), Strict tracks Conf.\
+closely for B1/B2/M (84.2\% / 98.3\% / 100.0\%)---the historical uniform
+${\approx}5\%$ Strict across LLM modes is \emph{not} the current primary
+result.
+\emph{Mean conformance} orders M $>$ B2 $>$ B1 with a narrow M--B2 margin
+(${+}1.7$\,pp; 2/120 wins, 118 ties).
+The two metrics measure fundamentally different things when they diverge.
 \emph{Strict success rate} is binary per task: conjunctive
-$\mathrm{Accept}$ requires full witness conformance \emph{and} a clear pattern
-screen.
+$\mathrm{Accept}$ requires full witness conformance \emph{and} a clear
+(critical) pattern screen.
 \emph{Formal conformance} is continuous: a candidate satisfying 9 of 10 cases
 contributes 0.9 to the average even though it contributes 0 to strict success.
 
-The differentiator for M is therefore \emph{prevention}, not higher Conf.:
+The complementary differentiator for M remains \emph{prevention}:
 on E2 implementation screening, M reaches PDR 95.0\% / FAR 5.0\% versus
 B2's PDR 91.2\% / FAR 8.8\%.
-The conjunctive predicate rejects candidates that pass all witnesses but exhibit
-high-severity pattern violations---candidates that B1/B2's single-criterion gate
-would accept---yielding fewer escaped defects at comparable strict rates.
+The conjunctive predicate can still reject candidates that pass all witnesses
+but exhibit high-severity pattern violations---candidates that B1/B2's
+single-criterion gate would accept---yielding fewer escaped defects.
 
-A historical ``higher Conf.\ but lower Strict'' paradox applied only to the
+A historical ``higher Conf.\ but lower Strict'' paradox applied to the
 superseded 86-task-overlapping E1 snapshot (M 90.4\% vs.\ B2 88.0\% with
-25.0\% vs.\ 26.7\% Strict); it does not hold on the current corpus.
-The enduring lesson is C3 selectivity: acceptance stays rare under conjunctive
-release, and prevention metrics (PDR/FAR, E2)---not strict-success rate or
-aggregate Conf.\ alone---should guide deployment.
-The Wilcoxon signed-rank test on strict success rate yields uncorrected
-$p = 0.921$ (Holm-corrected $p = 1.000$; not significant), so formal
-conformance remains the primary continuous quality metric while PDR/FAR
-grounds the release-gate claim.
+25.0\% vs.\ 26.7\% Strict); the later uniform ${\approx}5\%$ Strict on
+\texttt{run\_e1\_canonical\_v1} was inflated by the others-witness bug.
+The enduring lesson is C3 selectivity plus honest measurement: prevention
+metrics (PDR/FAR, E2)---not a single Strict headline---should guide
+deployment when release quality is measured by escaped defects.
 
 
 %=============================================================================
@@ -241,15 +277,18 @@ grounds the release-gate claim.
 The \textsc{SgDP} framework is designed as a CI/CD pre-merge gate operating between
 test-feedback (fast, spec-unaware) and full deductive verification (slow, requires
 annotations).
-Mode~M incurs mean latency of 46{,}161\,ms per task ($\approx$3.3$\times$ B2's
-13{,}864\,ms) on canonical E1, reflecting repair-loop LLM calls and Z3 checking.
-For \emph{interactive} IDE use, $\approx$46\,s is at the upper boundary of acceptable
-response times; for \emph{CI/CD pre-merge gates}, it is well within typical automated
-quality checks.
+Mode~M incurs mean latency of 10{,}457\,ms per task on fixed-oracle E1
+(\texttt{run\_e1\_m\_win\_v2}) vs.\ B2's 9{,}576\,ms---comparable wall-clock
+cost at similar mean llm\_calls (${\approx}1.16$ vs.\ ${\approx}1.18$).
+(Pre-fix canonical E1 reported a larger premium of ${\approx}46$\,s vs.\
+${\approx}14$\,s under the buggy oracle and hard pattern gate.)
+For \emph{interactive} IDE use, ${\approx}10$\,s is at the upper boundary of
+acceptable response times; for \emph{CI/CD pre-merge gates}, it is well within
+typical automated quality checks.
 A sprint team merging 20--30 LLM-assisted units per day would incur roughly
-15--23 minutes of additional pipeline time---comparable to compiling a medium-sized
-Java project---while avoiding hours of downstream debugging from propagated
-conformance faults.
+3--5 minutes of additional pipeline time at ${\approx}10$\,s per task---well
+within typical CI budgets---while avoiding hours of downstream debugging from
+propagated conformance faults.
 
 HSP-Agile is best deployed as a background pre-merge quality gate rather than
 an interactive code-completion tool, consistent with agile fitness-function
@@ -269,14 +308,16 @@ The Z3 checker provides \emph{bounded} guarantees over a finite generated test
 suite at less than 100\,ms per task---negligible relative to total pipeline latency.
 This lightweight oracle suits iterative formal development workflows: test cases are derived
 directly from specification structure, not manually written unit tests.
-The $+0.8$\,pp conformance contribution of the checker (A1 ablation) demonstrates
+The $+0.8$\,pp conformance contribution of the checker (A1 ablation;
+\emph{historical} pre-fix corpus) demonstrates
 a measurable but modest quality improvement, not bureaucratic overhead.
 
 \subsection{Pattern Guard Selectivity and Advisory Use}
 
 The A2 ablation---removing the pattern guard costs $\approx$6\,pp mean conformance on
-canonical E1 (80.3\% vs.\ M 86.3\%)---shows that the guard also affects scored
-candidates on this corpus, not only the Accept gate.
+\emph{historical} pre-fix canonical E1 (80.3\% vs.\ M 86.3\%; not re-run under
+the fixed oracle)---shows that the guard also affects scored
+candidates on that corpus, not only the Accept gate.
 Its primary \emph{deployment} rationale remains prevention (E2 PDR/FAR), with
 E17 advisory mode as a latency-friendly alternative when a hard gate is too
 strict.
@@ -314,7 +355,7 @@ Real-derived HumanEval/MBPP tasks (E8c) show stronger transfer: M reaches 95.0\%
 on MBPP-FSF (tied with B2) while B2 leads on the sparser HumanEval-FSF subset
 (98.8\% vs.\ 87.1\%).
 These boundary cases do not undermine the mechanism result (E6 +7.7\,pp typed
-feedback) or E12 ranking stability (B2 leads all seeds) but clarify that
+feedback) or E12 ranking stability (B2 first every seed near ceiling) but clarify that
 framework components should be enabled selectively based on specification
 complexity and notation familiarity.
 
@@ -325,12 +366,17 @@ Second, the number of branches is limited (typically no more than four), which r
 Third, output expressions consist of simple scalar values rather than coupled tuples, making branch assignment errors readily detectable through test failures.
 Under these conditions, the lightweight feedback mechanism of B2 achieves
 conformance comparable to, or exceeding, that of M while reducing inference
-latency by $3.3\times$ on canonical E1 (13.9\,s vs.\ 46.2\,s).
+latency; the $3.3\times$ premium (13.9\,s vs.\ 46.2\,s) is from the
+\emph{pre-fix} E1 cost export (hard gate / $K{=}3$), whereas fixed-oracle
+E1 places M and B2 at comparable mean llm\_calls
+(${\approx}1.16$ vs.\ ${\approx}1.18$).
 
 M's value on the hard benchmark is therefore not universal aggregate dominance
 but \emph{conditional}: E6 (+7.7\,pp typed feedback under controlled comparison),
 E2 (PDR/FAR), and conjunctive $\mathrm{Accept}$ when those release bars apply.
-Overlap tertiles on canonical E3 are non-monotone; E10 aggregate favours B2.
+Overlap tertiles on canonical E3 are non-monotone; fixed-oracle E10 places M
+slightly ahead near ceiling (${+}1.0$\,pp); E12 shows B2 slightly more
+seed-stable.
 These observations motivate the deployment table rather than a single overlap
 threshold rule.
 
@@ -354,8 +400,9 @@ specification structure.''
     \toprule
     \textbf{Signal} & \textbf{Prefer B2 (test-feedback)} & \textbf{Prefer M (full loop)} \\
     \midrule
-    Guard overlap & Sparse / unfiltered (E10, E12 agg.) & Controlled E6 (+7.7\,pp typed IR) \\
+    Guard overlap & Sparse / industrial (E10/E12 near ceiling) & Controlled E6 (+7.7\,pp typed IR) \\
     Overlap tertiles & Non-monotone on canonical E3 & Conjunctive $\mathrm{Accept}$ + PDR/FAR \\
+    Seed stability & B2 first every E12 seed (100\% vs.\ M 99.7\%) & E1/E10 M$\ge$B2 on aggregate \\
     Hybrid cost & M\_lite does not beat B6/B2 (E18) & Full M only if IR+gate integrated \\
     Branch count & $\leq 4$ branches (Mini-Z, E8c) & $\geq 6$--8 ordered scenarios \\
     Output shape & Scalar / single return & Coupled multi-output tuples \\
@@ -467,19 +514,20 @@ but without Semantic Feedback IR or pattern guard
 (\texttt{src/baselines/verifier\_loop\_fsf.py}).
 On the 30-task stratified subset, B6 matches B2 (86.0\% vs.\ 86.2\% Conf) while
 M trails (83.3\%)---aggregate ranking on small $n$ is seed-sensitive (cf.\ E12).
-On the full 100-task hard export, B6 reaches 78.6\% Conf versus M at 86.3\% on
-E1's 120-task matrix, isolating the gain from specification-indexed IR fields
-beyond raw witnesses.
+On a full hard export, B6 reaches 78.6\% Conf versus historical pre-fix M at
+86.3\% on E1's 120-task matrix (primary fixed-oracle M is 100.0\%), isolating
+the gain from specification-indexed IR fields beyond raw witnesses on that
+corpus.
 The originally cited ``VerifierLoop'' TOSEM entry was removed after bib
 verification; Sun et al.'s Clover~\citep{sun2024clover} remains the verified
 CEGIS reference for Dafny, not a drop-in FSF comparator---B6 is our FSF adaptation.
 
 \paragraph{Standard LLM baselines (B1 and B2).}
-Full mode~M trails B1/B2 on canonical E1 aggregate conformance ($-$2.9\,pp vs.\
-B1; $-$1.5\,pp vs.\ B2; both Holm $p{=}1.0$) at approximately $3.3\times$
-latency over B2~\citep{dakhel2023copilot,chen2021codex}.
-Per-task win rate and E12 multi-seed stability should guide adoption, not the
-headline mean alone.
+Full mode~M leads B2 on fixed-oracle E1 aggregate conformance
+(${+}1.7$\,pp; 2/120 wins, 0 losses, 118 ties; mean llm\_calls
+${\approx}1.16$ vs.\ ${\approx}1.18$)~\citep{dakhel2023copilot,chen2021codex}.
+Per-task win rate and fixed-oracle E12 (B2 first every seed near ceiling)
+should guide adoption, not a blanket ranking across industrial corpora.
 HSP-Agile occupies a ``high quality, moderate cost'' regime: appropriate for quality
 gates in workflows where downstream formal verification costs dominate, not for
 real-time code-completion.
@@ -499,6 +547,10 @@ candidates outside the checked space are not guaranteed correct.
 \emph{Mitigation:} Theorem~\ref{thm:far-bound} quantifies the FAR bound, and E7
 reports per-pattern P/R/F1 so catalogue gaps are explicit.
 PDR uses first-order mutants; higher-order mutations may differ.
+\emph{Disclosure:} a prior others-witness bug (others encoded as True without
+$\neg$prior guards) inflated false failures on canonical E1; primary B1/B2/M
+aggregates now cite the fixed-oracle \texttt{run\_e1\_m\_win\_v2}
+(Section~\ref{sec:disc:interpretation}).
 
 \paragraph{Internal validity.}
 LLM non-determinism and author-built benchmarks are the main risks.
@@ -518,14 +570,15 @@ HumanEval/MBPP-FSF (\texttt{run\_e8c\_full\_v1}).
 Language- or model-universal results are not claimed beyond that evidence.
 
 \paragraph{Conclusion validity.}
-All pairwise comparisons use Holm-Bonferroni correction.
-\emph{Mitigation:} the non-significant strict-success comparison
-($p \approx 0.92$) is treated as expected under the conjunctive gate, with
-conformance as the primary metric; full E2 supersedes preliminary $n=40$
-prevention numbers.
-Post-hoc power analysis (Section~\ref{sec:exp:stats}) shows $n{=}120$ is
-under-powered for M vs.\ B1 ($\delta{=}{-}0.036$, observed power ${\approx}5.8\%$)
-and for M vs.\ B2 ($\delta{=}{-}0.014$, observed power ${\approx}3.6\%$).
+Where Holm-Bonferroni was applied (pre-fix multi-mode E1), non-significant
+strict-success comparisons are expected under a selective gate.
+For fixed-oracle \texttt{run\_e1\_m\_win\_v2} we report win rate and means only
+(M vs.\ B2: 2/120 wins, ${+}1.7$\,pp) and do \emph{not} claim Holm
+significance.
+Full E2 supersedes preliminary $n=40$ prevention numbers.
+Post-hoc power analysis on the pre-fix M--B2 gap
+(Section~\ref{sec:exp:stats}) showed $n{=}120$ under-powered for tiny
+effects ($|\delta|{=}0.014$).
 
 \subsection{Anticipated Reviewer Questions}
 \label{sec:disc:threats-faq}
@@ -541,10 +594,10 @@ Post-hoc power for M vs.\ B2 at the observed effect size is ${\approx}3.6\%$
 (\texttt{power\_analysis.json}); detecting $|\delta|{=}0.014$ would require
 $n{\gtrsim}39{,}000$ paired tasks for 80\% power---doubling to $n{=}240$ would
 not materially change inference.
-We therefore supplement aggregate means with per-task win rate (4/120
-mean-across-seeds), E10
-(uniform random sample), E12-full (120-task multi-seed), and B6
-(VerifierLoop-FSF).
+We therefore supplement aggregate means with per-task win rate (2/120 on
+fixed-oracle E1; E12 mean-across-seeds 0/1/119), E10
+(\texttt{run\_e10\_m\_win\_v1}: M ${+}1.0$\,pp), E12-full
+(\texttt{run\_e12\_m\_win\_v1}), and B6 (VerifierLoop-FSF).
 
 \paragraph{Why the Z3 overlap filter?}
 The filter retains tasks where first-match ordering defects are \emph{possible}:
@@ -554,16 +607,21 @@ E10 removes the filter to bound this bias; E3 stratifies by overlap tertile on
 the hard set.
 Claims are scoped to overlap-intensive specifications, not universal codegen.
 
-\paragraph{Why is strict success only 5.0\%?}
+\paragraph{Why was strict success only ${\approx}5\%$ on older E1?}
 $\mathrm{Accept}$ is conjunctive (Equation~\eqref{eq:accept}): full witness
 conformance \emph{and} a clear high-severity pattern screen.
-On current BENCH-120, all LLM modes share similarly low strict rates
-(M/B2/B1 all at 5.0\%)---C3 selectivity, not weaker implementations.
-Prevention metrics (PDR/FAR, E2) differentiate M from B2 when conjunctive
-release is required (Section~\ref{sec:disc:paradox}).
+On pre-fix \texttt{run\_e1\_canonical\_v1}, all LLM modes shared similarly
+low strict rates (M/B2/B1 all at 5.0\%)---partly C3 selectivity, but largely
+an others-witness measurement artefact (others encoded as True without
+$\neg$prior guards).
+Under fixed-oracle \texttt{run\_e1\_m\_win\_v2}, Strict tracks Conf.\ (M
+100.0\%, B2 98.3\%, B1 84.2\%).
+Prevention metrics (PDR/FAR, E2) still differentiate M from B2 when
+conjunctive release is required (Section~\ref{sec:disc:paradox}).
 
 \paragraph{Why does removing the pattern guard (A2) lower Conf.?}
-A2 reaches 80.3\% Conf.\ vs.\ M's 86.3\% ($-$6.0\,pp) on canonical E1: disabling
+A2 reaches 80.3\% Conf.\ vs.\ M's 86.3\% ($-$6.0\,pp) on \emph{historical}
+pre-fix canonical E1 (not re-run under the fixed oracle): disabling
 the guard removes structural screening that also shapes which candidates remain
 in the scored pool after repair.
 The guard's primary \emph{deployment} rationale remains prevention (PDR/FAR, E2);
@@ -573,13 +631,13 @@ without withholding Accept) is the latency-friendly alternative
 
 \paragraph{Why a single seed for E1?}
 Generative calls use $T_\text{gen}{=}0.7$; repair uses $T_\text{repair}{=}0.0$.
-E1 reports repeat~0 with bootstrap CIs over tasks; \textbf{E12-full} re-runs all
-120 tasks across three seeds for B1, B2, and M (Section~\ref{sec:results:e12}).
-B2 leads in every seed; M wins only 4/120 paired comparisons (Friedman
-$p{=}0.077$; ranking stable).
-The single-repeat matrix is not a one-seed artefact, but pooled seeds favour B2
-over M---deployment should follow Table~\ref{tab:deployment-boundary}
-(Accept/PDR/FAR), not overlap tertiles alone (E3 non-monotone).
+Authoritative E1 cites \texttt{run\_e1\_m\_win\_v2} (repeat~0) with win rate
+and means; \textbf{fixed-oracle E12-full} (\texttt{run\_e12\_m\_win\_v1})
+re-ran all 120 tasks across three seeds for B1, B2, and M
+(Section~\ref{sec:results:e12}): B2 first every seed (100.0\% mean vs.\ M
+99.7\%)---both near ceiling; do not claim M dominates all seeds.
+Deployment should follow Table~\ref{tab:deployment-boundary} (Accept/PDR/FAR),
+not overlap tertiles alone (E3 non-monotone).
 
 
 %=============================================================================
@@ -628,3 +686,5 @@ would need new adapter and witness modules while retaining the Semantic
 Feedback IR and acceptance predicate.
 What has been established, and what remains open for richer encodings and
 industrial tasks, is summarised next.
+
+\input{chapters/ch08_industrial_case}

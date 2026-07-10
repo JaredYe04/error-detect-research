@@ -1,0 +1,810 @@
+[
+  {
+    "taskId": "PubIndPilot.CrossingApproach",
+    "kind": "process",
+    "sourceFile": "industrial://liu1998railwaycrossing",
+    "module": "IndustrialSOFL",
+    "name": "crossing_approach",
+    "signature": {
+      "inputs": [
+        {
+          "name": "train_dist",
+          "type": "int"
+        },
+        {
+          "name": "gate_pos",
+          "type": "int"
+        },
+        {
+          "name": "fault",
+          "type": "int"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "cmd",
+          "type": "int"
+        },
+        {
+          "name": "alarm",
+          "type": "int"
+        }
+      ]
+    },
+    "fsfScenarios": [
+      {
+        "index": 1,
+        "kind": "scenario",
+        "test": "fault gt 0",
+        "def": "cmd eq 0 && alarm eq 2"
+      },
+      {
+        "index": 2,
+        "kind": "scenario",
+        "test": "train_dist le 3 && gate_pos ge 2",
+        "def": "cmd eq 2 && alarm eq 1"
+      },
+      {
+        "index": 3,
+        "kind": "scenario",
+        "test": "train_dist le 3 && gate_pos eq 1",
+        "def": "cmd eq 1 && alarm eq 1"
+      },
+      {
+        "index": 4,
+        "kind": "scenario",
+        "test": "train_dist ge 8 && gate_pos eq 0",
+        "def": "cmd eq 3 && alarm eq 0"
+      },
+      {
+        "index": 5,
+        "kind": "others",
+        "test": "others",
+        "def": "cmd eq 0 && alarm eq 0"
+      }
+    ],
+    "ext": [],
+    "promptSpec": "Process crossing_approach(train_dist, gate_pos, fault) -> (cmd, alarm)\n\nFSF specification:\nif (fault gt 0) => cmd eq 0 && alarm eq 2\nif (train_dist le 3 && gate_pos ge 2) => cmd eq 2 && alarm eq 1\nif (train_dist le 3 && gate_pos eq 1) => cmd eq 1 && alarm eq 1\nif (train_dist ge 8 && gate_pos eq 0) => cmd eq 3 && alarm eq 0\nothers => cmd eq 0 && alarm eq 0",
+    "sourceBasename": "liu1998railwaycrossing",
+    "externalProvenance": {
+      "source": "liu1998railwaycrossing",
+      "section": "Railway crossing controller industrial trial (Mitsubishi); FSF reconstruction of approach/clear/fault priority",
+      "generator": "manual_industrial_curation",
+      "corpus": "industrial_sofl"
+    },
+    "referenceCode": "def crossing_approach(train_dist: int, gate_pos: int, fault: int) -> dict:\n    \"\"\"Reference implementation auto-generated from FSF.\"\"\"\n    if fault > 0:\n        return {\"cmd\": 0, \"alarm\": 2}\n    elif train_dist <= 3  and  gate_pos >= 2:\n        return {\"cmd\": 2, \"alarm\": 1}\n    elif train_dist <= 3  and  gate_pos == 1:\n        return {\"cmd\": 1, \"alarm\": 1}\n    elif train_dist >= 8  and  gate_pos == 0:\n        return {\"cmd\": 3, \"alarm\": 0}\n    else:\n        return {\"cmd\": 0, \"alarm\": 0}\n",
+    "complexity": {
+      "scenario_count": 4,
+      "guard_complexity": "AND",
+      "overlap_rate": 0.8,
+      "has_external_vars": false,
+      "overlap_density_tier": "low"
+    }
+  },
+  {
+    "taskId": "PubIndPilot.CrossingClear",
+    "kind": "process",
+    "sourceFile": "industrial://liu1998railwaycrossing",
+    "module": "IndustrialSOFL",
+    "name": "crossing_clear_check",
+    "signature": {
+      "inputs": [
+        {
+          "name": "occupancy",
+          "type": "int"
+        },
+        {
+          "name": "gate_pos",
+          "type": "int"
+        },
+        {
+          "name": "timer",
+          "type": "int"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "permit",
+          "type": "int"
+        },
+        {
+          "name": "status",
+          "type": "int"
+        }
+      ]
+    },
+    "fsfScenarios": [
+      {
+        "index": 1,
+        "kind": "scenario",
+        "test": "occupancy gt 0",
+        "def": "permit eq 0 && status eq 2"
+      },
+      {
+        "index": 2,
+        "kind": "scenario",
+        "test": "gate_pos gt 0",
+        "def": "permit eq 0 && status eq 1"
+      },
+      {
+        "index": 3,
+        "kind": "scenario",
+        "test": "timer lt 2",
+        "def": "permit eq 0 && status eq 1"
+      },
+      {
+        "index": 4,
+        "kind": "scenario",
+        "test": "occupancy eq 0 && gate_pos eq 0 && timer ge 2",
+        "def": "permit eq 1 && status eq 0"
+      },
+      {
+        "index": 5,
+        "kind": "others",
+        "test": "others",
+        "def": "permit eq 0 && status eq 0"
+      }
+    ],
+    "ext": [],
+    "promptSpec": "Process crossing_clear_check(occupancy, gate_pos, timer) -> (permit, status)\n\nFSF specification:\nif (occupancy gt 0) => permit eq 0 && status eq 2\nif (gate_pos gt 0) => permit eq 0 && status eq 1\nif (timer lt 2) => permit eq 0 && status eq 1\nif (occupancy eq 0 && gate_pos eq 0 && timer ge 2) => permit eq 1 && status eq 0\nothers => permit eq 0 && status eq 0",
+    "sourceBasename": "liu1998railwaycrossing",
+    "externalProvenance": {
+      "source": "liu1998railwaycrossing",
+      "section": "Clearance permit under occupancy/gate/timer constraints",
+      "generator": "manual_industrial_curation",
+      "corpus": "industrial_sofl"
+    },
+    "referenceCode": "def crossing_clear_check(occupancy: int, gate_pos: int, timer: int) -> dict:\n    \"\"\"Reference implementation auto-generated from FSF.\"\"\"\n    if occupancy > 0:\n        return {\"permit\": 0, \"status\": 2}\n    elif gate_pos > 0:\n        return {\"permit\": 0, \"status\": 1}\n    elif timer < 2:\n        return {\"permit\": 0, \"status\": 1}\n    elif occupancy == 0  and  gate_pos == 0  and  timer >= 2:\n        return {\"permit\": 1, \"status\": 0}\n    else:\n        return {\"permit\": 0, \"status\": 0}\n",
+    "complexity": {
+      "scenario_count": 4,
+      "guard_complexity": "Nested",
+      "overlap_rate": 1.2,
+      "has_external_vars": false,
+      "overlap_density_tier": "high"
+    }
+  },
+  {
+    "taskId": "PubIndPilot.RouteLock",
+    "kind": "process",
+    "sourceFile": "industrial://luo2017railway",
+    "module": "IndustrialSOFL",
+    "name": "route_lock",
+    "signature": {
+      "inputs": [
+        {
+          "name": "route_req",
+          "type": "int"
+        },
+        {
+          "name": "conflict",
+          "type": "int"
+        },
+        {
+          "name": "point_ok",
+          "type": "int"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "locked",
+          "type": "int"
+        },
+        {
+          "name": "reject",
+          "type": "int"
+        }
+      ]
+    },
+    "fsfScenarios": [
+      {
+        "index": 1,
+        "kind": "scenario",
+        "test": "conflict gt 0",
+        "def": "locked eq 0 && reject eq 2"
+      },
+      {
+        "index": 2,
+        "kind": "scenario",
+        "test": "point_ok eq 0",
+        "def": "locked eq 0 && reject eq 1"
+      },
+      {
+        "index": 3,
+        "kind": "scenario",
+        "test": "route_req gt 0 && conflict eq 0 && point_ok gt 0",
+        "def": "locked eq 1 && reject eq 0"
+      },
+      {
+        "index": 4,
+        "kind": "others",
+        "test": "others",
+        "def": "locked eq 0 && reject eq 0"
+      }
+    ],
+    "ext": [],
+    "promptSpec": "Process route_lock(route_req, conflict, point_ok) -> (locked, reject)\n\nFSF specification:\nif (conflict gt 0) => locked eq 0 && reject eq 2\nif (point_ok eq 0) => locked eq 0 && reject eq 1\nif (route_req gt 0 && conflict eq 0 && point_ok gt 0) => locked eq 1 && reject eq 0\nothers => locked eq 0 && reject eq 0",
+    "sourceBasename": "luo2017railway",
+    "externalProvenance": {
+      "source": "luo2017railway",
+      "section": "Casco interlocking route-lock decision (published SOFL case); conflict preempts lock",
+      "generator": "manual_industrial_curation",
+      "corpus": "industrial_sofl"
+    },
+    "referenceCode": "def route_lock(route_req: int, conflict: int, point_ok: int) -> dict:\n    \"\"\"Reference implementation auto-generated from FSF.\"\"\"\n    if conflict > 0:\n        return {\"locked\": 0, \"reject\": 2}\n    elif point_ok == 0:\n        return {\"locked\": 0, \"reject\": 1}\n    elif route_req > 0  and  conflict == 0  and  point_ok > 0:\n        return {\"locked\": 1, \"reject\": 0}\n    else:\n        return {\"locked\": 0, \"reject\": 0}\n",
+    "complexity": {
+      "scenario_count": 3,
+      "guard_complexity": "Nested",
+      "overlap_rate": 0.833,
+      "has_external_vars": false,
+      "overlap_density_tier": "low"
+    }
+  },
+  {
+    "taskId": "PubIndPilot.SignalAspect",
+    "kind": "process",
+    "sourceFile": "industrial://luo2017railway",
+    "module": "IndustrialSOFL",
+    "name": "signal_aspect",
+    "signature": {
+      "inputs": [
+        {
+          "name": "route_locked",
+          "type": "int"
+        },
+        {
+          "name": "block_clear",
+          "type": "int"
+        },
+        {
+          "name": "override",
+          "type": "int"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "aspect",
+          "type": "int"
+        },
+        {
+          "name": "restrict",
+          "type": "int"
+        }
+      ]
+    },
+    "fsfScenarios": [
+      {
+        "index": 1,
+        "kind": "scenario",
+        "test": "override gt 0",
+        "def": "aspect eq 0 && restrict eq 1"
+      },
+      {
+        "index": 2,
+        "kind": "scenario",
+        "test": "route_locked eq 0",
+        "def": "aspect eq 0 && restrict eq 1"
+      },
+      {
+        "index": 3,
+        "kind": "scenario",
+        "test": "route_locked gt 0 && block_clear eq 0",
+        "def": "aspect eq 1 && restrict eq 1"
+      },
+      {
+        "index": 4,
+        "kind": "scenario",
+        "test": "route_locked gt 0 && block_clear gt 0",
+        "def": "aspect eq 2 && restrict eq 0"
+      },
+      {
+        "index": 5,
+        "kind": "others",
+        "test": "others",
+        "def": "aspect eq 0 && restrict eq 0"
+      }
+    ],
+    "ext": [],
+    "promptSpec": "Process signal_aspect(route_locked, block_clear, override) -> (aspect, restrict)\n\nFSF specification:\nif (override gt 0) => aspect eq 0 && restrict eq 1\nif (route_locked eq 0) => aspect eq 0 && restrict eq 1\nif (route_locked gt 0 && block_clear eq 0) => aspect eq 1 && restrict eq 1\nif (route_locked gt 0 && block_clear gt 0) => aspect eq 2 && restrict eq 0\nothers => aspect eq 0 && restrict eq 0",
+    "sourceBasename": "luo2017railway",
+    "externalProvenance": {
+      "source": "luo2017railway",
+      "section": "Signal aspect selection under lock/block/override priority",
+      "generator": "manual_industrial_curation",
+      "corpus": "industrial_sofl"
+    },
+    "referenceCode": "def signal_aspect(route_locked: int, block_clear: int, override: int) -> dict:\n    \"\"\"Reference implementation auto-generated from FSF.\"\"\"\n    if override > 0:\n        return {\"aspect\": 0, \"restrict\": 1}\n    elif route_locked == 0:\n        return {\"aspect\": 0, \"restrict\": 1}\n    elif route_locked > 0  and  block_clear == 0:\n        return {\"aspect\": 1, \"restrict\": 1}\n    elif route_locked > 0  and  block_clear > 0:\n        return {\"aspect\": 2, \"restrict\": 0}\n    else:\n        return {\"aspect\": 0, \"restrict\": 0}\n",
+    "complexity": {
+      "scenario_count": 4,
+      "guard_complexity": "AND",
+      "overlap_rate": 0.867,
+      "has_external_vars": false,
+      "overlap_density_tier": "low"
+    }
+  },
+  {
+    "taskId": "PubIndPilot.PointMove",
+    "kind": "process",
+    "sourceFile": "industrial://luo2017railway",
+    "module": "IndustrialSOFL",
+    "name": "point_move_permit",
+    "signature": {
+      "inputs": [
+        {
+          "name": "locked",
+          "type": "int"
+        },
+        {
+          "name": "occupied",
+          "type": "int"
+        },
+        {
+          "name": "cmd",
+          "type": "int"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "move",
+          "type": "int"
+        },
+        {
+          "name": "deny",
+          "type": "int"
+        }
+      ]
+    },
+    "fsfScenarios": [
+      {
+        "index": 1,
+        "kind": "scenario",
+        "test": "locked gt 0",
+        "def": "move eq 0 && deny eq 2"
+      },
+      {
+        "index": 2,
+        "kind": "scenario",
+        "test": "occupied gt 0",
+        "def": "move eq 0 && deny eq 1"
+      },
+      {
+        "index": 3,
+        "kind": "scenario",
+        "test": "cmd gt 0 && locked eq 0 && occupied eq 0",
+        "def": "move eq 1 && deny eq 0"
+      },
+      {
+        "index": 4,
+        "kind": "others",
+        "test": "others",
+        "def": "move eq 0 && deny eq 0"
+      }
+    ],
+    "ext": [],
+    "promptSpec": "Process point_move_permit(locked, occupied, cmd) -> (move, deny)\n\nFSF specification:\nif (locked gt 0) => move eq 0 && deny eq 2\nif (occupied gt 0) => move eq 0 && deny eq 1\nif (cmd gt 0 && locked eq 0 && occupied eq 0) => move eq 1 && deny eq 0\nothers => move eq 0 && deny eq 0",
+    "sourceBasename": "luo2017railway",
+    "externalProvenance": {
+      "source": "luo2017railway",
+      "section": "Point (switch) move permit; lock/occupancy preempt command",
+      "generator": "manual_industrial_curation",
+      "corpus": "industrial_sofl"
+    },
+    "referenceCode": "def point_move_permit(locked: int, occupied: int, cmd: int) -> dict:\n    \"\"\"Reference implementation auto-generated from FSF.\"\"\"\n    if locked > 0:\n        return {\"move\": 0, \"deny\": 2}\n    elif occupied > 0:\n        return {\"move\": 0, \"deny\": 1}\n    elif cmd > 0  and  locked == 0  and  occupied == 0:\n        return {\"move\": 1, \"deny\": 0}\n    else:\n        return {\"move\": 0, \"deny\": 0}\n",
+    "complexity": {
+      "scenario_count": 3,
+      "guard_complexity": "Nested",
+      "overlap_rate": 0.75,
+      "has_external_vars": false,
+      "overlap_density_tier": "low"
+    }
+  },
+  {
+    "taskId": "PubIndPilot.AtmAuth",
+    "kind": "process",
+    "sourceFile": "industrial://liu2004soflbook",
+    "module": "IndustrialSOFL",
+    "name": "atm_auth",
+    "signature": {
+      "inputs": [
+        {
+          "name": "pin_ok",
+          "type": "int"
+        },
+        {
+          "name": "card_ok",
+          "type": "int"
+        },
+        {
+          "name": "tries",
+          "type": "int"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "auth",
+          "type": "int"
+        },
+        {
+          "name": "retain",
+          "type": "int"
+        }
+      ]
+    },
+    "fsfScenarios": [
+      {
+        "index": 1,
+        "kind": "scenario",
+        "test": "card_ok eq 0",
+        "def": "auth eq 0 && retain eq 1"
+      },
+      {
+        "index": 2,
+        "kind": "scenario",
+        "test": "tries ge 3",
+        "def": "auth eq 0 && retain eq 1"
+      },
+      {
+        "index": 3,
+        "kind": "scenario",
+        "test": "pin_ok eq 0",
+        "def": "auth eq 0 && retain eq 0"
+      },
+      {
+        "index": 4,
+        "kind": "scenario",
+        "test": "pin_ok gt 0 && card_ok gt 0 && tries lt 3",
+        "def": "auth eq 1 && retain eq 0"
+      },
+      {
+        "index": 5,
+        "kind": "others",
+        "test": "others",
+        "def": "auth eq 0 && retain eq 0"
+      }
+    ],
+    "ext": [],
+    "promptSpec": "Process atm_auth(pin_ok, card_ok, tries) -> (auth, retain)\n\nFSF specification:\nif (card_ok eq 0) => auth eq 0 && retain eq 1\nif (tries ge 3) => auth eq 0 && retain eq 1\nif (pin_ok eq 0) => auth eq 0 && retain eq 0\nif (pin_ok gt 0 && card_ok gt 0 && tries lt 3) => auth eq 1 && retain eq 0\nothers => auth eq 0 && retain eq 0",
+    "sourceBasename": "liu2004soflbook",
+    "externalProvenance": {
+      "source": "liu2004soflbook",
+      "section": "ATM authentication FSF (book industrial example pattern)",
+      "generator": "manual_industrial_curation",
+      "corpus": "industrial_sofl"
+    },
+    "referenceCode": "def atm_auth(pin_ok: int, card_ok: int, tries: int) -> dict:\n    \"\"\"Reference implementation auto-generated from FSF.\"\"\"\n    if card_ok == 0:\n        return {\"auth\": 0, \"retain\": 1}\n    elif tries >= 3:\n        return {\"auth\": 0, \"retain\": 1}\n    elif pin_ok == 0:\n        return {\"auth\": 0, \"retain\": 0}\n    elif pin_ok > 0  and  card_ok > 0  and  tries < 3:\n        return {\"auth\": 1, \"retain\": 0}\n    else:\n        return {\"auth\": 0, \"retain\": 0}\n",
+    "complexity": {
+      "scenario_count": 4,
+      "guard_complexity": "Nested",
+      "overlap_rate": 0.933,
+      "has_external_vars": false,
+      "overlap_density_tier": "medium"
+    }
+  },
+  {
+    "taskId": "PubIndPilot.AtmWithdraw",
+    "kind": "process",
+    "sourceFile": "industrial://liu2004soflbook",
+    "module": "IndustrialSOFL",
+    "name": "atm_withdraw_pilot",
+    "signature": {
+      "inputs": [
+        {
+          "name": "auth",
+          "type": "int"
+        },
+        {
+          "name": "balance",
+          "type": "int"
+        },
+        {
+          "name": "amount",
+          "type": "int"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "cash",
+          "type": "int"
+        },
+        {
+          "name": "status",
+          "type": "int"
+        }
+      ]
+    },
+    "fsfScenarios": [
+      {
+        "index": 1,
+        "kind": "scenario",
+        "test": "auth eq 0",
+        "def": "cash eq 0 && status eq 2"
+      },
+      {
+        "index": 2,
+        "kind": "scenario",
+        "test": "amount le 0",
+        "def": "cash eq 0 && status eq 1"
+      },
+      {
+        "index": 3,
+        "kind": "scenario",
+        "test": "amount gt balance",
+        "def": "cash eq 0 && status eq 1"
+      },
+      {
+        "index": 4,
+        "kind": "scenario",
+        "test": "auth gt 0 && amount gt 0 && amount le balance",
+        "def": "cash eq 1 && status eq 0"
+      },
+      {
+        "index": 5,
+        "kind": "others",
+        "test": "others",
+        "def": "cash eq 0 && status eq 0"
+      }
+    ],
+    "ext": [],
+    "promptSpec": "Process atm_withdraw_pilot(auth, balance, amount) -> (cash, status)\n\nFSF specification:\nif (auth eq 0) => cash eq 0 && status eq 2\nif (amount le 0) => cash eq 0 && status eq 1\nif (amount gt balance) => cash eq 0 && status eq 1\nif (auth gt 0 && amount gt 0 && amount le balance) => cash eq 1 && status eq 0\nothers => cash eq 0 && status eq 0",
+    "sourceBasename": "liu2004soflbook",
+    "externalProvenance": {
+      "source": "liu2004soflbook",
+      "section": "ATM withdraw under auth/balance guards",
+      "generator": "manual_industrial_curation",
+      "corpus": "industrial_sofl"
+    },
+    "referenceCode": "def atm_withdraw_pilot(auth: int, balance: int, amount: int) -> dict:\n    \"\"\"Reference implementation auto-generated from FSF.\"\"\"\n    if auth == 0:\n        return {\"cash\": 0, \"status\": 2}\n    elif amount <= 0:\n        return {\"cash\": 0, \"status\": 1}\n    elif amount > balance:\n        return {\"cash\": 0, \"status\": 1}\n    elif auth > 0  and  amount > 0  and  amount <= balance:\n        return {\"cash\": 1, \"status\": 0}\n    else:\n        return {\"cash\": 0, \"status\": 0}\n",
+    "complexity": {
+      "scenario_count": 4,
+      "guard_complexity": "Nested",
+      "overlap_rate": 1.0,
+      "has_external_vars": false,
+      "overlap_density_tier": "medium"
+    }
+  },
+  {
+    "taskId": "PubIndPilot.HotelBook",
+    "kind": "process",
+    "sourceFile": "industrial://liu_sofl_hotel",
+    "module": "IndustrialSOFL",
+    "name": "hotel_book",
+    "signature": {
+      "inputs": [
+        {
+          "name": "rooms",
+          "type": "int"
+        },
+        {
+          "name": "nights",
+          "type": "int"
+        },
+        {
+          "name": "vip",
+          "type": "int"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "booked",
+          "type": "int"
+        },
+        {
+          "name": "rate",
+          "type": "int"
+        }
+      ]
+    },
+    "fsfScenarios": [
+      {
+        "index": 1,
+        "kind": "scenario",
+        "test": "rooms le 0",
+        "def": "booked eq 0 && rate eq 0"
+      },
+      {
+        "index": 2,
+        "kind": "scenario",
+        "test": "nights le 0",
+        "def": "booked eq 0 && rate eq 0"
+      },
+      {
+        "index": 3,
+        "kind": "scenario",
+        "test": "vip gt 0 && rooms gt 0 && nights gt 0",
+        "def": "booked eq 1 && rate eq 1"
+      },
+      {
+        "index": 4,
+        "kind": "scenario",
+        "test": "rooms gt 0 && nights gt 0",
+        "def": "booked eq 1 && rate eq 2"
+      },
+      {
+        "index": 5,
+        "kind": "others",
+        "test": "others",
+        "def": "booked eq 0 && rate eq 0"
+      }
+    ],
+    "ext": [],
+    "promptSpec": "Process hotel_book(rooms, nights, vip) -> (booked, rate)\n\nFSF specification:\nif (rooms le 0) => booked eq 0 && rate eq 0\nif (nights le 0) => booked eq 0 && rate eq 0\nif (vip gt 0 && rooms gt 0 && nights gt 0) => booked eq 1 && rate eq 1\nif (rooms gt 0 && nights gt 0) => booked eq 1 && rate eq 2\nothers => booked eq 0 && rate eq 0",
+    "sourceBasename": "liu_sofl_hotel",
+    "externalProvenance": {
+      "source": "liu_sofl_hotel",
+      "section": "Hotel reservation SOFL application (Liu research applications list)",
+      "generator": "manual_industrial_curation",
+      "corpus": "industrial_sofl"
+    },
+    "referenceCode": "def hotel_book(rooms: int, nights: int, vip: int) -> dict:\n    \"\"\"Reference implementation auto-generated from FSF.\"\"\"\n    if rooms <= 0:\n        return {\"booked\": 0, \"rate\": 0}\n    elif nights <= 0:\n        return {\"booked\": 0, \"rate\": 0}\n    elif vip > 0  and  rooms > 0  and  nights > 0:\n        return {\"booked\": 1, \"rate\": 1}\n    elif rooms > 0  and  nights > 0:\n        return {\"booked\": 1, \"rate\": 2}\n    else:\n        return {\"booked\": 0, \"rate\": 0}\n",
+    "complexity": {
+      "scenario_count": 4,
+      "guard_complexity": "Nested",
+      "overlap_rate": 1.5,
+      "has_external_vars": false,
+      "overlap_density_tier": "high"
+    }
+  },
+  {
+    "taskId": "PubIndPilot.TransferGuard",
+    "kind": "process",
+    "sourceFile": "industrial://liu_sofl_online_banking",
+    "module": "IndustrialSOFL",
+    "name": "transfer_guard",
+    "signature": {
+      "inputs": [
+        {
+          "name": "balance",
+          "type": "int"
+        },
+        {
+          "name": "amount",
+          "type": "int"
+        },
+        {
+          "name": "daily_left",
+          "type": "int"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "ok",
+          "type": "int"
+        },
+        {
+          "name": "reason",
+          "type": "int"
+        }
+      ]
+    },
+    "fsfScenarios": [
+      {
+        "index": 1,
+        "kind": "scenario",
+        "test": "amount le 0",
+        "def": "ok eq 0 && reason eq 1"
+      },
+      {
+        "index": 2,
+        "kind": "scenario",
+        "test": "amount gt balance",
+        "def": "ok eq 0 && reason eq 2"
+      },
+      {
+        "index": 3,
+        "kind": "scenario",
+        "test": "amount gt daily_left",
+        "def": "ok eq 0 && reason eq 3"
+      },
+      {
+        "index": 4,
+        "kind": "scenario",
+        "test": "amount gt 0 && amount le balance && amount le daily_left",
+        "def": "ok eq 1 && reason eq 0"
+      },
+      {
+        "index": 5,
+        "kind": "others",
+        "test": "others",
+        "def": "ok eq 0 && reason eq 0"
+      }
+    ],
+    "ext": [],
+    "promptSpec": "Process transfer_guard(balance, amount, daily_left) -> (ok, reason)\n\nFSF specification:\nif (amount le 0) => ok eq 0 && reason eq 1\nif (amount gt balance) => ok eq 0 && reason eq 2\nif (amount gt daily_left) => ok eq 0 && reason eq 3\nif (amount gt 0 && amount le balance && amount le daily_left) => ok eq 1 && reason eq 0\nothers => ok eq 0 && reason eq 0",
+    "sourceBasename": "liu_sofl_online_banking",
+    "externalProvenance": {
+      "source": "liu_sofl_online_banking",
+      "section": "Online banking transfer guards (published SOFL modelling case)",
+      "generator": "manual_industrial_curation",
+      "corpus": "industrial_sofl"
+    },
+    "referenceCode": "def transfer_guard(balance: int, amount: int, daily_left: int) -> dict:\n    \"\"\"Reference implementation auto-generated from FSF.\"\"\"\n    if amount <= 0:\n        return {\"ok\": 0, \"reason\": 1}\n    elif amount > balance:\n        return {\"ok\": 0, \"reason\": 2}\n    elif amount > daily_left:\n        return {\"ok\": 0, \"reason\": 3}\n    elif amount > 0  and  amount <= balance  and  amount <= daily_left:\n        return {\"ok\": 1, \"reason\": 0}\n    else:\n        return {\"ok\": 0, \"reason\": 0}\n",
+    "complexity": {
+      "scenario_count": 4,
+      "guard_complexity": "Nested",
+      "overlap_rate": 1.25,
+      "has_external_vars": false,
+      "overlap_density_tier": "high"
+    }
+  },
+  {
+    "taskId": "PubIndPilot.FraudHold",
+    "kind": "process",
+    "sourceFile": "industrial://liu_sofl_online_banking",
+    "module": "IndustrialSOFL",
+    "name": "fraud_hold",
+    "signature": {
+      "inputs": [
+        {
+          "name": "risk",
+          "type": "int"
+        },
+        {
+          "name": "amount",
+          "type": "int"
+        },
+        {
+          "name": "new_device",
+          "type": "int"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "hold",
+          "type": "int"
+        },
+        {
+          "name": "challenge",
+          "type": "int"
+        }
+      ]
+    },
+    "fsfScenarios": [
+      {
+        "index": 1,
+        "kind": "scenario",
+        "test": "risk ge 8",
+        "def": "hold eq 1 && challenge eq 2"
+      },
+      {
+        "index": 2,
+        "kind": "scenario",
+        "test": "new_device gt 0 && amount ge 5",
+        "def": "hold eq 1 && challenge eq 1"
+      },
+      {
+        "index": 3,
+        "kind": "scenario",
+        "test": "risk ge 5 && amount ge 8",
+        "def": "hold eq 1 && challenge eq 1"
+      },
+      {
+        "index": 4,
+        "kind": "scenario",
+        "test": "risk lt 5",
+        "def": "hold eq 0 && challenge eq 0"
+      },
+      {
+        "index": 5,
+        "kind": "others",
+        "test": "others",
+        "def": "hold eq 0 && challenge eq 0"
+      }
+    ],
+    "ext": [],
+    "promptSpec": "Process fraud_hold(risk, amount, new_device) -> (hold, challenge)\n\nFSF specification:\nif (risk ge 8) => hold eq 1 && challenge eq 2\nif (new_device gt 0 && amount ge 5) => hold eq 1 && challenge eq 1\nif (risk ge 5 && amount ge 8) => hold eq 1 && challenge eq 1\nif (risk lt 5) => hold eq 0 && challenge eq 0\nothers => hold eq 0 && challenge eq 0",
+    "sourceBasename": "liu_sofl_online_banking",
+    "externalProvenance": {
+      "source": "liu_sofl_online_banking",
+      "section": "Fraud hold priority over routine transfer clearance",
+      "generator": "manual_industrial_curation",
+      "corpus": "industrial_sofl"
+    },
+    "referenceCode": "def fraud_hold(risk: int, amount: int, new_device: int) -> dict:\n    \"\"\"Reference implementation auto-generated from FSF.\"\"\"\n    if risk >= 8:\n        return {\"hold\": 1, \"challenge\": 2}\n    elif new_device > 0  and  amount >= 5:\n        return {\"hold\": 1, \"challenge\": 1}\n    elif risk >= 5  and  amount >= 8:\n        return {\"hold\": 1, \"challenge\": 1}\n    elif risk < 5:\n        return {\"hold\": 0, \"challenge\": 0}\n    else:\n        return {\"hold\": 0, \"challenge\": 0}\n",
+    "complexity": {
+      "scenario_count": 4,
+      "guard_complexity": "AND",
+      "overlap_rate": 1.0,
+      "has_external_vars": false,
+      "overlap_density_tier": "medium"
+    }
+  }
+]

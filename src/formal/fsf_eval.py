@@ -236,9 +236,14 @@ def generate_concrete_cases(
 
     for sc in scenarios:
         if sc.get("kind") == "others":
-            test_z3 = BoolVal(True)
             test_str = "others"
-            prior_tests = [s["test"] for s in scenarios if s.get("kind") != "others"]
+            prior = [
+                predicate_to_z3(s["test"], sym)
+                for s in scenarios
+                if s.get("kind") != "others" and s.get("test")
+            ]
+            # First-match others region: ¬(g1 ∨ … ∨ g_{n-1})
+            test_z3 = Not(Or(*prior)) if prior else BoolVal(True)
         else:
             test_str = sc["test"]
             test_z3 = predicate_to_z3(test_str, sym)
@@ -263,7 +268,18 @@ def generate_concrete_cases(
         while solver.check() == sat and attempts < 3 and len(cases) < max_cases:
             model = solver.model()
             env = {n: model.eval(sym[n]).as_long() for n in var_names if model.eval(sym[n]) is not None}
-            if not eval_predicate(test_str, env):
+            if sc.get("kind") == "others":
+                # Reject models that still activate any higher-priority guard.
+                if any(
+                    eval_predicate(s["test"], env)
+                    for s in scenarios
+                    if s.get("kind") != "others" and s.get("test")
+                ):
+                    block = Or(*[sym[n] != env[n] for n in env if n in sym])
+                    solver.add(block)
+                    attempts += 1
+                    continue
+            elif not eval_predicate(test_str, env):
                 break
             assignments = parse_def_assignments(sc["def"])
             expected = resolve_expected(assignments, env)

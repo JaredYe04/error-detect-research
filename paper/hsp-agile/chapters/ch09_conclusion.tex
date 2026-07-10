@@ -23,30 +23,40 @@ as critical.
 
 \paragraph{Four insights.}
 (1)~Prevention should depend on semantic regions, not surface syntax---SpecIR
-is the hinge.
+is the engineering hinge (E3 tertiles are non-monotone; no monotone-overlap
+claim).
 (2)~\textbf{Lead:} repair needs a typed scenario failure (Semantic Feedback IR),
-not raw test bits (+7.7\,pp vs.\ test-only under controlled E6; not vs.\ every
-structured trace---see E14).
+not raw test bits (+7.7\,pp vs.\ test-only under controlled E6; paired
+14/4/102; 95\% CI $[2.3,\,13.6]$; $p{=}0.018$; not vs.\ every structured
+trace---see E14).
 (3)~Release is conjunctive: full witness conformance \emph{and} a clear
-high-severity pattern screen.
-(4)~Deploy M when conjunctive release or prevention metrics are required;
-prefer B2 otherwise (Table~\ref{tab:deployment-boundary}).
+high-severity pattern screen (E2/E17).
+(4)~Prefer B2 by default; escalate to~M \emph{iff} $\mathrm{Accept}{=}1$ or
+FAR${\le}5\%$ (Table~\ref{tab:deployment-boundary}).
 
 \paragraph{Evidence.}
-Canonical E1 (seed~0): B1 89.2\%, B2 87.7\%, M 86.3\% (all non-significant).
-E12-full: B2 leads all seeds (mean 88.0\% vs.\ M 86.0\%; 4/120 M wins;
-Friedman $p{=}0.077$, ranking stable).
-Gain is mechanism-level (typed feedback under E6) and prevention-level
-(PDR 95.0\%, FAR 5.0\% vs.\ B2); adapters transfer to Mini-Z and Mini-StateMachine (E8).
+Lead: E6 typed IR ${+}7.7$\,pp vs.\ test-only on \texttt{ecnu-plus} (CI
+excludes zero; E14 scopes C2: \texttt{semantic\_ir} 75.1\% $\neq$
+\texttt{execution\_trace\_matched} 85.4\%); E2 prevention PDR 95.0\% /
+FAR 5.0\% vs.\ B2 (bootstrap CIs exclude zero); C4 deploy B2 by default
+unless conjunctive $\mathrm{Accept}$ or FAR${\le}5\%$ is required.
+Secondary near-ceiling stress-test under fixed oracle / strengthened~$K{=}5$
+\emph{bundle}: E1 M ${+}1.7$\,pp (2/120 wins); E12 B2 first every seed---do
+not claim M dominates all seeds.
+Equal-$K$ Conf.\ hygiene (\texttt{run\_e1\_equal\_k\_v1}): \texttt{M\_eq}
+100.0\% vs.\ B2 97.5\% (${+}2.5$\,pp; 3/120 wins).
+Adapters transfer to Mini-Z and Mini-StateMachine (E8).
 
 \paragraph{Limitation.}
-Under $K{=}3$, acceptance stays selective (5.0\% strict success on current
-BENCH-120 by design); residual failures are mostly ordering and boundary/arithmetic;
-latency is $3.3\times$ vs.\ test-feedback B2 (46.2\,s vs.\ 13.9\,s); E8c, E10,
-and E12-full bound rather than prove universal external validity; E12-full
-confirms B2 leads all seeds; E16 and E6 on \texttt{ecnu-max} show saturation
-(ties / ${\approx}89.2\%$ A/B/C) rather than ranking reversal---typed-IR gains
-remain primary-endpoint evidence under repair headroom.
+Fixed-oracle E1/E10/E12 sit near ceiling under strengthened~$K{=}5$; they are
+stress-tests, not the primary effectiveness claim.
+A prior others-witness bug had made Strict look uniformly ${\approx}5\%$---a
+measurement artefact, disclosed as a correction enabling fair evaluation.
+Residual failure taxonomy (E9) and pre-fix latency premiums ($3.3\times$)
+describe older corpora; E8c, E10, and E12 bound external validity;
+E16 and E6 on \texttt{ecnu-max} show saturation (ties /
+${\approx}89.2\%$ A/B/C) rather than ranking reversal---typed-IR gains remain
+primary-endpoint evidence under repair headroom.
 
 
 %=============================================================================
@@ -102,8 +112,9 @@ It is a practical bridge built on three ideas---shared semantic regions,
 typed repair feedback, and conjunctive acceptance---that keep many
 specification-conformance defects out of release on overlap-intensive ordered
 guard specifications while remaining usable inside a sprint.
-The M--B2 aggregate margin is modest; deployment should follow
-Table~\ref{tab:deployment-boundary} (conjunctive Accept, PDR/FAR, E6 mechanism),
-not a universal superiority claim.
+The evidence that matters for deployment is E6 (+7.7\,pp), E2 (PDR/FAR), and
+Table~\ref{tab:deployment-boundary}; fixed-oracle E1/E10/E12 are near-ceiling
+stress-tests (M ${+}1.7$\,pp / ${+}1.0$\,pp aggregate; E12 B2 slightly more
+seed-stable)---not a universal superiority claim across industrial corpora.
 How far that bridge extends depends on richer encodings, industrial tasks,
-E10/E12-full/E16 completion, and adaptive repair.
+and adaptive repair.

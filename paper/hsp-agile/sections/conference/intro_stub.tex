@@ -1,38 +1,40 @@
-Ordered guard specifications (first-match semantics) partition the input
-domain into semantic regions; LLM-generated code often violates precedence on
-\emph{thin overlap} where several guards hold simultaneously---regions that
-random unit tests rarely sample~\citep{ammann2016testing,zhu1997specification}.
+Ordered guard specifications enforce \emph{first-match} precedence: when
+several guards hold, only the earliest scenario may fire.
+LLM-generated code often violates that rule on \emph{thin overlap} slices that
+random unit tests almost never sample~\cite{ammann2016testing,zhu1997specification}.
 
-The running example \texttt{classify\_signal} makes the failure mode concrete:
-when $\mathit{threshold}{<}0$, an input such as $(-3,-10)$ satisfies both
-$G_1$ (\texttt{level < 0}) and $G_2$ (\texttt{level >= threshold}); FSF
-ordering mandates \texttt{"Error"} via~$S_1$, yet a typical LLM candidate
-checks the threshold first and returns \texttt{"Critical"}.
-A non-negative test distribution never reaches that slice, so pass/fail repair
-never sees the ordering defect---the motivation for SpecIR witnesses and a
-typed Semantic Feedback IR.
+Running example \texttt{classify\_signal}: with $\mathit{threshold}{<}0$,
+input $(-3,-10)$ satisfies both $G_1$ (\texttt{level < 0}) and $G_2$
+(\texttt{level >= threshold}); FSF ordering mandates \texttt{"Error"} via~$S_1$,
+yet a typical candidate checks the threshold first and returns
+\texttt{"Critical"}.
+Pass/fail repair never sees the defect---hence SpecIR witnesses and a typed
+Semantic Feedback IR.
 
-We study \emph{when} specification-guided repair pays off, not whether one
-pipeline universally beats test feedback.
-\textbf{HSP-Agile} instantiates the \textsc{SgDP} framework for SOFL/FSF with:
-(i)~SpecIR overlap witnesses, (ii)~a typed \textbf{Semantic Feedback IR}, and
+\textbf{Main claim.}
+On ordered-guard specs, typed Semantic Feedback IR improves repair over
+unstructured test-only under \emph{controlled equal budget} (E6, $K{=}3$:
+${+}7.7$\,pp; paired 14/4/102; 95\% CI $[2.3,\,13.6]$; $p{=}0.018$);
+conjunctive $\mathrm{Accept}$ improves prevention (E2);
+\textbf{deploy B2 by default} for mean Conf.\ / latency unless Accept or
+PDR/FAR is required (C4).
+Equal-$K$ Conf.\ ranking (\texttt{M\_eq} vs.\ B2, both $K{=}3$): ${+}2.5$\,pp
+(3/120 wins); strengthened E1 ($K{=}5$ bundle) is a near-ceiling stress-test,
+not the lead claim.
+
+\textbf{HSP-Agile} instantiates \textsc{SgDP} for SOFL/FSF with
+(i)~SpecIR first-match regions,
+(ii)~typed Semantic Feedback IR, and
 (iii)~conjunctive $\mathrm{Accept}$ (full witness conformance $\wedge$ clear
 high-severity pattern screen).
 
 \textbf{Contributions.}
-\textbf{(C2)} Typed Semantic Feedback IR improves repair by \textbf{+7.7\,pp}
-over unstructured test-only feedback under controlled comparison (E6,
-$n{=}120$, $K{=}3$; variants A/B/C: 79.1\,/\,78.9\,/\,86.9).
-\emph{Caveat:} under length-matched E14, \texttt{semantic\_ir} (75.1\%) does
-not beat \texttt{execution\_trace\_matched} (85.4\%)---the +7.7\,pp claim is
-scoped to unstructured test-only under full~M, not uniqueness vs.\ any
-structured trace.
-\textbf{(C3)} Conjunctive release lowers escaped defects (E2: M PDR
+\textbf{(C1)}~SpecIR is a notation-agnostic hinge for first-match regions
+(engineering; E3 tertiles are \emph{non-monotone}---do not use overlap alone).
+\textbf{(C2)}~Typed Semantic Feedback IR yields \textbf{+7.7\,pp} over
+unstructured test-only under~M (E6; CI excludes~0)---scoped vs.\ length-matched
+traces by E14.
+\textbf{(C3)}~Conjunctive release improves prevention (E2: M PDR
 95.0\%\,/\,FAR 5.0\% vs.\ B2 91.2\%\,/\,8.8\%).
-\textbf{(C4)} A \textbf{deployment boundary} prescribes B2 by default and
-full~M when conjunctive $\mathrm{Accept}$ or prevention metrics matter.
-
-We do \emph{not} claim M beats B2 on aggregate Conf.: canonical E1 reports B1
-89.2\%, B2 87.7\%, M 86.3\% (all Holm n.s.; Strict 5.0\%; latency 46.2\,s vs.\
-13.9\,s); E12-canonical shows B2 leads every seed (mean 88.0\% vs.\ M 86.0\%;
-4/120 wins; Friedman $p{=}0.077$).
+\textbf{(C4)}~Deployment boundary: B2 default on unfiltered/industrial;
+escalate to~M iff $\mathrm{Accept}{=}1$ or target FAR${\le}5\%$ is required.

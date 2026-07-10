@@ -1,25 +1,9 @@
-% Conference stub: cross-model (n1n) + industrial external validity.
-% Regenerate tables: python paper/hsp-agile/scripts/aggregate_n1n_campaigns.py
-
-\subsection{Cross-model scope (n1n E6 + E16)}
-Primary E6 (+7.7\,pp C$-$A under~\texttt{ecnu-plus}) is headroom-dependent.
-Commercial n1n replication on the 29-task stratified subset
-(Table~\ref{tab:cross-model-e6}): \texttt{gpt-4o} saturates ($\Delta{=}0$);
-\texttt{claude-sonnet-4-6} yields \textbf{+1.0\,pp}; \texttt{deepseek-v3.2}
-shows $-$3.9\,pp (structured prompts can hurt).
-E16-style ranking on \texttt{gpt-4o} (Table~\ref{tab:cross-model-e16}) keeps
-B2 as the mean-Conf.\ default (B1${=}$B2 100\%, M 88.9\%).
-
-\input{../hsp-agile/tables/cross_model_e6.tex}
-\input{../hsp-agile/tables/cross_model_e16.tex}
-
-\subsection{Industrial SOFL corpus}
-Curated industrial-pattern FSF tasks ($n{=}31$;
-\texttt{benchmarks/industrial\_sofl.json}).
-Under \texttt{gpt-4o} and \texttt{claude-sonnet-4-6}, B2 reaches
-\textbf{100\%} Conf.\ vs.\ B1/M at 95.5\% (Strict 67.7\%);
-\texttt{deepseek-v3.2} preserves B2 $>$ M $>$ B1---strongest support
-for deploying B2 by default on practitioner-style ordered guards
-(Table~\ref{tab:cross-model-industrial}).
-
-\input{../hsp-agile/tables/cross_model_industrial.tex}
+Campus and commercial replications bound model dependence.
+On \texttt{ecnu-max}, E6 saturates (${\approx}89.2\%$ for A/B/C); typed-IR
+gains require repair headroom.
+On n1n \texttt{gpt-4o}/\texttt{claude-sonnet-4-6}/\texttt{deepseek-v3.2}
+($n{=}29$ stratified), E6 shows saturation (+0.0\,pp), modest gain (+1.0\,pp),
+or regression ($-$3.9\,pp) respectively.
+On industrial-pattern SOFL ($n{=}31$), B2 reaches \textbf{100\%} Conf.\ under
+gpt-4o and Claude while B1/M sit at 95.5\%---the strongest external support for
+\textbf{C4: default B2} on practitioner-style specs; reserve~M for Accept/PDR-FAR.

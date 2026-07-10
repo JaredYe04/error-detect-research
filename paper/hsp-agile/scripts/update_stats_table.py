@@ -160,19 +160,32 @@ def _pairwise_block(
 
 
 def render_table(data: dict) -> str:
-    lines = [
-        r"\begin{table}[t]",
-        r"\caption{Statistical test summary for E1 (120-task hard benchmark, repeat~0). "
+    # longtable so multi-page stats do not clip without a continued head
+    caption = (
+        r"Statistical test summary for E1 (120-task hard benchmark, repeat~0). "
         r"Wilcoxon signed-rank for per-task strict success and conformance; "
         r"Mann--Whitney~U for latency. Holm--Bonferroni correction within each metric family. "
-        r"Cliff's $\delta$: positive favours the first mode in each pair.}",
-        r"\label{tab:stats}",
-        r"\centering",
-        r"\small",
-        r"\begin{tabular}{lccc}",
+        r"Cliff's $\delta$: positive favours the first mode in each pair."
+    )
+    lines = [
+        r"\footnotesize",
+        r"\begin{longtable}{lccc}",
+        rf"\caption{{{caption}}}",
+        r"\label{tab:stats} \\",
         r"\toprule",
         r"Comparison & $p$ (Holm) & Significant ($\alpha{=}0.05$) & Cliff's $\delta$ / ratio \\",
         r"\midrule",
+        r"\endfirsthead",
+        r"\multicolumn{4}{c}{\tablename~\thetable{} --- \textit{continued from previous page}} \\",
+        r"\toprule",
+        r"Comparison & $p$ (Holm) & Significant ($\alpha{=}0.05$) & Cliff's $\delta$ / ratio \\",
+        r"\midrule",
+        r"\endhead",
+        r"\midrule",
+        r"\multicolumn{4}{r}{\textit{Continued on next page}} \\",
+        r"\endfoot",
+        r"\bottomrule",
+        r"\endlastfoot",
         r"\multicolumn{4}{l}{\textit{Primary comparisons}} \\",
         r"\addlinespace",
     ]
@@ -193,7 +206,7 @@ def render_table(data: dict) -> str:
         ]
     )
     lines.extend(_pairwise_block(data["pairwise_strict_success_holm"], metric_label="strict"))
-    lines.extend([r"\bottomrule", r"\end{tabular}", r"\end{table}"])
+    lines.extend([r"\end{longtable}", r"\normalsize"])
     return "\n".join(lines) + "\n"
 
 

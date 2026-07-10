@@ -1,36 +1,14 @@
-SOFL/FSF models ordered guards with first-match
-precedence~\citep{liu1998sofl,liu2004soflbook}; Agile-SOFL embeds them in
-sprint workflows~\citep{li2022qrs_companion,li2023iet_faultprevention}.
-LLM synthesis accelerates coding~\citep{chen2021codex,openai2023gpt4} but
-does not respect guard order~\citep{dakhel2023copilot}.
-
-\paragraph{Verifier-in-the-loop.}
-DafnyBench~\citep{loughman2024dafnybench} evaluates LLM synthesis under full
-deductive verification, repairing from compiler messages without FSF ordering
-or PDR/FAR.
-Clover~\citep{sun2024clover} is the closest CEGIS-style verifier loop for
-Dafny; it lacks first-match SpecIR regions, typed scenario feedback, and a
-pattern gate.
-Our B6 (VerifierLoop-FSF) adapts witness-in-the-loop repair to FSF without
-Semantic IR or hard pattern screening---a controlled comparator, not a
-drop-in Clover clone.
-
-\paragraph{Verbal / test repair loops.}
-Self-Refine~\citep{madaan2023selfrefine}, Self-Debug~\citep{chen2023selfdebug},
-and Reflexion~\citep{shinn2023reflexion} iterate on self-critique, execution
-traces, or verbal memory.
-They improve generation success but do not emit region-typed failure records
-or measure prevention under conjunctive release.
-Our B3--B5 instantiate those styles on the same BENCH-120 budget ($K{=}3$);
-full numbers sit in the supplementary material.
-
-\paragraph{Positioning.}
-HSP-Agile sits below full deductive verification: bounded SMT
-witnesses~\citep{demoura2008z3,barrett2018smt} and pattern guards approximate
-release quality at agile latency~\citep{woodcock2009formalsurvey}.
-Relative to prior work we contribute (i)~first-match SpecIR witnesses,
-(ii)~typed Semantic Feedback IR as the repair hinge, and (iii)~conjunctive
-$\mathrm{Accept}$ with PDR/FAR---evaluated against B1/B2 and ablations A1/A3
-in the main text (B3--B6 in supp.).
-E18 shows that naive witness{+}IR hybrids (\texttt{M\_lite}) do not recover
-E6-level gains without the integrated gate.
+Closest LLM+verifier systems differ on whether witnesses respect first-match
+order, whether repair carries scenario structure, and whether prevention
+(PDR/FAR) is measured~\cite{loughman2024dafnybench,sun2024clover}.
+DafnyBench and Clover target proof-oriented oracles; Self-Refine, Self-Debug,
+and Reflexion raise generation success via critique or verbal
+memory~\cite{madaan2023selfrefine,chen2023selfdebug,shinn2023reflexion} but do
+not emit region-typed failure records.
+CodeT and coding agents (OpenHands, SWE-agent) optimise repository
+tasks~\cite{chen2022codet,wang2024opendevin,yang2024sweagent} without an FSF
+oracle $g_t$.
+\textsc{SgDP} combines first-match SMT witnesses, typed Semantic Feedback IR,
+and conjunctive $\mathrm{Accept}$ under PDR/FAR---not a claim that no prior
+system uses any of LLM synthesis, CEGIS, or SMT checks.
+We evaluate verbal/trace loops as B3--B5 and verifier-loop FSF as B6.

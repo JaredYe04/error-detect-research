@@ -1065,10 +1065,18 @@ def plot_repair_convergence(formats: list[str], dpi: int) -> None:
         m_data = real[real["mode"] == "M"]
         if not m_data.empty:
             agg = m_data.groupby("attempt")["conf"].agg(["mean", "std"]).reindex([1, 2, 3])
-            means = agg["mean"].ffill().fillna(0).values
-            stds = agg["std"].fillna(0).values
-            attempts = np.array([1, 2, 3])
-            title_suffix = " (attempt_history, M mode)"
+            cand_means = agg["mean"].ffill().fillna(0).values.astype(float)
+            cand_stds = agg["std"].fillna(0).values.astype(float)
+            # Flat / collapsed / all-zero series make a blank-looking plot.
+            spread = float(np.nanmax(cand_means) - np.nanmin(cand_means))
+            peak = float(np.nanmax(cand_means))
+            if spread >= 0.01 and peak >= 0.05:
+                means = cand_means
+                stds = cand_stds
+                attempts = np.array([1, 2, 3])
+                title_suffix = " (attempt_history, M mode)"
+            else:
+                title_suffix = " (mode-proxy; flat attempt_history)"
 
     csv = PROC_DIR / "summary_by_mode.csv"
     summary = pd.read_csv(csv) if csv.exists() else pd.DataFrame()
@@ -1076,7 +1084,9 @@ def plot_repair_convergence(formats: list[str], dpi: int) -> None:
     if not summary.empty and "A3" in summary["mode"].values:
         fc_a3 = float(summary.set_index("mode").loc["A3"].get("formal_conformance", fc_a3))
 
-    fc_b1, fc_b2, fc_m = means[0], means[1], means[2]
+    fc_b1, fc_b2, fc_m = float(means[0]), float(means[1]), float(means[2])
+    y0 = max(0.70, min(fc_b1, fc_a3, fc_m) - 0.06)
+    y1 = min(1.02, max(fc_b1, fc_a3, fc_m) + 0.06)
 
     fig, ax = plt.subplots(figsize=(5.0, 3.5))
     ax.axhline(fc_m, ls=":", lw=0.8, color=PALETTE["M"], alpha=0.5)
@@ -1093,8 +1103,9 @@ def plot_repair_convergence(formats: list[str], dpi: int) -> None:
             markeredgecolor="white", markeredgewidth=1.2, label="Mean formal conformance")
 
     # Shade the improvement region from attempt 1 to 3
-    ax.fill_between([1, 3], [fc_b1, fc_b1], [fc_m, fc_m],
-                    alpha=0.07, color=PALETTE["M"], hatch="//", linewidth=0)
+    if fc_m > fc_b1 + 1e-6:
+        ax.fill_between([1, 3], [fc_b1, fc_b1], [fc_m, fc_m],
+                        alpha=0.07, color=PALETTE["M"], hatch="//", linewidth=0)
 
     for xi, yi in zip(attempts, means):
         ax.annotate(f"{yi:.1%}", (xi, yi),
@@ -1103,50 +1114,54 @@ def plot_repair_convergence(formats: list[str], dpi: int) -> None:
                     color=PALETTE["M"])
 
     total_gain = fc_m - fc_b1
-    ax.annotate(
-        "",
-        xy=(3, fc_m),
-        xytext=(1, fc_b1),
-        arrowprops=dict(arrowstyle="<->", color=PALETTE["B1"], lw=1.1),
-    )
-    ax.text(
-        2.0, (fc_b1 + fc_m) / 2,
-        f"+{total_gain * 100:.1f} pp\n(repair loop, K=3)",
-        ha="center", va="center", fontsize=FONT_ANNOT,
-        color=PALETTE["B1"], fontweight="bold",
-        bbox=dict(boxstyle="round,pad=0.28", fc="white", ec=PALETTE["B1"], alpha=0.92, lw=0.7),
-    )
+    if total_gain >= 0.005:
+        ax.annotate(
+            "",
+            xy=(3, fc_m),
+            xytext=(1, fc_b1),
+            arrowprops=dict(arrowstyle="<->", color=PALETTE["B1"], lw=1.1),
+        )
+        ax.text(
+            2.0, (fc_b1 + fc_m) / 2,
+            f"+{total_gain * 100:.1f} pp\n(repair loop, K=3)",
+            ha="center", va="center", fontsize=FONT_ANNOT,
+            color=PALETTE["B1"], fontweight="bold",
+            bbox=dict(boxstyle="round,pad=0.28", fc="white", ec=PALETTE["B1"], alpha=0.92, lw=0.7),
+        )
 
     mid_gain = fc_b2 - fc_b1
-    _callout(
-        ax,
-        (1.5, (fc_b1 + fc_b2) / 2),
-        f"Most gain by\nAttempt 2 (+{mid_gain * 100:.1f} pp)",
-        (0.55, 0.795),
-        color=PALETTE["B2"],
-        ha="center",
-    )
+    if mid_gain >= 0.005:
+        _callout(
+            ax,
+            (1.5, (fc_b1 + fc_b2) / 2),
+            f"Most gain by\nAttempt 2 (+{mid_gain * 100:.1f} pp)",
+            (0.55, 0.795),
+            color=PALETTE["B2"],
+            ha="center",
+        )
 
-    ax.annotate(
-        "Diminishing\nreturns",
-        xy=(2.5, (fc_b2 + fc_m) / 2),
-        xytext=(3.35, fc_b2 - 0.015),
-        fontsize=FONT_ANNOT - 0.5,
-        color="#666666",
-        ha="left",
-        arrowprops=dict(arrowstyle="->", color="#888888", lw=0.8),
-        bbox=dict(boxstyle="round,pad=0.2", fc="#fafafa", ec="#bbbbbb", alpha=0.9),
-    )
+    if fc_m - fc_b2 >= 0.005:
+        ax.annotate(
+            "Diminishing\nreturns",
+            xy=(2.5, (fc_b2 + fc_m) / 2),
+            xytext=(3.35, fc_b2 - 0.015),
+            fontsize=FONT_ANNOT - 0.5,
+            color="#666666",
+            ha="left",
+            arrowprops=dict(arrowstyle="->", color="#888888", lw=0.8),
+            bbox=dict(boxstyle="round,pad=0.2", fc="#fafafa", ec="#bbbbbb", alpha=0.9),
+        )
 
     ax.set_xticks(attempts)
     ax.set_xticklabels(["Attempt 1\n(initial)", "Attempt 2\n(+1 repair)", "Attempt 3\n(+2 repairs)"],
                        fontsize=FONT_TICK)
     ax.yaxis.set_major_formatter(plt.FuncFormatter(lambda v, _: f"{v:.0%}"))
-    ax.set_ylim(0.75, 1.02)
+    ax.set_ylim(y0, y1)
+    ax.set_xlim(0.85, 3.55)
     ax.set_xlabel("LLM Invocations (Mode M pipeline)")
     ax.set_ylabel("Mean Formal Conformance")
     ax.set_title(f"Repair convergence{title_suffix}")
-    ax.legend(fontsize=FONT_ANNOT, framealpha=0.8)
+    ax.legend(loc="lower right", fontsize=FONT_ANNOT, framealpha=0.9)
     fig.tight_layout()
     _save(fig, "repair_convergence", formats, dpi)
     plt.close(fig)

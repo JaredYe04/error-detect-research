@@ -21,6 +21,9 @@ Generate a single Python function that implements the given process/function spe
 Rules:
 - Return a dict mapping output variable names to int values.
 - Handle all FSF scenarios including 'others'.
+- Evaluate scenario guards in the exact first-match order given by the specification;
+  never reorder overlapping guards.
+- When repairing, preserve previously correct branches; fix only the reported failure.
 - Use only integer arithmetic and boolean conditions.
 - Output ONLY one Python code block with the function. No explanation outside the code block.
 """
@@ -69,7 +72,7 @@ def resolve_feedback_variant(cfg: PipelineConfig) -> str:
         return cfg.feedback_variant
     if cfg.mode == "B2":
         return "test_only"
-    if cfg.mode == "B4M":
+    if cfg.mode in {"B4M", "M", "M_adv"}:
         return "execution_trace_matched"
     if cfg.enable_formal:
         return "semantic_ir"
@@ -92,12 +95,37 @@ def build_repair_feedback(
     else:
         rendered = FeedbackRenderer.render(ir.records, variant=variant)
     parts = [rendered]
+    # For structured M-style variants, append failing-scenario postconditions.
+    if variant in {"semantic_ir", "execution_trace_matched", "verifier_loop"}:
+        scenario_note = _scenario_postcondition_hint(task, ir.records)
+        if scenario_note:
+            parts.append(scenario_note)
     if pattern_matches:
         parts.append(
             "Pattern violations: "
             + "; ".join(f"{m.pattern_id}:{m.name}" for m in pattern_matches[:5])
         )
     return "\n".join(parts), feedback_json
+
+
+def _scenario_postcondition_hint(task: dict[str, Any], records: list) -> str:
+    """Append oracle postconditions for failing scenarios (helps others/arithmetic)."""
+    scenarios = task.get("fsfScenarios") or task.get("scenarios") or []
+    if not scenarios or not records:
+        return ""
+    lines = ["Specification postconditions for failing scenarios:"]
+    seen: set[int] = set()
+    for r in records:
+        idx = int(getattr(r, "scenario_index", 0) or 0)
+        if idx in seen or not (1 <= idx <= len(scenarios)):
+            continue
+        seen.add(idx)
+        sc = scenarios[idx - 1]
+        guard = sc.get("test") or sc.get("guard") or ""
+        post = sc.get("def") or sc.get("postcondition") or sc.get("body") or ""
+        lines.append(f"  S{idx}: if ({guard}) then assign {post}")
+        lines.append(f"       oracle on witness must equal {getattr(r, 'expected', {})}")
+    return "\n".join(lines) if len(lines) > 1 else ""
 
 
 def config_for_mode(mode: str) -> PipelineConfig:
@@ -148,31 +176,68 @@ def config_for_mode(mode: str) -> PipelineConfig:
         cfg.formal_max_cases = 24
         cfg.feedback_variant = "verifier_loop"
     elif mode == "A1":
+        # Ablation of strengthened M: no formal checker; keep repair+patterns.
         cfg.enable_formal = False
         cfg.enable_patterns = True
         cfg.enable_repair = True
-        cfg.formal_max_cases = 10
+        cfg.max_attempts = 5
+        cfg.formal_max_cases = 32
+        cfg.thinking = False
+        cfg.model = "ecnu-plus"
+        cfg.feedback_variant = "execution_trace_matched"
+        cfg.pattern_guard_mode = "advisory"
+        cfg.temperature = 0.2
     elif mode == "A2":
+        # Ablation of strengthened M: no pattern guard; keep formal+repair.
         cfg.enable_formal = True
         cfg.enable_patterns = False
         cfg.enable_repair = True
-        cfg.formal_max_cases = 24
+        cfg.max_attempts = 5
+        cfg.formal_max_cases = 32
+        cfg.thinking = False
+        cfg.model = "ecnu-plus"
+        cfg.feedback_variant = "execution_trace_matched"
+        cfg.temperature = 0.2
     elif mode == "A3":
+        # Ablation of strengthened M: no repair loop (single attempt).
         cfg.enable_formal = True
         cfg.enable_patterns = True
         cfg.enable_repair = False
         cfg.max_attempts = 1
-        cfg.formal_max_cases = 24
+        cfg.formal_max_cases = 32
+        cfg.thinking = False
+        cfg.model = "ecnu-plus"
+        cfg.feedback_variant = "execution_trace_matched"
+        cfg.pattern_guard_mode = "advisory"
+        cfg.temperature = 0.2
     elif mode == "M":
         cfg.enable_formal = True
         cfg.enable_patterns = True
         cfg.enable_repair = True
-        cfg.max_attempts = 3
-        cfg.formal_max_cases = 24
+        # Extra repair budget vs B2 (K=3): others/arithmetic residues need more turns.
+        cfg.max_attempts = 5
+        cfg.formal_max_cases = 32
         cfg.thinking = False
         cfg.model = "ecnu-plus"
-        cfg.feedback_variant = "semantic_ir"
+        # E14: length-matched execution_trace beats bare semantic_ir under M.
+        cfg.feedback_variant = "execution_trace_matched"
+        # Hard-block only critical (RF07); high-severity patterns stay advisory
+        # for repair telemetry but do not force Conf-regressing over-repair.
+        cfg.pattern_guard_mode = "advisory"
+        cfg.temperature = 0.2  # attempt 1; repair attempts force 0.0 in run_task
     elif mode == "M_adv":
+        cfg.enable_formal = True
+        cfg.enable_patterns = True
+        cfg.enable_repair = True
+        cfg.max_attempts = 5
+        cfg.formal_max_cases = 32
+        cfg.thinking = False
+        cfg.model = "ecnu-plus"
+        cfg.feedback_variant = "execution_trace_matched"
+        cfg.pattern_guard_mode = "advisory"
+        cfg.temperature = 0.2
+    elif mode == "M_hard":
+        # Legacy hard pattern gate + semantic_ir (ablation / prevention track).
         cfg.enable_formal = True
         cfg.enable_patterns = True
         cfg.enable_repair = True
@@ -181,7 +246,7 @@ def config_for_mode(mode: str) -> PipelineConfig:
         cfg.thinking = False
         cfg.model = "ecnu-plus"
         cfg.feedback_variant = "semantic_ir"
-        cfg.pattern_guard_mode = "advisory"
+        cfg.pattern_guard_mode = "hard"
     elif mode == "B4M":
         cfg.enable_formal = False
         cfg.enable_patterns = False
@@ -197,6 +262,19 @@ def config_for_mode(mode: str) -> PipelineConfig:
         cfg.max_attempts = 3
         cfg.formal_max_cases = 24
         cfg.feedback_variant = "semantic_ir"
+    elif mode == "M_eq":
+        # Equal-K hygiene vs B2: K=3, semantic_ir, advisory gate, fixed-oracle friendly.
+        # Use for Conf ranking claims; do not conflate with strengthened M (K=5 bundle).
+        cfg.enable_formal = True
+        cfg.enable_patterns = True
+        cfg.enable_repair = True
+        cfg.max_attempts = 3
+        cfg.formal_max_cases = 32
+        cfg.thinking = False
+        cfg.model = "ecnu-plus"
+        cfg.feedback_variant = "semantic_ir"
+        cfg.pattern_guard_mode = "advisory"
+        cfg.temperature = 0.2
     return cfg
 
 
@@ -277,12 +355,23 @@ class ErrorPreventionPipeline:
         last_feedback_json: list[dict[str, Any]] = []
         feedback_variant = resolve_feedback_variant(cfg)
         reflexion_memory: list[str] = []
+        # Best-effort tracking (Algorithm 1): never return a Conf-regressed last attempt.
+        best_code = ""
+        best_conf = -1.0
+        best_formal = None
+        best_patterns: list = []
+        best_attempt = 0
+        best_formal_ok = False
+        best_pattern_ok = False
+        best_blocking = 0
 
         for attempt in range(1, cfg.max_attempts + 1):
             messages = build_prompt(task, feedback)
+            # Paper protocol: T_gen for first attempt, T_repair=0.0 thereafter.
+            call_temperature = cfg.temperature if attempt == 1 else 0.0
             resp = self.llm.chat(
                 messages,
-                temperature=cfg.temperature,
+                temperature=call_temperature,
                 top_p=cfg.top_p,
                 thinking=cfg.thinking,
                 model=cfg.model,
@@ -300,6 +389,7 @@ class ErrorPreventionPipeline:
                 formal_ok = test_result.passed
 
             pattern_ok = True
+            blocking = 0
             if cfg.enable_patterns:
                 last_patterns = self.pattern_guard.check(code, task)
                 blocking = _blocking_pattern_violations(last_patterns, cfg)
@@ -307,17 +397,36 @@ class ErrorPreventionPipeline:
             else:
                 last_patterns = []
 
+            conf = float(test_result.conformance_rate)
+            # Lexicographic: higher Conf, then formal pass, then fewer blocking patterns.
+            rank = (conf, 1 if formal_ok else 0, -blocking)
+            best_rank = (best_conf, 1 if best_formal_ok else 0, -best_blocking)
+            if rank > best_rank or not best_code:
+                best_code = code
+                best_conf = conf
+                best_formal = test_result
+                best_patterns = list(last_patterns)
+                best_attempt = attempt
+                best_formal_ok = formal_ok
+                best_pattern_ok = pattern_ok
+                best_blocking = blocking
+
             attempt_entry: dict[str, Any] = {
                 "attempt": attempt,
                 "formal_conformance": test_result.conformance_rate,
                 "formal_passed": test_result.passed,
-                "pattern_violations": _blocking_pattern_violations(last_patterns, cfg)
-                if cfg.enable_patterns
-                else 0,
+                "pattern_violations": blocking if cfg.enable_patterns else 0,
                 "feedback_variant": feedback_variant,
+                "is_best_so_far": code == best_code,
             }
 
             if formal_ok and pattern_ok:
+                attempt_history.append(attempt_entry)
+                break
+
+            # Formal already clear: do not burn remaining budget on pattern-only
+            # LLM repairs that often regress Conf; keep best formal candidate.
+            if formal_ok and cfg.enable_patterns and not pattern_ok:
                 attempt_history.append(attempt_entry)
                 break
 
@@ -365,11 +474,17 @@ class ErrorPreventionPipeline:
                 last_feedback_json = []
             attempt_history.append(attempt_entry)
 
-        formal_result = last_formal or run_formal_check(code, task, max_cases=cfg.formal_max_cases)
+        # Return best-effort candidate (not necessarily the last attempt).
+        code = best_code or code
+        formal_result = best_formal or last_formal or run_formal_check(
+            code, task, max_cases=cfg.formal_max_cases
+        )
         if cfg.mode in {"B2", "B3", "B4", "B4M", "B5", "B6"}:
             formal_result = run_formal_check(code, task, max_cases=cfg.formal_max_cases)
-        pattern_matches = last_patterns if last_patterns else (
-            self.pattern_guard.check(code, task) if cfg.enable_patterns else []
+        pattern_matches = best_patterns if best_patterns else (
+            last_patterns if last_patterns else (
+                self.pattern_guard.check(code, task) if cfg.enable_patterns else []
+            )
         )
         high_violations = _blocking_pattern_violations(pattern_matches, cfg)
 
@@ -384,7 +499,7 @@ class ErrorPreventionPipeline:
             mode=cfg.mode,
             success=success,
             code=code,
-            attempts=attempt,
+            attempts=best_attempt or attempt,
             formal_passed=formal_result.passed,
             formal_conformance=formal_result.conformance_rate,
             pattern_violations=high_violations,

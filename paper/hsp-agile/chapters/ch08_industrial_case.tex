@@ -1,0 +1,23 @@
+%% Optional industrial case vignette (P2) — included from ch08 if desired.
+\section{Industrial Decision Vignette}
+\label{sec:disc:industrial-case}
+
+Consider a telecom-style ordered alert table in
+\texttt{benchmarks/industrial\_sofl.json}: overlapping severity guards where
+``link down'' must preempt ``high latency'' when both predicates hold.
+Under gpt-4o / Claude on the $n{=}31$ industrial-pattern corpus, B2 already
+reaches 100\% mean Conf.\ while M sits at 95.5\%
+(Table~\ref{tab:cross-model-industrial})---so \emph{mean Conf.\ alone}
+selects B2.
+
+Apply the C4 rule: escalate to~M only if the sprint release bar requires
+$\mathrm{Accept}{=}1$ (every SpecIR witness plus clear critical pattern screen)
+or a prevention target FAR${\le}5\%$ on mutant screening (E2).
+If the team only needs high mean Conf.\ before merge, keep B2 and avoid the
+strengthened-$K$ bundle.
+Overlap density is \emph{not} the trigger: E3 tertiles are non-monotone on
+BENCH-120, and this industrial slice already favours B2 on Conf.
+
+This vignette is curated industrial-\emph{pattern} SOFL, not a production
+vendor trace; quantitative production KPIs are out of scope until a live
+Agile-SOFL pilot is instrumented.

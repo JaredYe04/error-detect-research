@@ -11,3 +11,6 @@ dist/
 build/
 .DS_Store
 /artifacts
+# Proprietary / NDA Agile-SOFL artefacts (keep README + .gitkeep)
+vendor/agile-sofl-toolchain/examples/*.asfl
+benchmarks/vendor_asfl_pilot.json

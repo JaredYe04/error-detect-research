@@ -75,6 +75,27 @@ def compile_callable(code: str, func_name: str) -> Callable[..., dict[str, int]]
     return wrapper
 
 
+def first_match_oracle(
+    scenarios: list[dict[str, Any]],
+    inputs: dict[str, int],
+) -> tuple[dict[str, int], int]:
+    """Compute expected outputs under FSF first-match semantics."""
+    for sc in scenarios:
+        if sc.get("kind") == "others":
+            continue
+        test = sc.get("test") or ""
+        if test and eval_predicate(test, inputs):
+            expected = resolve_expected(parse_def_assignments(sc["def"]), inputs)
+            return expected, int(sc.get("index", 0) or 0)
+    others = next((s for s in scenarios if s.get("kind") == "others"), None)
+    if others is None and scenarios:
+        others = scenarios[-1]
+    if others is None:
+        return {}, 0
+    expected = resolve_expected(parse_def_assignments(others["def"]), inputs)
+    return expected, int(others.get("index", len(scenarios)) or len(scenarios))
+
+
 def run_formal_check(
     code: str,
     task: dict[str, Any],
@@ -105,19 +126,23 @@ def run_formal_check(
 
     for case in cases:
         try:
+            # Recompute oracle via first-match (defense against mislabeled witnesses).
+            expected, active_idx = first_match_oracle(scenarios, case.inputs)
+            if not expected:
+                expected, active_idx = case.expected, case.scenario_index
             actual_raw = fn(**case.inputs)
-            actual = {k: int(actual_raw.get(k, 0)) for k in case.expected}
-            ok = all(actual.get(k) == v for k, v in case.expected.items())
+            actual = {k: int(actual_raw.get(k, 0)) for k in expected}
+            ok = all(actual.get(k) == v for k, v in expected.items())
             if ok:
                 passed += 1
             else:
                 counterexamples.append(
                     Counterexample(
-                        scenario_index=case.scenario_index,
+                        scenario_index=active_idx or case.scenario_index,
                         inputs=case.inputs,
-                        expected=case.expected,
+                        expected=expected,
                         actual=actual,
-                        message=f"FSF scenario {case.scenario_index} violated",
+                        message=f"FSF scenario {active_idx or case.scenario_index} violated",
                     )
                 )
         except Exception as exc:  # noqa: BLE001
@@ -130,19 +155,6 @@ def run_formal_check(
                     message=f"runtime_error: {exc}",
                 )
             )
-
-    # scenario coverage: verify correct branch selection via predicate
-    for sc in scenarios:
-        if sc.get("kind") == "others":
-            continue
-        test = sc["test"]
-        def_expr = sc["def"]
-        for case in cases:
-            env = {**case.inputs, **case.expected}
-            if eval_predicate(test, env):
-                expected = resolve_expected(parse_def_assignments(def_expr), env)
-                # branch consistency check already covered above
-                break
 
     return FormalCheckResult(
         passed=passed == len(cases) and len(cases) > 0,

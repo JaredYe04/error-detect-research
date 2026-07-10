@@ -12,6 +12,8 @@ not merely that a system runs.
 Hardware, modes, metrics, and E1--E9 tracks are stated once; threats are
 previewed here and analysed in Chapter~\ref{ch:discussion}.
 
+\input{tables/authoritative_numbers}
+
 \begin{inlinetable}{Claim-to-experiment map (Tier-1 focus).}
   \label{tab:claim-map}
   \footnotesize
@@ -35,26 +37,37 @@ previewed here and analysed in Chapter~\ref{ch:discussion}.
 %=============================================================================
 
 Each RQ answers a reviewer concern and maps to the claims above.
+Numbering is \emph{mechanism-first} (same scheme as Chapter~\ref{ch:intro}
+and Chapter~\ref{ch:results}): typed feedback and overlap structure first,
+then prevention and deployment, with aggregate E1 ranking as an RQ5
+stress-test rather than a universal-effectiveness headline.
 
-\paragraph{RQ1 (Overall Effectiveness).}
-Does the three-insight loop improve formal conformance over one-shot and
-test-feedback baselines? (E1, E2; supports C1--C3 jointly.)
+\paragraph{RQ1 (Typed Semantic Feedback IR).}
+Does typed Semantic Feedback IR improve repair beyond test-only feedback?
+(E6, A3; primarily C2.)
 
-\paragraph{RQ2 (Fault Class Prevention).}
-Which defect classes does the conjunctive gate catch, and which remain?
-(E2, E7, E9; primarily C3, residual analysis for C1/C2.)
+\paragraph{RQ2 (Gap vs.\ Guard-Overlap Density).}
+Does the M--baseline gap grow monotonically with guard-overlap density?
+(E3, E10; primarily C1.)
 
-\paragraph{RQ3 (Component Attribution).}
-How much do typed feedback and the formal checker contribute independently?
-(E5, E6, A1--A3; primarily C2, with C3 via A2/PDR.)
+\paragraph{RQ3 (Conjunctive Accept vs.\ Conf Alone).}
+Does conjunctive $\mathrm{Accept}$ improve prevention versus mean
+conformance alone? (E2, A2 vs.\ M; primarily C3.)
 
-\paragraph{RQ4 (Complexity Scaling).}
-Does the advantage grow where semantic regions are hardest to sample?
-(E3, E4; primarily C1.)
+\paragraph{RQ4 (Deployment Boundary).}
+Under what conditions should practitioners deploy M versus B2?
+(E3, E10, E11, E8c; C4 / Table~\ref{tab:deployment-boundary}.)
 
 \paragraph{RQ5 (Quality--Overhead Trade-off).}
-Is the latency cost justified by the conformance gain?
-(E1 Pareto; practical bound on all three claims.)
+Is the latency cost justified by prevention and release requirements?
+(E1 Pareto, A2 operating point; practical bound.)
+Primary fixed-oracle E1 ranking (B1/B2/M mean Conf.\ from
+\code{run\_e1\_m\_win\_v2}) is reported under RQ5 as an overlap stress-test
+with paired win rates, not as a powered dominance claim.
+Holm-corrected non-significance of multi-mode Conf.\ gaps applies to the
+\emph{pre-fix} canonical E1 corpus
+(\code{run\_e1\_canonical\_v1}/\code{run\_hard\_full\_parallel\_v1});
+fixed-oracle E1 does not restate a Holm claim (see Chapter~\ref{ch:results}).
 
 %=============================================================================
 \section{Hardware and Software Environment}
@@ -83,20 +96,67 @@ Temperature was set to $T_\text{gen} = 0.7$ for all generation calls and to
 $T_\text{repair} = 0.0$ for all repair calls, following the prompting strategy
 described in Chapter~\ref{ch:method}.
 The maximum token budget per LLM call was 4096 tokens.
-The budget parameter $K = 3$ was fixed for all LLM-based modes: in mode~M, the repair
-loop may invoke the LLM up to three times per task, consuming between 1 and 3 API
-calls depending on when the loop terminates.
+The repair budget~$K$ is \emph{not} uniform across corpora.
+On primary fixed-oracle ranking runs (E1/E10/E12 M-win), strengthened mode~M
+uses $K{=}5$ (best-effort argmax Conf.\ over attempts); B1/B2 retain their
+baseline budgets under the same harness.
+Mechanism and controlled comparisons---notably E6 feedback variants and the
+historical pre-fix multi-mode matrix---use $K{=}3$ as the default.
+In mode~M the repair loop may therefore invoke the LLM up to $K$ times per
+task, consuming between 1 and $K$ API calls depending on early termination.
 
 \subsection{Experiment Identifier and Scale}
 
-The primary experiment was conducted under the run identifier
-\code{run\_hard\_full\_parallel\_v1}.
-In total, 1{,}200 runs were executed: 10 modes $\times$ 120 tasks, each run
-processed independently by a dedicated worker process.
-The core seven-mode matrix (\code{run\_hard\_full\_parallel\_v1}) covers
-B0--B2, M, and A1--A3; extended baselines B3--B5 were evaluated under
-\code{run\_ccf\_b\_extended\_v1} (repeat~0 merged into the reported tables
-after \texttt{config\_for\_mode} was corrected for those modes).
+Three corpora must be kept distinct (Table~\ref{tab:corpus-card};
+authoritative numbers in \texttt{artifacts/AUTHORITATIVE\_NUMBERS.md}).
+
+\begin{inlinetable}{Corpus / protocol card (which experiment cites which run).}
+  \label{tab:corpus-card}
+  \footnotesize
+  \begin{tabular}{p{0.22\linewidth}p{0.32\linewidth}p{0.38\linewidth}}
+    \toprule
+    Role & Run id(s) & Used for \\
+    \midrule
+    Primary ranking
+      (fixed others-witness oracle)
+      & \code{run\_e1\_m\_win\_v2},
+        \code{run\_e10\_m\_win\_v1},
+        \code{run\_e12\_m\_win\_v1},
+        \code{run\_e1\_ablation\_fixed\_v1},
+        \textbf{\code{run\_e1\_equal\_k\_v1}}
+      & E1/E10/E12 B1/B2/M Conf stress
+        (M $K{=}5$ bundle);
+        \textbf{equal-$K$ Conf:\ B2 vs.\ \texttt{M\_eq}
+        ($K{=}3$, ${+}2.5$\,pp)};
+        fixed-oracle A1--A3 \\
+    Mechanism / prevention
+      & \code{run\_feedback\_v2},
+        \code{prevention\_full\_v1}
+      & E6 typed-IR ($K{=}3$); E2 PDR/FAR \\
+    Historical pre-fix
+      (superseded for ranking)
+      & \code{run\_e1\_canonical\_v1}/
+        \code{run\_hard\_full\_parallel\_v1};
+        also \code{run\_e12\_canonical\_v1},
+        \code{run\_e10\_random\_v2}
+      & Pre-fix A1--A3 Conf.\ ordering
+        (archive), some latency figures,
+        pre-fix Holm multi-mode stats;
+        $K{=}3$; buggy others-witness
+        oracle ($\sim$5\% Strict) \\
+    \bottomrule
+  \end{tabular}
+\end{inlinetable}
+
+Primary B1/B2/M aggregates cite the fixed-oracle M-win runs above
+(E1: 120 tasks $\times$ 3 modes; E10: 100; E12: 120 $\times$ 3 seeds $\times$ 3 modes).
+The historical seven-mode matrix
+(\code{run\_hard\_full\_parallel\_v1}/\code{run\_e1\_canonical\_v1})
+covers B0--B2, M, and A1--A3 under the pre-fix oracle; extended baselines
+B3--B5 were evaluated under \code{run\_ccf\_b\_extended\_v1} (repeat~0).
+Fixed-oracle A1--A3 now live in \code{run\_e1\_ablation\_fixed\_v1}
+(matched to strengthened~M); cite Table~\ref{tab:ablation-fixed} as primary
+component ranking and keep pre-fix A1--A3 only as archive.
 Run artefacts (prompts, LLM responses, Z3 query logs, evaluation traces, timing
 records) were serialised to disk in JSONL format for
 reproducibility~\citep{ammann2016testing}.
@@ -118,10 +178,18 @@ re-running experiments.
 Data preparation, aggregation, and plotting each run as a distinct pipeline
 stage (\code{prepare\_paper\_data.py}, \code{prepare\_mechanism\_data.py},
 \code{plot\_mpl\_figures.py}).
-All reported tables and figures are generated from the canonical
-\code{run\_hard\_full\_parallel\_v1} artifact (120 tasks $\times$ 7 modes),
-\code{run\_ccf\_b\_extended\_v1} (B3--B5, repeat~0), and
-\code{prevention\_full\_v1} prevention evaluation.
+Primary ranking tables cite
+\code{run\_e1\_m\_win\_v2}, \code{run\_e10\_m\_win\_v1},
+\code{run\_e12\_m\_win\_v1}, and \code{run\_e1\_ablation\_fixed\_v1}
+(summarised via \texttt{summarize\_m\_win.py} /
+\texttt{summarize\_ablation\_fixed.py};
+see \texttt{artifacts/AUTHORITATIVE\_NUMBERS.md}).
+Mechanism and prevention tables cite \code{run\_feedback\_v2} (E6) and
+\code{prevention\_full\_v1} (E2).
+Historical multi-mode / pre-fix ablation figures cite
+\code{run\_e1\_canonical\_v1} or
+\code{run\_hard\_full\_parallel\_v1}, plus \code{run\_ccf\_b\_extended\_v1}
+for B3--B5; those must not be presented as primary B1/B2/M ranking evidence.
 Long-running mechanism experiments (E6 feedback variants, E8 generalisation) write
 incremental \code{results.jsonl} and a live \code{progress.json} with completed/total
 counts and ETA; use \code{python -u} for unbuffered console output.
@@ -144,10 +212,15 @@ verification, not FSF precedence---hence a domain-specific set.
 non-empty overlap regions: five inputs, three outputs, eight ordered
 scenarios, annotated by overlap density, guard-complexity label, and
 scenario count.
-B0 one-shot reaches 89.2\% mean Conf.\ at $\approx$0.2\,s latency on canonical
-E1---matching B1 at seed~0 and confirming that aggregate mean Conf.\ does not
-separate repair modes on this slice; per-task variance (Figure~\ref{fig:conf-distribution})
-and prevention metrics carry the discriminative signal instead.
+On the historical pre-fix canonical E1 corpus, B0 one-shot reaches
+89.2\% mean Conf.\ at $\approx$0.2\,s latency---matching B1 at seed~0 and
+confirming that aggregate mean Conf.\ does not separate repair modes on that
+slice.
+Under the fixed others-witness oracle used for primary ranking
+(\code{run\_e1\_m\_win\_v2}), B1 mean Conf.\ is 84.2\%; B0 is not re-reported
+in the M-win matrix.
+Per-task variance (Figure~\ref{fig:conf-distribution}) and prevention metrics
+carry the discriminative signal instead.
 
 \subsection{Base Tasks and Hard Synthetic Generation}
 
@@ -196,9 +269,12 @@ the Z3 overlap-density filter (\texttt{--no-filter} in
 \texttt{build\_benchmark.py}).
 Tasks were annotated with overlap rate, boundary density, and scenario count for
 post-hoc stratification.
-Evaluation runs B1, B2, and M under the same $K{=}3$, model, and token budget
-as E1 (\texttt{run\_e10\_random\_v1} on
-\texttt{benchmarks/random\_tasks\_annotated.json}).
+Evaluation runs B1, B2, and M under the fixed-oracle M-win protocol
+(\texttt{run\_e10\_m\_win\_v1} on
+\texttt{benchmarks/random\_tasks\_annotated.json}): strengthened M uses
+$K{=}5$ with the same model and token budget family as primary E1; the
+historical pre-fix E10 run (\texttt{run\_e10\_random\_v2}) is superseded
+for ranking.
 The decision question is whether aggregate M $>$ B2 holds on uniformly sampled
 tasks, or whether overlap tertiles (E3) and deployment signals (Table~\ref{tab:deployment-boundary})
 must be read jointly---E10 is a negative control for overlap filtering.
@@ -216,8 +292,9 @@ A parallel export \texttt{benchmarks/manual\_heldout.json} (same $n{=}22$, zero 
 overlap) is reserved for vendor-example provenance when the Agile-SOFL submodule is
 available; in this artifact package both files reference the curated external corpus
 because \texttt{vendor/agile-sofl-toolchain/examples} is not bundled.
-Evaluation (\texttt{run\_e11\_external\_v1}) runs B1, B2, and M under the same
-$K{=}3$ budget as E1.
+Evaluation (\texttt{run\_e11\_external\_v1}) runs B1, B2, and M under the
+historical controlled budget $K{=}3$ (mechanism-style; not the primary
+M-win $K{=}5$ ranking protocol).
 
 \subsection{Generalisation Subset (E8)}
 
@@ -302,7 +379,10 @@ the mean guard region overlap rate is 1.8 scenarios per input point.
 The evaluation question is which feedback source actually repairs precedence
 faults: none, unit tests, self-critique, execution traces, or
 specification-indexed SMT witnesses.
-Ten modes are evaluated in E1 (B0--B5, M, A1--A3).
+Ten modes are evaluated across the E1 family (B0--B5, M, A1--A3): primary
+fixed-oracle ranking reports B1/B2/M from \code{run\_e1\_m\_win\_v2}; the
+historical seven-mode matrix and B3--B5 extensions supply ablations and
+extended baselines (Table~\ref{tab:corpus-card}).
 The design space spans formal reference (B0), LLM baselines (B1--B5), full
 HSP-Agile (M), and three ablations (A1--A3).
 
@@ -350,7 +430,8 @@ and passes it directly to the evaluator with no feedback loop.
 B2 extends B1 with an iterative test-feedback loop~\citep{zhu1997specification}.
 After each generation, unit tests derived from FSF pre/post-conditions are executed;
 failures are appended to the prompt for the next LLM call until all tests pass or
-$K=3$ is exhausted.
+the baseline repair budget $K{=}3$ is exhausted (B2 keeps $K{=}3$ even on
+primary M-win harnesses where strengthened~M uses $K{=}5$).
 B2 uses no Z3 and no pattern guard.
 
 \paragraph{B3 --- Self-Refine Baseline.}
@@ -366,8 +447,9 @@ specification-level annotation.
 Unlike B2, B4 uses only reference-implementation observable behaviour rather than
 FSF-derived tests.
 All three extended baselines B3--B5 use the same prompt template family as M,
-the same budget~$K$, and the same per-call token cap; results appear in
-Table~\ref{tab:main-results} (repeat~0, \code{run\_ccf\_b\_extended\_v1}).
+the historical controlled budget $K{=}3$, and the same per-call token cap;
+results appear in Table~\ref{tab:main-results} (repeat~0,
+\code{run\_ccf\_b\_extended\_v1}).
 
 \paragraph{B5 --- Reflexion-Lite Baseline.}
 B5 (Reflexion-style~\citep{shinn2023reflexion}): a lightweight verbal memory
@@ -391,7 +473,11 @@ evaluation: \texttt{run\_b6\_full\_v1} ($n{=}100$ hard tasks) and
 \paragraph{M --- Full HSP-Agile Pipeline.}
 Mode~M runs the complete pipeline (Chapters~\ref{ch:method} and~\ref{ch:implementation}):
 LLM generation, Z3 counterexample inputs, pattern-guard screening, and CEGIS repair
-with Semantic Feedback IR until all checks pass or $K=3$ is reached.
+with Semantic Feedback IR until all checks pass or the budget~$K$ is reached.
+On primary fixed-oracle ranking runs (E1/E10/E12 M-win), $K{=}5$ with
+best-effort argmax Conf., \texttt{execution\_trace\_matched} feedback, and an
+advisory critical-only pattern gate; mechanism runs such as E6 keep $K{=}3$
+under full~M to isolate feedback content.
 
 \paragraph{A1 --- Ablation: No Formal Check.}
 A1 replaces Z3-based case generation with the B2 unit-test harness; pattern guard and
@@ -471,16 +557,21 @@ The mutation kill rate $\mu_k$ is the fraction killed; it measures checker preci
 not generator quality.
 
 \paragraph{LLM Call Count and Latency.}
-LLM call count is the mean API calls per task (1.0 for B1; 1--3 for repair modes).
+LLM call count is the mean API calls per task (1.0 for B1; up to~$K$ for
+repair modes, with $K{=}3$ on mechanism/historical runs and $K{=}5$ for
+strengthened M on primary M-win ranking).
 Latency is wall-clock time from task start to final verdict, including LLM, Z3, pattern
 guard, and orchestration overhead.
 
 \paragraph{PDR and FAR (Prevention Metrics).}
+Both metrics are defined over the set of \emph{faulty} mutants
+(Definitions~\ref{def:pdr}--\ref{def:far}).
 PDR is the fraction of faulty mutants for which
 $\neg\mathrm{Accept}(c_m,t_m)$ (correctly blocked).
 FAR is the fraction of faulty mutants for which $\mathrm{Accept}(c_m,t_m)$
-still holds (escaped into release); see Definitions~\ref{def:pdr}--\ref{def:far}
-and the miniature example above.
+still holds---the escape / false-accept rate among faulty mutants, not a
+precision score; see the miniature example above.
+On a fixed faulty-mutant set, $\mathrm{PDR}+\mathrm{FAR}=1$.
 Both are reported per mutant operator in E2 and aggregated in E1.
 
 %=============================================================================
@@ -491,17 +582,23 @@ Both are reported per mutant operator in E2 and aggregated in E1.
 Each experiment answers one decision question; artifact paths live in
 Appendix~\ref{app:reproducibility}.
 
-\paragraph{E1 --- Overall Effectiveness.}
+\paragraph{E1 --- Aggregate Stress-Test (RQ5).}
 Does the full loop beat one-shot and test-feedback on Conf, PDR, FAR, and
-latency?  120 tasks $\times$ 10 modes (1{,}200 runs: core matrix plus B3--B5
-from \code{run\_ccf\_b\_extended\_v1}); $K=3$, $T_\text{gen}=0.7$,
-$T_\text{repair}=0.0$.
+latency?  Reported under RQ5 as an overlap stress-test, not a universal
+effectiveness headline.
+Primary B1/B2/M ranking cites \code{run\_e1\_m\_win\_v2} (120 tasks;
+strengthened M with $K{=}5$, $T_\text{gen}=0.7$, $T_\text{repair}=0.0$;
+report means and paired win rates, no Holm claim).
+Historical multi-mode / ablation evidence (B0--B2, M, A1--A3 under $K{=}3$)
+remains in \code{run\_e1\_canonical\_v1}/\code{run\_hard\_full\_parallel\_v1};
+B3--B5 from \code{run\_ccf\_b\_extended\_v1}.
 
-\paragraph{E2 --- Full Prevention Evaluation.}
+\paragraph{E2 --- Full Prevention Evaluation (RQ3).}
 Which mutant operators does each mode catch?  120 tasks $\times$ 6 modes
-$\times$ 8 operators, reporting PDR/FAR per operator.
+$\times$ 8 operators, reporting PDR/FAR per operator
+(\code{prevention\_full\_v1}; unchanged mechanism protocol).
 
-\paragraph{E3 --- Specification Complexity.}
+\paragraph{E3 --- Specification Complexity (RQ2).}
 Does the M--baseline gap grow with overlap?  Conf stratified by density
 tertile and guard-complexity label.
 
@@ -510,13 +607,15 @@ Is SMT sampling necessary, or would denser random tests suffice?
 Coverage of SMT vs.\ random across budgets $\{4,8,16,32,64\}$ and three
 density tiers.
 
-\paragraph{E5 --- Repair Dynamics.}
-Where does budget $K=3$ pay off?  $\mathrm{Conf}(k)$ for M vs.\ B2 at
-$k=1,2,3$ from logged \code{attempt\_history}.
+\paragraph{E5 --- Repair Dynamics (supports RQ1).}
+Where does budget~$K$ pay off?  $\mathrm{Conf}(k)$ for M vs.\ B2 from
+logged \code{attempt\_history} (historical controlled comparisons use
+$K{=}3$; primary M-win M allows $k$ up to~5).
 
-\paragraph{E6 --- Feedback Variant Comparison.}
+\paragraph{E6 --- Feedback Variant Comparison (RQ1).}
 Is the gain from structure or from longer prompts?  120 tasks $\times$ three
-variants under mode~M: A (test only), B (test + expected), C (full Semantic
+variants under mode~M with $K{=}3$
+(\code{run\_feedback\_v2}): A (test only), B (test + expected), C (full Semantic
 Feedback IR).
 
 \paragraph{E7 --- Pattern Guard P/R/F1.}
@@ -532,18 +631,24 @@ E8b expands the Mini-Z and Mini-StateMachine corpora to $n{=}30$ tasks each
 real-derived HumanEval/MBPP tasks.
 
 \paragraph{E9 --- Failure Analysis.}
-What remains after $K=3$?  Taxonomy of non-accepted tasks under mode~M.
+What remains after the repair budget?  Taxonomy of non-accepted tasks under
+mode~M.
 
 \paragraph{E10 --- Random Benchmark.}
 Does aggregate M beat B2 without overlap filtering?  100 uniformly sampled
-tasks $\times$ modes B1, B2, M (Section~\ref{sec:exp:e10}).
+tasks $\times$ modes B1, B2, M under
+\code{run\_e10\_m\_win\_v1} (Section~\ref{sec:exp:e10}); historical
+\code{run\_e10\_random\_v2} is superseded for ranking.
 
 \paragraph{E12 --- Multi-Seed Stability.}
 Does the M--B2 ranking flip under LLM stochasticity?
 \textbf{E12-full} re-runs the full 120-task hard benchmark $\times$ seeds
-$\{0,1,2\}$ $\times$ modes B1, B2, M (\texttt{run\_e12\_canonical\_v1}, 1080 jobs).
-Per-mode mean, per-seed means, paired win rate, and Friedman test are reported in
-Section~\ref{sec:results:e12}.
+$\{0,1,2\}$ $\times$ modes B1, B2, M under the fixed oracle
+(\texttt{run\_e12\_m\_win\_v1}, 1080 jobs).
+Per-mode mean, per-seed means, and paired win rate are reported in
+Section~\ref{sec:results:e12}; the historical pre-fix
+\texttt{run\_e12\_canonical\_v1} (with Friedman test) is superseded for
+ranking.
 A prior 30-task stratified pilot (\texttt{run\_e12\_stability\_v1}) is superseded.
 
 \paragraph{E14 --- Length-Matched Feedback Sweep.}
@@ -576,7 +681,8 @@ The full statistical protocol comprises:
 \begin{itemize}
   \item Paired Wilcoxon signed-rank test for conformance comparisons.
   \item Mann-Whitney U test for latency comparisons.
-  \item Holm-Bonferroni correction applied across all pairwise mode comparisons.
+  \item Holm-Bonferroni correction for pre-fix multi-mode pairwise
+    comparisons (not restated for fixed-oracle E1 win rates).
   \item Cliff's $\delta$ as non-parametric effect size.
   \item Bootstrap 95\% confidence intervals ($n=1000$ resamples).
   \item Significance threshold $\alpha = 0.05$.
@@ -585,20 +691,24 @@ The full statistical protocol comprises:
 Effect sizes are interpreted as: $|\delta| < 0.147$ negligible,
 $0.147 \le |\delta| < 0.33$ small, $0.33 \le |\delta| < 0.474$ medium,
 $|\delta| \ge 0.474$ large.
-We apply Holm-Bonferroni correction for E1 all-mode comparisons.
+We apply Holm-Bonferroni correction for \emph{pre-fix} multi-mode E1
+comparisons on \code{run\_e1\_canonical\_v1}; fixed-oracle primary E1 reports
+win rates and means without a Holm claim.
 
-\paragraph{Post-hoc power analysis (REV-5).}
-With $n{=}120$ paired tasks on canonical E1, observed Cliff's $\delta$ for M vs.\ B1
+\paragraph{Post-hoc power analysis (REV-5; pre-fix corpus).}
+With $n{=}120$ paired tasks on historical canonical E1
+(\code{run\_e1\_canonical\_v1}), observed Cliff's $\delta$ for M vs.\ B1
 conformance is $-0.036$ (Wilcoxon $p{=}0.059$, Holm $p{=}1.0$): M trails B1 at
 seed~0 and the benchmark is \emph{under-powered} to detect an effect this small.
 For M vs.\ B2, $\delta{=}{-}0.014$ (Holm $p{=}1.0$): the observed gap is
 negligible and post-hoc power is ${\approx}3.6\%$ at $\alpha{=}0.05$.
 Detecting a paired effect of $|\delta|{=}0.014$ would require $n{\gtrsim}39{,}000$
 paired tasks for 80\% power (\texttt{power\_analysis.json}); we therefore do not
-treat aggregate M--B2 conformance as a powered hypothesis test.
-We report per-task win rate (2/120 at E1 seed~0; 4/120 E12 mean-across-seeds),
-overlap stratification (E3, E10), multi-seed stability (E12-canonical), and
-prevention metrics (E2) rather than headline percentage gaps.
+treat aggregate M--B2 conformance as a powered hypothesis test on that corpus.
+Fixed-oracle E1 (\code{run\_e1\_m\_win\_v2}) instead reports per-task win rate
+(2/120 M vs.\ B2) and means; multi-seed stability uses
+\code{run\_e12\_m\_win\_v1}, with overlap stratification (E3, E10) and
+prevention metrics (E2) as complementary evidence.
 Analysis script: \texttt{power\_analysis.py} $\to$
 \texttt{data/processed/power\_analysis.json}.
 
@@ -607,14 +717,15 @@ Analysis script: \texttt{power\_analysis.py} $\to$
 
 \textbf{E12-full} re-runs all 120 hard-benchmark tasks with three independent
 LLM seeds (repeats $\{0,1,2\}$) for modes B1, B2, and M while holding
-$T_\text{gen}$, $T_\text{repair}$, and $K$ fixed (\texttt{run\_e12\_full\_v1}).
+$T_\text{gen}$ and $T_\text{repair}$ fixed under the M-win protocol
+(\texttt{run\_e12\_m\_win\_v1}; strengthened M uses $K{=}5$).
 The primary stability outcomes are: (i)~per-seed mean conformance ranking;
-(ii)~paired per-task win rate M vs.\ B2 pooled across seeds; and
-(iii)~Friedman test across seeds for mode ranking.
+(ii)~paired per-task win rate M vs.\ B2 pooled across seeds.
 This supplements the single-repeat E1 matrix without re-running all modes at
 three seeds.
-A 30-task stratified pilot remains in the artifact tree for protocol debugging
-but is not the headline evidence.
+The historical pre-fix \texttt{run\_e12\_canonical\_v1} (including Friedman
+test) is superseded for ranking; a 30-task stratified pilot remains in the
+artifact tree for protocol debugging but is not the headline evidence.
 
 %=============================================================================
 \section{Threats to Validity (Preview)}
@@ -652,16 +763,18 @@ Implementations are Python; results may not transfer to other languages or LLMs.
 
 \paragraph{Conclusion validity.}
 Holm-Bonferroni correction, Cliff's~$\delta$, and bootstrap 95\% CIs are applied
-throughout.
-The strict-success null result (M vs.\ B1/B2, uncorrected $p \approx 0.92$;
-Holm $p = 1.000$) reflects the conjunctive acceptance gate design, not method
-equivalence on conformance.
+to pre-fix multi-mode comparisons where reported.
+The historical strict-success null result (M vs.\ B1/B2, uncorrected
+$p \approx 0.92$; Holm $p = 1.000$) on the buggy others-witness oracle
+reflects that corpus's conjunctive gate behaviour, not fixed-oracle ranking
+evidence; primary E1/E10/E12 cite M-win run ids and win rates instead.
 The full prevention evaluation supersedes preliminary spec-confusion results
 ($n=40$); the non-monotonic B2/M ordering reflects complementary detection
 mechanisms.
 
 With the protocol fixed, the next chapter reports what those experiments
-actually show---mechanism first, then overall effectiveness.
+actually show---mechanism first (RQ1--RQ4), then quality--overhead and the
+E1 stress-test under RQ5.
 
 % -----------------------------------------------------------------------------
 \section*{Chapter Summary}
@@ -671,6 +784,11 @@ actually show---mechanism first, then overall effectiveness.
 Nine core experiments (E1--E9) plus E10 (random benchmark) and E12
 (multi-seed stability) test the three Tier-1 claims across five research
 questions on a 120-task hard benchmark with ten compared modes.
+Primary B1/B2/M ranking cites fixed-oracle M-win run ids
+(Table~\ref{tab:corpus-card}); mechanism (E6) and prevention (E2) use
+unchanged dedicated corpora; ablations remain on the historical pre-fix
+matrix.
 Prevention is measured by PDR and FAR alongside formal conformance and latency;
-statistical comparisons use Holm-Bonferroni-corrected non-parametric tests.
+pre-fix multi-mode statistics use Holm-Bonferroni-corrected non-parametric
+tests where reported, while fixed-oracle E1 emphasises win rates.
 Threats are previewed here and fully analysed in Chapter~\ref{ch:discussion}.

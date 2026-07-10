@@ -1,0 +1,56 @@
+{
+  "source": "D:\\repos\\error-detect-research\\artifacts\\run_feedback_v2\\feedback_variants\\results.jsonl",
+  "n_rows": 360,
+  "n_tasks": 120,
+  "variant_means": {
+    "semantic_ir": {
+      "n": 120,
+      "mean_conf": 0.8688492063492064
+    },
+    "test_expected": {
+      "n": 120,
+      "mean_conf": 0.7889880952380952
+    },
+    "test_only": {
+      "n": 120,
+      "mean_conf": 0.7914186507936508
+    }
+  },
+  "comparisons": [
+    {
+      "focal": "semantic_ir",
+      "comparator": "test_only",
+      "n_paired": 120,
+      "wins": 14,
+      "losses": 4,
+      "ties": 102,
+      "mean_focal": 0.8688492063492064,
+      "mean_comparator": 0.7914186507936508,
+      "delta_pp": 7.743055555555555,
+      "mean_delta_pp": 7.7430555555555545,
+      "ci_low_pp": 2.256944444444444,
+      "ci_high_pp": 13.645833333333332,
+      "B": 5000,
+      "seed": 42,
+      "wilcoxon_p": 0.0182342529296875
+    },
+    {
+      "focal": "semantic_ir",
+      "comparator": "test_expected",
+      "n_paired": 120,
+      "wins": 14,
+      "losses": 4,
+      "ties": 102,
+      "mean_focal": 0.8688492063492064,
+      "mean_comparator": 0.7889880952380952,
+      "delta_pp": 7.986111111111116,
+      "mean_delta_pp": 7.986111111111112,
+      "ci_low_pp": 2.1527777777777777,
+      "ci_high_pp": 13.958333333333334,
+      "B": 5000,
+      "seed": 42,
+      "wilcoxon_p": 0.02684783935546875
+    }
+  ],
+  "note": "Paired per task_id. Wins = semantic_ir > comparator. Bootstrap 95% CI on mean paired delta (B=5000, seed=42)."
+}

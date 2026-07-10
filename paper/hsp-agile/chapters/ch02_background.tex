@@ -6,8 +6,8 @@
 
 The pieces needed for prevention already exist---ordered FSF contracts,
 LLM synthesis, CEGIS-style repair, SMT witnesses, pattern screens, mutation
-metrics---but they have not been combined for specification-conformance
-defects.
+metrics---but prior systems typically address only a subset of these for
+specification-conformance defects.
 This chapter maps each piece briefly and ends with comparison tables that
 position \textsc{SgDP}; formal objects wait for Chapter~\ref{ch:formalization}.
 
@@ -91,15 +91,17 @@ CEGIS splits synthesis into a synthesiser and a verifier that returns
 counterexamples until success or budget exhaustion
 \citep{solarlezama2008sketching}.
 LLM-augmented variants replace templates with free-form generation while
-retaining formal checks~\citep{loughman2024dafnybench,sun2024clover},
-but prior systems lack FSF first-match semantics and pattern-guard pre-filters.
+retaining formal checks~\citep{loughman2024dafnybench,sun2024clover};
+those pipelines target Dafny-style proof obligations rather than FSF
+first-match regions or requirements-level pattern screens.
 
 HSP-Agile instantiates the \textsc{SgDP} loop with an LLM synthesiser, a
 Z3-based verifier over suite $\mathcal{D}(t)$, and a feedback aggregator that
 packages counterexamples $(x^*, g_t(x^*), f_{c_k}(x^*))$ together with
 high-severity pattern hits (Figure~\ref{fig:cegis-loop}).
 Budget $K$ caps iterations ($K=3$ in the experiments); on exhaustion the
-highest-scoring candidate is returned as best-effort~\citep{barrett2018smt}.
+highest-$\mathrm{Conf}$ candidate is returned as best-effort
+($\arg\max_k \mathrm{Conf}(c_k,t)$)~\citep{barrett2018smt}.
 
 \begin{figure}[t]
   \centering
@@ -125,11 +127,14 @@ input~\citep{barrett2018smt,demoura2008z3}.
 For each scenario $s_i$, HSP-Agile solves the \emph{effective} guard
 $\varphi_i = g_i(x) \wedge \bigwedge_{j<i}\neg g_j(x)$, guaranteeing at least
 one witness per first-match region---targeted coverage that random testing
-(e.g.\ QuickCheck~\citep{claessen2000quickcheck}) does not provide.
+(e.g.\ QuickCheck) does not provide.
 This is weaker than full deductive verification (e.g.\ Dafny~\citep{leino2010dafny})
 but requires no developer annotations and fits Agile-SOFL sprint velocity;
 prevention guarantees remain bounded by suite coverage
 (Chapter~\ref{ch:formalization}).
+Property-based testing such as QuickCheck samples broad input families from
+executable properties~\citep{claessen2000quickcheck,zhu1997specification};
+HSP-Agile complements it with solver-directed witnesses for ordered regions.
 
 % ─────────────────────────────────────────────────────────────────────────────
 \section{Requirement-Level Error Pattern Detection}
@@ -156,8 +161,8 @@ HSP-Agile uses two operator families (details in Chapter~\ref{ch:experiments}):
 specification-level SNO, ORO, SPO; implementation-level ICO, WRO, BCO.
 Prevention quality is scored as \emph{Prevention Detection Rate} (PDR: fraction
 of injected faults correctly rejected) and \emph{False Accept Rate} (FAR:
-fraction of conforming candidates incorrectly rejected), analogous to
-sensitivity--specificity~\citep{okun2013sate4}.
+escape rate among faulty mutants), both over the faulty-mutant set
+(Definitions~\ref{def:pdr}--\ref{def:far}).
 
 % ─────────────────────────────────────────────────────────────────────────────
 \section{Related Work}
@@ -177,9 +182,15 @@ Closest LLM+verifier systems differ on three axes: whether witnesses respect
 first-match order, whether repair carries scenario structure, and whether
 prevention (not only pass@k) is measured.
 DafnyBench~\citep{loughman2024dafnybench} uses full deductive verification but
-repairs from compiler messages, with no pattern guard and pass@k evaluation.
-Sun et al.\ (Clover)~\citep{sun2024clover} is the closest verifier-in-the-loop
-design, yet lacks FSF ordering, pattern guards, and PDR/FAR.
+repairs from compiler messages under a proof-oriented oracle, with pass@k
+evaluation rather than PDR/FAR.
+Sun et al.\ (Clover)~\citep{sun2024clover} is the closest CEGIS-style
+verifier-in-the-loop design for Dafny; it is a fair reference for closed-loop
+repair, not a drop-in FSF comparator---it does not encode first-match SpecIR
+regions, typed scenario feedback, or a requirements pattern gate.
+Our B6 (VerifierLoop-FSF) adapts witness-in-the-loop repair to FSF without
+Semantic Feedback IR or hard pattern screening---a controlled comparator, not
+a Clover clone.
 Baselines B1 (one-shot LLM) and B2 (test-feedback without SMT witnesses)
 isolate those two ingredients.
 
@@ -237,9 +248,11 @@ isolate those two ingredients.
 \end{inlinetable}
 
 \noindent
-No prior approach combines FSF first-match semantics, LLM synthesis, CEGIS
-repair with SMT counterexamples, and a pattern guard under PDR/FAR prevention
-metrics~\citep{chen2021codex,loughman2024dafnybench}.
+Relative to these lines of work, \textsc{SgDP} contributes the
+\emph{combination} of FSF first-match witnesses, typed Semantic Feedback IR,
+and conjunctive $\mathrm{Accept}$ under PDR/FAR---not a claim that no prior
+system uses any of LLM synthesis, CEGIS repair, or SMT
+checks~\citep{chen2021codex,loughman2024dafnybench,sun2024clover}.
 
 % ─────────────────────────────────────────────────────────────────────────────
 \section{Gap Summary}
@@ -254,8 +267,21 @@ modes neither human-process prevention nor test-only post-processing alone
 addresses.
 Coding agents (OpenHands, SWE-agent, and similar)~\citep{wang2024opendevin,yang2024sweagent}
 target repository tasks without a specification oracle $g_t$ or PDR/FAR;
-they are orthogonal to \textsc{SgDP} (Reflexion-style verbal memory captures a
-dimension most relevant to repair but is not evaluated here).
+they are orthogonal to \textsc{SgDP}.
+LLM-based automated program repair (ChatRepair, code-LM
+APR)~\citep{xia2023chatrepair,jiang2023impact,yasunaga2021graph2tree} patches
+failing tests or buggy snippets; our loop instead repairs against
+\emph{ordered-guard} witnesses derived from SpecIR and scores prevention
+(PDR/FAR), not only pass@k.
+Adjacent formal notations such as Alloy and TLA+~\citep{jackson2002alloy,lamport2002tla}
+encode structured constraints; SpecIR adapters are the intended bridge when
+guards are first-match and SMT-encodable---not a claim that \textsc{SgDP}
+already covers temporal or relational logics.
+Self-Debug~\citep{chen2023selfdebug} and Reflexion~\citep{shinn2023reflexion}
+are fair verbal/trace repair baselines: they raise generation success via
+critique or verbal memory, but do not emit region-typed failure records or
+measure prevention under conjunctive release.
+We evaluate those styles as B3--B5 on BENCH-120 ($K{=}3$).
 
 Table~\ref{tab:related-positioning} positions \textsc{SgDP} on the dimensions
 that matter for specification-conformance defect prevention.
@@ -281,13 +307,16 @@ that matter for specification-conformance defect prevention.
   \end{tabular}
 \end{inlinetable}
 
-Unlike Clover-style closed-loop verifier feedback~\citep{sun2024clover},
-failing unit tests are not the primary signal: guard precedence is encoded as
-SMT constraints, and the LLM receives a typed failure record that names the
-violated scenario.
+Unlike Clover-style closed-loop verifier feedback for Dafny~\citep{sun2024clover},
+failing unit tests are not the primary signal here: guard precedence is encoded
+as SMT constraints over first-match regions, and the LLM receives a typed
+failure record that names the violated scenario.
 
 \begin{inlinetable}{Repair-loop baselines evaluated in this report (feedback signal,
-  formal oracle, pattern gate, typical latency on E1).}
+  formal oracle, pattern gate).
+  Conf.\ (\%) on \emph{pre-fix} canonical E1 (historical);
+  primary fixed-oracle E1: B2 98.3\%, M 100.0\%
+  (Table~\ref{tab:main-results}).}
   \label{tab:repair-loops}
   \footnotesize
   \begin{tabular}{lcccc}
@@ -304,8 +333,9 @@ violated scenario.
   \end{tabular}
 \end{inlinetable}
 
-Mode~B6 places SMT counterexamples in the repair loop \emph{without} typed
-Semantic Feedback IR and \emph{without} a hard pattern gate.
+Mode~B6 is our FSF adaptation of the verifier-loop idea: SMT counterexamples
+in the repair loop \emph{without} typed Semantic Feedback IR and \emph{without}
+a hard pattern gate (equal $K$ and witness budget as M).
 On the paired E13 full hard run ($n{=}120$), B2 reaches ${\approx}88.2\%$ Conf.,
 B6 ${\approx}81.1\%$, and M ${\approx}82.0\%$: M does not dominate B6 on aggregate
 conformance, and both trail B2---so the value of full~M is conjunctive
@@ -317,9 +347,9 @@ practitioners should deploy full IR$+$gate integration or stay on B2.
 
 Unlike DafnyBench-style proof pipelines~\citep{loughman2024dafnybench}, the
 model is not asked for annotations it systematically fails to produce.
-Self-Debug~\citep{chen2023selfdebug} and Reflexion~\citep{shinn2023reflexion}
-are evaluated here as B3--B5: they lack FSF first-match witnesses, and on
-canonical E1 none beats B2 (Table~\ref{tab:main-results}).
+On the \emph{historical} pre-fix multi-mode E1 export, none of B3--B5 beats
+B2; primary fixed-oracle ranking is Table~\ref{tab:main-results}
+(B1/B2/M only).
 Unlike those verbal loops, every repair step in \textsc{SgDP} is grounded in
 an executable oracle, and evaluation measures prevention (PDR/FAR), not only
 generation success.
@@ -333,7 +363,9 @@ that Chapter~\ref{ch:formalization} makes precise:
   \item[\textbf{C1.}] Prevention must depend on \emph{semantic regions}
         (first-match partitions), not surface syntax---realised by SpecIR.
   \item[\textbf{C2.}] Repair needs a \emph{typed scenario failure}, not raw
-        pass/fail bits---realised by the Semantic Feedback IR.
+        pass/fail bits---realised by the Semantic Feedback IR
+        (E6 vs.\ test-only under full~M; not uniqueness vs.\ every structured
+        trace---see E14).
   \item[\textbf{C3.}] Release must be \emph{conjunctive}: every witness matches
         \emph{and} no high-severity structural pattern remains.
 \end{enumerate}

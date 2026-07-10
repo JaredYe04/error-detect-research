@@ -79,14 +79,15 @@ activates $s_i$ under first-match semantics, not merely satisfies $g_i$ in isola
 The witness set $\mathcal{D}(t) = \{\mathbf{x}_1^*, \ldots, \mathbf{x}_n^*\}$ contains
 one witness per scenario.
 
-\begin{theorem}[Scenario-aware Witness Soundness]
+\begin{proposition}[Scenario-aware Witness Soundness]
 \label{thm:witness-soundness}
 Let $\hat{g}_i$ be a sound Z3 encoding of $g_i$ (i.e., $\hat{g}_i(\mathbf{x}) \iff
 g_i(\mathbf{x})$ for all $\mathbf{x}$).  If Z3 returns a model $\mathbf{x}^*$
 satisfying $\Phi_i$, then $g_i(\mathbf{x}^*)$ is true and $g_j(\mathbf{x}^*)$ is false
 for all $j < i$.  Consequently, $g_t(\mathbf{x}^*) = \phi_i(\mathbf{x}^*)$ — the
 oracle assigns $\mathbf{x}^*$ to scenario $i$ under first-match semantics.
-\end{theorem}
+Soundness assumes a faithful SMT encoding of SpecIR guards.
+\end{proposition}
 \begin{proof}[Sketch]
 By Z3 soundness, if $\mathbf{x}^*$ satisfies $\Phi_i$ then $\hat{g}_i(\mathbf{x}^*)$
 and $\lnot\hat{g}_j(\mathbf{x}^*)$ for $j < i$.  By encoding correctness,
@@ -94,9 +95,9 @@ $g_i(\mathbf{x}^*)$ and $\lnot g_j(\mathbf{x}^*)$ for $j < i$.  By first-match
 semantics, $i = \min\{j : g_j(\mathbf{x}^*)\}$, so the oracle evaluates via $\phi_i$.
 \end{proof}
 
-Theorem~\ref{thm:witness-soundness} establishes that every witness is semantically
-valid: conformance failures reported on witnesses are genuine violations, not artefacts
-of test-input construction.
+Proposition~\ref{thm:witness-soundness} establishes that every witness is semantically
+valid under that encoding: conformance failures on witnesses are genuine violations, not
+artefacts of test-input construction.
 
 \subsection{Scenario-aware Semantic Feedback IR}
 \label{subsec:feedback-ir}
@@ -155,7 +156,7 @@ minimum probability that a randomly sampled witness exposes the fault.
 $\mathrm{Accept}(c,t)$ requires $\mathrm{Conf}(c,t)=1$, which requires $f_c(\mathbf{x})
 = g_t(\mathbf{x})$ for every $\mathbf{x} \in \mathcal{D}(t)$.  A faulty candidate that
 differs from $g_t$ on at least one input is accepted only if that input is not in
-$\mathcal{D}(t)$.  By Theorem~\ref{thm:witness-soundness}, witnesses are semantically
+$\mathcal{D}(t)$.  By Proposition~\ref{thm:witness-soundness}, witnesses are semantically
 targeted; the bound follows by counting witnesses.
 \end{proof}
 

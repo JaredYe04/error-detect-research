@@ -1,0 +1,82 @@
+{
+  "source": "D:\\repos\\error-detect-research\\artifacts\\run_e14_sweep_v1\\results.jsonl",
+  "n_rows": 480,
+  "n_tasks": 120,
+  "variant_means": {
+    "execution_trace_matched": {
+      "n": 120,
+      "mean_conf": 0.854265873015873,
+      "mean_strict": 0.041666666666666664
+    },
+    "semantic_ir": {
+      "n": 120,
+      "mean_conf": 0.751140873015873,
+      "mean_strict": 0.05
+    },
+    "test_expected": {
+      "n": 120,
+      "mean_conf": 0.7438492063492064,
+      "mean_strict": 0.05
+    },
+    "test_only": {
+      "n": 120,
+      "mean_conf": 0.7379464285714286,
+      "mean_strict": 0.05
+    }
+  },
+  "comparisons": [
+    {
+      "focal": "semantic_ir",
+      "comparator": "execution_trace_matched",
+      "n_paired": 120,
+      "wins": 5,
+      "losses": 19,
+      "ties": 96,
+      "mean_focal": 0.751140873015873,
+      "mean_comparator": 0.854265873015873,
+      "delta_pp": -10.312500000000002,
+      "mean_delta": -0.103125,
+      "metric": "mean_conf"
+    },
+    {
+      "focal": "semantic_ir",
+      "comparator": "test_only",
+      "n_paired": 120,
+      "wins": 18,
+      "losses": 16,
+      "ties": 86,
+      "mean_focal": 0.751140873015873,
+      "mean_comparator": 0.7379464285714286,
+      "delta_pp": 1.3194444444444398,
+      "mean_delta": 0.013194444444444444,
+      "metric": "mean_conf"
+    },
+    {
+      "focal": "semantic_ir",
+      "comparator": "execution_trace_matched",
+      "n_paired": 120,
+      "wins": 1,
+      "losses": 0,
+      "ties": 119,
+      "mean_focal": 0.05,
+      "mean_comparator": 0.041666666666666664,
+      "delta_pp": 0.8333333333333338,
+      "mean_delta": 0.008333333333333333,
+      "metric": "strict_conf"
+    },
+    {
+      "focal": "semantic_ir",
+      "comparator": "test_only",
+      "n_paired": 120,
+      "wins": 0,
+      "losses": 0,
+      "ties": 120,
+      "mean_focal": 0.05,
+      "mean_comparator": 0.05,
+      "delta_pp": 0.0,
+      "mean_delta": 0.0,
+      "metric": "strict_conf"
+    }
+  ],
+  "note": "Paired per task_id. Wins = semantic_ir > comparator on the metric. Aggregate means in e14_feedback_summary.csv remain the table source; this file adds paired W/L/T only."
+}
