@@ -8,7 +8,8 @@
 The industrial-monitoring contract \code{classify\_signal} asked a practical
 question: can first-match ordering defects be prevented by using the
 specification itself as evidence, without full deductive verification?
-Three insights answer yes; \textsc{SgDP} / HSP-Agile is how they are realised.
+Three mechanisms and a deployment rule answer that question on overlap-intensive
+specifications; \textsc{SgDP} / HSP-Agile is how they are realised.
 
 
 %=============================================================================
@@ -20,27 +21,30 @@ Three insights answer yes; \textsc{SgDP} / HSP-Agile is how they are realised.
 Test-based repair does not know which input regions the specification treats
 as critical.
 
-\paragraph{Three insights.}
+\paragraph{Four insights.}
 (1)~Prevention should depend on semantic regions, not surface syntax---SpecIR
 is the hinge.
-(2)~Repair needs a typed scenario failure (Semantic Feedback IR), not raw
-test bits.
+(2)~\textbf{Lead:} repair needs a typed scenario failure (Semantic Feedback IR),
+not raw test bits (+7.7\,pp in E6).
 (3)~Release is conjunctive: full witness conformance \emph{and} a clear
 high-severity pattern screen.
+(4)~Deploy M when conjunctive release or prevention metrics are required;
+prefer B2 otherwise (Table~\ref{tab:deployment-boundary}).
 
 \paragraph{Evidence.}
-90.4\% mean Conf.\ (+6.2\,pp over one-shot B1); M wins 6/120 tasks against
-test-feedback B2 ($\approx$5\%) but the aggregate M--B2 gap is not
-Holm-significant ($p{=}0.811$).
-Gain concentrates where guards overlap (E3, E10); Feedback IR alone +7.7\,pp
-(E6); conjunctive acceptance keeps escaped defects lower (PDR 95.0\%, FAR 5.0\%
-vs.\ B2); adapters transfer to Mini-Z and Mini-StateMachine (E8).
+Canonical E1 (seed~0): B1 89.2\%, B2 87.7\%, M 86.3\% (all non-significant).
+E12-full: B2 leads all seeds (mean 88.0\% vs.\ M 86.0\%; 4/120 M wins;
+Friedman $p{=}0.077$, ranking stable).
+Gain is mechanism-level (E6 +7.7\,pp typed feedback) and prevention-level
+(PDR 95.0\%, FAR 5.0\% vs.\ B2); adapters transfer to Mini-Z and Mini-StateMachine (E8).
 
 \paragraph{Limitation.}
-Under $K{=}3$, acceptance stays selective (25.0\% strict success by design);
-residual failures are mostly ordering and boundary/arithmetic; latency is
-$\approx 4.6\times$ vs.\ test-feedback; E8c and E10/E12 subsets bound rather
-than prove universal external validity.
+Under $K{=}3$, acceptance stays selective (5.0\% strict success on current
+BENCH-120 by design); residual failures are mostly ordering and boundary/arithmetic;
+latency is $3.3\times$ vs.\ test-feedback B2 (46.2\,s vs.\ 13.9\,s); E8c, E10,
+and E12-full bound rather than prove universal external validity; E12-full
+confirms B2 leads all seeds; E16-canonical (\texttt{ecnu-max}, $n{=}120$) shows
+no ranking reversal (all modes 89.2\%).
 
 
 %=============================================================================
@@ -48,14 +52,17 @@ than prove universal external validity.
 \label{sec:conc:remember}
 %=============================================================================
 
-If only three facts survive:
+If only four facts survive:
 \begin{enumerate}
   \item SpecIR matters because the prevention loop must be notation-agnostic
         while preserving first-match regions.
   \item Semantic Feedback IR matters because structure in the repair prompt
-        beats longer unstructured test dumps.
+        beats longer unstructured test dumps (+7.7\,pp, E6).
   \item The acceptance gate matters because high mean conformance is not
         release---witnesses and patterns must both clear.
+  \item Deployment follows release requirements: B2 default for mean conformance
+        and latency; M when conjunctive $\mathrm{Accept}$ or PDR/FAR matter
+        (Table~\ref{tab:deployment-boundary}).
 \end{enumerate}
 
 
@@ -92,7 +99,8 @@ It is a practical bridge built on three ideas---shared semantic regions,
 typed repair feedback, and conjunctive acceptance---that keep many
 specification-conformance defects out of release on overlap-intensive ordered
 guard specifications while remaining usable inside a sprint.
-The M--B2 aggregate margin is modest; deployment should follow specification
-complexity (Section~\ref{sec:disc:deployment}), not a universal superiority claim.
+The M--B2 aggregate margin is modest; deployment should follow
+Table~\ref{tab:deployment-boundary} (conjunctive Accept, PDR/FAR, E6 mechanism),
+not a universal superiority claim.
 How far that bridge extends depends on richer encodings, industrial tasks,
-E10/E12 completion, and adaptive repair.
+E10/E12-full/E16 completion, and adaptive repair.

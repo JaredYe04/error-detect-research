@@ -1,0 +1,12 @@
+SOFL/FSF models ordered guards with first-match precedence~\citep{liu2010sofl}.
+Prior LLM repair loops (Reflexion-style test feedback~\citep{shinn2023reflexion},
+verifier-guided synthesis~\citep{sun2024clover}) lack region-typed failure
+signals and under-repair ordering defects.
+
+HSP-Agile sits below full deductive verification: bounded SMT witnesses and
+pattern guards approximate release quality at agile latency~\citep{woodcock2009formalsurvey}.
+We compare one-shot (B1), test-feedback (B2), and full \textsc{SgDP} (M) on a
+shared 120-task benchmark with conjunctive strict metrics.
+Table~\ref{tab:repair-loops} (appendix in full report) positions M against
+Reflexion-style and verifier-loop baselines; E18 shows naive witness+IR hybrids
+(\texttt{M\_lite}) do not recover E6-level gains.

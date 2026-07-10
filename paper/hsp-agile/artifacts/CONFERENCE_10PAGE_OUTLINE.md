@@ -226,7 +226,7 @@ Use this skeleton; target **200–230 words**.
 
 5. **Evaluation setup (1 sentence):** 120-task precedence-sensitive benchmark, seven modes (one-shot, test-feedback, full pipeline, ablations), Qwen-27B, budget K=3.
 
-6. **Headline results (2–3 sentences):** 90.4% mean conformance (+6.2/+2.4 pp over baselines); +7.7 pp from typed feedback alone; advantage scales with overlap density; 95.0% PDR on implementation mutants.
+6. **Headline results (2–3 sentences):** E6 +7.7\,pp typed feedback (lead); overlap-scoped E3/E10; E1 stress-test 90.4\% (+6.2\,pp vs B1); M--B2 aggregate **not** Holm-significant ($p{=}0.811$); PDR 95.0\% / FAR 5.0\%.
 
 7. **Transfer & artifact (1 sentence):** Adapter-level transfer to Mini-StateMachine and real-derived HumanEval/MBPP subsets; tasks, logs, and scripts released.
 
@@ -263,7 +263,7 @@ Use this skeleton; target **200–230 words**.
 | **A3** No repair | **Yes** | Isolates CEGIS loop (−6.3 pp) |
 | **A2** No pattern guard | **Mention** | Near-Pareto (90.9%, 12 s); C3 gate not Conf booster |
 | **B0** Template reference | **Footnote** | Difficulty calibration (27.5%) only |
-| B3–B5 | **Cut** | Not evaluated |
+| B3–B5 | **Supplementary** | Evaluated; 5\% Strict without formal witnesses; B4≈B2 |
 
 ### Experiments E1–E9
 

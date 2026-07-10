@@ -9,9 +9,9 @@ repair feedback is structured by a typed Semantic Feedback IR carrying specifica
 information; acceptance is gated by a conjunctive predicate combining oracle-grounded
 conformance with specification-derived quality criteria.
 
-HSP-Agile, the SOFL/FSF instantiation of \textsc{SgDP}, achieves 90.4\% mean strict
-formal conformance on a 120-task hard benchmark (+6.2 pp over one-shot LLM, +2.4 pp over
-test-feedback).  Mechanism analysis confirms that these gains are not incidental:
+HSP-Agile reaches 86.3\% mean strict formal conformance at seed~0 on canonical
+E1; B1 leads at 89.2\%.
+Mechanism analysis confirms that gains are overlap-conditional, not universal:
 E3 shows the advantage grows with specification complexity; E4 shows SMT witnesses
 maintain boundary coverage where random sampling fails; E5/E6 show that the Semantic
 Feedback IR produces faster repair convergence than test-only or test-plus-expected

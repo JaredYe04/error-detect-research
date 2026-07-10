@@ -1,0 +1,10 @@
+mode,overlap_density_tier,mean_conf_pct,n_tasks
+B1,high,81.7,21
+B1,low,93.8,36
+B1,medium,93.3,9
+B2,high,81.7,21
+B2,low,93.8,36
+B2,medium,93.3,9
+M,high,74.9,21
+M,low,91.7,36
+M,medium,73.3,9

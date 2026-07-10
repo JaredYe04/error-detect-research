@@ -265,8 +265,8 @@ flowchart TD
 | **ID** | `REV-9` |
 | **P** | **P0** (after experiments) |
 | **Do not emphasize** | “+2.4 pp over B2” as headline; “outperform B2” without Holm caveat |
-| **Do emphasize** | Structured semantic feedback (E6 +7.7 pp); specification-guided repair; conjunctive safety release; **when** M > B2 ≈ B2 (boundary table) |
-| **Add** | Win rate 73/120 with CI; E10 overlap stratification; honest M vs B2 non-significance |
+| **Do emphasize** | Structured semantic feedback (E6 +7.7 pp); specification-guided repair; conjunctive safety release; **when** M > B2 ≈ B2 (boundary table); M–B2 non-sig (p=0.811); E12 seed limitation |
+| **Add** | Win rate 6/120 with CI; E10 overlap stratification; honest M vs B2 non-significance |
 | **Paper files** | `front/abstract.tex`, `ch01_introduction.tex`, `ch08_discussion.tex` (new §deployment boundary), `ch09_conclusion.tex` |
 | **Template** | See `CONFERENCE_10PAGE_OUTLINE.md` §6 abstract bullets (update +2.4 pp line) |
 | **Effort** | **M** (1–2 days) |
@@ -278,7 +278,7 @@ flowchart TD
 |-----------|--------|
 | **ID** | `REV-9b` |
 | **Code** | `prepare_paper_data.py` or `stability_analysis.py` → `win_rate_m_vs_b2.json` |
-| **Paper** | `ch07` RQ1: “M wins 73/120 tasks (61%; 95% CI …)” |
+| **Paper** | `ch07` RQ1: “M wins 6/120 tasks (5%; 95% CI …)” |
 | **Effort** | **S** |
 
 ---

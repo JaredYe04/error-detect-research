@@ -19,8 +19,8 @@ previewed here and analysed in Chapter~\ref{ch:discussion}.
     \toprule
     Claim & Experiments & What would falsify it \\
     \midrule
-    C1 (semantic regions) & E3, E4, E8 & Gap vanishes under dense overlap;
-      adapters fail to transfer \\
+    C1 (semantic regions) & E3, E4, E8 & E6 typed-IR gain vanishes; E4 SMT
+      coverage equals random at equal budget; adapters fail to transfer \\
     C2 (typed feedback) & E5, E6, A3 & Full IR $\not>$ test-only; repair
       unused \\
     C3 (conjunctive gate) & E1 Strict, E2 PDR/FAR, A2 & High Conf.\ with
@@ -144,7 +144,10 @@ verification, not FSF precedence---hence a domain-specific set.
 non-empty overlap regions: five inputs, three outputs, eight ordered
 scenarios, annotated by overlap density, guard-complexity label, and
 scenario count.
-B0 at 27.5\% strict success confirms genuine difficulty.
+B0 one-shot reaches 89.2\% mean Conf.\ at $\approx$0.2\,s latency on canonical
+E1---matching B1 at seed~0 and confirming that aggregate mean Conf.\ does not
+separate repair modes on this slice; per-task variance (Figure~\ref{fig:conf-distribution})
+and prevention metrics carry the discriminative signal instead.
 
 \subsection{Base Tasks and Hard Synthetic Generation}
 
@@ -196,9 +199,9 @@ post-hoc stratification.
 Evaluation runs B1, B2, and M under the same $K{=}3$, model, and token budget
 as E1 (\texttt{run\_e10\_random\_v1} on
 \texttt{benchmarks/random\_tasks\_annotated.json}).
-The decision question is whether M's advantage over B2 persists on uniformly
-sampled tasks or concentrates in the overlap-intensive tertiles already
-observed in E3.
+The decision question is whether aggregate M $>$ B2 holds on uniformly sampled
+tasks, or whether overlap tertiles (E3) and deployment signals (Table~\ref{tab:deployment-boundary})
+must be read jointly---E10 is a negative control for overlap filtering.
 
 \subsection{External SOFL Benchmark (E11)}
 \label{sec:exp:e11}
@@ -532,15 +535,34 @@ real-derived HumanEval/MBPP tasks.
 What remains after $K=3$?  Taxonomy of non-accepted tasks under mode~M.
 
 \paragraph{E10 --- Random Benchmark.}
-Does M's advantage persist without overlap filtering?  100 uniformly sampled
+Does aggregate M beat B2 without overlap filtering?  100 uniformly sampled
 tasks $\times$ modes B1, B2, M (Section~\ref{sec:exp:e10}).
 
 \paragraph{E12 --- Multi-Seed Stability.}
-Does the M--B2 ranking flip under LLM stochasticity?  30 stratified tasks
-(from \texttt{benchmarks/e12\_stratified\_30.json}) $\times$ seeds
-$\{0,1,2\}$ $\times$ modes B2, M (\texttt{run\_e12\_stability\_v1}).
-Per-mode mean, standard deviation, win rate, and Friedman test across seeds
-are reported in Section~\ref{sec:results:e12}.
+Does the M--B2 ranking flip under LLM stochasticity?
+\textbf{E12-full} re-runs the full 120-task hard benchmark $\times$ seeds
+$\{0,1,2\}$ $\times$ modes B1, B2, M (\texttt{run\_e12\_canonical\_v1}, 1080 jobs).
+Per-mode mean, per-seed means, paired win rate, and Friedman test are reported in
+Section~\ref{sec:results:e12}.
+A prior 30-task stratified pilot (\texttt{run\_e12\_stability\_v1}) is superseded.
+
+\paragraph{E14 --- Length-Matched Feedback Sweep.}
+Does B4$\approx$B2 despite E6 (+7.7\,pp) reflect unfair feedback length?
+Mode~M with four feedback variants (\texttt{run\_e14\_sweep\_v1}, $n{=}120$ each):
+\texttt{test\_only}, \texttt{test\_expected}, \texttt{semantic\_ir},
+\texttt{execution\_trace\_matched}.
+
+\paragraph{E16 --- Second-Model Replication.}
+Does the deployment boundary hold under a different ECNU endpoint?
+\textbf{E16-canonical} replicates the full 120-task BENCH-120 $\times$ B1/B2/M on
+\texttt{ecnu-max} (primary E1/E12 use \texttt{ecnu-plus});
+\texttt{run\_e16\_canonical\_v1} ($n{=}120$ per mode).
+A prior 29-task pilot is superseded.
+
+\paragraph{E17 --- Advisory Pattern Guard.}
+Does hard pattern screening explain the A2--M gap?
+\texttt{M\_adv} (RF07 hard block only) vs.\ A2 vs.\ M on 120 tasks
+(\texttt{run\_e17\_advisory\_v1}).
 
 %=============================================================================
 \section{Statistical Protocol}
@@ -566,33 +588,33 @@ $|\delta| \ge 0.474$ large.
 We apply Holm-Bonferroni correction for E1 all-mode comparisons.
 
 \paragraph{Post-hoc power analysis (REV-5).}
-With $n{=}120$ paired tasks, observed Cliff's $\delta$ for M vs.\ B1 conformance
-is $+0.036$ (Wilcoxon $p{=}0.010$, Holm $p{=}0.075$): the benchmark is
-marginally powered for that comparison.
-For M vs.\ B2, $\delta{\approx}0.0002$ (Holm $p{=}0.811$): the observed gap is
-negligible and post-hoc power is ${\approx}2.5\%$ at $\alpha{=}0.05$---far below
-the conventional 80\% target.
-Detecting an effect of this size would require $n{\gtrsim}10^{5}$ paired tasks
-for 80\% power at $\alpha{=}0.05$ (\texttt{power\_analysis.json}); an
-$n{=}240$ extension was therefore not pursued.
-We report per-task win rate (6/120), overlap stratification (E3, E10),
-multi-seed stability (E12), and VerifierLoop-FSF (B6) rather than treating the
-aggregate M--B2 conformance delta as a headline claim.
+With $n{=}120$ paired tasks on canonical E1, observed Cliff's $\delta$ for M vs.\ B1
+conformance is $-0.036$ (Wilcoxon $p{=}0.059$, Holm $p{=}1.0$): M trails B1 at
+seed~0 and the benchmark is \emph{under-powered} to detect an effect this small.
+For M vs.\ B2, $\delta{=}{-}0.014$ (Holm $p{=}1.0$): the observed gap is
+negligible and post-hoc power is ${\approx}3.6\%$ at $\alpha{=}0.05$.
+Detecting a paired effect of $|\delta|{=}0.014$ would require $n{\gtrsim}39{,}000$
+paired tasks for 80\% power (\texttt{power\_analysis.json}); we therefore do not
+treat aggregate M--B2 conformance as a powered hypothesis test.
+We report per-task win rate (2/120 at E1 seed~0; 4/120 E12 mean-across-seeds),
+overlap stratification (E3, E10), multi-seed stability (E12-canonical), and
+prevention metrics (E2) rather than headline percentage gaps.
 Analysis script: \texttt{power\_analysis.py} $\to$
 \texttt{data/processed/power\_analysis.json}.
 
 \subsection{Multi-Seed Protocol (E12)}
 \label{sec:exp:e12}
 
-E12 selects 30 tasks stratified by overlap tertile and guard-complexity label
-(\texttt{scripts/select\_stratified\_subset.py}) and re-runs modes B2 and M with
-three independent LLM seeds while holding $T_\text{gen}$, $T_\text{repair}$, and
-$K$ fixed.
-The primary stability outcomes are: (i)~whether M's mean conformance exceeds B2's
-in every seed; (ii)~per-task win rate M vs.\ B2 pooled across seeds; and
-(iii)~Friedman test across seeds for ranking reversals.
-This supplements the single-repeat E1 matrix without re-running all 120 tasks
-$\times$ 10 modes at three seeds.
+\textbf{E12-full} re-runs all 120 hard-benchmark tasks with three independent
+LLM seeds (repeats $\{0,1,2\}$) for modes B1, B2, and M while holding
+$T_\text{gen}$, $T_\text{repair}$, and $K$ fixed (\texttt{run\_e12\_full\_v1}).
+The primary stability outcomes are: (i)~per-seed mean conformance ranking;
+(ii)~paired per-task win rate M vs.\ B2 pooled across seeds; and
+(iii)~Friedman test across seeds for mode ranking.
+This supplements the single-repeat E1 matrix without re-running all modes at
+three seeds.
+A 30-task stratified pilot remains in the artifact tree for protocol debugging
+but is not the headline evidence.
 
 %=============================================================================
 \section{Threats to Validity (Preview)}
@@ -613,7 +635,7 @@ PDR uses first-order mutation operators; higher-order and real-world faults may 
 
 \paragraph{Internal validity.}
 LLM non-determinism is mitigated by $T_\text{repair}=0.0$, fixed seeds, bootstrap CIs over
-tasks, and E12 multi-seed stability on a 30-task stratified subset.
+tasks, and E12-full multi-seed stability on the 120-task hard benchmark.
 The extended B3--B5 baselines use dedicated \texttt{config\_for\_mode} branches
 validated before merge.
 Reference implementations are auto-generated via \code{reference\_gen.py} with

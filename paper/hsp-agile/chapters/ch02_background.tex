@@ -285,6 +285,25 @@ Unlike Clover-style closed-loop verifier feedback~\citep{sun2024clover},
 failing unit tests are not the primary signal: guard precedence is encoded as
 SMT constraints, and the LLM receives a typed failure record that names the
 violated scenario.
+
+\begin{inlinetable}{Repair-loop baselines evaluated in this report (feedback signal,
+  formal oracle, pattern gate, typical latency on E1).}
+  \label{tab:repair-loops}
+  \footnotesize
+  \begin{tabular}{lcccc}
+    \toprule
+    Mode & Feedback & SMT witnesses & Pattern gate & Conf.\ (\%) \\
+    \midrule
+    B2 & test pass/fail & --- & --- & 87.7 \\
+    B3--B5 & self-critique / trace / reflexion & --- & --- & 81--87 \\
+    B6 & verifier counterexample & \checkmark & --- & 81.8 \\
+    M\_lite & Semantic IR & \checkmark & --- & 79.0 \\
+    A2 & Semantic IR & \checkmark & --- & 80.3 \\
+    M & Semantic IR & \checkmark & hard & 86.3 \\
+    \bottomrule
+  \end{tabular}
+\end{inlinetable}
+
 Unlike DafnyBench-style proof pipelines~\citep{loughman2024dafnybench}, the
 model is not asked for annotations it systematically fails to produce.
 Unlike Self-Refine / Self-Debug verbal loops, every repair step is grounded in

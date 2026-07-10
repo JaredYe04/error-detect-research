@@ -1,0 +1,59 @@
+\documentclass[10pt,twocolumn]{article}
+\usepackage[margin=0.75in]{geometry}
+\usepackage{times}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{amsmath,amssymb}
+\usepackage{hyperref}
+\usepackage{microtype}
+
+\title{Deployment-Aware Specification-Guided Repair\\for Ordered Guard Specifications}
+\author{Anonymous Authors}
+\date{}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+Ordered guard specifications require first-match precedence; LLMs and test-feedback
+repair miss thin overlap regions.
+We present \textsc{SgDP}/HSP-Agile with SpecIR regions, typed Semantic Feedback IR
+(\textbf{+7.7\,pp} over test-only under controlled comparison, E6), and conjunctive
+release.
+\textbf{Deploy B2 by default;} use full M when conjunctive $\mathrm{Accept}$ or
+prevention (PDR/FAR) is required.
+Canonical E1 (seed~0): B1 89.2\%, B2 87.7\%, M 86.3\% (all n.s.).
+E12-full (\texttt{run\_e12\_canonical\_v1}): B2 leads every seed (mean 88.0\% vs.\ M 86.0\%;
+Friedman $p{=}0.077$).
+\end{abstract}
+
+\section{Introduction}
+\input{../hsp-agile/sections/conference/intro_stub.tex}
+
+\section{Related Work}
+\input{../hsp-agile/sections/conference/related_stub.tex}
+
+\section{Approach}
+\input{../hsp-agile/sections/conference/approach_stub.tex}
+
+\section{Experimental Setup}
+\input{../hsp-agile/sections/conference/setup_stub.tex}
+
+\section{Results}
+\input{../hsp-agile/sections/conference/results_stub.tex}
+
+\section{Discussion}
+\input{../hsp-agile/sections/conference/discussion_stub.tex}
+
+\section{Threats to Validity}
+Overlap-filtered BENCH-120 favours structured feedback; E10/E11 partially mitigate.
+$n{=}120$ is under-powered for M vs.\ B2 aggregate gaps ($|\delta|{=}0.014$).
+Single primary model; E16 replicates on 120 tasks with \texttt{ecnu-max}.
+
+\section{Conclusion}
+\input{../hsp-agile/sections/conference/conclusion_stub.tex}
+
+\bibliographystyle{IEEEtran}
+\bibliography{../hsp-agile/bib/references}
+
+\end{document}

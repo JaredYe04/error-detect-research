@@ -107,6 +107,7 @@ class FeedbackRenderer:
         "verifier_loop",
         "self_critique",
         "execution_trace",
+        "execution_trace_matched",
         "reflexion",
     )
 
@@ -123,6 +124,8 @@ class FeedbackRenderer:
             return FeedbackRenderer._render_self_critique(records)
         if variant == "execution_trace":
             return FeedbackRenderer._render_execution_trace(records)
+        if variant == "execution_trace_matched":
+            return FeedbackRenderer._render_execution_trace_matched(records)
         if variant == "reflexion":
             return FeedbackRenderer._render_reflexion(records)
         return FeedbackRenderer._render_full(records)
@@ -170,6 +173,20 @@ class FeedbackRenderer:
             lines.append(f"  inputs={r.inputs}")
             lines.append(f"    execute → return {r.observed}")
             lines.append(f"    oracle mismatch on scenario {r.scenario_index}")
+        return "\n".join(lines)
+
+    @staticmethod
+    def _render_execution_trace_matched(records: list[SemanticFeedback]) -> str:
+        """E14: execution-trace surface with semantic fields for length-fair comparison."""
+        lines = ["Execution trace on failing witnesses (length-matched semantic detail):"]
+        for r in records:
+            lines.append(f"  Scenario {r.scenario_index}: guard ({r.constraint_text})")
+            lines.append(f"    inputs={r.inputs}")
+            lines.append(f"    execute → return {r.observed}")
+            lines.append(f"    oracle expected={r.expected}")
+            lines.append(f"    violation_type={r.violation_type}; reason: {r.reason}")
+            if r.suggested_fix:
+                lines.append(f"    suggested_fix: {r.suggested_fix}")
         return "\n".join(lines)
 
     @staticmethod

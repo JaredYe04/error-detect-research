@@ -78,7 +78,86 @@ def _parse_args() -> argparse.Namespace:
         default=None,
         help="B6/B2/M stratified run → b6_stratified_summary.csv",
     )
+    parser.add_argument(
+        "--e12-full-run-dir",
+        type=Path,
+        default=None,
+        help="E12 multi-seed run → e12_stability_summary.json via stability_analysis.py",
+    )
+    parser.add_argument(
+        "--e14-run-dir",
+        type=Path,
+        default=None,
+        help="E14 length-matched sweep → e14_feedback_summary.csv",
+    )
+    parser.add_argument(
+        "--e16-run-dir",
+        type=Path,
+        default=None,
+        help="E16 second-model pilot → e16_model_summary.csv",
+    )
+    parser.add_argument(
+        "--e17-run-dir",
+        type=Path,
+        default=None,
+        help="E17 advisory pattern guard → e17_advisory_summary.csv",
+    )
+    parser.add_argument(
+        "--m-lite-run-dir",
+        type=Path,
+        default=None,
+        help="E18 M_lite run → e18_m_lite_summary.csv",
+    )
     return parser.parse_args()
+
+
+def _summarize_modes(df: pd.DataFrame, success_col: str, conf_col: str) -> pd.DataFrame:
+    agg: dict[str, tuple[str, str]] = {
+        "n": (success_col, "count"),
+        "success_rate": (success_col, "mean"),
+        "strict_conformance": (conf_col, "mean"),
+        "mutation_kill_rate": ("mutation_kill_rate", "mean"),
+        "latency_ms": ("latency_ms", "mean"),
+    }
+    if "strict_failures" in df.columns:
+        agg["strict_failures"] = ("strict_failures", "mean")
+    else:
+        agg["strict_failures"] = (success_col, "sum")
+    return df.groupby("mode").agg(**agg).reset_index()
+
+
+def _overlay_e12_canonical(
+    summary: pd.DataFrame,
+    df: pd.DataFrame,
+    e12_run_dir: Path,
+    *,
+    success_col: str,
+    conf_col: str,
+) -> tuple[pd.DataFrame, pd.DataFrame]:
+    """Replace B1/B2/M rows with E12 repeat-0 on current BENCH-120."""
+    e12_path = e12_run_dir.resolve() / "results.jsonl"
+    if not e12_path.exists():
+        return summary, df
+    e12_rows = [
+        json.loads(line)
+        for line in e12_path.read_text(encoding="utf-8").splitlines()
+        if line.strip()
+    ]
+    e12_df = pd.DataFrame(e12_rows)
+    if "repeat" in e12_df.columns:
+        e12_df = e12_df[e12_df["repeat"] == 0]
+    e12_df = e12_df[e12_df["mode"].isin(["B1", "B2", "M"])]
+    if e12_df.empty:
+        return summary, df
+
+    e12_summary = _summarize_modes(e12_df, success_col, conf_col)
+    summary = summary[~summary["mode"].isin(["B1", "B2", "M"])]
+    summary = pd.concat([summary, e12_summary], ignore_index=True)
+    df = pd.concat(
+        [df[~df["mode"].isin(["B1", "B2", "M"])], e12_df],
+        ignore_index=True,
+    )
+    return summary, df
 
 
 def _win_rate_m_vs_b2(df: pd.DataFrame, conf_col: str) -> dict[str, float | int]:
@@ -128,18 +207,19 @@ def main() -> None:
     success_col = "strict_formal_passed" if "strict_formal_passed" in df.columns else "success"
     conf_col = "strict_formal_conformance" if "strict_formal_conformance" in df.columns else "formal_conformance"
 
-    summary = (
-        df.groupby("mode")
-        .agg(
-            n=(success_col, "count"),
-            success_rate=(success_col, "mean"),
-            strict_conformance=(conf_col, "mean"),
-            mutation_kill_rate=("mutation_kill_rate", "mean"),
-            latency_ms=("latency_ms", "mean"),
-            strict_failures=("strict_failures", "mean") if "strict_failures" in df.columns else (success_col, "sum"),
+    summary = _summarize_modes(df, success_col, conf_col)
+    canonical_names = {"run_e1_canonical_v1"}
+    if (
+        args.e12_full_run_dir is not None
+        and run_dir.name not in canonical_names
+    ):
+        summary, df = _overlay_e12_canonical(
+            summary,
+            df,
+            args.e12_full_run_dir,
+            success_col=success_col,
+            conf_col=conf_col,
         )
-        .reset_index()
-    )
     summary.to_csv(PROC_DIR / "summary_by_mode.csv", index=False)
 
     distribution_cols = ["mode", "latency_ms", conf_col]
@@ -336,6 +416,60 @@ def main() -> None:
                 .reset_index()
             )
             strat_summary.to_csv(PROC_DIR / "b6_stratified_summary.csv", index=False)
+
+    if args.e12_full_run_dir is not None:
+        e12_path = args.e12_full_run_dir.resolve() / "results.jsonl"
+        if e12_path.exists():
+            import subprocess
+            import sys
+
+            stability_script = PAPER_ROOT / "scripts" / "stability_analysis.py"
+            subprocess.run(
+                [sys.executable, str(stability_script), "--jsonl", str(e12_path)],
+                check=True,
+            )
+
+    if args.e14_run_dir is not None:
+        e14_summary = args.e14_run_dir.resolve() / "summary.json"
+        if e14_summary.exists():
+            data = json.loads(e14_summary.read_text(encoding="utf-8"))
+            rows = [
+                {"feedback_variant": variant, "mean_strict_conformance": float(val)}
+                for variant, val in data.items()
+            ]
+            pd.DataFrame(rows).to_csv(PROC_DIR / "e14_feedback_summary.csv", index=False)
+
+    def _summarize_run(run_dir: Path, out_name: str, conf_col_candidates: tuple[str, ...] = (
+        "strict_formal_conformance",
+        "formal_conformance",
+    )) -> None:
+        jsonl = run_dir.resolve() / "results.jsonl"
+        if not jsonl.exists():
+            return
+        run_rows = [json.loads(line) for line in jsonl.read_text(encoding="utf-8").splitlines() if line.strip()]
+        run_df = pd.DataFrame(run_rows)
+        conf_col = next((c for c in conf_col_candidates if c in run_df.columns), None)
+        if conf_col is None:
+            return
+        success_col = "strict_formal_passed" if "strict_formal_passed" in run_df.columns else "success"
+        summary = (
+            run_df.groupby("mode")
+            .agg(
+                n=(conf_col, "count"),
+                success_rate=(success_col, "mean"),
+                strict_conformance=(conf_col, "mean"),
+                latency_ms=("latency_ms", "mean"),
+            )
+            .reset_index()
+        )
+        summary.to_csv(PROC_DIR / out_name, index=False)
+
+    if args.e16_run_dir is not None:
+        _summarize_run(args.e16_run_dir, "e16_model_summary.csv")
+    if args.e17_run_dir is not None:
+        _summarize_run(args.e17_run_dir, "e17_advisory_summary.csv")
+    if args.m_lite_run_dir is not None:
+        _summarize_run(args.m_lite_run_dir, "e18_m_lite_summary.csv")
 
     print(f"Prepared paper data from {run_dir}")
     print(f"Raw dir: {RAW_DIR}")

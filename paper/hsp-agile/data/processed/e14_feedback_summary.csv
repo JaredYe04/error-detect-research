@@ -1,0 +1,5 @@
+feedback_variant,mean_strict_conformance
+test_only,0.7379464285714286
+test_expected,0.7438492063492064
+semantic_ir,0.751140873015873
+execution_trace_matched,0.854265873015873
