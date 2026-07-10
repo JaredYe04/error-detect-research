@@ -3,6 +3,8 @@
 **目标：** 从当前 *Borderline (lean Weak Reject)* 提升至 **CCF-B（ICSME / SANER）可接受**水准  
 **策略：** 不重写核心方法（SpecIR、Semantic Feedback IR、Conjunctive Accept），而是 **重定位叙事 + 补齐关键实验 + 会议版裁剪**  
 **基准日期：** 2026-07-10  
+**状态（2026-07-10 夜）：** P0/P1 文稿 + E2 bootstrap + E6/E11×ecnu-max **已完成**；**n1n 商业三模型**（gpt-4o / claude-sonnet-4-6 / deepseek-v3.2）E6+工业语料 **已完成并入文**；工业模式语料 31 任务。估计审稿档位：**Accept 边缘 ~68–75%**。  
+**详见：** `AUTHOR_RESPONSE_ACCEPT_PUSH.md`  
 **输入：** `REVIEWER_REPORT.md`、`REVISION_TODO_MATRIX.md`（Phase 1 已完成项）、三路子 agent 审计
 
 ---

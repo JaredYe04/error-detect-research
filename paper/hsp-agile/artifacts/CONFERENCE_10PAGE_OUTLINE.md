@@ -59,7 +59,7 @@ Assumes IEEE two-column, 10 pt, ~0.5 page for abstract (often excluded from limi
 | ID | Claim (report wording) | Primary evidence |
 |----|------------------------|------------------|
 | **C1** | Prevention depends on **semantic regions** (first-match partitions), not surface syntax; **SpecIR** is the hinge. | E3 overlap scaling; E8 adapter transfer |
-| **C2** | Repair needs a **typed scenario failure** (Semantic Feedback IR), not raw pass/fail. | E6 (+7.7 pp A→C); E5 convergence; A3 ablation (−6.3 pp) |
+| **C2** | Repair needs a **typed scenario failure** (Semantic Feedback IR), not raw pass/fail. | E6 (+7.7 pp A→C); E5 convergence; A3 ablation (−3.9 pp) |
 | **C3** | Release is **conjunctive**: full witness conformance **and** clear high-severity pattern screen. | E1 strict paradox; E2 PDR/FAR; `Accept` decision tree |
 
 ### Headline numbers (repeat in abstract, intro, conclusion)
@@ -68,7 +68,7 @@ Assumes IEEE two-column, 10 pt, ~0.5 page for abstract (often excluded from limi
 - **+6.2 pp** vs one-shot B1; **+2.4 pp** vs test-feedback B2  
 - **+7.7 pp** full Semantic Feedback IR vs test-only (E6)  
 - **25.0%** strict success under conjunctive gate (vs 26.7% B1/B2) — frame as *selectivity*, not weakness  
-- **4.6×** latency vs B2; **A2** as near-Pareto alternative (90.9% Conf., 12.1 s)
+- **3.3×** latency vs B2; **A2** is an ablation (80.3% Conf., −6.0 pp vs M), not a Conf. upgrade
 
 ### Figures to KEEP (with file paths)
 
@@ -259,9 +259,9 @@ Use this skeleton; target **200–230 words**.
 | **B1** One-shot LLM | **Yes** | Primary baseline |
 | **B2** Test-feedback | **Yes** | Strongest practical baseline |
 | **M** Full SgDP/HSP-Agile | **Yes** | Proposed method |
-| **A1** No formal checker | **Yes** | Isolates Z3 witnesses (−3.9 pp) |
-| **A3** No repair | **Yes** | Isolates CEGIS loop (−6.3 pp) |
-| **A2** No pattern guard | **Mention** | Near-Pareto (90.9%, 12 s); C3 gate not Conf booster |
+| **A1** No formal checker | **Yes** | Isolates Z3 witnesses (−0.8 pp Conf) |
+| **A3** No repair | **Yes** | Isolates CEGIS loop (−3.9 pp Conf) |
+| **A2** No pattern guard | **Mention** | Largest Conf drop (−6.0 pp); A2 does not beat M; prevention via E2 |
 | **B0** Template reference | **Footnote** | Difficulty calibration (27.5%) only |
 | B3–B5 | **Supplementary** | Evaluated; 5\% Strict without formal witnesses; B4≈B2 |
 
@@ -291,10 +291,10 @@ Use this skeleton; target **200–230 words**.
 | **Single LLM, single run** | Qwen-27B, no multi-seed repeats | State T_repair=0.0, bootstrap CIs over tasks; ablations isolate components; footnote B3–B5 planned; sensitivity to model discussed in threats |
 | **Strict success paradox** | M has *lower* strict rate (25% vs 26.7%) | Dedicated §6.1: conjunctive gate ≠ weaker code; FAR 5.0% vs 8.8%; conformance is primary metric; cite Wilcoxon non-sig |
 | **Small effect vs B2** | +2.4 pp conformance may seem modest | Pair with E3 (+8 pp in dense tier) and E6 (+7.7 pp); emphasise *mechanism* and fault-class complementarity (heatmap), not aggregate pp alone |
-| **Latency cost** | 4.6× B2, ~44 s/task | Pareto figure; position as CI pre-merge gate; offer **A2** operating point (90.9%, 12 s) when pattern screen optional |
+| **Latency cost** | 3.3× B2, ~46 s/task | Pareto figure; position as CI pre-merge gate; A2 is cheaper but lower Conf (80.3%, −6.0 pp)—not a Conf upgrade |
 | **SOFL niche** | FSF unfamiliar to general SE audience | Frame as **ordered guard specs** (general); SpecIR as notation-agnostic; Mini-StateMachine transfer |
 | **Not full verification** | Finite witnesses, no proof | Up-front positioning: bounded prevention between tests and Dafny; FAR bound theorem → supplementary |
-| **Pattern guard ad hoc** | 14 RF rules | Report E7 F1 in supp; A2 ablation shows +0.5 pp Conf — guard is diagnostic/prevention gate, not accuracy driver |
+| **Pattern guard ad hoc** | 14 RF rules | Report E7 F1 in supp; A2 ablation shows −6.0 pp Conf (largest |\Delta|; A2 > A3 > A1); guard also prevention gate (E2) |
 | **E8c incomplete baselines** | No B1/B2 on HumanEval/MBPP | Label clearly; do not over-claim; use as external sanity check for M only |
 | **Author-constructed benchmark** | Tuning bias | Ablation + independent E8 subsets; release 180→120 filter protocol in artifact |
 

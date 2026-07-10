@@ -1,0 +1,25 @@
+% Conference stub: cross-model (n1n) + industrial external validity.
+% Regenerate tables: python paper/hsp-agile/scripts/aggregate_n1n_campaigns.py
+
+\subsection{Cross-model scope (n1n E6 + E16)}
+Primary E6 (+7.7\,pp C$-$A under~\texttt{ecnu-plus}) is headroom-dependent.
+Commercial n1n replication on the 29-task stratified subset
+(Table~\ref{tab:cross-model-e6}): \texttt{gpt-4o} saturates ($\Delta{=}0$);
+\texttt{claude-sonnet-4-6} yields \textbf{+1.0\,pp}; \texttt{deepseek-v3.2}
+shows $-$3.9\,pp (structured prompts can hurt).
+E16-style ranking on \texttt{gpt-4o} (Table~\ref{tab:cross-model-e16}) keeps
+B2 as the mean-Conf.\ default (B1${=}$B2 100\%, M 88.9\%).
+
+\input{../hsp-agile/tables/cross_model_e6.tex}
+\input{../hsp-agile/tables/cross_model_e16.tex}
+
+\subsection{Industrial SOFL corpus}
+Curated industrial-pattern FSF tasks ($n{=}31$;
+\texttt{benchmarks/industrial\_sofl.json}).
+Under \texttt{gpt-4o} and \texttt{claude-sonnet-4-6}, B2 reaches
+\textbf{100\%} Conf.\ vs.\ B1/M at 95.5\% (Strict 67.7\%);
+\texttt{deepseek-v3.2} preserves B2 $>$ M $>$ B1---strongest support
+for deploying B2 by default on practitioner-style ordered guards
+(Table~\ref{tab:cross-model-industrial}).
+
+\input{../hsp-agile/tables/cross_model_industrial.tex}

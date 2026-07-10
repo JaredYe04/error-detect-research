@@ -1,42 +1,16 @@
-"""ECNU OpenAI-compatible LLM adapter with retry, logging, and cost tracking."""
+"""ECNU / N1N OpenAI-compatible LLM adapter with retry, logging, and cost tracking."""
 
 from __future__ import annotations
 
 import json
-import os
 import time
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any
 
-from dotenv import load_dotenv
 from openai import OpenAI
 
-load_dotenv()
-
-def _resolve_api_key(explicit: str | None) -> str | None:
-    if explicit:
-        return explicit
-    key = os.getenv("ECNU_API_KEY") or os.getenv("OPENAI_API_KEY")
-    if key:
-        return key
-    # Support bare-key .env (single line starting with sk-)
-    env_path = Path(__file__).resolve().parents[2] / ".env"
-    if env_path.exists():
-        for line in env_path.read_text(encoding="utf-8").splitlines():
-            line = line.strip()
-            if not line or line.startswith("#"):
-                continue
-            if "=" in line:
-                k, v = line.split("=", 1)
-                if k.strip() in {"ECNU_API_KEY", "OPENAI_API_KEY"}:
-                    return v.strip().strip('"').strip("'")
-            elif line.startswith("sk-"):
-                return line
-    return None
-
-DEFAULT_BASE_URL = "https://chat.ecnu.edu.cn/open/api/v1"
-DEFAULT_MODEL = "ecnu-plus"
+from src.llm.providers import DEFAULT_MODEL, resolve_provider
 
 
 @dataclass
@@ -64,7 +38,7 @@ class LLMResponse:
 
 
 class ECNUClient:
-    """Thin wrapper around ECNU's OpenAI-compatible chat API."""
+    """Thin wrapper around OpenAI-compatible chat APIs (ECNU campus or N1N)."""
 
     def __init__(
         self,
@@ -72,20 +46,25 @@ class ECNUClient:
         api_key: str | None = None,
         base_url: str | None = None,
         model: str = DEFAULT_MODEL,
+        provider: str | None = None,
         log_dir: str | Path | None = None,
         max_retries: int = 3,
         retry_backoff: float = 2.0,
-        request_timeout_s: float = 90.0,
+        request_timeout_s: float = 120.0,
     ) -> None:
-        self.api_key = _resolve_api_key(api_key)
-        if not self.api_key:
-            raise ValueError("Missing API key. Set ECNU_API_KEY or OPENAI_API_KEY in .env")
-        self.base_url = base_url or os.getenv("ECNU_BASE_URL", DEFAULT_BASE_URL)
+        cfg = resolve_provider(
+            model=model, provider=provider, api_key=api_key, base_url=base_url
+        )
+        self.provider = cfg.name
+        self.api_key = cfg.api_key
+        self.base_url = cfg.base_url
         self.model = model
         self.max_retries = max_retries
         self.retry_backoff = retry_backoff
         self.request_timeout_s = request_timeout_s
-        self.client = OpenAI(api_key=self.api_key, base_url=self.base_url, timeout=self.request_timeout_s)
+        self.client = OpenAI(
+            api_key=self.api_key, base_url=self.base_url, timeout=self.request_timeout_s
+        )
         self.log_dir = Path(log_dir) if log_dir else None
         if self.log_dir:
             self.log_dir.mkdir(parents=True, exist_ok=True)
@@ -103,6 +82,19 @@ class ECNUClient:
         metadata: dict[str, Any] | None = None,
     ) -> LLMResponse:
         model_name = model or self.model
+        # Re-resolve if caller overrides to a different provider's model mid-flight
+        if model and model != self.model:
+            cfg = resolve_provider(model=model_name)
+            if cfg.base_url != self.base_url or cfg.api_key != self.api_key:
+                self.client = OpenAI(
+                    api_key=cfg.api_key,
+                    base_url=cfg.base_url,
+                    timeout=self.request_timeout_s,
+                )
+                self.provider = cfg.name
+                self.base_url = cfg.base_url
+                self.api_key = cfg.api_key
+
         kwargs: dict[str, Any] = {
             "model": model_name,
             "messages": messages,
@@ -110,7 +102,7 @@ class ECNUClient:
             "top_p": top_p,
             "max_tokens": max_tokens,
         }
-        if thinking:
+        if thinking and self.provider == "ecnu":
             kwargs["extra_body"] = {"thinking": {"type": "enabled"}}
 
         last_err: Exception | None = None
@@ -150,6 +142,7 @@ class ECNUClient:
         ts = int(time.time() * 1000)
         payload = {
             "timestamp": ts,
+            "provider": self.provider,
             "model": model,
             "messages": messages,
             "response": content,
@@ -161,3 +154,7 @@ class ECNUClient:
 
     def usage_summary(self) -> dict[str, Any]:
         return self.cumulative_usage.__dict__
+
+
+# Back-compat alias
+LLMClient = ECNUClient

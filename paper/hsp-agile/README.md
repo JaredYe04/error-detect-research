@@ -1,22 +1,25 @@
 # HSP-Agile / SgDP — CCF-B Research Report
 
-> **Title:** *A Specification-Guided Defect Prevention Framework for Reliable LLM-Assisted Formal Development*  
+> **Title:** *Deployment-Aware Specification-Guided Repair for Ordered Guard Specifications*  
+> **Subtitle:** HSP-Agile: A SOFL/FSF Instantiation  
 > **Format:** A4 report (`report` class + `thesis.sty`), ~120 pages  
 > **Target:** CCF-B venues (SANER / ICSME / QRS / ICFEM; stretch ASE/TOSEM)
 
-This directory contains the **expanded CCF-B research report**, upgraded from the short acmart conference draft. It reuses the thesis typography, diagrams, listings, and experimental figures while preserving the **SgDP framework narrative** (RQ1–RQ5, C1–C5, Theorems 1–3, E1–E9).
+This directory contains the **expanded CCF-B research report**, upgraded from the short acmart conference draft. It reuses the thesis typography, diagrams, listings, and experimental figures while preserving the **SgDP framework narrative** (RQ1–RQ5, C1–C4, Theorems 1–3, E1–E16).
+
+A shorter **conference cut** lives in [`paper/hsp-agile-conference/`](../hsp-agile-conference/).
 
 ## Document Structure
 
 | Chapter | File | Content |
 |---------|------|---------|
 | Front | `front/cover.tex`, `front/abstract.tex` | Title page + abstract |
-| Ch 1 | `chapters/ch01_introduction.tex` | SgDP framing, C1–C5, RQ1–5, motivating example |
+| Ch 1 | `chapters/ch01_introduction.tex` | SgDP framing, C1–C4, RQ1–5, motivating example |
 | Ch 2 | `chapters/ch02_background.tex` | SOFL/FSF, CEGIS, SMT, mutation + positioning table |
 | Ch 3 | `chapters/ch03_formalization.tex` | Formal task model, BAP, benchmark formalization |
 | Ch 4 | `chapters/ch04_method.tex` | SgDP framework, theorems, pipeline stages |
 | Ch 5 | `chapters/ch05_implementation.tex` | System architecture, modules, orchestration |
-| Ch 6 | `chapters/ch06_experimental_setup.tex` | RQ1–5, E1–9 protocol, benchmark, modes |
+| Ch 6 | `chapters/ch06_experimental_setup.tex` | RQ1–5, E1–16 protocol, benchmark, modes |
 | Ch 7 | `chapters/ch07_results.tex` | Mechanism-first results + all figures |
 | Ch 8 | `chapters/ch08_discussion.tex` | Failure analysis, paradox, threats, implications |
 | Ch 9 | `chapters/ch09_conclusion.tex` | Findings + future work |

@@ -304,13 +304,29 @@ violated scenario.
   \end{tabular}
 \end{inlinetable}
 
+Mode~B6 places SMT counterexamples in the repair loop \emph{without} typed
+Semantic Feedback IR and \emph{without} a hard pattern gate.
+On the paired E13 full hard run ($n{=}120$), B2 reaches ${\approx}88.2\%$ Conf.,
+B6 ${\approx}81.1\%$, and M ${\approx}82.0\%$: M does not dominate B6 on aggregate
+conformance, and both trail B2---so the value of full~M is conjunctive
+$\mathrm{Accept}$ and the E6 typed-IR mechanism under controlled comparison, not
+an aggregate Conf.\ win over B6.
+E18's M\_lite (witnesses$+$IR, no hard gate) reaches only ${\approx}79.0\%$ Conf.\
+against that run's B2 at $89.3\%$, confirming that naive stacking fails;
+practitioners should deploy full IR$+$gate integration or stay on B2.
+
 Unlike DafnyBench-style proof pipelines~\citep{loughman2024dafnybench}, the
 model is not asked for annotations it systematically fails to produce.
-Unlike Self-Refine / Self-Debug verbal loops, every repair step is grounded in
+Self-Debug~\citep{chen2023selfdebug} and Reflexion~\citep{shinn2023reflexion}
+are evaluated here as B3--B5: they lack FSF first-match witnesses, and on
+canonical E1 none beats B2 (Table~\ref{tab:main-results}).
+Unlike those verbal loops, every repair step in \textsc{SgDP} is grounded in
 an executable oracle, and evaluation measures prevention (PDR/FAR), not only
 generation success.
 
-The remaining gap is therefore not a longer feature list.
+The remaining gap is therefore not a longer feature list, and hybrid baselines
+show that SMT cex alone (B6) or witnesses$+$IR without the gate (M\_lite) are
+not shortcuts to M's prevention profile.
 It is three insights that Table~\ref{tab:related-positioning} leaves open and
 that Chapter~\ref{ch:formalization} makes precise:
 \begin{enumerate}

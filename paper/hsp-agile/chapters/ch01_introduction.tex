@@ -188,7 +188,9 @@ engineering; they support the claims but are not advertised as contributions.
     failure}, not raw pass/fail bits.
     The Semantic Feedback IR names the violated scenario, witness, and expected
     output before any natural-language prompt is rendered
-    (+7.7\,pp over test-only feedback in E6).
+    (+7.7\,pp vs.\ test-only under controlled E6; not vs.\ every structured
+    trace---E14 length-matched \texttt{execution\_trace} can exceed bare
+    \texttt{semantic\_ir}).
 
   \item[\textbf{C3.}] \textbf{Insight:} release must be \emph{conjunctive}:
     every specification-derived witness matches \emph{and} no high-severity

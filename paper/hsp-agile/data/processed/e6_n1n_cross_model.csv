@@ -1,0 +1,10 @@
+model,variant,mean_conf,n,delta_C_minus_A_pp
+gpt-4o,A,0.8894,29,0.0
+gpt-4o,B,0.8793,29,0.0
+gpt-4o,C,0.8894,29,0.0
+claude-4.6,A,0.875,29,1.01
+claude-4.6,B,0.8103,29,1.01
+claude-4.6,C,0.8851,29,1.01
+deepseek,A,0.75,29,-3.88
+deepseek,B,0.6983,29,-3.88
+deepseek,C,0.7112,29,-3.88

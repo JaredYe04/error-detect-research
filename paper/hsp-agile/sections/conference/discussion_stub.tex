@@ -1,15 +1,26 @@
+\textbf{Deployment.}
+Prefer \textbf{B2 by default} for mean Conf.\ and latency on sparse or
+unfiltered workloads (E10, E12).
+Escalate to full~\textbf{M} when (i)~typed Semantic Feedback IR is the repair
+signal of interest (E6), (ii)~conjunctive $\mathrm{Accept}$ is the release
+bar, or (iii)~prevention (PDR/FAR) must improve (E2).
+Table~\ref{tab:deploy} is the operational summary.
+
 \textbf{Negative aggregate result.}
-Full mode~M does not outperform test-feedback B2 on canonical BENCH-120;
+Full mode~M does not outperform test-feedback B2 on canonical BENCH-120 Conf.;
 the contribution is \emph{conditional deployment}, not universal superiority.
+E3 tertiles are non-monotone; E12 ranking favours B2.
 
 \textbf{Strict-success selectivity.}
-5\% strict success reflects conjunctive $\mathrm{Accept}$ by design; prevention
-(PDR/FAR) and typed feedback (E6) are the discriminators.
+5\% Strict reflects conjunctive $\mathrm{Accept}$ by design; prevention
+(PDR/FAR) and typed feedback (E6) are the discriminators, not mean Conf.
 
-\textbf{External validity.}
-E11 ($n{=}22$) and E16 (second model) bound rather than prove transfer; E8c
-shows B2 can dominate on sparse HumanEval-FSF guards.
-
-\textbf{Limitations.}
-Single primary model; synthetic overlap stress-test; bounded witnesses vs.\
-full verification; E14 shows trace-matched feedback can narrow the E6 gap.
+\textbf{Threats.}
+(1)~\emph{Construct:} overlap-filtered BENCH-120 favours structured feedback;
+E10/E11/E8c partially mitigate.
+(2)~\emph{Internal:} $n{=}120$ is under-powered for M vs.\ B2 aggregate Conf.\
+gaps ($|\delta|{=}0.014$).
+(3)~\emph{External:} single primary model (E16 bounds transfer); synthetic
+hard corpus; bounded SMT witnesses vs.\ full verification.
+(4)~\emph{Claim scope:} E14 shows length-matched execution traces can exceed
+\texttt{semantic\_ir} alone---disclose when citing +7.7\,pp.

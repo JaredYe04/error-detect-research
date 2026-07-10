@@ -76,22 +76,25 @@ Mean iterations are nearly identical ($\approx$2.98 across variants).
   \centering
   \includegraphics[width=\linewidth]{figures/ablation_contribution_ci.pdf}
   \caption{Ablation deltas relative to full M.  Error bars show 95\% bootstrap
-    confidence intervals.  Removing the repair loop (A3) causes the largest Conf drop
-    ($-$6.3\,pp); removing the formal checker (A1) costs $-$3.9\,pp.}
+    confidence intervals.  By $|\Delta\mathrm{Conf}|$: A2 ($-$6.0\,pp) $>$
+    A3 ($-$3.9\,pp) $>$ A1 ($-$0.8\,pp).}
   \label{fig:ablation}
 \end{figure}
 
 Table~\ref{tab:main} and Figure~\ref{fig:ablation} show component attributions on
 canonical E1.
-Removing the repair loop (A3) causes the largest conformance drop ($\Delta = -6.3$\,pp).
-Removing the formal checker (A1) costs $-3.9$\,pp.
-Removing the pattern guard (A2) lowers Conf.\ to 80.3\% ($-$6.0\,pp vs.\ M) but the
-guard's prevention value is better measured via PDR than mean Conf.
+Removing the pattern guard (A2) causes the largest conformance drop
+($\Delta = -6.0$\,pp; 80.3\% vs.\ M 86.3\%)---A2 does \emph{not} beat M.
+Removing the repair loop (A3) costs $-$3.9\,pp; removing the formal checker
+(A1) costs $-$0.8\,pp.
+Ranking by $|\Delta\mathrm{Conf}|$: A2 $>$ A3 $>$ A1.
+The guard's prevention value is additionally measured via PDR/FAR (E2).
 
 \paragraph{Answer to RQ3.}
-The Semantic Feedback IR (E5/E6) and the formal checker (ablation A1/A3) are the
-dominant contributing components.  The pattern guard is a prevention/diagnostic gate,
-not a Conf.\ booster on canonical E1.
+On Conf.\ ablations, pattern-guard removal (A2) dominates, then repair (A3),
+then the formal checker (A1).
+Semantic Feedback IR (E5/E6) remains the lead mechanism claim for typed repair;
+the pattern guard is also a prevention/diagnostic gate (E2 PDR/FAR).
 
 %% -------------------------------------------------------------------
 \subsection{RQ1: Overall Effectiveness (E1)}

@@ -1,0 +1,281 @@
+[
+  {
+    "taskId": "IndustrialSOFL.LoanUnderwrite",
+    "scenarios": 4,
+    "witness_cases": 12,
+    "scenarios_with_witness": 4,
+    "missing_witness_scenarios": [],
+    "formal_passed": true,
+    "formal_error": null
+  },
+  {
+    "taskId": "IndustrialSOFL.AtmWithdraw",
+    "scenarios": 4,
+    "witness_cases": 12,
+    "scenarios_with_witness": 4,
+    "missing_witness_scenarios": [],
+    "formal_passed": true,
+    "formal_error": null
+  },
+  {
+    "taskId": "IndustrialSOFL.WireTransferGate",
+    "scenarios": 4,
+    "witness_cases": 12,
+    "scenarios_with_witness": 4,
+    "missing_witness_scenarios": [],
+    "formal_passed": true,
+    "formal_error": null
+  },
+  {
+    "taskId": "IndustrialSOFL.CallRoute",
+    "scenarios": 4,
+    "witness_cases": 12,
+    "scenarios_with_witness": 4,
+    "missing_witness_scenarios": [],
+    "formal_passed": true,
+    "formal_error": null
+  },
+  {
+    "taskId": "IndustrialSOFL.SmsThrottle",
+    "scenarios": 4,
+    "witness_cases": 12,
+    "scenarios_with_witness": 4,
+    "missing_witness_scenarios": [],
+    "formal_passed": true,
+    "formal_error": null
+  },
+  {
+    "taskId": "IndustrialSOFL.BadgeAccess",
+    "scenarios": 4,
+    "witness_cases": 12,
+    "scenarios_with_witness": 4,
+    "missing_witness_scenarios": [],
+    "formal_passed": true,
+    "formal_error": null
+  },
+  {
+    "taskId": "IndustrialSOFL.ApiAcl",
+    "scenarios": 4,
+    "witness_cases": 12,
+    "scenarios_with_witness": 4,
+    "missing_witness_scenarios": [],
+    "formal_passed": true,
+    "formal_error": null
+  },
+  {
+    "taskId": "IndustrialSOFL.DoseAlert",
+    "scenarios": 4,
+    "witness_cases": 12,
+    "scenarios_with_witness": 4,
+    "missing_witness_scenarios": [],
+    "formal_passed": true,
+    "formal_error": null
+  },
+  {
+    "taskId": "IndustrialSOFL.LabCritical",
+    "scenarios": 4,
+    "witness_cases": 12,
+    "scenarios_with_witness": 4,
+    "missing_witness_scenarios": [],
+    "formal_passed": true,
+    "formal_error": null
+  },
+  {
+    "taskId": "IndustrialSOFL.PickPriority",
+    "scenarios": 4,
+    "witness_cases": 12,
+    "scenarios_with_witness": 4,
+    "missing_witness_scenarios": [],
+    "formal_passed": true,
+    "formal_error": null
+  },
+  {
+    "taskId": "IndustrialSOFL.ReorderPoint",
+    "scenarios": 4,
+    "witness_cases": 12,
+    "scenarios_with_witness": 4,
+    "missing_witness_scenarios": [],
+    "formal_passed": true,
+    "formal_error": null
+  },
+  {
+    "taskId": "IndustrialSOFL.ScadaTrip",
+    "scenarios": 4,
+    "witness_cases": 12,
+    "scenarios_with_witness": 4,
+    "missing_witness_scenarios": [],
+    "formal_passed": true,
+    "formal_error": null
+  },
+  {
+    "taskId": "IndustrialSOFL.GridDispatch",
+    "scenarios": 4,
+    "witness_cases": 12,
+    "scenarios_with_witness": 4,
+    "missing_witness_scenarios": [],
+    "formal_passed": true,
+    "formal_error": null
+  },
+  {
+    "taskId": "IndustrialSOFL.SeatUpgrade",
+    "scenarios": 4,
+    "witness_cases": 12,
+    "scenarios_with_witness": 4,
+    "missing_witness_scenarios": [],
+    "formal_passed": true,
+    "formal_error": null
+  },
+  {
+    "taskId": "IndustrialSOFL.FareRule",
+    "scenarios": 4,
+    "witness_cases": 12,
+    "scenarios_with_witness": 4,
+    "missing_witness_scenarios": [],
+    "formal_passed": true,
+    "formal_error": null
+  },
+  {
+    "taskId": "IndustrialSOFL.AutoPremium",
+    "scenarios": 4,
+    "witness_cases": 12,
+    "scenarios_with_witness": 4,
+    "missing_witness_scenarios": [],
+    "formal_passed": true,
+    "formal_error": null
+  },
+  {
+    "taskId": "IndustrialSOFL.ClaimTriage",
+    "scenarios": 4,
+    "witness_cases": 12,
+    "scenarios_with_witness": 4,
+    "missing_witness_scenarios": [],
+    "formal_passed": true,
+    "formal_error": null
+  },
+  {
+    "taskId": "IndustrialSOFL.IntersectionPhase",
+    "scenarios": 4,
+    "witness_cases": 12,
+    "scenarios_with_witness": 4,
+    "missing_witness_scenarios": [],
+    "formal_passed": true,
+    "formal_error": null
+  },
+  {
+    "taskId": "IndustrialSOFL.RampMeter",
+    "scenarios": 4,
+    "witness_cases": 12,
+    "scenarios_with_witness": 4,
+    "missing_witness_scenarios": [],
+    "formal_passed": true,
+    "formal_error": null
+  },
+  {
+    "taskId": "IndustrialSOFL.CdnCache",
+    "scenarios": 4,
+    "witness_cases": 12,
+    "scenarios_with_witness": 4,
+    "missing_witness_scenarios": [],
+    "formal_passed": true,
+    "formal_error": null
+  },
+  {
+    "taskId": "IndustrialSOFL.ApiRateLimit",
+    "scenarios": 4,
+    "witness_cases": 12,
+    "scenarios_with_witness": 4,
+    "missing_witness_scenarios": [],
+    "formal_passed": true,
+    "formal_error": null
+  },
+  {
+    "taskId": "IndustrialSOFL.LibraryBorrow",
+    "scenarios": 4,
+    "witness_cases": 12,
+    "scenarios_with_witness": 4,
+    "missing_witness_scenarios": [],
+    "formal_passed": true,
+    "formal_error": null
+  },
+  {
+    "taskId": "IndustrialSOFL.LibraryRenew",
+    "scenarios": 4,
+    "witness_cases": 12,
+    "scenarios_with_witness": 4,
+    "missing_witness_scenarios": [],
+    "formal_passed": true,
+    "formal_error": null
+  },
+  {
+    "taskId": "IndustrialSOFL.TankLevel",
+    "scenarios": 4,
+    "witness_cases": 12,
+    "scenarios_with_witness": 4,
+    "missing_witness_scenarios": [],
+    "formal_passed": true,
+    "formal_error": null
+  },
+  {
+    "taskId": "IndustrialSOFL.BoilerInterlock",
+    "scenarios": 4,
+    "witness_cases": 12,
+    "scenarios_with_witness": 4,
+    "missing_witness_scenarios": [],
+    "formal_passed": true,
+    "formal_error": null
+  },
+  {
+    "taskId": "IndustrialSOFL.CardFraud",
+    "scenarios": 4,
+    "witness_cases": 12,
+    "scenarios_with_witness": 4,
+    "missing_witness_scenarios": [],
+    "formal_passed": true,
+    "formal_error": null
+  },
+  {
+    "taskId": "IndustrialSOFL.LoginAnomaly",
+    "scenarios": 4,
+    "witness_cases": 12,
+    "scenarios_with_witness": 4,
+    "missing_witness_scenarios": [],
+    "formal_passed": true,
+    "formal_error": null
+  },
+  {
+    "taskId": "IndustrialSOFL.CourseEnroll",
+    "scenarios": 4,
+    "witness_cases": 12,
+    "scenarios_with_witness": 4,
+    "missing_witness_scenarios": [],
+    "formal_passed": true,
+    "formal_error": null
+  },
+  {
+    "taskId": "IndustrialSOFL.BenefitEnroll",
+    "scenarios": 4,
+    "witness_cases": 12,
+    "scenarios_with_witness": 4,
+    "missing_witness_scenarios": [],
+    "formal_passed": true,
+    "formal_error": null
+  },
+  {
+    "taskId": "IndustrialSOFL.BonusAward",
+    "scenarios": 4,
+    "witness_cases": 12,
+    "scenarios_with_witness": 4,
+    "missing_witness_scenarios": [],
+    "formal_passed": true,
+    "formal_error": null
+  },
+  {
+    "taskId": "IndustrialSOFL.OvertimePay",
+    "scenarios": 4,
+    "witness_cases": 12,
+    "scenarios_with_witness": 4,
+    "missing_witness_scenarios": [],
+    "formal_passed": true,
+    "formal_error": null
+  }
+]

@@ -1,7 +1,16 @@
 Ordered guard specifications (first-match semantics) partition the input
 domain into semantic regions; LLM-generated code often violates precedence on
 \emph{thin overlap} where several guards hold simultaneously---regions that
-random unit tests rarely sample~\citep{ammann2016testing}.
+random unit tests rarely sample~\citep{ammann2016testing,zhu1997specification}.
+
+The running example \texttt{classify\_signal} makes the failure mode concrete:
+when $\mathit{threshold}{<}0$, an input such as $(-3,-10)$ satisfies both
+$G_1$ (\texttt{level < 0}) and $G_2$ (\texttt{level >= threshold}); FSF
+ordering mandates \texttt{"Error"} via~$S_1$, yet a typical LLM candidate
+checks the threshold first and returns \texttt{"Critical"}.
+A non-negative test distribution never reaches that slice, so pass/fail repair
+never sees the ordering defect---the motivation for SpecIR witnesses and a
+typed Semantic Feedback IR.
 
 We study \emph{when} specification-guided repair pays off, not whether one
 pipeline universally beats test feedback.
@@ -12,14 +21,18 @@ high-severity pattern screen).
 
 \textbf{Contributions.}
 \textbf{(C2)} Typed Semantic Feedback IR improves repair by \textbf{+7.7\,pp}
-over test-only feedback under controlled comparison (E6, $n{=}120$, $K{=}3$).
-\textbf{(C3)} Conjunctive release lowers escaped defects (PDR 95.0\%/FAR 5.0\%
-vs.\ B2 91.2\%/8.8\%).
-\textbf{(C4)} A \textbf{deployment boundary table} prescribes B2 by default and
-full M when conjunctive $\mathrm{Accept}$ or prevention metrics matter.
+over unstructured test-only feedback under controlled comparison (E6,
+$n{=}120$, $K{=}3$; variants A/B/C: 79.1\,/\,78.9\,/\,86.9).
+\emph{Caveat:} under length-matched E14, \texttt{semantic\_ir} (75.1\%) does
+not beat \texttt{execution\_trace\_matched} (85.4\%)---the +7.7\,pp claim is
+scoped to unstructured test-only under full~M, not uniqueness vs.\ any
+structured trace.
+\textbf{(C3)} Conjunctive release lowers escaped defects (E2: M PDR
+95.0\%\,/\,FAR 5.0\% vs.\ B2 91.2\%\,/\,8.8\%).
+\textbf{(C4)} A \textbf{deployment boundary} prescribes B2 by default and
+full~M when conjunctive $\mathrm{Accept}$ or prevention metrics matter.
 
-We do \emph{not} claim M beats B2 on aggregate: canonical E1 reports B1
-89.2\%, B2 87.7\%, M 86.3\% (all Holm n.s.); E12-canonical shows B2 leads every
-seed (mean 88.0\% vs.\ M 86.0\%; Friedman $p{=}0.077$).
-The running example \texttt{classify\_signal} illustrates an ordering defect
-invisible to tests but repaired via typed IR.
+We do \emph{not} claim M beats B2 on aggregate Conf.: canonical E1 reports B1
+89.2\%, B2 87.7\%, M 86.3\% (all Holm n.s.; Strict 5.0\%; latency 46.2\,s vs.\
+13.9\,s); E12-canonical shows B2 leads every seed (mean 88.0\% vs.\ M 86.0\%;
+4/120 wins; Friedman $p{=}0.077$).

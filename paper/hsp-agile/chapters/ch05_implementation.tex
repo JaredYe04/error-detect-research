@@ -250,16 +250,20 @@ $\Phi_i \equiv \widehat{g}_i \land \bigwedge_{j<i}\lnot\widehat{g}_j$,
 with \texttt{others} as the negation of preceding guards
 (Definition~\ref{def:oracle}).
 Each $\Phi_i$ uses a fresh solver; integer variables are bounded to
-$[-5,20]$ for termination (sufficient for the Chapter~\ref{ch:experiments}
-thresholds).
+$[-5,20]$ for Z3 termination in the checker implementation.
+Hard-task metadata describes inputs over $[0,100]^5$
+(Chapter~\ref{ch:experiments}); witness generation in the reported experiments
+uses the implemented solver bounds $[-5,20]$ rather than the full declared
+domain (bounds follow task metadata for generation thresholds; see
+Appendix~\ref{app:reproducibility}).
 Satisfying models become concrete witnesses $(x,y,i)$; model blocking yields
 up to a few alternatives per scenario (Algorithm~\ref{alg:case-gen}).
 Candidates run in an isolated namespace; field-wise integer equality against
 the oracle yields
 $\mathrm{Conf}(c,t) = |\mathit{passed}| / |\mathcal{D}(t)|$
 \eqref{eq:conformance}.
-Repair iterations use a 16-case budget; post-pipeline strict scoring uses 64
-cases (\texttt{PipelineConfig}; sensitivity in
+Repair iterations use a 16-case budget ($N_{\max}$ for mode~M); post-pipeline
+strict scoring uses 64 cases (\texttt{PipelineConfig}; sensitivity in
 Section~\ref{sec:results:sensitivity}).
 
 \begin{algorithm}[t]
@@ -389,8 +393,12 @@ Checker and guard are complementary filters, not substitutes
 % ---------------------------------------------------------------------------
 
 The orchestrator prioritises parallel throughput, crash-safe resumption, and
-live progress for the 840-run matrix (7 modes $\times$ 120
-tasks)~\citep{harman2004maff,beck2001xp}.
+live progress~\citep{harman2004maff,beck2001xp}.
+Two matrices are used: the \emph{core} seven-mode matrix is
+$7 \times 120 = 840$ runs (B0--B2, M, A1--A3 under
+\code{run\_hard\_full\_parallel\_v1}); the \emph{extended} matrix is
+$10 \times 120 = 1{,}200$ when B3--B5 are included
+(\code{run\_ccf\_b\_extended\_v1}; B6 is reported separately where evaluated).
 Jobs run in a \emph{process pool} (one worker per core) because Z3's native
 global state is not thread-safe; each worker owns its own client, config, and
 pipeline, then appends a strict 64-case evaluation (and optional mutation
@@ -398,7 +406,7 @@ score~\citep{demillo1978mutation,li2023iet_faultprevention}) to a shared JSONL l
 Incremental persistence plus a \texttt{progress.json} sidecar make mid-batch
 restarts resume-safe without re-running finished keys.
 
-Table~\ref{tab:impl-modes} lists the seven modes; flags on
+Table~\ref{tab:impl-modes} lists the seven core modes; flags on
 \texttt{PipelineConfig} enable ablations A1--A3 and baselines B0--B2 against
 full mode~M (Chapter~\ref{ch:experiments}).
 

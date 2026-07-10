@@ -284,6 +284,15 @@ The bound is finite-sample only: acceptance under $\mathrm{Accept}(c,t)$ does
 not imply correctness on $\mathcal{X}_t\setminus\mathcal{D}(t)$.
 \end{proof}
 
+\noindent
+The bound is \emph{motivational} under i.i.d.\ witness assumptions and does
+\emph{not} constitute a correctness guarantee for $\mathrm{Accept}$: the
+deployed pipeline uses deterministic priority-encoded models
+(Equation~\eqref{eq:priority}), not independent random draws.
+Witness cardinality also differs by stage: the repair loop uses up to
+$N_{\max}$ cases (16 for mode~M); strict evaluation uses 64 cases; the FAR
+illustrative calculation below uses $n{=}9$ as an example only.
+
 \subsection{Structured Feedback and Repair Hypothesis}
 \label{subsec:repair-monotonicity}
 
@@ -303,7 +312,8 @@ stochastic model of LLM repair is beyond current theory.
 \subsection{Empirical FAR Validation}
 \label{subsec:far-validation}
 
-With $\varepsilon = 0.08$ and $n = 9$, Theorem~\ref{thm:far-bound} predicts
+With $\varepsilon = 0.08$ and illustrative $n = 9$ (not the pipeline's
+$N_{\max}{=}16$ or strict-eval 64), Theorem~\ref{thm:far-bound} predicts
 $\mathrm{FAR} \leq (0.92)^9 \approx 0.473$; mode~M in E2 measures $0.14$
 (Table~\ref{tab:far-validation}), well inside the conservative bound
 (Section~\ref{sec:results:rq2}).

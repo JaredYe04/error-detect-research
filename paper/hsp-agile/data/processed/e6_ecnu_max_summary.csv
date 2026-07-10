@@ -1,0 +1,4 @@
+variant_label,feedback_variant,model,mean_conf,mean_iterations,n
+A,test_only,ecnu-max,0.8921,2.92,120
+B,test_expected,ecnu-max,0.8902,2.91,120
+C,semantic_ir,ecnu-max,0.8925,2.91,120

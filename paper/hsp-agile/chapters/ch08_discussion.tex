@@ -44,9 +44,12 @@ prevention improves).
 
 B0 one-shot (89.2\% mean Conf., $\approx$0.2\,s) matches B1 at seed~0 on
 canonical E1---a one-call reference, not a production baseline.
-Ablations: A3 $-$6.3\,pp (no repair), A1 $-$3.9\,pp (no checker), A2
-$-$6.0\,pp on Conf.\ (pattern guard is a C3 prevention/diagnostic gate, not a
-Conf.\ booster; Section~\ref{sec:disc:implications}).
+Ablations vs.\ M on Conf.: A1 $-$0.8\,pp (no checker), A2 $-$6.0\,pp
+(no pattern guard), A3 $-$3.9\,pp (no repair)---removing the guard hurts most
+on this corpus, then repair, then the checker.
+A2 ($-$6.0\,pp Conf.) shows the guard also affects scored candidates; its
+primary \emph{deployment} rationale remains prevention (E2), with E17 advisory
+as a latency-friendly alternative (Section~\ref{sec:disc:implications}).
 
 
 %=============================================================================
@@ -198,9 +201,10 @@ detection of shadow guards and unreachable paths beyond the 14-rule catalog.
 \label{sec:disc:paradox}
 %=============================================================================
 
-One of the most important results on current BENCH-120 is that \emph{strict
-success is uniformly low} across LLM repair modes (M/B2/B1 at 5.0/5.0/4.2\%)
-while \emph{mean conformance} still discriminates B2 $>$ M $>$ B1.
+On current BENCH-120, \emph{strict success is uniformly low} across LLM repair
+modes (M/B2/B1 all at 5.0\%) and therefore does \emph{not} discriminate mode~M.
+\emph{Mean conformance} on canonical E1 (seed~0) orders
+B1 $\geq$ B2 $>$ M (89.2\% / 87.7\% / 86.3\%).
 The two metrics measure fundamentally different things.
 \emph{Strict success rate} is binary per task: conjunctive
 $\mathrm{Accept}$ requires full witness conformance \emph{and} a clear pattern
@@ -208,38 +212,23 @@ screen.
 \emph{Formal conformance} is continuous: a candidate satisfying 9 of 10 cases
 contributes 0.9 to the average even though it contributes 0 to strict success.
 
-On the current corpus, B1/B2 lead aggregate conformance at seed~0 (89.2\%/87.7\%);
-M reaches 86.3\%; the historical ``higher Conf.\ but lower Strict'' paradox applied only
-to the superseded 86-task-overlapping E1 snapshot (M 90.4\% vs.\ B2 88.0\% with
-25.0\% vs.\ 26.7\% Strict).
-The enduring lesson is C3 selectivity: acceptance stays rare under conjunctive
-release, and prevention metrics (PDR/FAR, E2)---not strict-success rate
-alone---should guide deployment.
-
-A useful analogy clarifies this relationship.
-Suppose two students sit ten examinations.
-Student~A scores 89\% on every paper.
-Student~B scores 100\% on three papers and 65\% on the remaining seven.
-On a binary pass/fail threshold of 75\%, Student~A passes all ten and
-Student~B passes only three.
-Yet Student~B's \emph{mean score} is $0.3 \times 100 + 0.7 \times 65 = 75.5\%$,
-below Student~A's 89\%.
-The binary metric favours Student~B despite lower average quality; the continuous
-metric correctly orders them.
-M is Student~A: consistently high conformance; B1 and B2 occasionally solve tasks
-completely but average lower quality.
-
-This is not a deficiency of M.
+The differentiator for M is therefore \emph{prevention}, not higher Conf.:
+on E2 implementation screening, M reaches PDR 95.0\% / FAR 5.0\% versus
+B2's PDR 91.2\% / FAR 8.8\%.
 The conjunctive predicate rejects candidates that pass all witnesses but exhibit
 high-severity pattern violations---candidates that B1/B2's single-criterion gate
-would accept.
-The escaped-defect rate confirms that M's accepted set contains 3.8\,pp fewer
-mutant-detectable faults than B2's accepted set (FAR 5.0\% vs.\ 8.8\% on
-implementation screening), while achieving higher detection rate (PDR 95.0\% vs.\
-91.2\%).
+would accept---yielding fewer escaped defects at comparable strict rates.
+
+A historical ``higher Conf.\ but lower Strict'' paradox applied only to the
+superseded 86-task-overlapping E1 snapshot (M 90.4\% vs.\ B2 88.0\% with
+25.0\% vs.\ 26.7\% Strict); it does not hold on the current corpus.
+The enduring lesson is C3 selectivity: acceptance stays rare under conjunctive
+release, and prevention metrics (PDR/FAR, E2)---not strict-success rate or
+aggregate Conf.\ alone---should guide deployment.
 The Wilcoxon signed-rank test on strict success rate yields uncorrected
-$p = 0.921$ (Holm-corrected $p = 1.000$; not significant), justifying formal
-conformance as the \emph{primary} metric on the hard benchmark.
+$p = 0.921$ (Holm-corrected $p = 1.000$; not significant), so formal
+conformance remains the primary continuous quality metric while PDR/FAR
+grounds the release-gate claim.
 
 
 %=============================================================================
@@ -252,13 +241,13 @@ conformance as the \emph{primary} metric on the hard benchmark.
 The \textsc{SgDP} framework is designed as a CI/CD pre-merge gate operating between
 test-feedback (fast, spec-unaware) and full deductive verification (slow, requires
 annotations).
-Mode~M incurs mean latency of 29{,}378\,ms per task ($3.2\times$ B2's 9{,}082\,ms),
-reflecting repair-loop LLM calls and Z3 checking.
-For \emph{interactive} IDE use, 29 seconds is at the upper boundary of acceptable
+Mode~M incurs mean latency of 46{,}161\,ms per task ($\approx$3.3$\times$ B2's
+13{,}864\,ms) on canonical E1, reflecting repair-loop LLM calls and Z3 checking.
+For \emph{interactive} IDE use, $\approx$46\,s is at the upper boundary of acceptable
 response times; for \emph{CI/CD pre-merge gates}, it is well within typical automated
 quality checks.
 A sprint team merging 20--30 LLM-assisted units per day would incur roughly
-10--15 minutes of additional pipeline time---comparable to compiling a medium-sized
+15--23 minutes of additional pipeline time---comparable to compiling a medium-sized
 Java project---while avoiding hours of downstream debugging from propagated
 conformance faults.
 
@@ -280,22 +269,25 @@ The Z3 checker provides \emph{bounded} guarantees over a finite generated test
 suite at less than 100\,ms per task---negligible relative to total pipeline latency.
 This lightweight oracle suits iterative formal development workflows: test cases are derived
 directly from specification structure, not manually written unit tests.
-The $+3.9$\,pp conformance contribution of the checker (A1 ablation) demonstrates
-material quality improvement, not bureaucratic overhead.
+The $+0.8$\,pp conformance contribution of the checker (A1 ablation) demonstrates
+a measurable but modest quality improvement, not bureaucratic overhead.
 
 \subsection{Pattern Guard Selectivity and Advisory Use}
 
 The A2 ablation---removing the pattern guard costs $\approx$6\,pp mean conformance on
-canonical E1---confirms the guard is not a Conf.\ booster.
-The guard provides value as a \emph{classification and diagnostic tool} and
-prevention lever rather than a mean-Conf.\ driver: when it fires, it identifies the specific fault pattern
+canonical E1 (80.3\% vs.\ M 86.3\%)---shows that the guard also affects scored
+candidates on this corpus, not only the Accept gate.
+Its primary \emph{deployment} rationale remains prevention (E2 PDR/FAR), with
+E17 advisory mode as a latency-friendly alternative when a hard gate is too
+strict.
+When the guard fires, it additionally identifies the specific fault pattern
 (e.g.\ RF07 unconditional success; RF03 missing precedence guard), information not
-captured by the conformance metric.
+captured by the conformance metric alone.
 
 For most patterns, \emph{advisory warnings} are preferable to hard rejections,
 following static-analysis severity-modulated gating
 policy~\citep{hovemeyer2004findbugs,ayewah2007findbugs}, with hard rejection reserved
-for RF07.
+for RF07; E17 evaluates that advisory operating point.
 The pattern guard is most valuable as a \emph{living artefact}: new failure modes
 observed in production can be added incrementally as RF patterns without retraining
 the LLM or modifying the formal checker; E7's per-pattern F1 guides catalogue
@@ -378,6 +370,15 @@ latency on external and unfiltered corpora; M when conjunctive $\mathrm{Accept}$
 PDR/FAR targets, or E6-typed feedback justify the overhead---not from overlap
 tertiles alone (canonical E3 is non-monotone).
 
+\paragraph{Hybrid baselines.}
+The irreducible increment of full~M over test-feedback and verifier-loop
+hybrids is conjunctive $\mathrm{Accept}$ together with PDR/FAR (and the E6
+typed-IR gain when operating inside M's repair loop).
+For mean Conf.\ alone, prefer B2 (E13 full: B2 $88.2\%$ vs.\ B6 $81.1\%$ /
+M $82.0\%$).
+M\_lite (E18: $79.0\%$ Conf.) and B6 are not shortcuts to M's prevention
+profile: deploy full IR$+$gate integration or stay on B2.
+
 The framework does not currently extend to temporal properties requiring LTL/CTL
 encoding, infinite-domain arithmetic beyond LIA, or probabilistic semantics.
 These represent natural extensions rather than fundamental limitations.
@@ -402,11 +403,16 @@ benchmark.
 Replication on practitioner SOFL/FSF projects~\citep{li2022qrs_companion,pohl2010requirements}
 is necessary before broad generalisability can be claimed.
 
-\paragraph{Single LLM family.}
-All experiments used Qwen2.5-27B-Instruct via an OpenAI-compatible LLM gateway.
-Conformance gains may differ with GPT-4, Claude~3.5 Sonnet, or Gemini~1.5 Pro.
-The pipeline structure is model-agnostic, but quantitative results are specific to
-the evaluated model family.
+\paragraph{Two campus endpoints plus commercial n1n models.}
+Primary results use \texttt{ecnu-plus} (Qwen-family); E16/E6-max use
+\texttt{ecnu-max} (DeepSeek-family); commercial replication uses n1n
+\texttt{gpt-4o}, \texttt{claude-sonnet-4-6}, and \texttt{deepseek-v3.2}
+(Section~\ref{sec:results:n1n}).
+Cross-endpoint evidence shows saturation or modest gains rather than ranking
+reversal; on industrial-pattern tasks B2 reaches 100\% Conf.\ under gpt-4o and
+Claude (Section~\ref{sec:results:industrial}).
+The +7.7\,pp typed-IR result remains primary-endpoint evidence under repair
+headroom.
 
 \paragraph{Z3 test-case coverage.}
 The formal checker generates one test case per scenario branch.
@@ -552,17 +558,18 @@ Claims are scoped to overlap-intensive specifications, not universal codegen.
 $\mathrm{Accept}$ is conjunctive (Equation~\eqref{eq:accept}): full witness
 conformance \emph{and} a clear high-severity pattern screen.
 On current BENCH-120, all LLM modes share similarly low strict rates
-(M/B2/B1 at 5.0/5.0/4.2\%)---C3 selectivity, not weaker implementations.
+(M/B2/B1 all at 5.0\%)---C3 selectivity, not weaker implementations.
 Prevention metrics (PDR/FAR, E2) differentiate M from B2 when conjunctive
 release is required (Section~\ref{sec:disc:paradox}).
 
-\paragraph{Why keep the pattern guard when A2 is faster and slightly higher on Conf.?}
-A2 reaches 80.3\% Conf.\ vs.\ M's 86.3\% at $\approx$1.2$\times$ lower latency
-because it skips hard rejections on structural patterns.
-The guard's value is prevention (PDR/FAR, E2), not mean Conf.\ (A2 ablation
-$+$0.5\,pp on Conf.\ but lower structural PDR).
-For release gates, advisory RF patterns plus hard rejection for RF07 are the
-intended operating mode (Section~\ref{sec:disc:implications}).
+\paragraph{Why does removing the pattern guard (A2) lower Conf.?}
+A2 reaches 80.3\% Conf.\ vs.\ M's 86.3\% ($-$6.0\,pp) on canonical E1: disabling
+the guard removes structural screening that also shapes which candidates remain
+in the scored pool after repair.
+The guard's primary \emph{deployment} rationale remains prevention (PDR/FAR, E2);
+when a hard gate is too strict for interactive use, E17 advisory mode (warnings
+without withholding Accept) is the latency-friendly alternative
+(Section~\ref{sec:disc:implications}).
 
 \paragraph{Why a single seed for E1?}
 Generative calls use $T_\text{gen}{=}0.7$; repair uses $T_\text{repair}{=}0.0$.
@@ -571,14 +578,8 @@ E1 reports repeat~0 with bootstrap CIs over tasks; \textbf{E12-full} re-runs all
 B2 leads in every seed; M wins only 4/120 paired comparisons (Friedman
 $p{=}0.077$; ranking stable).
 The single-repeat matrix is not a one-seed artefact, but pooled seeds favour B2
-over M---deployment should follow overlap tier, not seed~0 alone.
-
-\paragraph{Why does A2 beat M on mean conformance?}
-A2 disables the pattern guard, so candidates that pass all witnesses but trigger
-a high-severity pattern are still counted toward mean Conf.\ even when M would
-withhold $\mathrm{Accept}$.
-A2 is the right mode when latency binds and prevention gating is deferred; M is
-the right mode when conjunctive release is required.
+over M---deployment should follow Table~\ref{tab:deployment-boundary}
+(Accept/PDR/FAR), not overlap tertiles alone (E3 non-monotone).
 
 
 %=============================================================================

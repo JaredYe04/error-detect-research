@@ -1,0 +1,11 @@
+[    1251ms] [INFO] %c ★ NewAPI %c v0.1.0 %c
+
+  Powered by open-source community
+  Github: https://github.com/QuantumNous/new-api
+  Built: 2026/7/10 10:11:24
+
+  "Any sufficiently advanced technology
+   is indistinguishable from magic."
+                        — Arthur C. Clarke
+ background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #fff; font-size: 20px; font-weight: bold; padding: 8px 16px; border-radius: 4px 0 0 4px; background: #23272f; color: #10b981; font-size: 14px; font-weight: bold; padding: 10px 12px; border-radius: 0 4px 4px 0; color: #888; font-size: 12px; line-height: 1.6; @ https://assets.wlai.vip/assets/js/index-J9g9GuX4.js:1
+[    1917ms] [ERROR] Failed to load resource: net::ERR_CONNECTION_CLOSED @ https://www.statcounter.com/counter/counter.js:0

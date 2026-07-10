@@ -1,21 +1,33 @@
-\textbf{Benchmark.} 120 hard synthetic tasks (\texttt{benchmarks/tasks.json},
-overlap-filtered stress-test, E1) plus 100 uniform random tasks (E10), 22-task
-external SOFL corpus (E11), and HumanEval/MBPP adapters (E8c).
+\textbf{Benchmark.}
+BENCH-120 is a synthetic \emph{hard} corpus (\texttt{benchmarks/tasks.json},
+overlap-filtered stress-test; fingerprint \texttt{322157816b37c34e}).
+Mitigations: E10 (100 uniform random tasks), E11 (22-task external SOFL
+corpus), E8c (HumanEval/MBPP FSF adapters).
 
-\textbf{Modes.} B1 one-shot; B2 test-feedback ($K{=}3$); M full \textsc{SgDP};
-ablations A1--A3 remove checker, pattern guard, or repair loop.
+\textbf{Modes (main text).}
+B1 one-shot; B2 test-feedback ($K{=}3$); M full \textsc{SgDP};
+A1 no formal checker; A3 no repair loop.
+B3--B5 (Self-Refine / Self-Debug / Reflexion-lite) and B6 (VerifierLoop-FSF)
+appear in the supplementary material; A2 (no pattern guard) is cited for
+ablation deltas only.
 
-\textbf{Metrics.} Strict formal conformance (primary), strict success under
-conjunctive Accept, mutation kill rate, latency, prevention PDR/FAR (E2).
+\textbf{Model.}
+Qwen2.5-27B-Instruct~\citep{yang2024qwen25} ($T_{\mathrm{gen}}{=}0.7$,
+$T_{\mathrm{repair}}{=}0$).
+E16-canonical replicates 120 tasks with \texttt{ecnu-max} (all modes 89.2\%;
+no ranking reversal).
 
-\textbf{Protocol.} Canonical runs \texttt{run\_e1\_canonical\_v1} and
-\texttt{run\_e12\_canonical\_v1} share benchmark fingerprint
-\texttt{322157816b37c34e}; E16-canonical replicates 120 tasks with
-\texttt{ecnu-max} (all modes 89.2\%, no ranking reversal).
+\textbf{Metrics.}
+Mean formal conformance (Conf.); Strict success under conjunctive
+$\mathrm{Accept}$; prevention PDR/FAR (E2); wall-clock latency.
 
-\textbf{Power.} Post-hoc analysis shows $n{=}120$ is under-powered for M vs.\ B2
-($\delta{=}{-}0.014$, observed power ${\approx}3.6\%$); we foreground E6 and
-deployment evidence over aggregate ranking.
+\textbf{Statistics.}
+Paired Wilcoxon tests with Holm correction on per-task metrics; Friedman
+test across E12 seeds for ranking stability.
+Canonical runs: \texttt{run\_e1\_canonical\_v1},
+\texttt{run\_e12\_canonical\_v1}.
 
-\textbf{Threats.} Overlap concentration (mitigated by E10/E8c); single primary
-model (E16); synthetic benchmark bias (scoped claims).
+\textbf{Power.}
+Post-hoc: $n{=}120$ is under-powered for M vs.\ B2 aggregate Conf.\
+($|\delta|{=}0.014$, observed power ${\approx}3.6\%$); we foreground E6
+mechanism evidence and the deployment boundary over aggregate ranking.

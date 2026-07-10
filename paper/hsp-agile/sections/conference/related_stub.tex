@@ -1,12 +1,36 @@
-SOFL/FSF models ordered guards with first-match precedence~\citep{liu2010sofl}.
-Prior LLM repair loops (Reflexion-style test feedback~\citep{shinn2023reflexion},
-verifier-guided synthesis~\citep{sun2024clover}) lack region-typed failure
-signals and under-repair ordering defects.
+SOFL/FSF models ordered guards with first-match
+precedence~\citep{liu1998sofl,liu2004soflbook}; Agile-SOFL embeds them in
+sprint workflows~\citep{li2022qrs_companion,li2023iet_faultprevention}.
+LLM synthesis accelerates coding~\citep{chen2021codex,openai2023gpt4} but
+does not respect guard order~\citep{dakhel2023copilot}.
 
-HSP-Agile sits below full deductive verification: bounded SMT witnesses and
-pattern guards approximate release quality at agile latency~\citep{woodcock2009formalsurvey}.
-We compare one-shot (B1), test-feedback (B2), and full \textsc{SgDP} (M) on a
-shared 120-task benchmark with conjunctive strict metrics.
-Table~\ref{tab:repair-loops} (appendix in full report) positions M against
-Reflexion-style and verifier-loop baselines; E18 shows naive witness+IR hybrids
-(\texttt{M\_lite}) do not recover E6-level gains.
+\paragraph{Verifier-in-the-loop.}
+DafnyBench~\citep{loughman2024dafnybench} evaluates LLM synthesis under full
+deductive verification, repairing from compiler messages without FSF ordering
+or PDR/FAR.
+Clover~\citep{sun2024clover} is the closest CEGIS-style verifier loop for
+Dafny; it lacks first-match SpecIR regions, typed scenario feedback, and a
+pattern gate.
+Our B6 (VerifierLoop-FSF) adapts witness-in-the-loop repair to FSF without
+Semantic IR or hard pattern screening---a controlled comparator, not a
+drop-in Clover clone.
+
+\paragraph{Verbal / test repair loops.}
+Self-Refine~\citep{madaan2023selfrefine}, Self-Debug~\citep{chen2023selfdebug},
+and Reflexion~\citep{shinn2023reflexion} iterate on self-critique, execution
+traces, or verbal memory.
+They improve generation success but do not emit region-typed failure records
+or measure prevention under conjunctive release.
+Our B3--B5 instantiate those styles on the same BENCH-120 budget ($K{=}3$);
+full numbers sit in the supplementary material.
+
+\paragraph{Positioning.}
+HSP-Agile sits below full deductive verification: bounded SMT
+witnesses~\citep{demoura2008z3,barrett2018smt} and pattern guards approximate
+release quality at agile latency~\citep{woodcock2009formalsurvey}.
+Relative to prior work we contribute (i)~first-match SpecIR witnesses,
+(ii)~typed Semantic Feedback IR as the repair hinge, and (iii)~conjunctive
+$\mathrm{Accept}$ with PDR/FAR---evaluated against B1/B2 and ablations A1/A3
+in the main text (B3--B6 in supp.).
+E18 shows that naive witness{+}IR hybrids (\texttt{M\_lite}) do not recover
+E6-level gains without the integrated gate.

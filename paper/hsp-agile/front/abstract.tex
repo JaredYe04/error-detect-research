@@ -16,13 +16,26 @@ high-severity structural pattern).
 
 \textbf{Lead empirical result:} under identical repair budget $K{=}3$, full
 Semantic Feedback IR improves mean formal conformance by \textbf{+7.7\,pp}
-over test-only feedback (E6) on the same 120 tasks under a controlled
-feedback-variant comparison.
+vs.\ test-only under controlled E6 on the primary endpoint \texttt{ecnu-plus}
+(not vs.\ every structured trace; see E14)
+on the same 120 tasks; under length-matched E14,
+\texttt{execution\_trace} can exceed bare \texttt{semantic\_ir}.
+On the second endpoint \texttt{ecnu-max}, the same E6 protocol saturates
+(${\approx}89.2\%$ for A/B/C; C$-$A ${+}0.03$\,pp), so typed-IR gains are
+headroom-dependent.
+Commercial n1n replication (\texttt{gpt-4o}/\texttt{claude-sonnet-4-6}/
+\texttt{deepseek-v3.2}, $n{=}29$ stratified) shows saturation (+0.0\,pp),
+modest gain (+1.0\,pp), or regression ($-$3.9\,pp) respectively.
+On a curated industrial-pattern corpus ($n{=}31$), B2 reaches 100\% Conf.\
+under gpt-4o and Claude while B1/M sit at 95.5\%---reinforcing B2 as the
+default.
 We provide a \textbf{deployment boundary table} (C4): test-feedback B2 is the
 default on aggregate conformance and unfiltered corpora (E10: B2 89.1\% vs.\ M
 83.1\%; E12: B2 leads all seeds); full mode~M is warranted when conjunctive
 $\mathrm{Accept}$ or prevention (PDR/FAR) is required, not from overlap
 tertiles alone (canonical E3 is non-monotone).
+Paired bootstrap on E2 impl-screening ($n{=}852$) places the M--B2 PDR/FAR
+gaps' 95\% CIs away from zero.
 
 On the current 120-task hard benchmark (E1 canonical, seed~0), B1 reaches
 89.2\% mean conformance versus M at 86.3\%---single-repeat ranking is

@@ -1,0 +1,887 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e3]:
+    - generic [ref=e8]:
+      - generic [ref=e9]:
+        - button "打开菜单" [ref=e11] [cursor=pointer]:
+          - img [ref=e13]
+        - link "logo" [ref=e15] [cursor=pointer]:
+          - /url: /
+          - img "logo" [ref=e16]
+          - generic:
+            - generic:
+              - heading [level=4]
+      - generic [ref=e17]:
+        - generic [ref=e19]:
+          - button "系统公告" [ref=e20] [cursor=pointer]:
+            - img [ref=e22]
+          - generic [ref=e25]: 99+
+        - button "切换主题" [ref=e27] [cursor=pointer]:
+          - img [ref=e29]
+        - button "切换语言" [ref=e36] [cursor=pointer]:
+          - img "language" [ref=e38]
+        - link "登录" [ref=e41] [cursor=pointer]:
+          - /url: /login
+          - button "登录" [ref=e42]:
+            - generic [ref=e44]: 登录
+    - generic [ref=e46]:
+      - main [ref=e47]:
+        - generic [ref=e51]:
+          - complementary [ref=e52]:
+            - generic [ref=e54]:
+              - button "重置" [ref=e55] [cursor=pointer]:
+                - img [ref=e56]
+                - generic [ref=e59]: 重置
+              - generic [ref=e60]:
+                - generic [ref=e61]: 供应商
+                - generic [ref=e62] [cursor=pointer]:
+                  - generic [ref=e64]: 全部供应商
+                  - generic [ref=e65]: "417"
+                - generic [ref=e66] [cursor=pointer]:
+                  - generic [ref=e67]:
+                    - img "OpenAI" [ref=e69]
+                    - generic [ref=e71]: OpenAI
+                  - generic [ref=e72]: "96"
+                - generic [ref=e73] [cursor=pointer]:
+                  - generic [ref=e74]:
+                    - img "Claude" [ref=e76]
+                    - generic [ref=e78]: Anthropic
+                  - generic [ref=e79]: "14"
+                - generic [ref=e80] [cursor=pointer]:
+                  - generic [ref=e81]:
+                    - img "Gemini" [ref=e83]
+                    - generic [ref=e88]: Google
+                  - generic [ref=e89]: "27"
+                - generic [ref=e90] [cursor=pointer]:
+                  - generic [ref=e91]:
+                    - img "OpenAI" [ref=e93]
+                    - generic [ref=e95]: OpenAI Plus
+                  - generic [ref=e96]: "7"
+                - generic [ref=e97] [cursor=pointer]:
+                  - generic [ref=e98]:
+                    - img "Qwen" [ref=e100]
+                    - generic [ref=e102]: Bailian (阿里云百炼)
+                  - generic [ref=e103]: "85"
+                - button "展开更多" [ref=e104] [cursor=pointer]:
+                  - img [ref=e105]
+                  - generic [ref=e107]: 展开更多
+              - generic [ref=e108]:
+                - generic [ref=e109]: 模型类型
+                - generic [ref=e110] [cursor=pointer]:
+                  - generic [ref=e112]: 全部类型
+                  - generic [ref=e113]: "417"
+                - generic [ref=e114] [cursor=pointer]:
+                  - generic [ref=e116]: 检索
+                  - generic [ref=e117]: "11"
+                - generic [ref=e118] [cursor=pointer]:
+                  - generic [ref=e120]: 图像
+                  - generic [ref=e121]: "42"
+                - generic [ref=e122] [cursor=pointer]:
+                  - generic [ref=e124]: 文本
+                  - generic [ref=e125]: "282"
+                - generic [ref=e126] [cursor=pointer]:
+                  - generic [ref=e128]: 音视频
+                  - generic [ref=e129]: "78"
+              - generic [ref=e130]:
+                - generic [ref=e131]: 标签
+                - generic [ref=e132] [cursor=pointer]:
+                  - generic [ref=e134]: 全部标签
+                  - generic [ref=e135]: "417"
+                - generic [ref=e136] [cursor=pointer]:
+                  - generic [ref=e138]: 参考生视频
+                  - generic [ref=e139]: "18"
+                - generic [ref=e140] [cursor=pointer]:
+                  - generic [ref=e142]: 参考图
+                  - generic [ref=e143]: "1"
+                - generic [ref=e144] [cursor=pointer]:
+                  - generic [ref=e146]: 动作模仿
+                  - generic [ref=e147]: "1"
+                - generic [ref=e148] [cursor=pointer]:
+                  - generic [ref=e150]: 对话
+                  - generic [ref=e151]: "288"
+                - generic [ref=e152] [cursor=pointer]:
+                  - generic [ref=e154]: 对口型
+                  - generic [ref=e155]: "1"
+                - button "展开更多" [ref=e156] [cursor=pointer]:
+                  - img [ref=e157]
+                  - generic [ref=e159]: 展开更多
+              - generic [ref=e160]:
+                - generic [ref=e161]: 可用令牌分组
+                - generic [ref=e162] [cursor=pointer]:
+                  - generic [ref=e164]: 全部分组
+                  - generic [ref=e165]: 全部
+                - generic [ref=e166] [cursor=pointer]:
+                  - generic [ref=e168]: Claude Code专属
+                  - generic [ref=e169]: x2.4
+                - generic [ref=e170] [cursor=pointer]:
+                  - generic [ref=e172]: Codex专属
+                  - generic [ref=e173]: x0.8
+                - generic [ref=e174] [cursor=pointer]:
+                  - generic [ref=e176]: MJ慢速
+                  - generic [ref=e177]: x0.6
+                - generic [ref=e178] [cursor=pointer]:
+                  - generic [ref=e180]: default
+                  - generic [ref=e181]: x1
+                - generic [ref=e182] [cursor=pointer]:
+                  - generic [ref=e184]: gemini-cli
+                  - generic [ref=e185]: x1
+                - button "展开更多" [ref=e186] [cursor=pointer]:
+                  - img [ref=e187]
+                  - generic [ref=e189]: 展开更多
+              - generic [ref=e190]:
+                - generic [ref=e191]: 计费类型
+                - generic [ref=e192] [cursor=pointer]:
+                  - generic [ref=e194]: 全部类型
+                  - generic [ref=e195]: "417"
+                - generic [ref=e196] [cursor=pointer]:
+                  - generic [ref=e198]: 按量计费
+                  - generic [ref=e199]: "317"
+                - generic [ref=e200] [cursor=pointer]:
+                  - generic [ref=e202]: 按次计费
+                  - generic [ref=e203]: "87"
+                - generic [ref=e204] [cursor=pointer]:
+                  - generic [ref=e206]: 按视频尺寸计费
+                  - generic [ref=e207]: "3"
+                - generic [ref=e208] [cursor=pointer]:
+                  - generic [ref=e210]: 按视频时间计费
+                  - generic [ref=e211]: "10"
+          - main [ref=e212]:
+            - generic [ref=e213]:
+              - generic [ref=e217]:
+                - generic [ref=e219]:
+                  - img [ref=e221]
+                  - textbox "模糊搜索模型名称" [ref=e224]
+                - generic [ref=e226]:
+                  - generic [ref=e227]: 倍率
+                  - switch [ref=e230] [cursor=pointer]
+                - button "表格视图" [ref=e231] [cursor=pointer]:
+                  - generic [ref=e232]: 表格视图
+                - button "M" [ref=e233] [cursor=pointer]:
+                  - generic [ref=e234]: M
+              - generic [ref=e236]:
+                - generic [ref=e237]:
+                  - button "grok-4.3 文本 grok-4.3 xAI 我们最先进的旗舰型号，引领行业在非幻觉率、代理工具调用和指令跟随能力方面。 输入价格 $1.2500/M 补全价格 $2.5000/M 对话 工具 思考 按量计费 立即体验" [ref=e238] [cursor=pointer]:
+                    - generic [ref=e239]:
+                      - img "grok-4.3" [ref=e240]
+                      - generic [ref=e242]: 文本
+                    - generic [ref=e243]:
+                      - generic [ref=e244]:
+                        - heading "grok-4.3" [level=3] [ref=e245]
+                        - text: xAI
+                      - paragraph [ref=e246]: 我们最先进的旗舰型号，引领行业在非幻觉率、代理工具调用和指令跟随能力方面。
+                      - generic [ref=e247]:
+                        - generic [ref=e248]: 输入价格 $1.2500/M
+                        - generic [ref=e249]: 补全价格 $2.5000/M
+                      - generic [ref=e250]:
+                        - generic [ref=e251]: 对话
+                        - generic [ref=e252]: 工具
+                        - generic [ref=e253]: 思考
+                        - generic [ref=e254]: 按量计费
+                      - generic [ref=e256]:
+                        - button [ref=e257]:
+                          - img [ref=e258]
+                        - button "立即体验" [ref=e261]:
+                          - img [ref=e262]
+                          - text: 立即体验
+                  - button "claude-sonnet-5 文本 claude-sonnet-5 Anthropic Claude Sonnet 5 默认支持 100 万令牌上下文窗口（100万 令牌既是默认也是最大值;没有更小的上下文变体）、128k 最大输出令牌、自适应思维，以及与 Claude Sonnet 4.6 相同的工具和平台功能，除了优先级（Priority Tier）功能，Claude Sonnet 5 不支持优先级。 输入价格 $2.4000/M 补全价格 $12.0000/M 缓存命中价格 $0.2400/M 对话 识图 工具 按量计费 立即体验" [ref=e264] [cursor=pointer]:
+                    - generic [ref=e265]:
+                      - img "claude-sonnet-5" [ref=e266]
+                      - generic [ref=e268]: 文本
+                    - generic [ref=e269]:
+                      - generic [ref=e270]:
+                        - heading "claude-sonnet-5" [level=3] [ref=e271]
+                        - text: Anthropic
+                      - paragraph [ref=e272]: Claude Sonnet 5 默认支持 100 万令牌上下文窗口（100万 令牌既是默认也是最大值;没有更小的上下文变体）、128k 最大输出令牌、自适应思维，以及与 Claude Sonnet 4.6 相同的工具和平台功能，除了优先级（Priority Tier）功能，Claude Sonnet 5 不支持优先级。
+                      - generic [ref=e273]:
+                        - generic [ref=e274]: 输入价格 $2.4000/M
+                        - generic [ref=e275]: 补全价格 $12.0000/M
+                        - generic [ref=e276]: 缓存命中价格 $0.2400/M
+                      - generic [ref=e277]:
+                        - generic [ref=e278]: 对话
+                        - generic [ref=e279]: 识图
+                        - generic [ref=e280]: 工具
+                        - generic [ref=e281]: 按量计费
+                      - generic [ref=e283]:
+                        - button [ref=e284]:
+                          - img [ref=e285]
+                        - button "立即体验" [ref=e288]:
+                          - img [ref=e289]
+                          - text: 立即体验
+                  - button "claude-fable-5 文本 claude-fable-5 Anthropic Claude‑fable‑5 是 Anthropic 推出的公开可用的高性能大型语言模型，具备超长上下文、多模态理解、复杂推理与企业级知识工作能力，同时带有严格安全保护。 输入价格 $24.0000/M 补全价格 $120.0000/M 缓存命中价格 $2.4000/M 对话 识图 工具 按量计费 立即体验" [ref=e291] [cursor=pointer]:
+                    - generic [ref=e292]:
+                      - img "claude-fable-5" [ref=e293]
+                      - generic [ref=e295]: 文本
+                    - generic [ref=e296]:
+                      - generic [ref=e297]:
+                        - heading "claude-fable-5" [level=3] [ref=e298]
+                        - text: Anthropic
+                      - paragraph [ref=e299]: Claude‑fable‑5 是 Anthropic 推出的公开可用的高性能大型语言模型，具备超长上下文、多模态理解、复杂推理与企业级知识工作能力，同时带有严格安全保护。
+                      - generic [ref=e300]:
+                        - generic [ref=e301]: 输入价格 $24.0000/M
+                        - generic [ref=e302]: 补全价格 $120.0000/M
+                        - generic [ref=e303]: 缓存命中价格 $2.4000/M
+                      - generic [ref=e304]:
+                        - generic [ref=e305]: 对话
+                        - generic [ref=e306]: 识图
+                        - generic [ref=e307]: 工具
+                        - generic [ref=e308]: 按量计费
+                      - generic [ref=e310]:
+                        - button [ref=e311]:
+                          - img [ref=e312]
+                        - button "立即体验" [ref=e315]:
+                          - img [ref=e316]
+                          - text: 立即体验
+                  - button "doubao-seed-2-1-pro-260628 文本 doubao-seed-2-1-pro-260628 Doubao (豆包) 迈向生产级智能的新一代大模型，全面升级 Coding、Agent 与多模态能力，以更强的自主规划、长链路执行和动态修复能力，胜任企业真实复杂任务。 输入价格 $9.0000/M 补全价格 $45.0000/M 对话 工具 识图 按量计费 立即体验" [ref=e318] [cursor=pointer]:
+                    - generic [ref=e319]:
+                      - img "doubao-seed-2-1-pro-260628" [ref=e320]
+                      - generic [ref=e322]: 文本
+                    - generic [ref=e323]:
+                      - generic [ref=e324]:
+                        - heading "doubao-seed-2-1-pro-260628" [level=3] [ref=e325]
+                        - text: Doubao (豆包)
+                      - paragraph [ref=e326]: 迈向生产级智能的新一代大模型，全面升级 Coding、Agent 与多模态能力，以更强的自主规划、长链路执行和动态修复能力，胜任企业真实复杂任务。
+                      - generic [ref=e327]:
+                        - generic [ref=e328]: 输入价格 $9.0000/M
+                        - generic [ref=e329]: 补全价格 $45.0000/M
+                      - generic [ref=e330]:
+                        - generic [ref=e331]: 对话
+                        - generic [ref=e332]: 工具
+                        - generic [ref=e333]: 识图
+                        - generic [ref=e334]: 按量计费
+                      - generic [ref=e336]:
+                        - button [ref=e337]:
+                          - img [ref=e338]
+                        - button "立即体验" [ref=e341]:
+                          - img [ref=e342]
+                          - text: 立即体验
+                  - button "doubao-seed-evolving 文本 doubao-seed-evolving Doubao (豆包) Seed-Evolving 是面向 Agent 与 Coding 场景打造的 Seed 系列模型，具备复杂任务编排、长程规划、代码生成与工具调用能力。统一调用 Model ID doubao-seed-evolving，无需关注版本切换，即可持续获得最新模型能力。 输入价格 $9.0000/M 补全价格 $45.0000/M 对话 识图 工具 按量计费 立即体验" [ref=e344] [cursor=pointer]:
+                    - generic [ref=e345]:
+                      - img "doubao-seed-evolving" [ref=e346]
+                      - generic [ref=e348]: 文本
+                    - generic [ref=e349]:
+                      - generic [ref=e350]:
+                        - heading "doubao-seed-evolving" [level=3] [ref=e351]
+                        - text: Doubao (豆包)
+                      - paragraph [ref=e352]: Seed-Evolving 是面向 Agent 与 Coding 场景打造的 Seed 系列模型，具备复杂任务编排、长程规划、代码生成与工具调用能力。统一调用 Model ID doubao-seed-evolving，无需关注版本切换，即可持续获得最新模型能力。
+                      - generic [ref=e353]:
+                        - generic [ref=e354]: 输入价格 $9.0000/M
+                        - generic [ref=e355]: 补全价格 $45.0000/M
+                      - generic [ref=e356]:
+                        - generic [ref=e357]: 对话
+                        - generic [ref=e358]: 识图
+                        - generic [ref=e359]: 工具
+                        - generic [ref=e360]: 按量计费
+                      - generic [ref=e362]:
+                        - button [ref=e363]:
+                          - img [ref=e364]
+                        - button "立即体验" [ref=e367]:
+                          - img [ref=e368]
+                          - text: 立即体验
+                  - button "gemini-3.1-flash-lite-image 图像 gemini-3.1-flash-lite-image Google Nano Banana Lite 旨在成为图片生成系列中的效率专家，提供超低延迟且经济实惠的图片生成和修改功能。仅支持1k图像生成 模型价格 $0.3102 绘图 按次计费 立即体验" [ref=e370] [cursor=pointer]:
+                    - generic [ref=e371]:
+                      - img "gemini-3.1-flash-lite-image" [ref=e372]
+                      - generic [ref=e374]: 图像
+                    - generic [ref=e375]:
+                      - generic [ref=e376]:
+                        - heading "gemini-3.1-flash-lite-image" [level=3] [ref=e377]
+                        - text: Google
+                      - paragraph [ref=e378]: Nano Banana Lite 旨在成为图片生成系列中的效率专家，提供超低延迟且经济实惠的图片生成和修改功能。仅支持1k图像生成
+                      - generic [ref=e380]: 模型价格 $0.3102
+                      - generic [ref=e381]:
+                        - generic [ref=e382]: 绘图
+                        - generic [ref=e383]: 按次计费
+                      - generic [ref=e385]:
+                        - button [ref=e386]:
+                          - img [ref=e387]
+                        - button "立即体验" [ref=e390]:
+                          - img [ref=e391]
+                          - text: 立即体验
+                  - button "gemini-3.5-flash 文本 gemini-3.5-flash Google Gemini 3.5 Flash 已正式发布 (GA)，性能稳定，可大规模用于生产环境。作为我们最智能的 Flash 模型，它在智能体执行、编码和长期任务方面可大规模提供持续的领先性能。 输入价格 $1.5000/M 补全价格 $9.0000/M 缓存命中价格 $0.1500/M 对话 工具 识图 按量计费 立即体验" [ref=e393] [cursor=pointer]:
+                    - generic [ref=e394]:
+                      - img "gemini-3.5-flash" [ref=e395]
+                      - generic [ref=e397]: 文本
+                    - generic [ref=e398]:
+                      - generic [ref=e399]:
+                        - heading "gemini-3.5-flash" [level=3] [ref=e400]
+                        - text: Google
+                      - paragraph [ref=e401]: Gemini 3.5 Flash 已正式发布 (GA)，性能稳定，可大规模用于生产环境。作为我们最智能的 Flash 模型，它在智能体执行、编码和长期任务方面可大规模提供持续的领先性能。
+                      - generic [ref=e402]:
+                        - generic [ref=e403]: 输入价格 $1.5000/M
+                        - generic [ref=e404]: 补全价格 $9.0000/M
+                        - generic [ref=e405]: 缓存命中价格 $0.1500/M
+                      - generic [ref=e406]:
+                        - generic [ref=e407]: 对话
+                        - generic [ref=e408]: 工具
+                        - generic [ref=e409]: 识图
+                        - generic [ref=e410]: 按量计费
+                      - generic [ref=e412]:
+                        - button [ref=e413]:
+                          - img [ref=e414]
+                        - button "立即体验" [ref=e417]:
+                          - img [ref=e418]
+                          - text: 立即体验
+                  - button "gpt-5.6-luna 文本 gpt-5.6-luna OpenAI GPT-5.6 Luna 主打低成本、大批量处理场景，对应早期 GPT-5 Nano 轻量化模型层级，兼容 -high/-xhigh/-low/-medium/-max/-ultra 全部后缀变体。 输入价格 $0.6000/M 补全价格 $3.6000/M 缓存命中价格 $0.0600/M 阶梯 对话 识图 工具 按量计费 立即体验" [ref=e420] [cursor=pointer]:
+                    - generic [ref=e421]:
+                      - img "gpt-5.6-luna" [ref=e422]
+                      - generic [ref=e424]: 文本
+                    - generic [ref=e425]:
+                      - generic [ref=e426]:
+                        - heading "gpt-5.6-luna" [level=3] [ref=e427]
+                        - text: OpenAI
+                      - paragraph [ref=e428]: GPT-5.6 Luna 主打低成本、大批量处理场景，对应早期 GPT-5 Nano 轻量化模型层级，兼容 -high/-xhigh/-low/-medium/-max/-ultra 全部后缀变体。
+                      - generic [ref=e429]:
+                        - generic [ref=e430]: 输入价格 $0.6000/M
+                        - generic [ref=e431]: 补全价格 $3.6000/M
+                        - generic [ref=e432]: 缓存命中价格 $0.0600/M
+                      - generic [ref=e433]:
+                        - generic [ref=e434]: 阶梯
+                        - generic [ref=e435]: 对话
+                        - generic [ref=e436]: 识图
+                        - generic [ref=e437]: 工具
+                        - generic [ref=e438]: 按量计费
+                      - generic [ref=e440]:
+                        - button [ref=e441]:
+                          - img [ref=e442]
+                        - button "立即体验" [ref=e445]:
+                          - img [ref=e446]
+                          - text: 立即体验
+                  - button "gpt-5.6-sol 文本 gpt-5.6-sol OpenAI GPT-5.6 Sol 是 GPT-5.6 系列旗舰基础模型，对应初代 GPT-5 无后缀基线版本。别名 gpt-5.6 请求会分发至 GPT-5.6 Sol，系列支持 -high、-xhigh、-low、-medium、-max、-ultra 全部后缀规格。 输入价格 $3.0000/M 补全价格 $18.0000/M 缓存命中价格 $0.3000/M 阶梯 对话 工具 识图 按量计费 立即体验" [ref=e448] [cursor=pointer]:
+                    - generic [ref=e449]:
+                      - img "gpt-5.6-sol" [ref=e450]
+                      - generic [ref=e452]: 文本
+                    - generic [ref=e453]:
+                      - generic [ref=e454]:
+                        - heading "gpt-5.6-sol" [level=3] [ref=e455]
+                        - text: OpenAI
+                      - paragraph [ref=e456]: GPT-5.6 Sol 是 GPT-5.6 系列旗舰基础模型，对应初代 GPT-5 无后缀基线版本。别名 gpt-5.6 请求会分发至 GPT-5.6 Sol，系列支持 -high、-xhigh、-low、-medium、-max、-ultra 全部后缀规格。
+                      - generic [ref=e457]:
+                        - generic [ref=e458]: 输入价格 $3.0000/M
+                        - generic [ref=e459]: 补全价格 $18.0000/M
+                        - generic [ref=e460]: 缓存命中价格 $0.3000/M
+                      - generic [ref=e461]:
+                        - generic [ref=e462]: 阶梯
+                        - generic [ref=e463]: 对话
+                        - generic [ref=e464]: 工具
+                        - generic [ref=e465]: 识图
+                        - generic [ref=e466]: 按量计费
+                      - generic [ref=e468]:
+                        - button [ref=e469]:
+                          - img [ref=e470]
+                        - button "立即体验" [ref=e473]:
+                          - img [ref=e474]
+                          - text: 立即体验
+                  - button "gpt-image-2 图像 gpt-image-2 OpenAI GPT Image 2 是我们最先进的图像生成模型，支持快速、高质量的图像生成和编辑。它支持灵活的图像尺寸和高保真图像输入。 输入价格 $3.0000/M 补全价格 $18.0000/M 图片输入价格 $4.8000/M 绘画 dall-e-3格式 按量计费 立即体验" [ref=e476] [cursor=pointer]:
+                    - generic [ref=e477]:
+                      - img "gpt-image-2" [ref=e478]
+                      - generic [ref=e480]: 图像
+                    - generic [ref=e481]:
+                      - generic [ref=e482]:
+                        - heading "gpt-image-2" [level=3] [ref=e483]
+                        - text: OpenAI
+                      - paragraph [ref=e484]: GPT Image 2 是我们最先进的图像生成模型，支持快速、高质量的图像生成和编辑。它支持灵活的图像尺寸和高保真图像输入。
+                      - generic [ref=e485]:
+                        - generic [ref=e486]: 输入价格 $3.0000/M
+                        - generic [ref=e487]: 补全价格 $18.0000/M
+                        - generic [ref=e488]: 图片输入价格 $4.8000/M
+                      - generic [ref=e489]:
+                        - generic [ref=e490]: 绘画
+                        - generic [ref=e491]: dall-e-3格式
+                        - generic [ref=e492]: 按量计费
+                      - generic [ref=e494]:
+                        - button [ref=e495]:
+                          - img [ref=e496]
+                        - button "立即体验" [ref=e499]:
+                          - img [ref=e500]
+                          - text: 立即体验
+                  - button "grok-4.5 文本 grok-4.5 xAI Grok 4.5 是 SpaceXAI 专为编码、智能体任务和知识工作而构建的前沿模型。它在 SpaceXAI 位于孟菲斯的数据中心，使用涵盖科学、工程和数学领域的新数据集进行训练。 输入价格 $2.0000/M 补全价格 $6.0000/M 缓存命中价格 $0.5000/M 阶梯 对话 工具 识图 按量计费 立即体验" [ref=e502] [cursor=pointer]:
+                    - generic [ref=e503]:
+                      - img "grok-4.5" [ref=e504]
+                      - generic [ref=e506]: 文本
+                    - generic [ref=e507]:
+                      - generic [ref=e508]:
+                        - heading "grok-4.5" [level=3] [ref=e509]
+                        - text: xAI
+                      - paragraph [ref=e510]: Grok 4.5 是 SpaceXAI 专为编码、智能体任务和知识工作而构建的前沿模型。它在 SpaceXAI 位于孟菲斯的数据中心，使用涵盖科学、工程和数学领域的新数据集进行训练。
+                      - generic [ref=e511]:
+                        - generic [ref=e512]: 输入价格 $2.0000/M
+                        - generic [ref=e513]: 补全价格 $6.0000/M
+                        - generic [ref=e514]: 缓存命中价格 $0.5000/M
+                      - generic [ref=e515]:
+                        - generic [ref=e516]: 阶梯
+                        - generic [ref=e517]: 对话
+                        - generic [ref=e518]: 工具
+                        - generic [ref=e519]: 识图
+                        - generic [ref=e520]: 按量计费
+                      - generic [ref=e522]:
+                        - button [ref=e523]:
+                          - img [ref=e524]
+                        - button "立即体验" [ref=e527]:
+                          - img [ref=e528]
+                          - text: 立即体验
+                  - button "kling-3.0-turbo 音视频 kling-3.0-turbo Kling (可灵) Kling-3.0-Turbo 是快手可灵推出的轻量化极速视频生成模型，在保障人物动作稳定连贯的前提下大幅提升出片速度，降低调用成本，适合大批量短视频素材自动化生产 模型价格 $1.360 异步 视频 按次计费 立即体验" [ref=e530] [cursor=pointer]:
+                    - generic [ref=e531]:
+                      - img "kling-3.0-turbo" [ref=e532]
+                      - generic [ref=e534]: 音视频
+                    - generic [ref=e535]:
+                      - generic [ref=e536]:
+                        - heading "kling-3.0-turbo" [level=3] [ref=e537]
+                        - text: Kling (可灵)
+                      - paragraph [ref=e538]: Kling-3.0-Turbo 是快手可灵推出的轻量化极速视频生成模型，在保障人物动作稳定连贯的前提下大幅提升出片速度，降低调用成本，适合大批量短视频素材自动化生产
+                      - generic [ref=e540]: 模型价格 $1.360
+                      - generic [ref=e541]:
+                        - generic [ref=e542]: 异步
+                        - generic [ref=e543]: 视频
+                        - generic [ref=e544]: 按次计费
+                      - generic [ref=e546]:
+                        - button [ref=e547]:
+                          - img [ref=e548]
+                        - button "立即体验" [ref=e551]:
+                          - img [ref=e552]
+                          - text: 立即体验
+                  - button "qwen-image-2.0-2026-03-03 图像 qwen-image-2.0-2026-03-03 Bailian (阿里云百炼) Qwen-Image-2.0系列加速版模型，实现了图片生成和图片编辑的融合；具备更专业的文字渲染1k token指令支持能力、更细腻的真实质感，细腻刻画写实场景、更强的语义遵循能力。加速版有效实现了模型效果和性能的最佳平衡 模型价格 $0.2600 绘画 按次计费 立即体验" [ref=e554] [cursor=pointer]:
+                    - generic [ref=e555]:
+                      - img "qwen-image-2.0-2026-03-03" [ref=e556]
+                      - generic [ref=e558]: 图像
+                    - generic [ref=e559]:
+                      - generic [ref=e560]:
+                        - heading "qwen-image-2.0-2026-03-03" [level=3] [ref=e561]
+                        - text: Bailian (阿里云百炼)
+                      - paragraph [ref=e562]: Qwen-Image-2.0系列加速版模型，实现了图片生成和图片编辑的融合；具备更专业的文字渲染1k token指令支持能力、更细腻的真实质感，细腻刻画写实场景、更强的语义遵循能力。加速版有效实现了模型效果和性能的最佳平衡
+                      - generic [ref=e564]: 模型价格 $0.2600
+                      - generic [ref=e565]:
+                        - generic [ref=e566]: 绘画
+                        - generic [ref=e567]: 按次计费
+                      - generic [ref=e569]:
+                        - button [ref=e570]:
+                          - img [ref=e571]
+                        - button "立即体验" [ref=e574]:
+                          - img [ref=e575]
+                          - text: 立即体验
+                  - button "qwen3.7-max 文本 qwen3.7-max Bailian (阿里云百炼) Qwen3.7系列中规模最大、综合能力最强的Max模型，当前开放纯文本模型能力供体验。Qwen3.7是面向智能体时代的新一代旗舰模型，核心优势在于智能体能力的广度与深度：在编程、办公与生产力、长周期自主执行方面均能出色胜任各项任务。 输入价格 $7.2000/M 补全价格 $21.6000/M 对话 工具 按量计费 立即体验" [ref=e577] [cursor=pointer]:
+                    - generic [ref=e578]:
+                      - img "qwen3.7-max" [ref=e579]
+                      - generic [ref=e581]: 文本
+                    - generic [ref=e582]:
+                      - generic [ref=e583]:
+                        - heading "qwen3.7-max" [level=3] [ref=e584]
+                        - text: Bailian (阿里云百炼)
+                      - paragraph [ref=e585]: Qwen3.7系列中规模最大、综合能力最强的Max模型，当前开放纯文本模型能力供体验。Qwen3.7是面向智能体时代的新一代旗舰模型，核心优势在于智能体能力的广度与深度：在编程、办公与生产力、长周期自主执行方面均能出色胜任各项任务。
+                      - generic [ref=e586]:
+                        - generic [ref=e587]: 输入价格 $7.2000/M
+                        - generic [ref=e588]: 补全价格 $21.6000/M
+                      - generic [ref=e589]:
+                        - generic [ref=e590]: 对话
+                        - generic [ref=e591]: 工具
+                        - generic [ref=e592]: 按量计费
+                      - generic [ref=e594]:
+                        - button [ref=e595]:
+                          - img [ref=e596]
+                        - button "立即体验" [ref=e599]:
+                          - img [ref=e600]
+                          - text: 立即体验
+                  - button "wan2.7-image-pro 图像 wan2.7-image-pro Bailian (阿里云百炼) 万相2.7-图像生成与编辑旗舰版模型，支持文生图、文生组图、图生组图、图像编辑、多图参考生成、交互式编辑，在文字渲染、主体一致性、复杂指令遵循上都有更强表现。 模型价格 $0.6500 绘画 按次计费 立即体验" [ref=e602] [cursor=pointer]:
+                    - generic [ref=e603]:
+                      - img "wan2.7-image-pro" [ref=e604]
+                      - generic [ref=e606]: 图像
+                    - generic [ref=e607]:
+                      - generic [ref=e608]:
+                        - heading "wan2.7-image-pro" [level=3] [ref=e609]
+                        - text: Bailian (阿里云百炼)
+                      - paragraph [ref=e610]: 万相2.7-图像生成与编辑旗舰版模型，支持文生图、文生组图、图生组图、图像编辑、多图参考生成、交互式编辑，在文字渲染、主体一致性、复杂指令遵循上都有更强表现。
+                      - generic [ref=e612]: 模型价格 $0.6500
+                      - generic [ref=e613]:
+                        - generic [ref=e614]: 绘画
+                        - generic [ref=e615]: 按次计费
+                      - generic [ref=e617]:
+                        - button [ref=e618]:
+                          - img [ref=e619]
+                        - button "立即体验" [ref=e622]:
+                          - img [ref=e623]
+                          - text: 立即体验
+                  - button "claude-opus-4-8 文本 claude-opus-4-8 Anthropic claude-opus-4-8 是目前 Anthropic 最强的“能一个人扛住长时间复杂工作的工具”，特别适合开发者做大项目、建 Agent，或者对质量和自主性要求极高的场景。 输入价格 $5.0000/M 补全价格 $25.0000/M 缓存命中价格 $0.5000/M 对话 识图 工具 按量计费 立即体验" [ref=e625] [cursor=pointer]:
+                    - generic [ref=e626]:
+                      - img "claude-opus-4-8" [ref=e627]
+                      - generic [ref=e629]: 文本
+                    - generic [ref=e630]:
+                      - generic [ref=e631]:
+                        - heading "claude-opus-4-8" [level=3] [ref=e632]
+                        - text: Anthropic
+                      - paragraph [ref=e633]: claude-opus-4-8 是目前 Anthropic 最强的“能一个人扛住长时间复杂工作的工具”，特别适合开发者做大项目、建 Agent，或者对质量和自主性要求极高的场景。
+                      - generic [ref=e634]:
+                        - generic [ref=e635]: 输入价格 $5.0000/M
+                        - generic [ref=e636]: 补全价格 $25.0000/M
+                        - generic [ref=e637]: 缓存命中价格 $0.5000/M
+                      - generic [ref=e638]:
+                        - generic [ref=e639]: 对话
+                        - generic [ref=e640]: 识图
+                        - generic [ref=e641]: 工具
+                        - generic [ref=e642]: 按量计费
+                      - generic [ref=e644]:
+                        - button [ref=e645]:
+                          - img [ref=e646]
+                        - button "立即体验" [ref=e649]:
+                          - img [ref=e650]
+                          - text: 立即体验
+                  - button "gemini-3-pro-image 图像 gemini-3-pro-image Google Nano Banana Pro 是一款由推理驱动的精细引擎，可实现专业级图片编辑和生成，提供工作室级精度和高级创意控制功能。Nano Banana Pro 最适合用于复杂的平面设计、高保真产品视觉稿和需要通过 Google 搜索进行真实世界接地的事实数据可视化，这些任务需要准确的文本渲染 模型价格 $0.7920 绘画 按次计费 立即体验" [ref=e652] [cursor=pointer]:
+                    - generic [ref=e653]:
+                      - img "gemini-3-pro-image" [ref=e654]
+                      - generic [ref=e656]: 图像
+                    - generic [ref=e657]:
+                      - generic [ref=e658]:
+                        - heading "gemini-3-pro-image" [level=3] [ref=e659]
+                        - text: Google
+                      - paragraph [ref=e660]: Nano Banana Pro 是一款由推理驱动的精细引擎，可实现专业级图片编辑和生成，提供工作室级精度和高级创意控制功能。Nano Banana Pro 最适合用于复杂的平面设计、高保真产品视觉稿和需要通过 Google 搜索进行真实世界接地的事实数据可视化，这些任务需要准确的文本渲染
+                      - generic [ref=e662]: 模型价格 $0.7920
+                      - generic [ref=e663]:
+                        - generic [ref=e664]: 绘画
+                        - generic [ref=e665]: 按次计费
+                      - generic [ref=e667]:
+                        - button [ref=e668]:
+                          - img [ref=e669]
+                        - button "立即体验" [ref=e672]:
+                          - img [ref=e673]
+                          - text: 立即体验
+                  - button "gemini-3.1-flash-image 图像 gemini-3.1-flash-image Google Nano Banana 2 以主流价格提供高质量的图片生成和对话式编辑功能，延迟低。它是Gemini 3.1 Pro Image 的高效版本，针对速度和高吞吐量开发者应用场景进行了优化。 模型价格 $0.3972 绘画 按次计费 立即体验" [ref=e675] [cursor=pointer]:
+                    - generic [ref=e676]:
+                      - img "gemini-3.1-flash-image" [ref=e677]
+                      - generic [ref=e679]: 图像
+                    - generic [ref=e680]:
+                      - generic [ref=e681]:
+                        - heading "gemini-3.1-flash-image" [level=3] [ref=e682]
+                        - text: Google
+                      - paragraph [ref=e683]: Nano Banana 2 以主流价格提供高质量的图片生成和对话式编辑功能，延迟低。它是Gemini 3.1 Pro Image 的高效版本，针对速度和高吞吐量开发者应用场景进行了优化。
+                      - generic [ref=e685]: 模型价格 $0.3972
+                      - generic [ref=e686]:
+                        - generic [ref=e687]: 绘画
+                        - generic [ref=e688]: 按次计费
+                      - generic [ref=e690]:
+                        - button [ref=e691]:
+                          - img [ref=e692]
+                        - button "立即体验" [ref=e695]:
+                          - img [ref=e696]
+                          - text: 立即体验
+                  - button "gemini-3.1-flash-lite 文本 gemini-3.1-flash-lite Google Google 旗下最具成本效益的模型，针对高容量智能体任务、翻译和简单的数据处理进行了优化。 输入价格 $0.2500/M 补全价格 $1.5000/M 缓存命中价格 $0.0250/M 对话 工具 识图 按量计费 立即体验" [ref=e698] [cursor=pointer]:
+                    - generic [ref=e699]:
+                      - img "gemini-3.1-flash-lite" [ref=e700]
+                      - generic [ref=e702]: 文本
+                    - generic [ref=e703]:
+                      - generic [ref=e704]:
+                        - heading "gemini-3.1-flash-lite" [level=3] [ref=e705]
+                        - text: Google
+                      - paragraph [ref=e706]: Google 旗下最具成本效益的模型，针对高容量智能体任务、翻译和简单的数据处理进行了优化。
+                      - generic [ref=e707]:
+                        - generic [ref=e708]: 输入价格 $0.2500/M
+                        - generic [ref=e709]: 补全价格 $1.5000/M
+                        - generic [ref=e710]: 缓存命中价格 $0.0250/M
+                      - generic [ref=e711]:
+                        - generic [ref=e712]: 对话
+                        - generic [ref=e713]: 工具
+                        - generic [ref=e714]: 识图
+                        - generic [ref=e715]: 按量计费
+                      - generic [ref=e717]:
+                        - button [ref=e718]:
+                          - img [ref=e719]
+                        - button "立即体验" [ref=e722]:
+                          - img [ref=e723]
+                          - text: 立即体验
+                  - button "glm-5.2 文本 glm-5.2 ChatGLM (智谱) GLM-5.2 是面向长任务时代的旗舰模型。支持真正可用的 1M 上下文，可承载项目级工程上下文，长程任务执行更稳定、工程规范遵循更可靠，一次任务即可完成从需求到多端部署的完整开发链路。 输入价格 $8.0000/M 补全价格 $28.0000/M 缓存命中价格 $2.0000/M 对话 工具 按量计费 立即体验" [ref=e725] [cursor=pointer]:
+                    - generic [ref=e726]:
+                      - img "glm-5.2" [ref=e727]
+                      - generic [ref=e729]: 文本
+                    - generic [ref=e730]:
+                      - generic [ref=e731]:
+                        - heading "glm-5.2" [level=3] [ref=e732]
+                        - text: ChatGLM (智谱)
+                      - paragraph [ref=e733]: GLM-5.2 是面向长任务时代的旗舰模型。支持真正可用的 1M 上下文，可承载项目级工程上下文，长程任务执行更稳定、工程规范遵循更可靠，一次任务即可完成从需求到多端部署的完整开发链路。
+                      - generic [ref=e734]:
+                        - generic [ref=e735]: 输入价格 $8.0000/M
+                        - generic [ref=e736]: 补全价格 $28.0000/M
+                        - generic [ref=e737]: 缓存命中价格 $2.0000/M
+                      - generic [ref=e738]:
+                        - generic [ref=e739]: 对话
+                        - generic [ref=e740]: 工具
+                        - generic [ref=e741]: 按量计费
+                      - generic [ref=e743]:
+                        - button [ref=e744]:
+                          - img [ref=e745]
+                        - button "立即体验" [ref=e748]:
+                          - img [ref=e749]
+                          - text: 立即体验
+                  - button "gpt-5.6-terra 文本 gpt-5.6-terra OpenAI GPT-5.6 Terra 主打算力与成本均衡，对应早期 GPT-5 迷你模型层级，兼容 -high/-xhigh/-low/-medium/-max/-ultra 全部后缀变体 输入价格 $1.5000/M 补全价格 $9.0000/M 缓存命中价格 $0.1500/M 阶梯 对话 工具 识图 按量计费 立即体验" [ref=e751] [cursor=pointer]:
+                    - generic [ref=e752]:
+                      - img "gpt-5.6-terra" [ref=e753]
+                      - generic [ref=e755]: 文本
+                    - generic [ref=e756]:
+                      - generic [ref=e757]:
+                        - heading "gpt-5.6-terra" [level=3] [ref=e758]
+                        - text: OpenAI
+                      - paragraph [ref=e759]: GPT-5.6 Terra 主打算力与成本均衡，对应早期 GPT-5 迷你模型层级，兼容 -high/-xhigh/-low/-medium/-max/-ultra 全部后缀变体
+                      - generic [ref=e760]:
+                        - generic [ref=e761]: 输入价格 $1.5000/M
+                        - generic [ref=e762]: 补全价格 $9.0000/M
+                        - generic [ref=e763]: 缓存命中价格 $0.1500/M
+                      - generic [ref=e764]:
+                        - generic [ref=e765]: 阶梯
+                        - generic [ref=e766]: 对话
+                        - generic [ref=e767]: 工具
+                        - generic [ref=e768]: 识图
+                        - generic [ref=e769]: 按量计费
+                      - generic [ref=e771]:
+                        - button [ref=e772]:
+                          - img [ref=e773]
+                        - button "立即体验" [ref=e776]:
+                          - img [ref=e777]
+                          - text: 立即体验
+                  - button "gpt-chat-latest 文本 gpt-chat-latest OpenAI gpt-chat-latest指向当前在ChatGPT中使用的最新即时模型。 输入价格 $3.0000/M 补全价格 $18.0000/M 对话 工具 按量计费 立即体验" [ref=e779] [cursor=pointer]:
+                    - generic [ref=e780]:
+                      - img "gpt-chat-latest" [ref=e781]
+                      - generic [ref=e783]: 文本
+                    - generic [ref=e784]:
+                      - generic [ref=e785]:
+                        - heading "gpt-chat-latest" [level=3] [ref=e786]
+                        - text: OpenAI
+                      - paragraph [ref=e787]: gpt-chat-latest指向当前在ChatGPT中使用的最新即时模型。
+                      - generic [ref=e788]:
+                        - generic [ref=e789]: 输入价格 $3.0000/M
+                        - generic [ref=e790]: 补全价格 $18.0000/M
+                      - generic [ref=e791]:
+                        - generic [ref=e792]: 对话
+                        - generic [ref=e793]: 工具
+                        - generic [ref=e794]: 按量计费
+                      - generic [ref=e796]:
+                        - button [ref=e797]:
+                          - img [ref=e798]
+                        - button "立即体验" [ref=e801]:
+                          - img [ref=e802]
+                          - text: 立即体验
+                  - button "grok-build-0.1 文本 grok-build-0.1 xAI xAI 当前主推的编码构建模型，适合代理式软件开发工作流。 输入价格 $6.0000/M 补全价格 $12.0000/M 对话 识图 工具 按量计费 立即体验" [ref=e804] [cursor=pointer]:
+                    - generic [ref=e805]:
+                      - img "grok-build-0.1" [ref=e806]
+                      - generic [ref=e808]: 文本
+                    - generic [ref=e809]:
+                      - generic [ref=e810]:
+                        - heading "grok-build-0.1" [level=3] [ref=e811]
+                        - text: xAI
+                      - paragraph [ref=e812]: xAI 当前主推的编码构建模型，适合代理式软件开发工作流。
+                      - generic [ref=e813]:
+                        - generic [ref=e814]: 输入价格 $6.0000/M
+                        - generic [ref=e815]: 补全价格 $12.0000/M
+                      - generic [ref=e816]:
+                        - generic [ref=e817]: 对话
+                        - generic [ref=e818]: 识图
+                        - generic [ref=e819]: 工具
+                        - generic [ref=e820]: 按量计费
+                      - generic [ref=e822]:
+                        - button [ref=e823]:
+                          - img [ref=e824]
+                        - button "立即体验" [ref=e827]:
+                          - img [ref=e828]
+                          - text: 立即体验
+                  - button "grok-imagine-video 音视频 grok-imagine-video xAI grok-imagine-video 是 xAI 的视频生成模型，可根据文字或图片生成带运动与声音的短视频。 模型价格 $0.4200 视频 首帧 参考图 按秒计费 立即体验" [ref=e830] [cursor=pointer]:
+                    - generic [ref=e831]:
+                      - img "grok-imagine-video" [ref=e832]
+                      - generic [ref=e834]: 音视频
+                    - generic [ref=e835]:
+                      - generic [ref=e836]:
+                        - heading "grok-imagine-video" [level=3] [ref=e837]
+                        - text: xAI
+                      - paragraph [ref=e838]: grok-imagine-video 是 xAI 的视频生成模型，可根据文字或图片生成带运动与声音的短视频。
+                      - generic [ref=e840]: 模型价格 $0.4200
+                      - generic [ref=e841]:
+                        - generic [ref=e842]: 视频
+                        - generic [ref=e843]: 首帧
+                        - generic [ref=e844]: 参考图
+                        - generic [ref=e845]: 按秒计费
+                      - generic [ref=e847]:
+                        - button [ref=e848]:
+                          - img [ref=e849]
+                        - button "立即体验" [ref=e852]:
+                          - img [ref=e853]
+                          - text: 立即体验
+                  - button "grok-imagine-video-1.5-preview 音视频 grok-imagine-video-1.5-preview xAI grok-imagine-video-1.5-preview是 xAI 的预览版视频生成模型，用于根据图像提示快速生成短视频内容。 模型价格 $0.4200 首帧 按秒计费 立即体验" [ref=e855] [cursor=pointer]:
+                    - generic [ref=e856]:
+                      - img "grok-imagine-video-1.5-preview" [ref=e857]
+                      - generic [ref=e859]: 音视频
+                    - generic [ref=e860]:
+                      - generic [ref=e861]:
+                        - heading "grok-imagine-video-1.5-preview" [level=3] [ref=e862]
+                        - text: xAI
+                      - paragraph [ref=e863]: grok-imagine-video-1.5-preview是 xAI 的预览版视频生成模型，用于根据图像提示快速生成短视频内容。
+                      - generic [ref=e865]: 模型价格 $0.4200
+                      - generic [ref=e866]:
+                        - generic [ref=e867]: 首帧
+                        - generic [ref=e868]: 按秒计费
+                      - generic [ref=e870]:
+                        - button [ref=e871]:
+                          - img [ref=e872]
+                        - button "立即体验" [ref=e875]:
+                          - img [ref=e876]
+                          - text: 立即体验
+                  - button "kimi-k2.7-code 文本 kimi-k2.7-code Moonshot Kimi K2.7 Code 是 Kimi 迄今最智能的 Coding 模型，在长上下文中更可靠地遵循指令，能以更高的成功率完成编程任务。同时支持文本、图片与视频输入，仅支持思考模式，对话与 Agent 任务 输入价格 $6.5000/M 补全价格 $27.0000/M 缓存命中价格 $1.3000/M 对话 工具 按量计费 立即体验" [ref=e878] [cursor=pointer]:
+                    - generic [ref=e879]:
+                      - img "kimi-k2.7-code" [ref=e880]
+                      - generic [ref=e882]: 文本
+                    - generic [ref=e883]:
+                      - generic [ref=e884]:
+                        - heading "kimi-k2.7-code" [level=3] [ref=e885]
+                        - text: Moonshot
+                      - paragraph [ref=e886]: Kimi K2.7 Code 是 Kimi 迄今最智能的 Coding 模型，在长上下文中更可靠地遵循指令，能以更高的成功率完成编程任务。同时支持文本、图片与视频输入，仅支持思考模式，对话与 Agent 任务
+                      - generic [ref=e887]:
+                        - generic [ref=e888]: 输入价格 $6.5000/M
+                        - generic [ref=e889]: 补全价格 $27.0000/M
+                        - generic [ref=e890]: 缓存命中价格 $1.3000/M
+                      - generic [ref=e891]:
+                        - generic [ref=e892]: 对话
+                        - generic [ref=e893]: 工具
+                        - generic [ref=e894]: 按量计费
+                      - generic [ref=e896]:
+                        - button [ref=e897]:
+                          - img [ref=e898]
+                        - button "立即体验" [ref=e901]:
+                          - img [ref=e902]
+                          - text: 立即体验
+                  - button "pixverse-image-template 音视频 pixverse-image-template PixVerse 不同于基于视频的模版，这是一套以图片为核心的 AI 模版玩法——只需上传您的照片，即可快速生成沉浸式的 AI 内容体验。 模型价格 $0.0410 图片模板 按次计费 立即体验" [ref=e904] [cursor=pointer]:
+                    - generic [ref=e905]:
+                      - img "pixverse-image-template" [ref=e906]
+                      - generic [ref=e908]: 音视频
+                    - generic [ref=e909]:
+                      - generic [ref=e910]:
+                        - heading "pixverse-image-template" [level=3] [ref=e911]
+                        - text: PixVerse
+                      - paragraph [ref=e912]: 不同于基于视频的模版，这是一套以图片为核心的 AI 模版玩法——只需上传您的照片，即可快速生成沉浸式的 AI 内容体验。
+                      - generic [ref=e914]: 模型价格 $0.0410
+                      - generic [ref=e915]:
+                        - generic [ref=e916]: 图片模板
+                        - generic [ref=e917]: 按次计费
+                      - generic [ref=e919]:
+                        - button [ref=e920]:
+                          - img [ref=e921]
+                        - button "立即体验" [ref=e924]:
+                          - img [ref=e925]
+                          - text: 立即体验
+                  - button "pixverse-lipsync 音视频 pixverse-lipsync PixVerse 对口型（Lipsync）接口专为解决视频中的对口型问题而设计。它分析视频中说话者的嘴部动作和提供的音频、TTS，使其精确匹配。这使您的视频更具表现力和吸引力，增加了故事叙述的深度。 模型价格 $0.0410 视频 对口型 按次计费 立即体验" [ref=e927] [cursor=pointer]:
+                    - generic [ref=e928]:
+                      - img "pixverse-lipsync" [ref=e929]
+                      - generic [ref=e931]: 音视频
+                    - generic [ref=e932]:
+                      - generic [ref=e933]:
+                        - heading "pixverse-lipsync" [level=3] [ref=e934]
+                        - text: PixVerse
+                      - paragraph [ref=e935]: 对口型（Lipsync）接口专为解决视频中的对口型问题而设计。它分析视频中说话者的嘴部动作和提供的音频、TTS，使其精确匹配。这使您的视频更具表现力和吸引力，增加了故事叙述的深度。
+                      - generic [ref=e937]: 模型价格 $0.0410
+                      - generic [ref=e938]:
+                        - generic [ref=e939]: 视频
+                        - generic [ref=e940]: 对口型
+                        - generic [ref=e941]: 按次计费
+                      - generic [ref=e943]:
+                        - button [ref=e944]:
+                          - img [ref=e945]
+                        - button "立即体验" [ref=e948]:
+                          - img [ref=e949]
+                          - text: 立即体验
+                  - button "pixverse-mask-selection 音视频 pixverse-mask-selection PixVerse Pixverse Mask Selection（或称 Swap Mask Generation）是 PixVerse 平台在 Modify 功能中使用的AI 智能蒙版生成工具，专门用于精确选择视频中需要编辑的区域（主体、物体、背景等），再配合提示词、参考图或替换模式进行针对性修改 模型价格 $0.0410 Mask 按次计费 立即体验" [ref=e951] [cursor=pointer]:
+                    - generic [ref=e952]:
+                      - img "pixverse-mask-selection" [ref=e953]
+                      - generic [ref=e955]: 音视频
+                    - generic [ref=e956]:
+                      - generic [ref=e957]:
+                        - heading "pixverse-mask-selection" [level=3] [ref=e958]
+                        - text: PixVerse
+                      - paragraph [ref=e959]: Pixverse Mask Selection（或称 Swap Mask Generation）是 PixVerse 平台在 Modify 功能中使用的AI 智能蒙版生成工具，专门用于精确选择视频中需要编辑的区域（主体、物体、背景等），再配合提示词、参考图或替换模式进行针对性修改
+                      - generic [ref=e961]: 模型价格 $0.0410
+                      - generic [ref=e962]:
+                        - generic [ref=e963]: Mask
+                        - generic [ref=e964]: 按次计费
+                      - generic [ref=e966]:
+                        - button [ref=e967]:
+                          - img [ref=e968]
+                        - button "立即体验" [ref=e971]:
+                          - img [ref=e972]
+                          - text: 立即体验
+                  - button "pixverse-mimic 音视频 pixverse-mimic PixVerse Mimic 功能支持将参考视频中的动作迁移到目标人物图片上，实现动作模仿与重建。 通过提供： • 一段跳舞（或动作）参考视频 • 一张人物图片 Mimic 功能会分析视频中的动作序列，并将其重建到提供的角色上，生成一段全新的视频，使角色复现原始动作。 模型价格 $0.0410 动作模仿 按次计费 立即体验" [ref=e974] [cursor=pointer]:
+                    - generic [ref=e975]:
+                      - img "pixverse-mimic" [ref=e976]
+                      - generic [ref=e978]: 音视频
+                    - generic [ref=e979]:
+                      - generic [ref=e980]:
+                        - heading "pixverse-mimic" [level=3] [ref=e981]
+                        - text: PixVerse
+                      - paragraph [ref=e982]: Mimic 功能支持将参考视频中的动作迁移到目标人物图片上，实现动作模仿与重建。 通过提供： • 一段跳舞（或动作）参考视频 • 一张人物图片 Mimic 功能会分析视频中的动作序列，并将其重建到提供的角色上，生成一段全新的视频，使角色复现原始动作。
+                      - generic [ref=e984]: 模型价格 $0.0410
+                      - generic [ref=e985]:
+                        - generic [ref=e986]: 动作模仿
+                        - generic [ref=e987]: 按次计费
+                      - generic [ref=e989]:
+                        - button [ref=e990]:
+                          - img [ref=e991]
+                        - button "立即体验" [ref=e994]:
+                          - img [ref=e995]
+                          - text: 立即体验
+                - list [ref=e998]:
+                  - button "Previous" [disabled] [ref=e999]:
+                    - img "chevron_left" [ref=e1000]:
+                      - img [ref=e1001]
+                  - listitem "Page 1" [ref=e1003] [cursor=pointer]: "1"
+                  - listitem "Page 2" [ref=e1004] [cursor=pointer]: "2"
+                  - listitem "Page 3" [ref=e1005] [cursor=pointer]: "3"
+                  - listitem "Page 4" [ref=e1006] [cursor=pointer]: "4"
+                  - listitem "More" [ref=e1007] [cursor=pointer]: ...
+                  - listitem "Page 13" [ref=e1008] [cursor=pointer]: "13"
+                  - listitem "Page 14" [ref=e1009] [cursor=pointer]: "14"
+                  - button "Next" [ref=e1010] [cursor=pointer]:
+                    - img "chevron_right" [ref=e1011]:
+                      - img [ref=e1012]
+                  - combobox "selected" [ref=e1015] [cursor=pointer]:
+                    - generic [ref=e1018]: 每页条数：30
+                    - img [ref=e1020]:
+                      - img [ref=e1021]
+      - generic [ref=e1025]: © 2026 n1n | All rights reserved.
+  - generic [ref=e1026]:
+    - generic [ref=e1027]:
+      - generic [ref=e1028]:
+        - img "logo" [ref=e1029]
+        - heading [level=4]
+      - button [ref=e1030] [cursor=pointer]:
+        - img [ref=e1032]
+    - navigation [ref=e1035]:
+      - link "首页" [ref=e1036] [cursor=pointer]:
+        - /url: /
+        - generic [ref=e1037]: 首页
+      - generic [ref=e1038]:
+        - button "控制台" [ref=e1039] [cursor=pointer]:
+          - generic [ref=e1040]: 控制台
+          - img [ref=e1041]
+        - generic [ref=e1043]: 请先登录以访问工作台
+      - link "模型广场" [ref=e1044] [cursor=pointer]:
+        - /url: /pricing
+        - generic [ref=e1045]: 模型广场
+      - link "联系我们" [ref=e1046] [cursor=pointer]:
+        - /url: /customersupport
+        - generic [ref=e1047]: 联系我们
+      - link "API 文档" [ref=e1048] [cursor=pointer]:
+        - /url: https://llm-api.apifox.cn
+        - generic [ref=e1049]: API 文档
+      - link "快速开始" [ref=e1050] [cursor=pointer]:
+        - /url: https://llm-api.apifox.cn/llm-api-quickstart
+        - generic [ref=e1051]: 快速开始
+      - link "接口调试" [ref=e1052] [cursor=pointer]:
+        - /url: https://llm-api.apifox.cn/llm-api-debug
+        - generic [ref=e1053]: 接口调试
+      - link "资源中心" [ref=e1054] [cursor=pointer]:
+        - /url: https://blog.llm-api.net
+        - generic [ref=e1055]: 资源中心
+      - link "主站导航" [ref=e1056] [cursor=pointer]:
+        - /url: https://cache.llm-api.net
+        - generic [ref=e1057]: 主站导航
+    - generic [ref=e1059]:
+      - button "notice 公告" [ref=e1061] [cursor=pointer]:
+        - generic [ref=e1062]:
+          - img "notice" [ref=e1063]
+          - generic [ref=e1064]: 公告
+      - button "language 语言" [ref=e1066] [cursor=pointer]:
+        - generic [ref=e1067]:
+          - img "language" [ref=e1068]
+          - generic [ref=e1069]: 语言
+    - button "登录" [ref=e1071] [cursor=pointer]:
+      - generic [ref=e1072]: 登录
+  - generic [ref=e1073] [cursor=pointer]:
+    - generic: "1"

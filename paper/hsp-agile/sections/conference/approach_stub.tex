@@ -1,15 +1,28 @@
-Given an FSF specification, HSP-Agile parses SpecIR regions, generates an LLM
-candidate, and iterates repair up to $K{=}3$ attempts.
-Each failed attempt emits Semantic Feedback IR: scenario label, violated guard,
-witness input, and optional pattern-guard hits.
+Given an FSF specification, HSP-Agile parses \textbf{SpecIR} regions
+$R_i = G_i \wedge \bigwedge_{j<i}\neg G_j$, synthesises an LLM candidate, and
+iterates repair up to $K{=}3$ attempts.
+Failed attempts emit a typed \textbf{Semantic Feedback IR}: scenario label,
+violated guard, SMT witness input, expected postcondition, and optional
+pattern-guard hits---rendered into the repair prompt without free-form
+verbal memory.
 
-Accept is conjunctive:
-$\mathrm{Accept}(c,t) \Leftrightarrow (\forall w.\,\mathrm{Conf}_w(c,t){=}1)
-\wedge \neg\exists p.\,\mathrm{severity}(p){\geq}\tau$.
+Release is conjunctive. With $\tau{=}1$ and high-severity pattern count
+$P^H(c)$:
+\begin{equation}
+  \mathrm{Accept}(c,t)
+  \;\iff\;
+  \mathrm{Conf}(c,t)\geq\tau
+  \;\wedge\;
+  P^H(c)=0.
+  \label{eq:accept-conf}
+\end{equation}
 Mode~M applies hard pattern screening before Accept; B2 uses unstructured
 test pass/fail only.
+Ablations A1/A3 remove the formal checker or the repair loop (A2 removes the
+pattern guard; $\Delta\mathrm{Conf}$ reported in Results).
 
-The Semantic Feedback IR is the repair hinge: variant~C (full IR) reaches
-86.9\% mean conformance vs.\ 79.1\% for test-only variant~A on the same 120 tasks
-(E6)---isolating specification structure from prompt volume (E14 confirms under
-length-matched sweeps).
+The Semantic Feedback IR is the repair hinge: under E6 ($n{=}120$, $K{=}3$),
+full IR (variant~C) reaches 86.9\% mean Conf.\ vs.\ 79.1\% for test-only
+variant~A---isolating specification structure from prompt volume under the
+unstructured-test baseline (E14 scopes the claim against length-matched
+traces; see Results).

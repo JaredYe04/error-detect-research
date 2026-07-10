@@ -176,6 +176,51 @@ machine-readable manifest bundled with the artifact store.  The manifest serves
 as the single source of configuration truth for any replication attempt.
 
 % ---------------------------------------------------------------------------
+\section{Reproducing Canonical Tables}
+\label{sec:repro:canonical-tables}
+% ---------------------------------------------------------------------------
+
+The manuscript numbers for the main E1 table are sourced from
+\texttt{paper/hsp-agile/data/processed/summary\_by\_mode.csv}
+(regenerated from frozen run artefacts; do not hand-edit).
+Prevention aggregates live in \texttt{prevention\_summary.json} and
+\texttt{prevention\_by\_eval.csv} in the same directory.
+
+From the repository root, regenerate processed metrics and figures, then
+compile:
+
+\begin{verbatim}
+python paper/hsp-agile/scripts/prepare_paper_data.py \
+  --run-dir artifacts/run_e1_canonical_v1
+python paper/hsp-agile/scripts/prepare_mechanism_data.py
+python paper/hsp-agile/figures/scripts/plot_mpl_figures.py \
+  --formats pdf png --dpi 200
+# Or one-shot refresh + plot + PDF:
+powershell -File paper/hsp-agile/scripts/build.ps1 -Clean
+# PDF-only (after data/figures exist):
+#   tools/tectonic/tectonic.exe --outdir paper/hsp-agile/build \
+#     paper/hsp-agile/main.tex
+\end{verbatim}
+
+Alternatively, \texttt{python paper/hsp-agile/scripts/refresh\_paper\_assets.py}
+invokes the prepare and plot steps with the default canonical run directories.
+Canonical run IDs cited in the paper:
+
+\begin{itemize}
+  \item \texttt{run\_e1\_canonical\_v1} --- E1 main table, ablations, E3
+        (source for \texttt{summary\_by\_mode.csv});
+  \item \texttt{run\_e12\_canonical\_v1} --- multi-seed B1/B2/M stability;
+  \item \texttt{run\_feedback\_v2} --- E6 Semantic Feedback IR variants;
+  \item \texttt{run\_e14\_sweep\_v1} --- length-matched feedback (E14);
+  \item \texttt{run\_b6\_full\_v2} --- VerifierLoop-FSF baseline (B6) on the
+        aligned corpus.
+\end{itemize}
+
+Stage~2 LLM re-execution is optional for table audit: given the bundled raw
+logs under \texttt{artifacts/}, Stages~3--4 alone reproduce the reported CSVs,
+figures, and PDF.
+
+% ---------------------------------------------------------------------------
 \section{Environment and Dependencies}
 \label{sec:repro:env}
 % ---------------------------------------------------------------------------

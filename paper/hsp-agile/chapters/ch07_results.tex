@@ -17,9 +17,12 @@ BENCH-120 mean conformance; full M does not win the powered pairwise tests
 ($n{=}120$, M vs.\ B2 Holm $p{=}1.0$; post-hoc power ${\approx}3.6\%$ for
 $|\delta|{=}0.014$).
 The paper's publishable core is therefore \textbf{not} ``M beats B2 universally''
-but (i)~typed feedback mechanism (E6 +7.7\,pp), (ii)~prevention under conjunctive
-Accept (E2), and (iii)~the deployment boundary (Table~\ref{tab:deployment-boundary}).
-E10 (unfiltered random sample) and E12-canonical bound external ranking claims.
+but (i)~typed feedback mechanism (E6 +7.7\,pp vs.\ unstructured test-only under
+full~M; E14: \texttt{semantic\_ir} 75.1\% $\neq$ \texttt{execution\_trace\_matched}
+85.4\%), (ii)~prevention under conjunctive Accept (E2), and (iii)~the deployment
+boundary (Table~\ref{tab:deployment-boundary}).
+E10 (unfiltered random sample; favours B2) and E12-canonical bound external
+ranking claims.
 
 Table~\ref{tab:results-roadmap} is the map; unless noted, $n{=}120$ hard tasks
 and the ten compared modes apply.
@@ -67,7 +70,8 @@ In the \textbf{low} tier ($n{=}49$), B1/B0 lead (91.9\%); M ties B2 (89.9\%).
 In the \textbf{medium} tier ($n{=}33$), B1/B2 tie (87.5\%); M trails (82.2\%).
 In the \textbf{high} tier ($n{=}38$), B1 leads (87.4\%); M ties B2 (85.1\%).
 Overlap tertiles on the canonical E1 run do \emph{not} show monotone M dominance;
-the controlled E6 feedback comparison (+7.7\,pp) and E12 multi-seed stability
+the controlled E6 feedback comparison (+7.7\,pp vs.\ unstructured test-only under
+full~M; E14 scopes length-matched traces) and E12 multi-seed stability
 are the primary mechanism and ranking evidence respectively.
 
 \begin{table}[H]
@@ -96,12 +100,15 @@ while Semantic Feedback IR names S1 and a second attempt restores order (E6).
 Figure~\ref{fig:e10-overlap} stratifies the \emph{unfiltered} E10 sample by
 overlap-rate tertile alongside Table~\ref{tab:e3-tiers} on the hard set.
 Together they bound C1: neither corpus shows monotone M dominance over B2;
-E6 (+7.7\,pp) isolates the typed-feedback mechanism under controlled conditions.
+E6 (+7.7\,pp vs.\ unstructured test-only under full~M) isolates the
+typed-feedback mechanism; E10 bounds external ranking (favours B2).
 
 \paragraph{Answer to RQ4 / C1.}
 E3 tertiles on canonical E1 are \textbf{not monotone}: M does not uniformly
 beat B2 across strata (Table~\ref{tab:e3-tiers}).
-The controlled E6 comparison (+7.7\,pp typed feedback) and E12-full multi-seed
+The controlled E6 comparison (+7.7\,pp vs.\ unstructured test-only under
+full~M; E14: \texttt{semantic\_ir} 75.1\% $\neq$
+\texttt{execution\_trace\_matched} 85.4\%) and E12-full multi-seed
 ranking (B2 leads all seeds) bound deployment claims; practitioners should follow
 Table~\ref{tab:deployment-boundary}, not aggregate E1 percentages alone.
 
@@ -149,7 +156,8 @@ On the \code{classify\_signal}-style witness $(-3,-10)$, variant~A tells the
 model only that the test failed; variant~B adds the expected string
 \texttt{Error}; variant~C additionally names Scenario~S1 and the guard
 $\mathit{level}<0$.
-The +7.7\,pp gap from A to C is the empirical cost of omitting that structure.
+The +7.7\,pp gap from A to C (under full~M) is the empirical cost of omitting
+that structure relative to unstructured test-only feedback.
 
 Figure~\ref{fig:feedback-variant} isolates feedback content under otherwise
 identical mode~M settings ($n=120$ tasks per variant; Table~\ref{tab:feedback-e6}).
@@ -166,7 +174,8 @@ structured trace variant.
 The repair benefit attributed to mode~M in E5 is structural on that baseline, not
 a side effect of longer prompts.
 
-\begin{inlinetable}{E6 feedback variant summary, $n=120$ per variant.}
+\begin{inlinetable}{E6 feedback variant summary, $n=120$ per variant
+  (primary model \texttt{ecnu-plus}).}
   \label{tab:feedback-e6}
   \begin{tabular}{lccc}
     \toprule
@@ -179,6 +188,37 @@ a side effect of longer prompts.
   \end{tabular}
 \end{inlinetable}
 
+\paragraph{Cross-model E6 (\texttt{ecnu-max}).}
+Table~\ref{tab:feedback-e6-max} repeats the same A/B/C protocol on
+\texttt{ecnu-max} (DeepSeek-family endpoint; \texttt{run\_e6\_ecnu\_max\_v1},
+$n{=}120$, 0 errors).
+Mean Conf.\ collapses to ${\approx}89.2\%$ for all three variants
+(C$-$A ${=}{+}0.03$\,pp; C beats A on only $1/120$ tasks).
+Interpretation: the +7.7\,pp typed-IR gain is \emph{primary-model} evidence
+under headroom; a stronger endpoint already saturates aggregate Conf.\ on
+BENCH-120, so feedback content no longer moves the mean.
+This does \emph{not} falsify E6 on \texttt{ecnu-plus}; it scopes deployment:
+prefer typed IR when the base model still leaves repair headroom, and prefer
+B2 when the endpoint already saturates mean Conf.\ (consistent with E16 ties).
+
+\begin{table}[H]
+  \caption{E6 on second endpoint \texttt{ecnu-max} ($n{=}120$ per variant).}
+  \label{tab:feedback-e6-max}
+  \centering
+  \thesistable{%
+    \small
+    \begin{tabular}{lcc}
+      \toprule
+      Variant & Feedback & Conf.\ (\%) \\
+      \midrule
+      A & test only & 89.2 \\
+      B & test + expected & 89.0 \\
+      C & full Semantic IR & 89.2 \\
+      \bottomrule
+    \end{tabular}%
+  }
+\end{table}
+
 \subsection{Length-Matched Feedback (E14)}
 \label{sec:results:e14}
 
@@ -187,8 +227,11 @@ mode~M (\texttt{run\_e14\_sweep\_v1}) to test whether B4$\approx$B2 despite
 E6 reflects prompt-length unfairness.
 Table~\ref{tab:e14-feedback} shows that \texttt{execution\_trace\_matched}
 (85.4\% mean strict conformance) exceeds \texttt{semantic\_ir} (75.1\%) and
-test-only surfaces ($\approx$74\%)---the E6 gap is not explained by length alone;
-region-typed content matters once trace structure is matched.
+test-only surfaces (73.8--74.4\%)---so length-matched Semantic IR alone is
+\emph{not} the uniquely best structured feedback, and the E6 +7.7\,pp claim
+must stay scoped to unstructured test-only under full~M.
+The E6 gap is not explained by length alone; region-typed content matters once
+trace structure is matched.
 
 \begin{table}[H]
   \caption{E14 length-matched feedback sweep ($n{=}120$ tasks per variant).}
@@ -221,27 +264,33 @@ a negative delta indicates that removing the component \emph{hurts} conformance.
 \begin{figure}[t]
   \centering
   \widefig{figures/ablation_contribution_ci.pdf}
-  \caption{\textbf{Key observation:} repair earns the largest conformance
-    share (A3 $-$6.3\,pp); the checker is next (A1 $-$3.9\,pp); the pattern
-    guard is a prevention gate, not a Conf.\ booster.
+  \caption{\textbf{Key observation:} by $|\Delta\mathrm{Conf}|$ vs.\ full~M
+    (86.3\%), pattern-guard removal hurts most (A2 $-$6.0\,pp), then repair
+    (A3 $-$3.9\,pp); the checker is small on Conf.\ (A1 $-$0.8\,pp).
+    Measure the guard's prevention value via E2 PDR/FAR; E17 for advisory.
     \textbf{How to read:} bars are $\Delta$ vs.\ full M with 95\% bootstrap CIs.}
   \label{fig:ablation}
 \end{figure}
 
-Which stage earns the gain?
-A3 (no repair) $-$6.3\,pp; A1 (no checker) $-$3.9\,pp; A2 (no pattern guard)
-$-$6.0\,pp on Conf.\ with lower structural PDR on some operators---prevention
+Which stage earns the gain on this corpus?
+A2 (no pattern guard) $-$6.0\,pp; A3 (no repair) $-$3.9\,pp; A1 (no checker)
+$-$0.8\,pp on Conf.\ A2 also lowers structural PDR on some operators---prevention
 value that conformance alone misses (Section~\ref{sec:results:rq2}).
 
 \subsection{Ranking of Component Contributions}
 
-Repair $>$ checker $\gg$ pattern guard on Conf.\ (A3/A1/A2);
-the guard's value shows up in structural PDR, not in mean Conf.
+By $|\Delta\mathrm{Conf}|$: A2 ($-$6.0) $>$ A3 ($-$3.9) $>$ A1 ($-$0.8).
+Pattern-guard removal hurts Conf.\ most here; repair is second; the checker is
+small on Conf.\ Still measure the guard's \emph{prevention} value via E2
+PDR/FAR; E17 for advisory mode.
 
 \paragraph{Answer to RQ3 / C2--C3.}
-Typed feedback is the largest repair lever (+7.7\,pp, E6; A3 $-$6.3\,pp);
-the checker is next (A1 $-$3.9\,pp); measure the pattern guard via PDR (C3),
-not mean Conf.
+Typed feedback remains the largest controlled repair lever (+7.7\,pp vs.\
+unstructured test-only under full~M, E6; E14:
+\texttt{semantic\_ir} 75.1\% does not match
+\texttt{execution\_trace\_matched} 85.4\%).
+On Conf.\ ablations: A2 $-$6.0\,pp $>$ A3 $-$3.9\,pp $>$ A1 $-$0.8\,pp;
+measure the pattern guard via PDR/FAR (C3, E2) and E17, not mean Conf.\ alone.
 
 \subsection{Advisory Pattern Guard (E17)}
 \label{sec:results:e17}
@@ -250,8 +299,9 @@ E17 compares \texttt{M\_adv} (pattern violations logged as advisory; only RF07
 hard-blocks) with full M and A2 on 120 tasks (\texttt{run\_e17\_advisory\_v1}).
 Table~\ref{tab:e17-advisory} shows M and M\_adv reach nearly identical mean
 conformance (83.2\% vs.\ 83.3\%) while A2 trails (74.5\%)---confirming that
-hard pattern screening is not the primary Conf.\ booster (cf.\ A2 ablation
-$+$0.5\,pp) but M\_adv retains advisory telemetry for prevention review.
+advisory logging preserves Conf.\ relative to hard screening, while full
+guard removal still hurts (canonical A2 $-$6.0\,pp); M\_adv retains advisory
+telemetry for prevention review.
 
 \begin{table}[H]
   \caption{E17 advisory pattern guard vs.\ A2 and M ($n{=}120$).}
@@ -409,8 +459,11 @@ Against B2, M wins 2/120 paired tasks on strict conformance at seed~0
 The aggregate M--B2 conformance gap ($-$1.5\,pp) is \emph{not significant} after
 Holm correction (Holm $p{=}1.0$, Cliff's $\delta{\approx}{-}0.01$).
 That is the honest primary-quality reading: structured specification feedback
-matters in controlled E6 (+7.7\,pp) and overlap-conditioned deployment (E10,
-E11), not as a universal headline over test-feedback.
+matters in controlled E6 (+7.7\,pp vs.\ unstructured test-only under full~M;
+E14: length-matched \texttt{semantic\_ir} 75.1\% does not match
+\texttt{execution\_trace\_matched} 85.4\%) and E11 deployment slices; E10
+bounds external ranking (favours B2), not as a universal headline over
+test-feedback.
 Wilcoxon on per-task strict success (M vs.\ B1/B2) remains negligible
 (Holm-corrected $p{=}1.000$); conformance at seed~0 orders B1 $\geq$ B2 $>$ M,
 with M vs.\ B1 at Holm $p{=}1.0$.
@@ -441,7 +494,8 @@ noise and should not be over-read for comparative ranking.
 \paragraph{Answer to RQ1 / C1--C3.}
 Canonical E1 at seed~0: B1/B2 $\geq$ M on conformance; none Holm-significant.
 E12-full confirms B2 leads all seeds; E6 confirms typed feedback mechanism
-(+7.7\,pp).
+(+7.7\,pp vs.\ unstructured test-only under full~M; E14 scopes against
+length-matched traces).
 Strict success (5\%) reflects C3 selectivity; prevention (PDR/FAR) differentiates M.
 
 %=============================================================================
@@ -531,9 +585,18 @@ naming the violated scenario.
   }
 \end{table}
 
-Table~\ref{tab:prevention} summarises the implementation-screening track:
+Table~\ref{tab:prevention} summarises the \emph{implementation-screening}
+track only ($n{=}852$ mutants per mode), not the pooled E2 corpus
+($n{=}1{,}704$ when spec-confusion and implementation-screening are
+combined; see \texttt{prevention\_summary.json}).
 B1 lacks an explicit rejection mechanism (FAR 100\%), while M improves both
-PDR (+3.8\,pp over B2) and FAR ($-$3.8\,pp) on the full mutant population.
+PDR (+3.8\,pp over B2) and FAR ($-$3.8\,pp) on this fixed mutant set.
+A paired bootstrap over mutant IDs ($B{=}5{,}000$, seed~42;
+\texttt{e2\_pdr\_far\_bootstrap.json}) yields
+$\Delta\mathrm{PDR}(\mathrm{M}{-}\mathrm{B2})$ 95\% CI
+$[2.5,\,5.0]$\,pp and $\Delta\mathrm{FAR}$ 95\% CI
+$[-5.0,\,{-}2.5]$\,pp---both intervals exclude zero---so the prevention
+gap is not a sampling artefact of a single point estimate.
 Per-operator complementarity---B2 leading on some boundary-shift operators,
 M on specification-structural faults---is visible in
 Figure~\ref{fig:prevention-heatmap}, not in the aggregate alone.
@@ -554,8 +617,11 @@ boundary shifts favour B2; arithmetic/output residues remain
 %=============================================================================
 
 \textbf{Claim (practical bound).}
-The three insights should buy Conf.\ at a measurable latency premium; a
-near-Pareto alternative should exist when the C3 pattern screen is optional.
+Full~M does \emph{not} buy higher mean Conf.\ than B2; it buys prevention /
+conjunctive $\mathrm{Accept}$ at a measurable latency premium
+(${\approx}3.3\times$).
+B2 remains the default mean-Conf.\ / latency point; A2 is a lower-prevention
+ablation, not a Conf.\ upgrade over M.
 
 \begin{figure}[t]
   \centering
@@ -576,8 +642,10 @@ while B1/B2 remain near one-call latencies.
 \begin{figure}[t]
   \centering
   \widefig{figures/pareto_quality_vs_latency.pdf}
-  \caption{\textbf{Claim:} M sits on the quality-dominant side of the
-    latency--conformance frontier.
+  \caption{\textbf{Claim:} B2 is the default mean-Conf.\ / latency operating
+    point; M is the prevention / conjunctive-Accept operating point at
+    ${\approx}3.3\times$ latency (46.2\,s vs.\ B2 13.9\,s)---not
+    quality-dominant on Conf.
     \textbf{How to read:} right/up is better quality, left is cheaper; the
     dashed polyline is the Pareto frontier and the annotation marks mode~M.}
   \label{fig:pareto}
@@ -789,14 +857,20 @@ Table~\ref{tab:e11-external} reports repeat~0 results from
   }
 \end{table}
 
-On the external corpus, B1 and B2 tie at 89.8\% mean conformance; M trails
+On the external corpus under the primary endpoint (\texttt{ecnu-plus}),
+B1 and B2 tie at 89.8\% mean conformance; M trails
 (81.9\%)---these curated tasks have moderate guard overlap and simpler branch
 structure than the E1 hard set, consistent with the deployment boundary in
 Chapter~\ref{ch:discussion}.
+Replicating E11 on \texttt{ecnu-max} (\texttt{run\_e11\_ecnu\_max\_v1}) yields
+a three-way tie at 89.8\% Conf.\ / 63.6\% Strict for B1/B2/M: the stronger
+endpoint closes the primary-model M gap without reversing B2 as the default
+mean-Conf.\ choice.
 Provenance for each task is recorded in \texttt{benchmarks/external\_sofl.json}.
 E15 stratification (overlap-density tiers on the external corpus) explains why
-M trails B1/B2 here: curated tasks have moderate overlap and simpler branch
-structure than the E1 stress-test (see \texttt{e11\_overlap\_stratified.csv}).
+M trails B1/B2 on \texttt{ecnu-plus}: curated tasks have moderate overlap and
+simpler branch structure than the E1 stress-test
+(see \texttt{e11\_overlap\_stratified.csv}).
 
 %=============================================================================
 \section{Multi-Seed Stability (E12)}
@@ -842,11 +916,15 @@ replication still favours B2 on every seed.
 \label{sec:results:e16}
 
 E16 replicates B1/B2/M on the \textbf{full} 120-task BENCH-120 using
-\texttt{ecnu-max} while E1/E12 use \texttt{ecnu-plus}
-(\texttt{run\_e16\_canonical\_v1}, $n{=}120$ per mode).
-All three modes tie at \textbf{89.2\%} mean strict conformance---endpoint choice
-does not reverse the deployment boundary (Table~\ref{tab:deployment-boundary}),
-though absolute gaps shrink vs.\ the primary model.
+\texttt{ecnu-max} (DeepSeek-family) while E1/E12 use \texttt{ecnu-plus}
+(Qwen-family) (\texttt{run\_e16\_canonical\_v1}, $n{=}120$ per mode).
+All three modes tie at \textbf{89.2\%} mean strict conformance---endpoint
+choice does not reverse the deployment boundary
+(Table~\ref{tab:deployment-boundary}), though absolute gaps shrink vs.\ the
+primary model.
+The controlled E6 protocol on the same endpoint
+(Table~\ref{tab:feedback-e6-max}) likewise saturates (${\approx}89.2\%$ for
+A/B/C), confirming that typed-IR gains require repair headroom.
 The prior 29-task pilot (\texttt{run\_e16\_model\_pilot\_v1}) is superseded.
 
 \begin{table}[H]
@@ -866,6 +944,64 @@ The prior 29-task pilot (\texttt{run\_e16\_model\_pilot\_v1}) is superseded.
     \end{tabular}%
   }
 \end{table}
+
+%=============================================================================
+\section{Commercial Cross-Model Replication (n1n)}
+\label{sec:results:n1n}
+%=============================================================================
+
+Campus endpoints alone leave a residual single-gateway threat.
+We replicate the controlled E6 A/B/C sweep and B1/B2/M ranking on commercial
+models via the n1n OpenAI-compatible gateway
+(\url{https://api.n1n.ai/pricing}): \texttt{gpt-4o},
+\texttt{claude-sonnet-4-6}, and \texttt{deepseek-v3.2}, on the same
+29-task stratified subset as E12
+(\texttt{benchmarks/e12\_stratified\_30.json}).
+
+\input{tables/cross_model_e6}
+
+\paragraph{Reading Table~\ref{tab:cross-model-e6}.}
+On \texttt{gpt-4o}, A and C tie at 88.9\% (saturation, $\Delta{=}0$).
+On \texttt{claude-sonnet-4-6}, typed IR yields a modest
+\textbf{+1.0\,pp} (87.5$\rightarrow$88.5).
+On \texttt{deepseek-v3.2}, C trails A by 3.9\,pp (75.0$\rightarrow$71.1):
+longer structured prompts can hurt weaker commercial endpoints.
+Together with primary E6 (+7.7\,pp on \texttt{ecnu-plus}) and E6-max
+saturation (${+}0.03$\,pp), the mechanism claim is headroom- and
+model-dependent, not universal.
+
+\input{tables/cross_model_e16}
+
+On the same stratified hard subset, \texttt{gpt-4o} ranks
+B1${=}$B2 at 100\% Conf.\ with M at 88.9\%---again no case for replacing B2
+as the mean-Conf.\ default.
+
+%=============================================================================
+\section{Industrial SOFL Corpus}
+\label{sec:results:industrial}
+%=============================================================================
+
+Beyond textbook/IET external SOFL (E11), we evaluate a curated
+industrial-pattern corpus
+(\texttt{benchmarks/industrial\_sofl.json}, $n{=}31$): banking, telecom,
+access control, medical alerts, SCADA-like thresholds, insurance, and related
+ordered-guard decision tables, with provenance
+\texttt{liu2004soflbook} / \texttt{li2023iet\_faultprevention} /
+\texttt{industrial\_pattern:<domain>}
+(\emph{not} production vendor traces; see
+\texttt{benchmarks/INDUSTRIAL\_SOFL\_README.md}).
+
+\input{tables/cross_model_industrial}
+
+\paragraph{Reading Table~\ref{tab:cross-model-industrial}.}
+Under both \texttt{gpt-4o} and \texttt{claude-sonnet-4-6}, test-feedback B2
+reaches \textbf{100\%} mean Conf.\ while B1 and M sit at 95.5\%, with
+identical Strict 67.7\%.
+On \texttt{deepseek-v3.2} absolute Conf.\ is lower, but the ranking is
+unchanged: B2 (80.7\%) $>$ M (72.5\%) $>$ B1 (52.7\%).
+This is the strongest external-validity support for the deployment rule:
+on practitioner-style ordered-guard specs, prefer B2 for mean conformance;
+reserve full~M when conjunctive $\mathrm{Accept}$ or PDR/FAR gates are required.
 
 %=============================================================================
 \section{VerifierLoop-FSF Baseline (E13 / B6)}
@@ -915,14 +1051,15 @@ M on the full hard benchmark (Table~\ref{tab:b6-full}).
   \end{tabular}
 \end{inlinetable}
 
-On the full 120-task export (\texttt{run\_b6\_full\_v2}, Table~\ref{tab:b6-full}),
-B6 reaches 81.1\% conformance on the \emph{same} unfiltered hard corpus as
-Table~\ref{tab:main-results}; mode~M on the current BENCH-120 reaches
-86.3\% (seed~0), below B1/B2 (89.2\%/87.7\%).
-The Semantic Feedback IR and pattern guard contribute margin beyond raw SMT
-witnesses in the repair loop.
-B6 latency ($\approx$21\,s) exceeds B2 ($\approx$11\,s) but stays below full M
-($\approx$44\,s), consistent with formal checking inside the loop without
+On the paired full 120-task export (\texttt{run\_b6\_full\_v2},
+Table~\ref{tab:b6-full}), B2 reaches 88.2\% Conf., B6 81.1\%, and M 82.0\%.
+Thus any SMT counterexample in the loop is \emph{not} enough for an aggregate
+Conf.\ win: B6 ${\approx}$~M, and both trail B2.
+Typed Semantic Feedback IR's value is shown under the controlled E6 setting
+(and in conjunctive $\mathrm{Accept}$ / PDR--FAR), not as ``M beats B6 on mean
+Conf.''
+B6 latency ($\approx$21\,s) exceeds B2 ($\approx$7\,s) but stays near this run's M
+($\approx$23\,s), consistent with formal checking inside the loop without
 pattern screening.
 
 \subsection{M\_lite: Witness + Semantic IR (E18)}
@@ -931,12 +1068,12 @@ pattern screening.
 Mode \texttt{M\_lite} combines B6-style SMT witnesses in the repair loop with
 Semantic Feedback IR but \emph{without} the pattern guard
 (\texttt{run\_m\_lite\_v1}, $n{=}120$).
-Table~\ref{tab:m-lite} shows that simply swapping verifier-loop prompts for
-Semantic IR \emph{does not} recover E6-level gains: M\_lite (79.0\%) trails B6
-(81.8\%) and B2 (89.3\%).
-The E6 +7.7\,pp effect requires the full mode~M repair integration, not
-witnesses plus IR alone; practitioners should choose B2 (cost) or M (quality +
-conjunctive gate), not a naive hybrid.
+Table~\ref{tab:m-lite} answers whether B2$+$typed IR is enough: M\_lite
+(79.0\%) trails B6 (81.8\%) and that run's B2 (89.3\%)---naive stacking fails.
+The E6 +7.7\,pp effect (vs.\ unstructured test-only under full~M) requires the
+full mode~M repair integration (IR$+$hard gate), not witnesses plus IR alone;
+practitioners should choose B2 (default mean Conf./latency) or full~M
+(Accept/PDR at ${\approx}3.3\times$ latency), not M\_lite as a shortcut.
 
 \begin{table}[H]
   \caption{M\_lite vs.\ B6 vs.\ B2 on 120-task hard benchmark (E18).}
@@ -1036,9 +1173,10 @@ Holm correction ($p{=}1.000$): the conjunctive gate is selective by design.
 Latency comparisons confirm the expected cost of M over B2
 (Mann--Whitney $p{<}0.001$, $4.05\times$ slower).
 Aggregate conformance gaps on canonical E1 are not Holm-significant (M vs.\ B2
-$p{=}1.0$); E6 (+7.7\,pp) and E12 multi-seed stability are the adoption signals.
+$p{=}1.0$); E6 (+7.7\,pp vs.\ unstructured test-only under full~M; E14 scopes
+traces) and E12 multi-seed stability are the adoption signals.
 Per-task win rate (2/120 at seed~0; 4/120 E12 mean-across-seeds) and overlap
-stratification (E3, E10) supplement the headline means.
+stratification (E3; E10 favours B2) supplement the headline means.
 These align with the per-task distributions
 in Figures~\ref{fig:conf-distribution} and~\ref{fig:conf-cdf}.
 
@@ -1046,9 +1184,11 @@ in Figures~\ref{fig:conf-distribution} and~\ref{fig:conf-cdf}.
 
 \noindent Taken together: canonical E1 at seed~0 shows B1/B2 $\geq$ M on
 conformance (89.2/87.7/86.3\%); E12-full confirms B2 leads all three seeds.
-The lead causal evidence is E6 (+7.7\,pp typed feedback) and prevention
-(PDR/FAR); deployment should follow Table~\ref{tab:deployment-boundary},
-not headline percentages alone.
+The lead causal evidence is E6 (+7.7\,pp vs.\ unstructured test-only under
+full~M; E14: \texttt{semantic\_ir} 75.1\% $\neq$
+\texttt{execution\_trace\_matched} 85.4\%) and prevention (PDR/FAR);
+deployment should follow Table~\ref{tab:deployment-boundary}, not headline
+percentages alone.
 
 % -----------------------------------------------------------------------------
 \section*{Chapter Summary}
@@ -1056,15 +1196,21 @@ not headline percentages alone.
 % -----------------------------------------------------------------------------
 
 Four empirical answers organise the evidence (mechanism-first).
-RQ1/C2: typed feedback is the largest repair lever (E6 +7.7\,pp; E14 confirms
-under length-matched variants; A3 $-$6.3\,pp).
-RQ2/C1: overlap tertiles are non-monotone on canonical E3; E6 (+7.7\,pp) and
-E10 (B2 89.1\% vs.\ M 83.1\%, 0/100 wins) bound deployment.
+RQ1/C2: typed feedback is the largest controlled repair lever (E6 +7.7\,pp
+vs.\ unstructured test-only under full~M; E14 shows length-matched
+\texttt{semantic\_ir} 75.1\% does not match \texttt{execution\_trace\_matched}
+85.4\%---Semantic IR is not uniquely best among structured variants; Conf.\ ablations:
+A2 $-$6.0\,pp $>$ A3 $-$3.9\,pp $>$ A1 $-$0.8\,pp).
+RQ2/C1: overlap tertiles are non-monotone on canonical E3; E6 (+7.7\,pp,
+scoped as above) and E10 bound external ranking (favours B2: 89.1\% vs.\ M
+83.1\%, 0/100 wins).
 RQ3/C3: conjunctive gate improves prevention (PDR 95.0\%, FAR 5.0\% vs.\ B2);
-E17 shows pattern guard is not the Conf.\ booster.
-RQ4: deployment boundary synthesises E3, E10, E11, and E8c
+E17 shows advisory logging preserves Conf.; measure hard-guard prevention via
+E2 PDR/FAR (A2 hurts Conf.\ most on this corpus).
+RQ4: deployment boundary synthesises E3, E10 (favours B2), E11, and E8c
 (Table~\ref{tab:deployment-boundary}).
 RQ5/E1 canonical: B1 89.2\%, B2 87.7\%, M 86.3\% at seed~0 (all n.s.);
-E12-full confirms B2 leads all three seeds.
+E12-full confirms B2 leads all three seeds---B2 default mean-Conf./latency;
+M for Accept/PDR at ${\approx}3.3\times$ latency.
 Chapter~\ref{ch:discussion} interprets what these numbers mean, what still
 fails, and how a sprint team should act.

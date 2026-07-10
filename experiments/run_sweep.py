@@ -97,12 +97,18 @@ def _run_feedback_job(job: dict, *, run_dir_str: str) -> tuple[str, dict, str]:
     task_id = task["taskId"]
     job_key = job["job_key"]
     ref_code = task.get("referenceCode", "")
+    model = job.get("model")
 
     cfg = config_for_mode("M")
     cfg.feedback_variant = variant_key
+    if model:
+        cfg.model = model
     cfg = copy.deepcopy(cfg)
     safe_id = task_id.replace(".", "_").replace("/", "_")
-    llm = ECNUClient(log_dir=Path(run_dir_str) / "llm_logs" / f"proc-{safe_id}-{variant_key}")
+    safe_model = (model or "default").replace("/", "_").replace(":", "_")
+    llm = ECNUClient(
+        log_dir=Path(run_dir_str) / "llm_logs" / f"proc-{safe_id}-{variant_key}-{safe_model}"
+    )
     pipeline = ErrorPreventionPipeline(config=cfg, llm=llm)
     try:
         result = pipeline.run_task(task, reference_code=ref_code)
@@ -111,7 +117,9 @@ def _run_feedback_job(job: dict, *, run_dir_str: str) -> tuple[str, dict, str]:
         rec = {"task_id": task_id, "error": str(e), "formal_conformance": 0.0, "attempt_history": []}
     rec["feedback_variant"] = variant_key
     rec["feedback_variant_label"] = variant_label
-    msg = f"[E6] {task_id} variant={variant_label} conf={rec.get('formal_conformance', 0):.3f}"
+    if model:
+        rec["model"] = model
+    msg = f"[E6] {task_id} variant={variant_label} model={model or 'default'} conf={rec.get('formal_conformance', 0):.3f}"
     return job_key, rec, msg
 
 
@@ -507,6 +515,7 @@ def run_feedback_variant_experiment(
     *,
     llm_client=None,
     parallelism: int = 6,
+    model: str | None = None,
 ) -> None:
     """Run E6: compare feedback variants A/B/C under the same M pipeline."""
     out_dir.mkdir(parents=True, exist_ok=True)
@@ -531,6 +540,7 @@ def run_feedback_variant_experiment(
                 "variant_key": variant_key,
                 "variant_label": variant_label,
                 "job_key": f"{task_id}|{variant_key}",
+                "model": model,
             })
 
     total = len(tasks) * len(variants)
@@ -538,7 +548,7 @@ def run_feedback_variant_experiment(
 
     if done:
         print(f"[E6] Resuming: {completed_start}/{total} jobs already in {results_path}")
-    print(f"[E6] Parallelism={parallelism}, pending={len(pending)} jobs")
+    print(f"[E6] model={model or 'default'} Parallelism={parallelism}, pending={len(pending)} jobs")
 
     if parallelism > 1:
         results = _run_jobs_parallel(
@@ -563,6 +573,8 @@ def run_feedback_variant_experiment(
             ref_code = task.get("referenceCode", "")
             cfg = config_for_mode("M")
             cfg.feedback_variant = variant_key
+            if model:
+                cfg.model = model
             pipeline = ErrorPreventionPipeline(config=cfg, llm=llm_client)
             try:
                 result = pipeline.run_task(task, reference_code=ref_code)
@@ -571,6 +583,8 @@ def run_feedback_variant_experiment(
                 rec = {"task_id": task_id, "error": str(e), "formal_conformance": 0.0, "attempt_history": []}
             rec["feedback_variant"] = variant_key
             rec["feedback_variant_label"] = variant_label
+            if model:
+                rec["model"] = model
             _append_jsonl(results_path, rec)
             results.append(rec)
             completed += 1
@@ -596,6 +610,8 @@ def run_feedback_variant_experiment(
                 "mean_conf": round(mean_conf, 4),
                 "mean_iterations": round(mean_iters, 2),
             }
+    if model:
+        summary["model"] = model
     _write_summary(out_dir / "summary.json", summary)
     _write_progress(
         progress_path, status="completed", completed=total, total=total,
@@ -634,6 +650,18 @@ def main() -> None:
     )
     parser.add_argument("--modes", nargs="+", default=None)
     parser.add_argument(
+        "--model",
+        type=str,
+        default=None,
+        help="Override LLM model id for E6/E3 (e.g. ecnu-max, gpt-4o, claude-sonnet-4-6)",
+    )
+    parser.add_argument(
+        "--task-subset",
+        type=Path,
+        default=None,
+        help="JSON list of taskIds or task objects (e.g. benchmarks/e12_stratified_30.json)",
+    )
+    parser.add_argument(
         "--parallelism",
         type=int,
         default=10,
@@ -647,9 +675,17 @@ def main() -> None:
     tasks = _load_annotated_tasks()
     # Paper-aligned: only HardSynthetic tasks (120-task hard suite)
     tasks = [t for t in tasks if "HardSynthetic" in t.get("taskId", "")]
+    if args.task_subset:
+        raw = json.loads(Path(args.task_subset).read_text(encoding="utf-8"))
+        if raw and isinstance(raw[0], dict):
+            want = {t.get("taskId") or t.get("task_id") for t in raw}
+        else:
+            want = set(raw)
+        tasks = [t for t in tasks if t.get("taskId") in want]
+        print(f"[sweep] Filtered to task-subset {args.task_subset}: {len(tasks)} tasks")
     if args.task_limit:
         tasks = tasks[: args.task_limit]
-    print(f"[sweep] Loaded {len(tasks)} tasks. Parallelism={args.parallelism}")
+    print(f"[sweep] Loaded {len(tasks)} tasks. model={args.model or 'default'} Parallelism={args.parallelism}")
 
     llm = None
     if args.parallelism <= 1:
@@ -671,7 +707,9 @@ def main() -> None:
         out = run_dir / "feedback_variants"
         print(f"[sweep] E6 progress file: {out / 'progress.json'}")
         print(f"[sweep] E6 results (incremental): {out / 'results.jsonl'}")
-        run_feedback_variant_experiment(tasks, out, llm_client=llm, parallelism=args.parallelism)
+        run_feedback_variant_experiment(
+            tasks, out, llm_client=llm, parallelism=args.parallelism, model=args.model,
+        )
     if exp in ("repair_dynamics", "all"):
         main_run = args.main_run or (ARTIFACTS / "run_ccf_b_main_v1")
         run_repair_dynamics_analysis(main_run, run_dir / "repair_dynamics", modes=args.modes)
