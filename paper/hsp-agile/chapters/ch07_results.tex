@@ -1,87 +1,72 @@
-%% ch07_results.tex  —  Chapter 7: Experimental Results
+%% ch07_results.tex  —  Chapter 7: Experimental Results (rewrite staging)
 %% HSP-Agile Thesis, East China Normal University, 2026
 
 \chapter{Experimental Results}
 \label{ch:results}
 
-This chapter is evidence for the three Tier-1 claims
-(Table~\ref{tab:claim-map}), not method restatement.
-\textbf{Presentation order is mechanism-first:} RQ1 (E6 typed IR) then RQ2
-(E3/E10 overlap) establish where feedback helps; RQ3 (E2) and RQ4
-(deployment boundary) prescribe \emph{when} to deploy full M vs.\ B2;
-E12-full stress-tests ranking stability; RQ5 covers Pareto/overhead, with
-canonical E1 as an overlap stress-test aggregate without headline status.
+This chapter tests one hypothesis:
+\emph{structured semantic feedback plus a conjunctive release gate reduces
+escaped defects on thin specification regions that mean pass rate hides.}
+The evidence ladder is fixed (Table~\ref{tab:evidence-ladder}):
+mechanism under repair headroom (E6), prevention under the conjunctive gate
+(E2), equal-$K$ Conf.\ ranking, deployment guidance (C4), and one public ACL
+interception case.
+Near-ceiling ranking corpora (E1/E10/E12) and historical failure archives (E9)
+appear only as saturation context in Section~\ref{sec:results:rq5} and
+Appendix~\ref{app:stress}.
 
-\paragraph{Interpreting aggregate vs.\ mechanism evidence.}
-Under the fixed first-match others-witness oracle
-(\texttt{run\_e1\_m\_win\_v2}), mode~M reaches \textbf{100.0\%} mean Conf.\ /
-Strict vs.\ B2 at 98.3\% (${+}1.7$\,pp; wins 2/120, losses~0, ties~118;
-mean llm\_calls ${\approx}1.16$ vs.\ ${\approx}1.18$).\footnote{A prior
-others-witness bug (others encoded as True without $\neg$prior guards)
-inflated false failures (${\approx}5\%$ Strict / ${\approx}86$--$89\%$ Conf.\
-on \texttt{run\_e1\_canonical\_v1}); the jump after fixing first-match others
-witnesses is a \emph{measurement correction} enabling fair evaluation.}
-The paper's publishable core remains (i)~typed feedback mechanism (E6
-+7.7\,pp vs.\ unstructured test-only under full~M, $K{=}3$---primary
-single-factor C2 evidence; E14 scopes uniqueness:
-\texttt{semantic\_ir} 75.1\% $\neq$ \texttt{execution\_trace\_matched}
-85.4\%), (ii)~prevention under conjunctive Accept (E2), and (iii)~the
-deployment boundary (Table~\ref{tab:deployment-boundary}).
-Fixed-oracle E1 M vs.\ B2 is a strengthened \emph{bundle} (not single-factor
-C2).
-Fixed-oracle E10/E12 place M and B2 near ceiling (E10: M ${+}1.0$\,pp; E12:
-B2 100.0\% vs.\ M 99.7\%, B2 first every seed) and bound external ranking
-claims---do not claim M dominates all seeds.
+After the first-match others-witness measurement correction, fixed-oracle
+aggregate Conf.\ sits near the ceiling (M and B2 both ${\ge}98\%$ on the hard
+set).
+Those figures are comparable Conf., not the safety claim; the claim is
+$\mathrm{Accept}\Leftrightarrow\mathrm{Conf}{=}1\wedge\mathrm{Screen}{=}\mathit{pass}$.
 
-Table~\ref{tab:results-roadmap} is the map; unless noted, $n{=}120$ hard tasks
-and the ten compared modes apply.
-
-\begin{inlinetable}{Results roadmap: mechanism-first RQ order
-  (RQ1 typed IR $\to$ RQ2 overlap $\to$ RQ3 prevention $\to$ RQ4 deployment
-  $\to$ RQ5 Pareto/E1).}
+\begin{inlinetable}{Results roadmap (main text).}
   \label{tab:results-roadmap}
   \footnotesize
   \begin{tabular}{lll}
     \toprule
-    RQ & Section & Key figure / table \\
+    Role & Section & Key figure / table \\
     \midrule
-    RQ1 & \ref{sec:results:rq1} & Figs.~\ref{fig:convergence},~\ref{fig:feedback-variant} \\
-    RQ2 & \ref{sec:results:rq2} & Figs.~\ref{fig:complexity},~\ref{fig:e10-overlap} \\
-    RQ3 & \ref{sec:results:rq3} & Figs.~\ref{fig:prevention-heatmap},~\ref{fig:prevention-bar} \\
-    RQ4 & \ref{sec:results:rq4} & Table~\ref{tab:deployment-boundary} \\
-    RQ5 & \ref{sec:results:rq5} & Fig.~\ref{fig:pareto}, Table~\ref{tab:main-results} \\
+    Mechanism (RQ1) & \ref{sec:results:rq1} & Fig.~\ref{fig:feedback-variant};
+      Tables~\ref{tab:e6-qual},~\ref{tab:field-structure} \\
+    Prevention (RQ3) & \ref{sec:results:rq3} & Table~\ref{tab:prevention};
+      Figs.~\ref{fig:prevention-heatmap},~\ref{fig:prevention-bar} \\
+    Equal-$K$ / deploy (RQ4) & \ref{sec:results:rq4} & Tables~\ref{tab:equal-k-unified},
+      \ref{tab:deployment-boundary}; ACL~\ref{sec:results:acl-case} \\
+    Overlap bound (RQ2) & \ref{sec:results:rq2} & Fig.~\ref{fig:complexity} \\
+    Ranking archive & \ref{sec:results:rq5}, App.~\ref{app:stress}
+      & Near-ceiling E1/E8/E10--E12; E9 \\
     \bottomrule
   \end{tabular}
 \end{inlinetable}
 
 %=============================================================================
-\section{RQ1: Typed Semantic Feedback IR (E5, E6, Ablation)}
+\section{RQ1: Typed Semantic Feedback IR}
 \label{sec:results:rq1}
 %=============================================================================
 
-\subsection{Repair Dynamics (E5)}
+Does naming the failed specification region improve repair beyond unstructured
+test dumps?
+The primary answer is E6 under full mode~M at matched $K{=}3$.
+Supporting runs (E5 budget shape, E14 structured-family scope, hard combo
+seeds, fixed-oracle component ablation, E17 advisory gate) refine that answer;
+they are not co-equal headlines.
 
-If most of the conformance gain arrives by the second attempt, budget $K=3$
-is a sweet spot; if not, the extra call is wasted money.
-Figure~\ref{fig:convergence} settles that question.
+\subsection{Catch-All Rescue under Typed Feedback (E6)}
+\label{sec:results:e6}
 
-\begin{figure}[t]
-  \centering
-  \widefig{figures/repair_convergence.pdf}
-  \caption{\textbf{Claim:} most repair gain arrives by iteration~2, justifying
-    budget $K=3$.
-    \textbf{How to read:} solid line is mode~M; compare to B2 at the same
-    attempt index.  Shaded bands are 95\% bootstrap CIs.}
-  \label{fig:convergence}
-\end{figure}
-
-The $\mathrm{Conf}(k)$ trajectory, extracted from 258 backfilled M/B2
-\texttt{attempt\_history} records, settles it: mode~M rises from 78.3\% at
-$k=1$ to 84.5\% at $k=2$, then plateaus at 83.4\% at $k=3$.
-Most of the repair gain arrives within two iterations; further calls show
-diminishing returns on this benchmark.
-
-\subsection{Feedback Variant Isolation (E6)}
+Return to the tier classifier of Chapter~\ref{ch:intro}: Reject and Pass bands
+are busy; the mid-band \texttt{OTHERWISE} must return \texttt{Review}; an LLM
+candidate collapses it to \texttt{Pass}.
+Busy unit tests stay green.
+When a rare residual witness finally fails, an unstructured dump says only
+that ``a test failed.''
+Typed Semantic Feedback IR names the residual \texttt{others} scenario, the
+guard, and the output mismatch---and that naming is what E6 isolates.
+(The intro vignette uses three scenarios with residual $S_3$; BENCH-120 hard
+tasks scale the same first-match skeleton to eight scenarios, so the residual
+is scenario index~8 / $S_8$ in the coded wins below.)
 
 \begin{figure}[t]
   \centering
@@ -93,36 +78,46 @@ diminishing returns on this benchmark.
   \label{fig:feedback-variant}
 \end{figure}
 
-\paragraph{Vignette (feedback content).}
-On the \code{classify\_signal}-style witness $(-3,-10)$, variant~A tells the
-model only that the test failed; variant~B adds the expected string
-\texttt{Error}; variant~C additionally names Scenario~S1 and the guard
-$\mathit{level}<0$.
-The +7.7\,pp gap from A to C (under full~M) is the empirical cost of omitting
-that structure relative to unstructured test-only feedback.
-
-Figure~\ref{fig:feedback-variant} isolates feedback content under otherwise
-identical mode~M settings ($n=120$ tasks per variant; Table~\ref{tab:feedback-e6}).
+Figure~\ref{fig:feedback-variant} holds mode~M fixed and varies only feedback
+content ($n{=}120$ tasks per variant; Table~\ref{tab:feedback-e6};
+\texttt{run\_feedback\_v2}).
 Variant~C (full Semantic Feedback IR) reaches mean Conf\,=\,86.9\%---a gain of
-\textbf{+7.7\,pp} over test-only feedback (A, 79.1\%) and \textbf{+8.0\,pp} over
++7.7\,pp over test-only feedback (A, 79.1\%) and +8.0\,pp over
 test-plus-expected (B, 78.9\%).
-Paired per-task statistics (Table~\ref{tab:e6-paired}): C vs.\ A wins/losses/ties
-\textbf{14/4/102}; bootstrap 95\% CI on mean $\Delta$Conf.\
+Paired per-task statistics (Table~\ref{tab:e6-paired}): C vs.\ A
+wins/losses/ties 14/4/102; bootstrap 95\% CI on mean $\Delta$Conf.\
 $[2.3,\,13.6]$\,pp; Wilcoxon signed-rank $p{=}0.018$ (nonzero deltas).
 C vs.\ B: same W/L/T, ${+}8.0$\,pp, CI $[2.2,\,14.0]$, $p{=}0.027$.
-Both intervals exclude zero---the lead C2 claim is not a sampling artefact of
-the mean alone.
+Both intervals exclude zero.
 A and B are statistically indistinguishable on aggregate means
-($\Delta < 0.3$\,pp).
+($\Delta < 0.3$\,pp): adding the expected string alone is not a substitute for
+naming the violated scenario.
+
 \input{tables/e6_paired_stats}
-Adding the expected string alone is not a substitute for naming the violated
-scenario and guard.
-E14 (length-matched sweep) further shows that \texttt{semantic\_ir} (75.1\%)
-alone does not match \texttt{execution\_trace\_matched} (85.4\%); the E6 claim
-is therefore \textbf{relative to unstructured test feedback}, not to every
-structured trace variant.
-The repair benefit attributed to mode~M in E5 is structural on that baseline, not
-a side effect of longer prompts.
+\input{tables/e6_win_profile}
+\input{tables/e6_win_loss_coding}
+\input{tables/defect_evidence_map}
+\input{tables/headroom_evidence_map}
+
+\paragraph{Qualitative coding (all 14 wins).}
+Table~\ref{tab:e6-qual} codes every C$-$A win.
+All 14/14 are catch-all \texttt{others} rescues (scenario index~8 on the
+eight-scenario hard skeleton---same residual \emph{role} as $S_3$ in the
+three-scenario intro vignette;
+\texttt{violation\_type=arithmetic} / output-expression mismatch).
+None (0/14) are ordering-precedence repairs.
+Of the 14 wins, 13 have \texttt{test\_only} Conf${=}0$---unstructured dumps
+collapse, and naming the residual scenario restores repair.
+The four losses are a mixed \texttt{output}/\texttt{arithmetic} subset
+(scenarios 6 and~8): typed IR does not dominate every task.
+The 14 tasks span distinct HardCase ids under the shared eight-scenario
+skeleton; the repeated signal is the \emph{residual region}, not a single
+hand-tuned prompt.
+Ordering / preemption defects still motivate $\Phi_i$ witnesses and E2
+mutants (Table~\ref{tab:defect-evidence-map}); they are simply not what E6's
+Conf.\ delta measures on this corpus.
+
+\input{tables/e6_qualitative_coding}
 
 \begin{inlinetable}{E6 feedback variant summary, $n=120$ per variant
   (primary model \texttt{ecnu-plus}).}
@@ -138,18 +133,17 @@ a side effect of longer prompts.
   \end{tabular}
 \end{inlinetable}
 
-\paragraph{Cross-model E6 (\texttt{ecnu-max}).}
+\paragraph{Cross-model scope (\texttt{ecnu-max}).}
 Table~\ref{tab:feedback-e6-max} repeats the same A/B/C protocol on
 \texttt{ecnu-max} (DeepSeek-family endpoint; \texttt{run\_e6\_ecnu\_max\_v1},
 $n{=}120$, 0 errors).
 Mean Conf.\ collapses to ${\approx}89.2\%$ for all three variants
 (C$-$A ${=}{+}0.03$\,pp; C beats A on only $1/120$ tasks).
-Interpretation: the +7.7\,pp typed-IR gain is \emph{primary-model} evidence
-under headroom; a stronger endpoint already saturates aggregate Conf.\ on
-BENCH-120, so feedback content no longer moves the mean.
-This does \emph{not} falsify E6 on \texttt{ecnu-plus}; it scopes deployment:
-prefer typed IR when the base model still leaves repair headroom, and prefer
-B2 when the endpoint already saturates mean Conf.\ (consistent with E16 ties).
+The +7.7\,pp typed-IR gain is therefore primary-model evidence under headroom:
+a stronger endpoint already saturates aggregate Conf.\ on BENCH-120, so
+feedback content no longer moves the mean.
+Prefer typed IR when the base model still leaves repair headroom; prefer B2
+when the endpoint already saturates mean Conf.\ (consistent with E16 ties).
 
 \begin{table}[H]
   \caption{E6 on second endpoint \texttt{ecnu-max} ($n{=}120$ per variant).}
@@ -169,23 +163,58 @@ B2 when the endpoint already saturates mean Conf.\ (consistent with E16 ties).
   }
 \end{table}
 
-\subsection{Length-Matched Feedback (E14)}
+\subsection{Repair Budget Shape (E5)}
+
+If most of the conformance gain arrives by the second attempt, budget $K{=}3$
+is enough; further calls buy little on this benchmark.
+Figure~\ref{fig:convergence} settles that question for mode~M.
+
+\begin{figure}[t]
+  \centering
+  \widefig{figures/repair_convergence.pdf}
+  \caption{\textbf{Claim:} most repair gain arrives by iteration~2, justifying
+    budget $K=3$.
+    \textbf{How to read:} solid line is mode~M; compare to B2 at the same
+    attempt index.  Shaded bands are 95\% bootstrap CIs.}
+  \label{fig:convergence}
+\end{figure}
+
+The $\mathrm{Conf}(k)$ trajectory, extracted from 258 backfilled M/B2
+\texttt{attempt\_history} records, rises from 78.3\% at $k{=}1$ to 84.5\% at
+$k{=}2$, then plateaus at 83.4\% at $k{=}3$.
+Most of the repair gain arrives within two iterations; E6's matched $K{=}3$
+protocol therefore sits at a natural budget sweet spot rather than an
+arbitrary truncation.
+
+\subsection{Structured-Surface Comparison (E14)}
 \label{sec:results:e14}
 
-E14 holds task count fixed ($n{=}120$) and sweeps four feedback variants under
-mode~M (\texttt{run\_e14\_sweep\_v1}) to test whether B4$\approx$B2 despite
-E6 reflects prompt-length unfairness.
-Table~\ref{tab:e14-feedback} shows that \texttt{execution\_trace\_matched}
-(85.4\% mean strict conformance) exceeds \texttt{semantic\_ir} (75.1\%) and
-test-only surfaces (73.8--74.4\%)---so length-matched Semantic IR alone is
-\emph{not} the uniquely best structured feedback, and the E6 +7.7\,pp claim
-must stay scoped to unstructured test-only under full~M.
+E6 contrasts typed IR with \emph{unstructured} dumps.
+E14 asks a different question: within length-matched \emph{structured}
+feedback, is bare Semantic Feedback IR uniquely best?
+Table~\ref{tab:e14-feedback} holds task count fixed ($n{=}120$) and sweeps
+four variants under mode~M (\texttt{run\_e14\_sweep\_v1}).
+\texttt{execution\_trace\_matched} (85.4\% mean strict conformance) exceeds
+\texttt{semantic\_ir} (75.1\%) and test-only surfaces (73.8--74.4\%).
 Paired per-task mean Conf.\ (\texttt{e14\_paired\_summary}):
 \texttt{semantic\_ir} vs.\ \texttt{execution\_trace\_matched} wins 5 / losses
 19 / ties 96 (${-}10.3$\,pp); vs.\ \texttt{test\_only} wins 18 / losses 16 /
 ties 86 (${+}1.3$\,pp).
-E14 therefore \emph{scopes} C2 uniqueness; it does not replace E6 as the
-primary single-factor lever vs.\ unstructured feedback.
+E14 therefore compares length-matched structured surfaces; it does not
+replace E6 as the primary single-factor lever against unstructured feedback.
+
+\paragraph{Design rule.}
+Unstructured test dumps are the wrong baseline when SpecIR witnesses expose
+scenario-local failures: naming the failed region (E6) moves mean Conf.\ under
+repair headroom---often as a rescue when test-only Conf.\ collapses
+(Table~\ref{tab:e6-win-profile}).
+Within the structured family, length-matched execution traces can beat bare
+Semantic Feedback IR on aggregate Conf.\ (E14), while scenario-indexed fields
+remain the right artefact when engineers need localisation, auditable repair
+prompts, or cross-notation rendering from SpecIR.
+Default strengthened mode~M may therefore render
+\texttt{execution\_trace\_matched} for Conf.; controlled E6 still isolates
+\texttt{semantic\_ir} vs.\ \texttt{test\_only} as the causal C2 lever.
 
 \begin{table}[H]
   \caption{E14 length-matched feedback sweep ($n{=}120$ tasks per variant).}
@@ -206,44 +235,54 @@ primary single-factor lever vs.\ unstructured feedback.
   }
 \end{table}
 
-\subsection{Hard Combo-Seed Support (gemini, $n{=}40$)}
+\subsection{Hard Combo Seeds and Field Structure}
 \label{sec:results:gemini-combo}
 
 E6 isolates feedback on the primary endpoint under natural repair failures.
-To test whether typed IR still helps when bugs are \emph{structurally harder},
-we freeze injected combo seeds
-(\texttt{combo\_invert\_relop}, \texttt{combo\_swap\_relop},
-\texttt{drop\_first\_guard}) on 40 hard tasks and run one $T{=}0$ repair under
-each feedback surface (\texttt{run\_ir\_combo\_seed\_gemini\_n40\_v1},
-\texttt{gemini-2.5-flash}; 1080 jobs).
-Table~\ref{tab:gemini-combo-n40} summarises paired contrasts.
+To test whether scenario-aware feedback transfers to another model family
+when bugs are structurally harder, and which record fields are minimally
+sufficient, we freeze injected combo seeds and run one $T{=}0$ repair under
+each feedback surface on \texttt{gemini-2.5-flash}.
 
-\input{tables/gemini_combo_n40}
+\paragraph{Pooled unstructured contrast ($n{=}80{\times}3$).}
+Table~\ref{tab:gemini-combo-n80} pools
+\texttt{run\_ir\_combo\_seed\_gemini\_n40\_v1}+\texttt{extra40}:
+FULL vs.\ \texttt{test\_only}/${+}26.5$\,pp and vs.\ \texttt{test\_expected}/
+${+}26.7$\,pp (CI excludes~0).
 
-Pooled over 120 task$\times$seed cells, FULL (\texttt{semantic\_ir}) beats
-\texttt{test\_only} by ${+}33.2$\,pp (47/8/65; CI $[25.1,\,41.9]$) and
-\texttt{test\_expected} by ${+}32.6$\,pp (47/8/65; CI $[24.6,\,41.1]$)---both
-intervals exclude zero on every seed type.
-FULL vs.\ \texttt{ir\_no\_expected} is only ${+}5.0$\,pp with CI including
-zero---so this run \emph{reinforces} C2 against unstructured and
-expected-string feedback under harder bugs, while remaining consistent with
-E14: typed IR is not uniquely best among all structured ablations.
+\input{tables/gemini_combo_n80}
+
+\paragraph{Minimal structure (field ablation; $n{=}120$ cells).}
+Table~\ref{tab:field-structure} asks whether any single IR field is necessary.
+FULL beats unstructured dumps \emph{and} an NL-only dump of the same facts
+(${+}28.0$\,pp vs.\ \texttt{ir\_nl\_only}; CI excludes~0).
+Dropping any single field (\texttt{scenario\_id}, \texttt{expected},
+\texttt{constraint}, \texttt{reason}, \texttt{suggested\_fix}) yields CIs
+that include~0.
+C2 is therefore a structure-versus-unstructured claim under headroom.
+E14 further shows that length-matched structured traces can exceed bare
+Semantic Feedback IR on aggregate Conf.
+
+\input{tables/field_structure_ablation}
+
 gpt-4o-mini and deepseek-chat saturate on the same combo protocol
-(${\approx}100\%$ Conf.) and are not used as weak-model evidence.
+(${\approx}100\%$ Conf.), showing that extra repair structure has little room
+to help when the base model already solves the seeded tasks.
+External public-SOFL ranking ties (HKCA09 / GitHub) support the deployment
+boundary
+(Table~\ref{tab:headroom-map}); HKCA09 \texttt{wrong\_relop} hard-seed is
+directional supporting evidence (${+}12.7$\,pp; CI includes~0).
 
-\subsection{Ablation Study (A1--A3; fixed-oracle primary)}
+\subsection{Component Ablation under Fixed Oracle}
 \label{sec:results:ablation-fixed}
 
-\paragraph{Protocol.}
 Under the fixed others-witness oracle we re-ran A1--A3 as ablations of
-\emph{strengthened} mode~M (\texttt{run\_e1\_ablation\_fixed\_v1}): same
-$K{=}5$ / \texttt{formal\_max\_cases}${}{=}32$ /
-\texttt{execution\_trace\_matched} / advisory gate as M, removing one
-component at a time.
+strengthened mode~M (\texttt{run\_e1\_ablation\_fixed\_v1}): same $K{=}5$ /
+\texttt{formal\_max\_cases}${}{=}32$ / \texttt{execution\_trace\_matched} /
+advisory gate as M, removing one component at a time.
 Deltas are vs.\ authoritative M on \texttt{run\_e1\_m\_win\_v2}
 (100.0\% mean Conf.).
-Pre-fix A1--A3 numbers remain historical only
-(Figure~\ref{fig:ablation}).
+Pre-fix A1--A3 numbers remain historical only (Figure~\ref{fig:ablation}).
 
 \begin{inlinetable}{Fixed-oracle component ablation vs.\ strengthened M
   ($n{=}120$; \texttt{run\_e1\_ablation\_fixed\_v1}).}
@@ -260,14 +299,16 @@ Pre-fix A1--A3 numbers remain historical only
   \end{tabular}
 \end{inlinetable}
 
-By $|\Delta\mathrm{Conf}|$ on the fixed-oracle corpus:
-A3 (no repair) $-$25.8\,pp $>$ A1 (no checker) $-$17.5\,pp $>$ A2 (no pattern
-guard) $0.0$\,pp.
+By $|\Delta\mathrm{Conf}|$: A3 (no repair) $-$25.8\,pp $>$ A1 (no checker)
+$-$17.5\,pp $>$ A2 (no pattern guard) $0.0$\,pp.
 Near the Conf.\ ceiling with an advisory pattern gate, removing the guard does
 not move mean Conf.---measure the guard via E2 PDR/FAR and E17, not Conf.\
 alone.
 Repair budget and the formal witness checker remain the Conf.\ levers under
 this protocol.
+Fixed-oracle E1 M vs.\ B2 is itself a multi-factor bundle ($K{=}5$, advisory
+gate, \texttt{execution\_trace\_matched}), not C2 isolation; E6 remains the
+single-factor feedback lever.
 
 \begin{figure}[t]
   \centering
@@ -284,31 +325,12 @@ this protocol.
   \label{fig:ablation}
 \end{figure}
 
-\paragraph{Historical pre-fix ranking (superseded for Conf.\ ordering).}
-On \texttt{run\_e1\_canonical\_v1}, A2 $-$6.0\,pp $>$ A3 $-$3.9\,pp $>$ A1
-$-$0.8\,pp vs.\ M 86.3\%.
-That ordering reflected the buggy others-witness regime and is \textbf{not}
-the primary component ranking after the measurement correction.
+On \texttt{run\_e1\_canonical\_v1}, the historical ordering was A2 $-$6.0\,pp
+$>$ A3 $-$3.9\,pp $>$ A1 $-$0.8\,pp vs.\ M 86.3\%.
+That ranking reflected the buggy others-witness regime and is not the primary
+component ranking after the measurement correction.
 
-\paragraph{Answer to RQ1 / C2.}
-Under controlled isolation of feedback content (E6, full~M, $K{=}3$), typed
-Semantic Feedback IR is the largest single-factor repair lever vs.\
-unstructured test-only (+7.7\,pp; CI excludes~0).
-E14 scopes uniqueness among structured surfaces
-(\texttt{semantic\_ir} 75.1\% does not match
-\texttt{execution\_trace\_matched} 85.4\%; paired 5/19/96)---do not read C2
-as ``typed IR beats every structured trace.''
-Hard combo seeds on \texttt{gemini-2.5-flash} ($n{=}40$;
-Table~\ref{tab:gemini-combo-n40}) further support C2 vs.\
-\texttt{test\_only}/\texttt{test\_expected} (pooled ${+}33$\,pp-class gaps;
-CI excludes~0) without overturning the E14 non-uniqueness scope
-(FULL vs.\ \texttt{ir\_no\_expected} CI includes~0).
-Fixed-oracle E1 M vs.\ B2 is a multi-factor bundle, not C2 isolation.
-Fixed-oracle component ablations
-(Table~\ref{tab:ablation-fixed}): repair (A3) and the formal checker (A1)
-drive Conf.; the pattern guard's value is prevention (E2/E17), not mean Conf.
-
-\subsection{Advisory Pattern Guard (E17)}
+\subsection{Advisory Pattern Gate (E17)}
 \label{sec:results:e17}
 
 E17 compares \texttt{M\_adv} (pattern violations logged as advisory; only RF07
@@ -316,8 +338,9 @@ hard-blocks) with full M and A2 on 120 tasks (\texttt{run\_e17\_advisory\_v1}).
 Table~\ref{tab:e17-advisory} shows M and M\_adv reach nearly identical mean
 conformance (83.2\% vs.\ 83.3\%) while A2 trails (74.5\%)---consistent with
 fixed-oracle A2 matching M on Conf.\ under an advisory gate
-(Table~\ref{tab:ablation-fixed}); M\_adv retains advisory telemetry for
-prevention review.
+(Table~\ref{tab:ablation-fixed}).
+M\_adv retains advisory telemetry for prevention review; Conf.\ alone does not
+measure the guard.
 
 \begin{table}[H]
   \caption{E17 advisory pattern guard vs.\ A2 and M ($n{=}120$).}
@@ -337,87 +360,34 @@ prevention review.
   }
 \end{table}
 
-%=============================================================================
-\section{RQ2: Gap vs.\ Guard-Overlap Density (E3, E10)}
-\label{sec:results:rq2}
-%=============================================================================
-
-\textbf{Claim (C1, scoped).}
-If prevention depends on semantic regions, typed feedback should help where
-overlap witnesses matter---but aggregate ranking may still favour B2 (E10, E12).
-
-\begin{figure}[t]
-  \centering
-  \widefig{figures/complexity_heatmap.pdf}
-  \caption{\textbf{Claim:} overlap tertiles on canonical E1 are \emph{not} monotone
-    for M vs.\ B2.
-    \textbf{How to read:} rows are density tertiles; cells are mean strict
-    formal conformance.  Deployment should follow Table~\ref{tab:deployment-boundary}
-    and E6, not a single tertile rule.}
-  \label{fig:complexity}
-\end{figure}
-
-Where does the advantage live?
-Table~\ref{tab:e3-tiers} reports mean conformance by overlap-density tier
-(\texttt{complexity\_by\_mode.csv}).
-In the \textbf{low} tier ($n{=}49$), B1/B0 lead (91.9\%); M ties B2 (89.9\%).
-In the \textbf{medium} tier ($n{=}33$), B1/B2 tie (87.5\%); M trails (82.2\%).
-In the \textbf{high} tier ($n{=}38$), B1 leads (87.4\%); M ties B2 (85.1\%).
-Overlap tertiles on the canonical E1 run do \emph{not} show monotone M dominance;
-the controlled E6 feedback comparison (+7.7\,pp vs.\ unstructured test-only under
-full~M; E14 scopes length-matched traces) and E12 multi-seed stability
-are the primary mechanism and ranking evidence respectively.
-
-\begin{table}[H]
-  \caption{E3: mean strict conformance by overlap-density tier (E1, $n$ per cell).}
-  \label{tab:e3-tiers}
-  \centering
-  \thesistable{%
-    \small
-    \begin{tabular}{lrrrr}
-      \toprule
-      Tier & $n$ & B1 (\%) & B2 (\%) & M (\%) \\
-      \midrule
-      Low    & 49 & 91.9 & 89.9 & 89.9 \\
-      Medium & 33 & 87.5 & 87.5 & 82.2 \\
-      High   & 38 & 87.4 & 85.1 & 85.1 \\
-      \bottomrule
-    \end{tabular}%
-  }
-\end{table}
-
-The vignette illustrates why overlap matters mechanistically: on
-\code{classify\_signal}'s $(-3,-10)$ witness, B1 may satisfy the wrong branch
-while Semantic Feedback IR names S1 and a second attempt restores order (E6).
-
-\paragraph{Cross-corpus overlap evidence (E3 + E10).}
-Figure~\ref{fig:e10-overlap} stratifies the \emph{unfiltered} E10 sample by
-overlap-rate tertile alongside Table~\ref{tab:e3-tiers} on the hard set.
-Together they bound C1: neither corpus shows monotone M dominance over B2
-across tertiles; E6 (+7.7\,pp vs.\ unstructured test-only under full~M)
-isolates the typed-feedback mechanism; fixed-oracle E10 places M slightly
-ahead on aggregate (${+}1.0$\,pp) while E12 shows B2 slightly more
-seed-stable.
-
-\paragraph{Answer to RQ2 / C1.}
-E3 tertiles on canonical E1 are \textbf{not monotone}: M does not uniformly
-beat B2 across strata (Table~\ref{tab:e3-tiers}).
-\textbf{The monotone-overlap hypothesis is not supported} on this corpus.
-The controlled E6 comparison (+7.7\,pp vs.\ unstructured test-only under
-full~M; paired CI excludes zero; E14: \texttt{semantic\_ir} 75.1\% $\neq$
-\texttt{execution\_trace\_matched} 85.4\%) and fixed-oracle E12 multi-seed
-ranking (B2 first every seed; M 99.7\% vs.\ B2 100.0\%) bound deployment
-claims; practitioners should follow Table~\ref{tab:deployment-boundary},
-not aggregate E1 percentages or overlap tertiles alone.
+\paragraph{Answer to RQ1 / C2.}
+Under controlled isolation of feedback content (E6, full~M, $K{=}3$), typed
+Semantic Feedback IR is the largest single-factor repair lever vs.\
+unstructured test-only (+7.7\,pp; CI excludes~0).
+The gain concentrates on catch-all rescue (14/14 wins; 13/14 with test-only
+Conf${=}0$; 0/14 ordering).
+E14 compares length-matched structured surfaces
+(\texttt{semantic\_ir} 75.1\% vs.\
+\texttt{execution\_trace\_matched} 85.4\%; paired 5/19/96).
+Hard combo seeds on \texttt{gemini-2.5-flash} (pooled $n{=}80$;
+Table~\ref{tab:gemini-combo-n80}) further support C2 vs.\
+\texttt{test\_only}/\texttt{test\_expected} (${+}26.5$/${+}26.7$\,pp;
+CI excludes~0) without overturning the E14 structured-family comparison.
+Repair and the formal checker drive Conf.\ under fixed-oracle ablation; the
+pattern guard's value is prevention (E2/E17).
 
 %=============================================================================
-\section{RQ3: Conjunctive Accept vs.\ Conf Alone (E2, E7)}
+\section{RQ3: Conjunctive Accept vs.\ Conf Alone}
 \label{sec:results:rq3}
 %=============================================================================
 
-\textbf{Claim (C3, with C1).}
-The conjunctive gate plus region witnesses should catch ordering/guard
-faults that unit-test feedback misses; residual classes name the limits.
+Catch-all rescue explains how typed feedback repairs residual failures under
+headroom.
+Prevention asks a complementary question: given a faulty candidate, does the
+conjunctive gate refuse release when unit-test feedback would still accept?
+Ordering and guard-inversion mutants are the secondary vignette here---the
+fault classes E6's Conf.\ delta does not measure on BENCH-120, but that the
+gate must still catch.
 
 \begin{figure}[t]
   \centering
@@ -446,7 +416,7 @@ remains competitive on boundary-shift operators.
 \end{figure}
 
 The aggregate bars (Figure~\ref{fig:prevention-bar}) collapse that heterogeneity:
-M reaches the highest overall PDR, but the heatmap is needed to see \emph{which}
+M reaches the highest overall PDR, but the heatmap is needed to see which
 fault families drive the gap.
 
 \begin{figure}[t]
@@ -472,9 +442,8 @@ What Figure~\ref{fig:prevention-heatmap} adds is complementarity, not a single
 winner.
 M leads on specification-structural operators (scenario reordering, guard
 inversion); B2 leads on boundary-shift operators.
-That split is mechanistic: SMT witnesses sit on first-match boundaries and
-expose ordering faults, while B2's tests sometimes hit boundary inputs without
-naming the violated scenario.
+SMT witnesses sit on first-match boundaries and expose ordering faults, while
+B2's tests sometimes hit boundary inputs without naming the violated scenario.
 
 \begin{table}[H]
   \caption{Implementation-screening prevention (E2 full evaluation,
@@ -498,909 +467,231 @@ naming the violated scenario.
   }
 \end{table}
 
-Table~\ref{tab:prevention} summarises the \emph{implementation-screening}
-track only ($n{=}852$ mutants per mode), not the pooled E2 corpus
-($n{=}1{,}704$ when spec-confusion and implementation-screening are
-combined; see \texttt{prevention\_summary.json}).
+Table~\ref{tab:prevention} summarises the implementation-screening track only
+($n{=}852$ mutants per mode), not the pooled E2 corpus ($n{=}1{,}704$ when
+spec-confusion and implementation-screening are combined; see
+\texttt{prevention\_summary.json}).
 B1 lacks an explicit rejection mechanism (FAR 100\%), while M improves both
 PDR (+3.8\,pp over B2) and FAR ($-$3.8\,pp) on this fixed mutant set.
 A paired bootstrap over mutant IDs ($B{=}5{,}000$, seed~42;
 \texttt{e2\_pdr\_far\_bootstrap.json}) yields
 $\Delta\mathrm{PDR}(\mathrm{M}{-}\mathrm{B2})$ 95\% CI
 $[2.5,\,5.0]$\,pp and $\Delta\mathrm{FAR}$ 95\% CI
-$[-5.0,\,{-}2.5]$\,pp---both intervals exclude zero---so the prevention
-gap is not a sampling artefact of a single point estimate.
-Per-operator complementarity---B2 leading on some boundary-shift operators,
-M on specification-structural faults---is visible in
+$[-5.0,\,{-}2.5]$\,pp---both intervals exclude zero.
+Per-operator complementarity is visible in
 Figure~\ref{fig:prevention-heatmap}, not in the aggregate alone.
-
 Per-category F1 in Figure~\ref{fig:pattern-f1} reinforces the structural
-prevention story: Ordering and GuardInversion achieve the highest recall,
-confirming that the pattern guard behaves as a specification-derived defect
-classifier rather than a loose heuristic rule set.
+prevention story: Ordering and GuardInversion achieve the highest recall.
 
 \paragraph{Answer to RQ3 / C3.}
 Ordering and guard-inversion defects are prevented most effectively;
 boundary shifts favour B2; arithmetic/output residues remain
 (Chapter~\ref{ch:discussion}).
+Equal-$K$ Conf.\ ranking (\texttt{M\_eq}, Section~\ref{sec:results:rq4})
+shows M can match or exceed B2 on mean Conf.\ at $K{=}3$, but prevention
+value of the conjunctive gate is read from E2 PDR/FAR under the shared mutant
+protocol---not from Conf.\ alone.
 
 %=============================================================================
 \section{RQ4: Deployment Boundary (M vs.\ B2)}
 \label{sec:results:rq4}
 %=============================================================================
 
-\textbf{Claim (C4).}
-Practitioners should match feedback depth to release requirements: B2 as the
-default for mean conformance and latency; full~M when conjunctive
-$\mathrm{Accept}$, prevention (PDR/FAR), or typed Semantic Feedback IR is
-required---not from overlap tertiles alone.
+Mechanism (E6) and prevention (E2) motivate when to escalate beyond test
+feedback.
+Fair Conf.\ ranking at matched budget, external pilots, and one public ACL
+case complete the deployment rule: prefer B2 by default; escalate to full~M
+when conjunctive $\mathrm{Accept}$, prevention (PDR/FAR), or typed Semantic
+Feedback IR is required---and repair headroom remains.
+
+\subsection{Equal-$K$ Conf.\ Ranking}
+
+Fixed-oracle E1 M-win compares strengthened~M ($K{=}5$ bundle) to B2
+($K{=}3$); that ranking is saturation context
+(Section~\ref{sec:results:rq5}), not the fair Conf.\ comparison.
+The matched-budget ranking is \texttt{run\_e1\_equal\_k\_v1}:
+\texttt{M\_eq} ($K{=}3$, \texttt{semantic\_ir}, advisory gate) reaches
+100.0\% vs.\ B2 97.5\% (${+}2.5$\,pp; paired 3/0/117).
+This is the matched-budget Conf.\ ranking for C4, not a substitute for E6's
+within-M feedback isolation (+7.7\,pp).
+\input{tables/equal_k_m_vs_b2}
+\input{tables/equal_k_unified}
+
+Table~\ref{tab:equal-k-unified} consolidates equal-$K$ B1/B2/\texttt{M\_eq}
+across BENCH-120 and external corpora: the primary fair Conf.\ gain is
+${+}2.5$\,pp on BENCH-120; GitHub/HKCA09/desensitized rows often tie---C4
+support, not a C2 null (Table~\ref{tab:headroom-map}).
+
+\subsection{Deployment Synthesis}
 
 Table~\ref{tab:deployment-boundary} synthesises the deployment rule from
-E3 (non-monotone tertiles on canonical E1), E10 (unfiltered: M ${+}1.0$\,pp
-near ceiling), E12 (B2 slightly more seed-stable), E11 (external SOFL), and
-E8c (real-derived slices).
-E6 remains the mechanism anchor (+7.7\,pp typed IR under controlled comparison);
-E2 supplies the prevention rationale for deploying the conjunctive gate.
+E3 (non-monotone tertiles on canonical E1; Section~\ref{sec:results:rq2}),
+E10 (unfiltered: M ${+}1.0$\,pp near ceiling), E12 (B2 slightly more
+seed-stable), E11 (external SOFL), and E8c (real-derived slices).
+E6 remains the mechanism anchor (+7.7\,pp typed IR under controlled
+comparison); E2 supplies the prevention rationale for deploying the
+conjunctive gate.
 Supporting sampling evidence appears in Section~\ref{sec:results:e4}
 (SMT vs.\ random boundary coverage).
 
 \paragraph{Answer to RQ4 / C4.}
-\textbf{Decision procedure (one measurable rule):} prefer B2 by default;
-escalate to~M \emph{iff} release requires $\mathrm{Accept}{=}1$ \emph{or}
-target FAR${\le}5\%$ (E2 operating point).
-Do \emph{not} escalate from overlap tertiles alone (E3 non-monotone).
-Default to B2 for mean Conf.\ / latency; deploy M when conjunctive
-$\mathrm{Accept}$ or PDR/FAR gates justify the cost
+Prefer B2 by default; escalate to~M when release requires
+$\mathrm{Accept}{=}1$ or target FAR${\le}5\%$ \emph{and} repair headroom
+remains (E6 rescue when test-only Conf.\ collapses).
+Do not escalate from overlap tertiles alone (E3 non-monotone).
+External pilots often tie B2 with \texttt{M\_eq} and reinforce the default
 (Table~\ref{tab:deployment-boundary}).
+Versus VerifierLoop-FSF (B6): full~M's irreducible increment is conjunctive
+$\mathrm{Accept}$ plus PDR/FAR (and E6 typed IR when operating inside M)---not
+aggregate Conf.\ dominance over B6 or B2 on near-ceiling corpora.
+When contracts are simple enough that baselines already saturate, B2 is the
+right choice; Section~\ref{sec:results:acl-case} shows when the gate still
+earns its keep.
 
 %=============================================================================
-\section{RQ5: Quality--Overhead Trade-off (E1 Pareto, A2)}
+\section{Public ACL Interception Case}
+\label{sec:results:acl-case}
+%=============================================================================
+
+Synthetic hard tasks leave a residual doubt: does conjunctive release ever
+catch a realistic lucky-pass candidate?
+Listing~\ref{lst:acl-fsf} is an ordered API ACL reconstructed from the
+public RealSpec / harvest family (\texttt{enforce\_api\_acl}): deny guests;
+require step-up MFA on high scope; permit narrow admin/reader bands; and
+fail-closed on \texttt{OTHERWISE}.
+
+Listing~\ref{lst:acl-bug} is the LLM-shaped failure that matters for release.
+Busy unit tests---guest deny, admin permit---pass.
+Two defects remain: (i)~high-scope without MFA incorrectly permits instead of
+stepping up; (ii)~the catch-all residual fail-\emph{opens}.
+Mean pass rate on a domestic-style suite can look excellent.
+An SMT witness for the residual
+$(\mathit{role}{=}2,\mathit{scope}{=}2,\mathit{mfa}{=}1)$ forces
+\texttt{OTHERWISE}; the candidate returns $\mathit{permit}{=}1$.
+Conjunctive Accept therefore yields $\mathrm{Conf}<1$ and refuses release
+(Listing~\ref{lst:acl-ir}).
+A pluggable high-severity screen can additionally flag fail-open residuals
+even when a sparse suite happens to miss them.
+
+This single public case is not a vendor production trace.
+It is the external-validity object the evaluation needs: a reproducible
+ordered-guard contract where tests look green and Accept stays red---the
+decision-framework claim in operational form.
+
+\inputfsf{listings/enforce_api_acl.fsf}{Public ACL-style ordered contract
+  (\texttt{enforce\_api\_acl}): fail-closed catch-all.}{lst:acl-fsf}
+\inputpython{listings/enforce_api_acl_bug.py}{Lucky-pass candidate: busy
+  bands pass; residual fail-opens (and MFA step-up can be skipped).}{lst:acl-bug}
+\input{listings/enforce_api_acl_feedback}
+
+%=============================================================================
+\section{RQ2: Gap vs.\ Guard-Overlap Density}
+\label{sec:results:rq2}
+%=============================================================================
+
+If prevention depends on semantic regions, typed feedback should help where
+overlap witnesses matter---but aggregate ranking may still favour B2, and
+overlap tertiles need not be monotone.
+Figure~\ref{fig:complexity} and Table~\ref{tab:e3-tiers} bound that premise
+on the canonical E1 run.
+
+\begin{figure}[t]
+  \centering
+  \widefig{figures/complexity_heatmap.pdf}
+  \caption{\textbf{Claim:} overlap tertiles on canonical E1 are \emph{not} monotone
+    for M vs.\ B2.
+    \textbf{How to read:} rows are density tertiles; cells are mean strict
+    formal conformance.  Deployment should follow Table~\ref{tab:deployment-boundary}
+    and E6, not a single tertile rule.}
+  \label{fig:complexity}
+\end{figure}
+
+Table~\ref{tab:e3-tiers} reports mean conformance by overlap-density tier
+(\texttt{complexity\_by\_mode.csv}).
+In the low tier ($n{=}49$), B1/B0 lead (91.9\%); M ties B2 (89.9\%).
+In the medium tier ($n{=}33$), B1/B2 tie (87.5\%); M trails (82.2\%).
+In the high tier ($n{=}38$), B1 leads (87.4\%); M ties B2 (85.1\%).
+Overlap tertiles on the canonical E1 run do not show monotone M dominance;
+the controlled E6 feedback comparison and E12 multi-seed stability remain the
+primary mechanism and ranking evidence respectively.
+
+\begin{table}[H]
+  \caption{E3: mean strict conformance by overlap-density tier (E1, $n$ per cell).}
+  \label{tab:e3-tiers}
+  \centering
+  \thesistable{%
+    \small
+    \begin{tabular}{lrrrr}
+      \toprule
+      Tier & $n$ & B1 (\%) & B2 (\%) & M (\%) \\
+      \midrule
+      Low    & 49 & 91.9 & 89.9 & 89.9 \\
+      Medium & 33 & 87.5 & 87.5 & 82.2 \\
+      High   & 38 & 87.4 & 85.1 & 85.1 \\
+      \bottomrule
+    \end{tabular}%
+  }
+\end{table}
+
+On \code{classify\_signal}'s $(-3,-10)$ witness, B1 may satisfy the wrong
+branch while Semantic Feedback IR names S1 and a second attempt restores order
+(E6)---mechanistic motivation for overlap witnesses, not a monotone ranking
+rule.
+
+\paragraph{Cross-corpus overlap evidence (E3 + E10).}
+Figure~\ref{fig:e10-overlap} stratifies the unfiltered E10 sample by
+overlap-rate tertile alongside Table~\ref{tab:e3-tiers} on the hard set.
+Together they bound C1: neither corpus shows monotone M dominance over B2
+across tertiles; E6 (+7.7\,pp vs.\ unstructured test-only under full~M)
+isolates the typed-feedback mechanism; fixed-oracle E10 places M slightly
+ahead on aggregate (${+}1.0$\,pp) while E12 shows B2 slightly more
+seed-stable.
+
+\paragraph{Answer to RQ2.}
+E3 tertiles on canonical E1 are not monotone: M does not uniformly beat B2
+across strata (Table~\ref{tab:e3-tiers}).
+The monotone-overlap hypothesis is not supported on this corpus.
+Practitioners should follow Table~\ref{tab:deployment-boundary}, not aggregate
+E1 percentages or overlap tertiles alone.
+
+%=============================================================================
+\section{Near-Ceiling Ranking Archive}
 \label{sec:results:rq5}
-%=============================================================================
-
-\textbf{Claim (practical bound).}
-Under the fixed others-witness oracle, strengthened~M reaches 100.0\% Conf.\
-vs.\ B2 98.3\% at comparable mean llm\_calls (${\approx}1.16$ vs.\
-${\approx}1.18$).
-B2 remains attractive for mean-Conf.\ / latency on unfiltered and industrial
-corpora; M additionally buys conjunctive $\mathrm{Accept}$ / prevention
-(PDR/FAR).
-A2 remains a lower-prevention ablation (\emph{historical} Conf.\ delta on the
-pre-fix corpus), not a Conf.\ upgrade over M.
-
-\begin{figure}[t]
-  \centering
-  \widefig{figures/mode_distribution_latency.pdf}
-  \caption{\textbf{Claim:} repair modes pay a clear latency premium
-    (figure from pre-fix E1 export).
-    \textbf{How to read:} log-scale wall-clock latency per task; compare the
-    M/A1 mass at higher values with B1/B2 near one call.
-    B0 and B1 are tightly concentrated near their means.  M and
-    A1 exhibit heavier right tails due to repair loop invocations that reach the
-    $K=3$ budget limit.}
-  \label{fig:latency-distribution}
-\end{figure}
-
-The latency distribution (Figure~\ref{fig:latency-distribution}) shows repair
-modes paying a clear premium: M and A1 spread toward higher wall-clock times,
-while B1/B2 remain near one-call latencies.
-
-\begin{figure}[t]
-  \centering
-  \widefig{figures/pareto_quality_vs_latency.pdf}
-  \caption{\textbf{Claim (latency axis from pre-fix Pareto export):}
-    B2 is the cheaper mean-Conf.\ / latency operating point; M buys
-    prevention / conjunctive Accept at ${\approx}3.3\times$ latency
-    (46.2\,s vs.\ B2 13.9\,s on that export).
-    Primary fixed-oracle Conf.\ is M~100.0\% / B2~98.3\%
-    (Table~\ref{tab:main-results})---do not read the figure's pre-fix
-    Conf.\ annotations (B2~87.7\%, M~86.3\%) as current primary quality.
-    \textbf{How to read:} right/up is better quality, left is cheaper; the
-    dashed polyline is the Pareto frontier and the annotation marks mode~M.}
-  \label{fig:pareto}
-\end{figure}
-
-The insight in Figure~\ref{fig:pareto} is a trade-off, not a free lunch.
-On the pre-fix latency export, M pays $3.3\times$ vs.\ B2
-(46.2\,s vs.\ 13.9\,s), mostly extra LLM calls (2.08 vs.\ 1.24)---acceptable
-for parallel CI, not for interactive IDE use.
-Historical A2 (39.9\,s, 80.3\% Conf.\ on pre-fix E1) traded prevention for
-modest latency savings vs.\ that run's M; pre-fix B2 (13.9\,s, 87.7\%) was
-the cheaper mean-Conf.\ point on that export.
-Under the fixed oracle, primary quality is M~100.0\% vs.\ B2~98.3\% at
-comparable llm\_calls (Table~\ref{tab:main-results}); the $3.3\times$ latency
-premium remains the cost framing for deploying full~M when Accept/PDR justify
-it.
-Mann-Whitney confirms the latency gap is not a sampling artefact
-($p{<}0.001$).
-
-\paragraph{Answer to RQ5.}
-Best prevention (PDR/FAR) at ${\approx}3.3\times$ B2 latency (pre-fix cost
-export); default to B2 for mean Conf.\ / latency and deploy M when
-Accept/PDR-FAR justify the cost.
-Fixed-oracle E1 aggregate ranking (Section~\ref{sec:results:e1-stress}) is the
-stress-test companion to this Pareto reading---not a claim that M dominates
-B2 on every corpus.
-
-%=============================================================================
-\section{E1 Aggregate Stress-Test (supports RQ5)}
 \label{sec:results:e1-stress}
 %=============================================================================
 
-\textbf{Claim (C1--C3 jointly; RQ5 stress-test).}
-The three-insight loop should raise mean Conf.\ over one-shot and
-test-feedback baselines; under the fixed others-witness oracle with
-strengthened~M ($K{=}5$, best-effort selection, advisory critical-only gate),
-Strict tracks Conf.\ closely on BENCH-120.
-Aggregate E1 ranking is reported here as an overlap stress-test under RQ5,
-not as a universal-effectiveness headline across unfiltered corpora.
-
-\paragraph{Equal-$K$ hygiene.}
-Fixed-oracle E1 M-win compares strengthened~M ($K{=}5$ bundle) to B2
-($K{=}3$)---\textbf{not} a single-factor Conf.\ ranking.
-Primary equal-$K$ Conf.\ ranking is \texttt{run\_e1\_equal\_k\_v1}:
-\texttt{M\_eq} ($K{=}3$, \texttt{semantic\_ir}) reaches \textbf{100.0\%} vs.\
-B2 97.5\% (${+}2.5$\,pp; paired wins/losses/ties 3/0/117).
-Lead mechanism evidence remains E6 (within~M, $K{=}3$, ${+}7.7$\,pp with CI
-excluding zero).
-\input{tables/equal_k_m_vs_b2}
-
-\subsection{Main Results}
-
-The headline question for this E1 stress-test is whether specification-guided
-repair improves \emph{conformance} under a fair first-match witness oracle.
-Table~\ref{tab:main-results} answers with B1/B2/M on 120 tasks each from
-\texttt{run\_e1\_m\_win\_v2}; ablation and extended-baseline rows from the
-pre-fix canonical run are retained only as historical context
-(footnote).
-
-\begin{table}[H]
-  \caption{Main comparison results ($n = 120$ tasks per mode).
-    \textbf{B1/B2/M} from fixed-oracle \texttt{run\_e1\_m\_win\_v2}
-    (strengthened~M: best-effort $\arg\max$ Conf., E14-informed
-    \texttt{execution\_trace\_matched}, advisory critical-only pattern gate,
-    $K{=}5$, \texttt{formal\_max\_cases}${}{=}32$).
-    Strict = strict success / acceptance rate
-    ($\mathrm{Accept}{=}1$); Conf.\ = mean formal conformance
-    ($\overline{\mathrm{Conf}}$); Kill = mutation kill rate (checker precision on
-    injected mutants, not generator quality---see \S\ref{sec:results:e1-stress}); Fail.\ = mean
-    strict evaluation failures per task.
-    \emph{Note:} Primary B1/B2/M use the fixed first-match others-witness
-    oracle (\texttt{run\_e1\_m\_win\_v2}).
-    Fixed-oracle component ablations (A1--A3) are Table~\ref{tab:ablation-fixed}
-    (\texttt{run\_e1\_ablation\_fixed\_v1}).
-    B3--B5 and daggered A1--A3 rows below are historical
-    \texttt{run\_e1\_canonical\_v1} under the buggy others-witness oracle and
-    are \emph{not} primary claims.
-    Report M vs.\ B2 as win rate and means (2/120 wins, 0 losses, 118 ties;
-    ${+}1.7$\,pp); no Holm claim is asserted for this run.
-    Equal-$K$ Conf.\ ranking is Table~\ref{tab:equal-k} (\texttt{M\_eq} vs.\ B2).}
-  \label{tab:main-results}
-  \centering
-  \thesistable{%
-    \footnotesize
-    \renewcommand{\arraystretch}{1.12}
-    \begin{tabular*}{\linewidth}{@{\extracolsep{\fill}}l r r r r r@{}}
-      \toprule
-      Mode & Strict & Conf. & Kill & Lat.\ (ms) & Fail. \\
-      \midrule
-      B0$^\dagger$   & 5.0\%           & 89.2\%        & 48.6\%       & 165           & 0.00 \\
-      B1   & 84.2\%          & 84.2\%        & 52.4\%       & 17{,}193      & 0.00 \\
-      B2   & 98.3\%          & 98.3\%        & 49.1\%       & 9{,}576       & 0.00 \\
-      B3$^\dagger$   & 5.0\%           & 81.9\%        & 51.0\%       & 13{,}210      & 2.33 \\
-      B4$^\dagger$   & 5.0\%           & 87.1\%        & 49.3\%       & 10{,}758      & 2.49 \\
-      B5$^\dagger$   & 5.0\%           & 81.1\%        & 50.6\%       & 6{,}212       & 2.33 \\
-      M    & \textbf{100.0\%} & \textbf{100.0\%} & 48.6\%    & 10{,}457      & 0.00 \\
-      A1$^\dagger$   & 5.0\%           & 85.5\%        & 54.0\%       & 4{,}791       & 0.00 \\
-      A2$^\dagger$   & 5.0\%           & 80.3\%        & 49.1\%       & 6{,}405       & 0.00 \\
-      A3$^\dagger$   & 3.3\%           & 82.4\%        & 53.3\%       & 4{,}333       & 0.00 \\
-      \bottomrule
-      \multicolumn{6}{l}{\footnotesize $^\dagger$Historical pre-fix
-        (\texttt{run\_e1\_canonical\_v1}; not primary).} \\
-    \end{tabular*}%
-  }
-\end{table}
-
-Table~\ref{tab:main-results} states the aggregate means under the fixed
-oracle: M reaches 100\% Conf./Strict, ahead of B2 (98.3\%) and B1 (84.2\%).
-Primary component ranking is the fixed-oracle ablation
-(Table~\ref{tab:ablation-fixed}: A3 $-$25.8\,pp, A1 $-$17.5\,pp, A2 $0.0$\,pp);
-daggered historical A1--A3 rows are archive only.
-
-\begin{figure}[t]
-  \centering
-  \widefig{figures/mode_distribution_strict_conformance.pdf}
-  \caption{\textbf{Claim (pre-fix export):} M concentrates mass in the upper
-    conformance band; B0 does not.
-    \textbf{How to read:} each violin/box is per-task $\mathit{Conf}(c,t)$ over
-    120 tasks; compare the right-hand mass of M with B0's low mode.
-    Primary fixed-oracle means are in Table~\ref{tab:main-results}.}
-  \label{fig:conf-distribution}
-\end{figure}
-
-Figure~\ref{fig:conf-distribution} separates difficulty calibration from
-LLM quality on the pre-fix export: B0's bimodal spread marks template
-failure on hard tasks, while B1--M cluster in the 60--100\% band.
-
-\begin{figure}[t]
-  \centering
-  \widefig{figures/formal_conformance_cdf.pdf}
-  \caption{\textbf{Claim (pre-fix export):} B2 and A2 dominate the upper CDF
-    tail on the historical corpus.
-    \textbf{How to read:} curves farther right mean higher conformance for more
-    tasks; B0's steep early rise marks template failure on hard tasks.
-    Primary fixed-oracle means are in Table~\ref{tab:main-results}.}
-  \label{fig:conf-cdf}
-\end{figure}
-
-The CDF in Figure~\ref{fig:conf-cdf} is from the pre-fix export: B2 and A2
-occupy the upper tail on that corpus; do not treat it as the fixed-oracle
-ranking (M~100.0\% $>$ B2~98.3\%).
-
-\begin{figure}[t]
-  \centering
-  \widefig{figures/summary_metrics_by_mode.pdf}
-  \caption{\textbf{Claim (pre-fix export):} highest mean Conf.\ coincides with
-    the most LLM calls on that corpus.
-    \textbf{How to read:} left axis = Strict / Conf.; right axis = mean LLM
-    calls; M's 2.08 calls show the repair loop is exercised, not idle.
-    Fixed-oracle llm\_calls are ${\approx}1.16$ (M) vs.\ ${\approx}1.18$ (B2).}
-  \label{fig:summary-metrics}
-\end{figure}
-
-Figure~\ref{fig:summary-metrics} links quality to cost on the pre-fix
-export; under the fixed oracle, M and B2 have comparable mean llm\_calls
-near one call (Table~\ref{tab:main-results}).
-
-\begin{figure}[t]
-  \centering
-  \widefig{figures/llm_calls_distribution.pdf}
-  \caption{\textbf{Claim:} budget $K=3$ is actively used, not decorative
-    (pre-fix call-count export).
-    \textbf{How to read:} M and A1 mass at 2--3 calls; B1 stays at one.}
-  \label{fig:llm-calls}
-\end{figure}
-
-The call-count histogram (Figure~\ref{fig:llm-calls}) confirms that budget
-$K{=}3$ is exercised on the pre-fix export: M and A1 concentrate at two or
-three calls, whereas B1 remains at a single generation attempt.
-
-\begin{figure}[t]
-  \centering
-  \widefig{figures/radar_metrics.pdf}
-  \caption{\textbf{Claim (pre-fix export):} M trades latency for conformance;
-    B2 is the cheaper moderate alternative on that corpus.
-    \textbf{How to read:} axes are normalised Conf., Strict, kill rate, and
-    inverse latency; larger area is not uniformly better.
-    Primary fixed-oracle Conf.\ ranking is Table~\ref{tab:main-results}.}
-  \label{fig:radar-metrics}
-\end{figure}
-
-Figure~\ref{fig:radar-metrics} summarises the multi-metric trade-off on the
-pre-fix export; fixed-oracle primary quality remains M~100.0\% vs.\ B2~98.3\%.
-
-Table~\ref{tab:main-results} is the aggregate on fixed-oracle E1: M at
-100.0\% Conf.\ / Strict leads B2 (98.3\%) and B1 (84.2\%).
-Against B2, M wins 2/120 paired tasks (${+}1.7$\,pp; losses~0, ties~118);
-mean llm\_calls are comparable (${\approx}1.16$ vs.\ ${\approx}1.18$).
-We report win rate and means only---no Holm significance is claimed for this
-run.
-That is the honest primary-quality reading: structured specification feedback
-matters in controlled E6 (+7.7\,pp vs.\ unstructured test-only under full~M;
-E14: length-matched \texttt{semantic\_ir} 75.1\% does not match
-\texttt{execution\_trace\_matched} 85.4\%) and E11 deployment slices;
-fixed-oracle E10/E12 place M and B2 near ceiling without M dominating every
-seed.
-Historical B3--B5 / A1--A3 rows under the buggy others-witness oracle
-(${\approx}5\%$ Strict) are not primary claims.
-
-\subsection{Reading the Distributions}
-
-Three observations settle the rest of the E1 stress-test.
-First, under the fixed oracle, B1/B2/M Strict tracks Conf.\ (84.2 / 98.3 /
-100.0\%): the historical uniform ${\approx}5\%$ Strict on
-\texttt{run\_e1\_canonical\_v1} was an others-witness measurement artefact,
-not the current primary result.
-Second, M leads B2 by ${+}1.7$\,pp with only 2/120 decisive wins (118 ties),
-so the margin is real but narrow; mean llm\_calls stay near one call
-(${\approx}1.16$ vs.\ ${\approx}1.18$).
-Third, mutation kill rate (${\approx}49$--$52\%$ across modes) still measures
-checker \emph{precision} against injected syntactic faults, not generator
-quality.
-
-\paragraph{E1 stress-test note (RQ5).}
-Fixed-oracle E1: M 100.0\% $>$ B2 98.3\% $>$ B1 84.2\% (win rate 2/120 vs.\ B2;
-no Holm claim).
-E6 confirms typed feedback mechanism (+7.7\,pp vs.\ unstructured test-only
-under full~M; E14 scopes against length-matched traces).
-Prevention (PDR/FAR) remains the complementary discriminator for conjunctive
-release; fixed-oracle E10/E12 (Sections~\ref{sec:results:e10},~\ref{sec:results:e12})
-bound seed stability and unfiltered ranking.
-
-%=============================================================================
-\section{Boundary Density (E4)}
-\label{sec:results:e4}
-%=============================================================================
-
-Test-feedback looks strong until witness sampling is held constant.
-If denser random tests already covered first-match regions, SMT witnesses
-would be optional; Figure~\ref{fig:boundary} demonstrates they are not.
-
-\begin{figure}[t]
-  \centering
-  \widefig{figures/boundary_coverage_by_density.pdf}
-  \caption{\textbf{Claim:} random sampling collapses in the Dense tier; SMT
-    does not.
-    \textbf{How to read:} coverage vs.\ case budget by density; compare SMT
-    vs.\ random within the Dense row at budget~$\ge 8$.}
-  \label{fig:boundary}
-\end{figure}
-
-At budget 16, random sampling covers far less of the Dense tier than
-SMT-guided generation; the gap shrinks in the Sparse tier.
-That is why test-feedback baselines look adequate on simple specifications
-and degrade on hard ones---the same story as the overlap-tertile split in
-Section~\ref{sec:results:rq2}, now measured at the sampling layer alone.
-
-%=============================================================================
-\section{Generalisation Study (E8)}
-\label{ch:generalization}
-%=============================================================================
-
-External validity asks whether SpecIR adapters carry the prevention loop
-beyond SOFL syntax, or whether the gains are notation-specific.
-Table~\ref{tab:generalisation} and Figure~\ref{fig:generalisation} answer
-that question.
-
-\begin{figure}[t]
-  \centering
-  \widefig{figures/generalisation_bar.pdf}
-  \caption{\textbf{Claim:} structured feedback helps across notations, but
-    adapter transfer is partial on the expanded $n{=}30$ corpus.
-    \textbf{How to read:} bars are mean Conf.\ by notation and mode; compare
-    M vs.\ B1 within each group (M leads on both adapters), then M vs.\ B2.}
-  \label{fig:generalisation}
-\end{figure}
-
-On SOFL/FSF (fixed-oracle E1), M leads at 100.0\% versus B2 98.3\% and B1 84.2\%.
-On the expanded adapter corpora ($n{=}30$ each, \texttt{run\_e8b\_expanded\_v1}),
-M beats B1 on Mini-StateMachine (41.6\% vs.\ 24.7\%) and Mini-Z (23.3\% vs.\
-5.8\%); M is within 0.8~pp of B2 on Mini-StateMachine and leads B2 by 5.0~pp
-on Mini-Z.
-Absolute conformance on adapter notations remains low (23--42\%), reflecting
-notation-specific generation difficulty rather than SOFL-level overlap structure;
-HumanEval/MBPP rows in Table~\ref{tab:generalisation} show stronger transfer on
-real-derived guards.
-Chapter~\ref{ch:discussion} interprets these boundaries.
-
-\begin{table}[H]
-  \caption{\textbf{Key observation:} M leads B1 on all notations; adapter
-    absolute conformance is low on the expanded $n{=}30$ corpus (E8b).
-    HumanEval-FSF and MBPP-FSF rows report full B1/B2/M from
-    \texttt{run\_e8c\_full\_v1}.}
-  \label{tab:generalisation}
-  \centering
-  \thesistable{%
-    \small
-    \begin{tabular}{lccc}
-      \toprule
-      Notation & B1 Conf.\% & B2 Conf.\% & M Conf.\% \\
-      \midrule
-      SOFL/FSF (120 tasks) & 84.2 & 98.3 & \textbf{100.0} \\
-      Mini-StateMachine (30 tasks) & 24.7 & 40.8 & \textbf{41.6} \\
-      Mini-Z (30 tasks) & 5.8 & 18.3 & \textbf{23.3} \\
-      HumanEval-FSF (20 tasks) & 89.7 & \textbf{98.8} & 87.1 \\
-      MBPP-FSF (20 tasks) & 90.0 & 95.0 & 95.0 \\
-      \bottomrule
-    \end{tabular}%
-  }
-\end{table}
-
-%=============================================================================
-\subsection{External Validity: Real-Derived Benchmark (E8c)}
-\label{subsec:results:real-derived}
-%=============================================================================
-
-Table~\ref{tab:benchmark-by-source} reports conformance across benchmark subsets.
-Mode~M reaches 95.0\% on MBPP-FSF (matching B2) and 87.1\% on HumanEval-FSF
-(where B2 leads at 98.8\%).
-MBPP confirms partial transfer to real-world guard structure; HumanEval shows
-that test-feedback baselines can dominate when branches are sparse.
-
-\begin{inlinetable}{Conformance by benchmark source (mode M, $K=3$).}
-  \label{tab:benchmark-by-source}
-  \footnotesize
-  \begin{tabular}{lrrr}
-    \toprule
-    Subset & $n$ & M Conf (\%) & M Strict (\%) \\
-    \midrule
-    Synthetic hard (E1)          & 120 & 100.0 & 100.0 \\
-    HumanEval-FSF (E8c)          & 20  & 87.1 & 70.0 \\
-    MBPP-FSF (E8c)               & 20  & 95.0 & 85.0 \\
-    Mini-Z (E8b expanded)        & 30  & 23.3 & --- \\
-    Mini-StateMachine (E8b)      & 30  & 41.6 & --- \\
-    \bottomrule
-  \end{tabular}
-\end{inlinetable}
-
-The higher strict-success rate on real-derived tasks (70--85\%) versus the
-historical pre-fix synthetic Strict (${\approx}5\%$) reflected the buggy
-others-witness oracle as much as simpler HumanEval/MBPP guard structure;
-under the fixed oracle, synthetic hard E1 Strict for~M is 100.0\%
-(Table~\ref{tab:main-results}).
-Full B1/B2/M baselines on HumanEval-FSF and MBPP-FSF are reported in
-Table~\ref{tab:generalisation} from \texttt{run\_e8c\_full\_v2}.
-
-%=============================================================================
-\section{Random Benchmark (E10)}
-\label{sec:results:e10}
-%=============================================================================
-
-E10 tests whether aggregate M beats B2 on an unfiltered random sample
-(Section~\ref{sec:exp:e10}).
-Table~\ref{tab:e10-random} reports fixed-oracle results from
-\texttt{run\_e10\_m\_win\_v1} ($n{=}100$ per mode).
-On this \emph{unfiltered} sample, M reaches 100.0\% mean Conf.\ vs.\ B2
-99.0\% (${+}1.0$\,pp; wins 1/100, losses~0, ties~99) and B1 81.0\%---consistent
-with E1's near-ceiling M$\ge$B2 reading, not a large unfiltered gap.
-
-\begin{table}[H]
-  \caption{Random benchmark results (E10, fixed others-witness oracle).
-    Uniformly sampled tasks without Z3 overlap filter; modes B1, B2, M;
-    \texttt{run\_e10\_m\_win\_v1}.
-    M leads B2 by ${+}1.0$\,pp (1/100 wins).}
-  \label{tab:e10-random}
-  \centering
-  \thesistable{%
-    \small
-    \begin{tabular}{lccc}
-      \toprule
-      Mode & Conf.\ (\%) & Win vs.\ B2 & Notes \\
-      \midrule
-      B1 & 81.0 & --- & --- \\
-      B2 & 99.0 & ref. & --- \\
-      M  & \textbf{100.0} & 1/100 & ${+}1.0$\,pp; 0 losses, 99 ties \\
-      \bottomrule
-    \end{tabular}%
-  }
-\end{table}
-
-The decision criterion remains qualitative: fixed-oracle E10 places M slightly
-ahead of B2 near ceiling; Figure~\ref{fig:e10-overlap} tertiles should be read
-together with E3 (Table~\ref{tab:e3-tiers})---neither shows monotone M
-dominance by overlap alone.
-The honest claim is overlap-\emph{conditional} deployment (C4), with E6 as the
-mechanism anchor.
-(Pre-fix \texttt{run\_e10\_random\_v2} had favoured B2 89.1\% vs.\ M 83.1\%
-under the buggy others-witness oracle and is not primary.)
-
-\begin{figure}[t]
-  \centering
-  \widefig{figures/performance_vs_overlap.pdf}
-  \caption{E10: mean conformance by overlap-rate tertile on the unfiltered random
-    benchmark (figure from pre-fix export; read aggregate means from
-    Table~\ref{tab:e10-random}).}
-  \label{fig:e10-overlap}
-\end{figure}
-
-%=============================================================================
-\section{External SOFL Benchmark (E11)}
-\label{sec:results:e11}
-%=============================================================================
-
-E11 evaluates curated, non-synthetic FSF tasks with citable external provenance
-(Section~\ref{sec:exp:e11}).
-Table~\ref{tab:e11-external} reports repeat~0 results from
-\texttt{run\_e11\_external\_v1} ($n{=}22$; zero ID overlap with E1).
-
-\begin{table}[H]
-  \caption{External SOFL benchmark (E11).  Hand-curated from textbook and IET
-    pattern sources; not generated by \texttt{HardTaskGenerator}.}
-  \label{tab:e11-external}
-  \centering
-  \thesistable{%
-    \small
-    \begin{tabular}{lcccc}
-      \toprule
-      Mode & $n$ & Strict (\%) & Conf.\ (\%) & Lat.\ (ms) \\
-      \midrule
-      B1 & 22 & 63.6 & 89.8 & 2{,}018 \\
-      B2 & 22 & 63.6 & 89.8 & 4{,}171 \\
-      M  & 22 & 59.1 & 81.9 & 5{,}103 \\
-      \bottomrule
-    \end{tabular}%
-  }
-\end{table}
-
-On the external corpus under the primary endpoint (\texttt{ecnu-plus}),
-B1 and B2 tie at 89.8\% mean conformance; M trails
-(81.9\%)---these curated tasks have moderate guard overlap and simpler branch
-structure than the E1 hard set, consistent with the deployment boundary in
-Chapter~\ref{ch:discussion}.
-Replicating E11 on \texttt{ecnu-max} (\texttt{run\_e11\_ecnu\_max\_v1}) yields
-a three-way tie at 89.8\% Conf.\ / 63.6\% Strict for B1/B2/M: the stronger
-endpoint closes the primary-model M gap without reversing B2 as the default
-mean-Conf.\ choice.
-Provenance for each task is recorded in \texttt{benchmarks/external\_sofl.json}.
-E15 stratification (overlap-density tiers on the external corpus) explains why
-M trails B1/B2 on \texttt{ecnu-plus}: curated tasks have moderate overlap and
-simpler branch structure than the E1 stress-test
-(see \texttt{e11\_overlap\_stratified.csv}).
-
-%=============================================================================
-\section{Multi-Seed Stability (E12)}
-\label{sec:results:e12}
-%=============================================================================
-
-E12 addresses LLM stochasticity on the \textbf{full} 120-task hard benchmark
-(Section~\ref{sec:exp:e12}).
-Table~\ref{tab:e12-stability} reports fixed-oracle E12-full from
-\texttt{run\_e12\_m\_win\_v1} (120 tasks $\times$ seeds $\{0,1,2\}$ $\times$
-modes B1, B2, M; 1080 jobs).
-Overall means: B1 88.6\%, B2 100.0\%, M 99.7\%.
-B2 is first every seed (ties with M at 100\% on seeds~0 and~2); M's sole
-failure is seed~1 HardCase069 (Conf.\ 0).
-Mean-across-seeds pairing: M wins 0, losses~1, ties~119 vs.\ B2.
-Honest framing: both near ceiling; E1/E10 show M$\ge$B2 on aggregate, while
-E12 shows B2 slightly more seed-stable (100.0\% vs.\ 99.7\%)---do \emph{not}
-claim M dominates all seeds.
-
-\begin{table}[H]
-  \caption{E12-full multi-seed stability under fixed others-witness oracle
-    (\texttt{run\_e12\_m\_win\_v1}; 120 tasks, seeds $\{0,1,2\}$).
-    Per-seed mean formal conformance (\%).}
-  \label{tab:e12-stability}
-  \centering
-  \thesistable{%
-    \small
-    \begin{tabular}{lcccc}
-      \toprule
-      Mode & Mean Conf.\ (\%) & Seed 0 & Seed 1 & Seed 2 \\
-      \midrule
-      B1 & 88.6 & 95.0 & 75.8 & 95.0 \\
-      B2 & \textbf{100.0} & 100.0 & 100.0 & 100.0 \\
-      M  & 99.7 & 100.0 & 99.2 & 100.0 \\
-      \addlinespace
-      \multicolumn{5}{l}{\textit{Mean-across-seeds M vs.\ B2: wins 0, losses 1, ties 119}} \\
-      \multicolumn{5}{l}{\textit{Ranking: B2 first every seed (ties M @100\% on seeds 0, 2)}} \\
-      \bottomrule
-    \end{tabular}%
-  }
-\end{table}
-
-\subsection{Second-Model Replication (E16)}
-\label{sec:results:e16}
-
-E16 replicates B1/B2/M on the \textbf{full} 120-task BENCH-120 using
-\texttt{ecnu-max} (DeepSeek-family) while E1/E12 use \texttt{ecnu-plus}
-(Qwen-family) (\texttt{run\_e16\_canonical\_v1}, $n{=}120$ per mode).
-All three modes tie at \textbf{89.2\%} mean strict conformance---endpoint
-choice does not reverse the deployment boundary
-(Table~\ref{tab:deployment-boundary}), though absolute gaps shrink vs.\ the
-primary model.
-The controlled E6 protocol on the same endpoint
-(Table~\ref{tab:feedback-e6-max}) likewise saturates (${\approx}89.2\%$ for
-A/B/C), confirming that typed-IR gains require repair headroom.
-The prior 29-task pilot (\texttt{run\_e16\_model\_pilot\_v1}) is superseded.
-
-\begin{table}[H]
-  \caption{E16 second-model replication (\texttt{ecnu-max}, $n{=}120$).}
-  \label{tab:e16-canonical}
-  \centering
-  \thesistable{%
-    \small
-    \begin{tabular}{lcc}
-      \toprule
-      Mode & Conf.\ (\%) & Lat.\ (ms) \\
-      \midrule
-      B1 & 89.2 & 3{,}374 \\
-      B2 & 89.2 & 4{,}139 \\
-      M  & 89.2 & 10{,}072 \\
-      \bottomrule
-    \end{tabular}%
-  }
-\end{table}
-
-%=============================================================================
-\section{Commercial Cross-Model Replication (n1n)}
-\label{sec:results:n1n}
-%=============================================================================
-
-Campus endpoints alone leave a residual single-gateway threat.
-We replicate the controlled E6 A/B/C sweep and B1/B2/M ranking on commercial
-models via the n1n OpenAI-compatible gateway
-(\url{https://api.n1n.ai/pricing}): \texttt{gpt-4o},
-\texttt{claude-sonnet-4-6}, and \texttt{deepseek-v3.2}, on the same
-29-task stratified subset as E12
-(\texttt{benchmarks/e12\_stratified\_30.json}).
-
-\input{tables/cross_model_e6}
-
-\paragraph{Reading Table~\ref{tab:cross-model-e6}.}
-On \texttt{gpt-4o}, A and C tie at 88.9\% (saturation, $\Delta{=}0$).
-On \texttt{claude-sonnet-4-6}, typed IR yields a modest
-\textbf{+1.0\,pp} (87.5$\rightarrow$88.5).
-On \texttt{deepseek-v3.2}, C trails A by 3.9\,pp (75.0$\rightarrow$71.1):
-longer structured prompts can hurt weaker commercial endpoints.
-Together with primary E6 (+7.7\,pp on \texttt{ecnu-plus}) and E6-max
-saturation (${+}0.03$\,pp), the mechanism claim is headroom- and
-model-dependent, not universal.
-
-\input{tables/cross_model_e16}
-
-On the same stratified hard subset, \texttt{gpt-4o} ranks
-B1${=}$B2 at 100\% Conf.\ with M at 88.9\%---again no case for replacing B2
-as the mean-Conf.\ default.
-
-%=============================================================================
-\section{Industrial SOFL Corpus}
-\label{sec:results:industrial}
-%=============================================================================
-
-Beyond textbook/IET external SOFL (E11), we evaluate a curated
-industrial-pattern corpus
-(\texttt{benchmarks/industrial\_sofl.json}, $n{=}31$): banking, telecom,
-access control, medical alerts, SCADA-like thresholds, insurance, and related
-ordered-guard decision tables, with provenance
-\texttt{liu2004soflbook} / \texttt{li2023iet\_faultprevention} /
-\texttt{industrial\_pattern:<domain>}
-(\emph{not} production vendor traces; see
-\texttt{benchmarks/INDUSTRIAL\_SOFL\_README.md}).
-
-\input{tables/cross_model_industrial}
-
-\paragraph{Reading Table~\ref{tab:cross-model-industrial}.}
-Under both \texttt{gpt-4o} and \texttt{claude-sonnet-4-6}, test-feedback B2
-reaches \textbf{100\%} mean Conf.\ while B1 and M sit at 95.5\%, with
-identical Strict 67.7\%.
-On \texttt{deepseek-v3.2} absolute Conf.\ is lower, but the ranking is
-unchanged: B2 (80.7\%) $>$ M (72.5\%) $>$ B1 (52.7\%).
-This is the strongest external-validity support for the deployment rule:
-on practitioner-style ordered-guard specs, prefer B2 for mean conformance;
-reserve full~M when conjunctive $\mathrm{Accept}$ or PDR/FAR gates are required.
-
-\paragraph{Published-industrial pilot.}
-Beyond pattern corpora, we evaluate $n{=}10$ FSF tasks
-\emph{reconstructed} from published industrial SOFL case studies---railway
-crossing~\cite{liu1998railwaycrossing}, interlocking~\cite{luo2017railway},
-and ATM/banking book applications~\cite{liu2004soflbook}
-(\texttt{benchmarks/published\_industrial\_pilot.json};
-\texttt{run\_pubind\_pilot\_v1}).
-Under equal $K{=}3$: B1 80.0\%, B2 100.0\%, \texttt{M\_eq} 100.0\%.
-This is \textbf{not} a proprietary Casco/Mitsubishi dump; vendor
-\texttt{.asfl} files merge when placed under
-\texttt{vendor/agile-sofl-toolchain/examples} (see \texttt{vendor/README.md}).
-
-\paragraph{Industrial decision procedure (C4).}
-Escalate to~M \emph{iff} the release bar requires $\mathrm{Accept}{=}1$
-\emph{or} a prevention target FAR${\le}5\%$ (E2 operating point); otherwise
-keep B2.
-Do \emph{not} escalate from overlap tertiles alone (E3 non-monotone).
-On industrial-pattern and published-industrial pilots, mean-Conf.\ alone
-already selects B2 under strong endpoints.
-
-%=============================================================================
-\section{VerifierLoop-FSF Baseline (E13 / B6)}
-\label{sec:results:b6}
-%=============================================================================
-
-REV-7 implements mode~B6: SMT witnesses during repair with structured
-counterexample prompts but without Semantic Feedback IR or pattern guard
-(Section~\ref{sec:exp:methods}).
-Table~\ref{tab:b6-stratified} compares B6 with B2 and M on the same 30-task
-stratified subset as E12 (\texttt{run\_b6\_stratified\_v1}, repeat~0).
-B6 (86.0\% mean conformance) matches B2 (86.2\%) within 0.2~pp while M trails
-(83.3\%) on this subset---showing that witness-guided repair without the full IR
-recovers test-feedback-level aggregate performance, but does not close the gap to
-M on the full hard benchmark (Table~\ref{tab:b6-full}).
-
-\begin{table}[H]
-  \caption{VerifierLoop-FSF (B6) vs.\ B2/M on 30-task stratified subset (E13).
-    Same tasks and $K{=}3$ as E12; single repeat.}
-  \label{tab:b6-stratified}
-  \centering
-  \thesistable{%
-    \small
-    \begin{tabular}{lccc}
-      \toprule
-      Mode & $n$ & Conf.\ (\%) & Lat.\ (ms) \\
-      \midrule
-      B2 & 30 & 86.2 & 5{,}416 \\
-      B6 & 30 & 86.0 & 16{,}245 \\
-      M  & 30 & 83.3 & 15{,}099 \\
-      \bottomrule
-    \end{tabular}%
-  }
-\end{table}
-
-\begin{inlinetable}{B6 full hard-benchmark run (\texttt{run\_b6\_full\_v2}, $n{=}120$).}
-  \label{tab:b6-full}
-  \footnotesize
-  \begin{tabular}{lrrrr}
-    \toprule
-    Mode & Strict (\%) & Conf.\ (\%) & Kill (\%) & Lat.\ (ms) \\
-    \midrule
-    B2 & 5.0 & 88.2 & 61.4 & 7{,}189 \\
-    B6 & 5.0 & 81.1 & 51.0 & 21{,}440 \\
-    M  & 5.0 & 82.0 & 60.6 & 22{,}507 \\
-    \bottomrule
-  \end{tabular}
-\end{inlinetable}
-
-On the paired full 120-task export (\texttt{run\_b6\_full\_v2},
-Table~\ref{tab:b6-full}), B2 reaches 88.2\% Conf., B6 81.1\%, and M 82.0\%.
-Thus any SMT counterexample in the loop is \emph{not} enough for an aggregate
-Conf.\ win: B6 ${\approx}$~M, and both trail B2.
-Typed Semantic Feedback IR's value is shown under the controlled E6 setting
-(and in conjunctive $\mathrm{Accept}$ / PDR--FAR), not as ``M beats B6 on mean
-Conf.''
-B6 latency ($\approx$21\,s) exceeds B2 ($\approx$7\,s) but stays near this run's M
-($\approx$23\,s), consistent with formal checking inside the loop without
-pattern screening.
-
-\subsection{M\_lite: Witness + Semantic IR (E18)}
-\label{sec:results:m-lite}
-
-Mode \texttt{M\_lite} combines B6-style SMT witnesses in the repair loop with
-Semantic Feedback IR but \emph{without} the pattern guard
-(\texttt{run\_m\_lite\_v1}, $n{=}120$).
-Table~\ref{tab:m-lite} answers whether B2$+$typed IR is enough: M\_lite
-(79.0\%) trails B6 (81.8\%) and that run's B2 (89.3\%)---naive stacking fails.
-The E6 +7.7\,pp effect (vs.\ unstructured test-only under full~M) requires the
-full mode~M repair integration (IR$+$hard gate), not witnesses plus IR alone;
-practitioners should choose B2 (default mean Conf./latency) or full~M
-(Accept/PDR at ${\approx}3.3\times$ latency), not M\_lite as a shortcut.
-
-\begin{table}[H]
-  \caption{M\_lite vs.\ B6 vs.\ B2 on 120-task hard benchmark (E18).}
-  \label{tab:m-lite}
-  \centering
-  \thesistable{%
-    \small
-    \begin{tabular}{lccc}
-      \toprule
-      Mode & Conf.\ (\%) & Strict (\%) & Lat.\ (ms) \\
-      \midrule
-      B2      & 89.3 & 5.0 & 9{,}066 \\
-      B6      & 81.8 & 4.2 & 36{,}747 \\
-      M\_lite & 79.0 & 5.0 & 37{,}219 \\
-      M (E1)$^\dagger$  & 86.3 & 5.0 & 46{,}161 \\
-      \bottomrule
-      \multicolumn{4}{l}{\footnotesize $^\dagger$Historical pre-fix M
-        (\texttt{run\_e1\_canonical\_v1}); primary fixed-oracle M is 100.0\%.} \\
-    \end{tabular}%
-  }
-\end{table}
-
-%=============================================================================
-\section{Sensitivity Analysis}
-\label{sec:results:sensitivity}
-%=============================================================================
-
-The sensitivity question is whether the reported operating point is brittle.
-Figure~\ref{fig:sensitivity-heatmap} maps mean strict formal conformance against
-guard-overlap density and repair budget across modes.
-
-\begin{figure}[t]
-  \centering
-  \widefig{figures/sensitivity_heatmap.pdf}
-  \caption{Sensitivity heatmap: mean strict formal conformance as a function of
-    task complexity (guard-overlap tertile) and pipeline configuration.
-    Overlap tertiles are non-monotone for M vs.\ B2 on canonical E3; read with
-    Table~\ref{tab:e3-tiers}.}
-  \label{fig:sensitivity-heatmap}
-\end{figure}
-
-\subsection{Sensitivity to Task Complexity}
-
-The 120-task benchmark spans a range of complexity in terms of guard-overlap density
-and scenario count.
-Partitioning tasks into three tertiles based on guard-overlap rate shows
-non-monotone M vs.\ B2 ranking on canonical E3 (Table~\ref{tab:e3-tiers});
-higher overlap does not uniformly favour M.
-The sensitivity heatmap in Figure~\ref{fig:sensitivity-heatmap} visualises the
-same heterogeneity across all ten primary and ablation modes.
-
-\subsection{Sensitivity to Budget $K$}
-
-The budget parameter $K$ controls the maximum number of LLM calls in the repair
-loop.
-Mode A3 ($K=1$ effectively) achieves 82.4\% conformance on the
-\emph{historical} pre-fix corpus; full mode~M ($K=3$) reaches 86.3\% on
-pre-fix canonical E1 at seed~0---repair budget alone does not close the
-B1/B2 gap without overlap-conditional deployment.
-(Primary fixed-oracle E1: M~100.0\% / B2~98.3\%; A1--A3 not re-run.)
-The marginal return of the second iteration (roughly 3--4\,pp) is higher than that of
-the third (roughly 2--3\,pp), consistent with diminishing returns
-(Figure~\ref{fig:convergence}).
-Extrapolating, $K=2$ would likely yield conformance in the range 87--88\% on that
-historical corpus, comparable to pre-fix B2 but with Z3-guided feedback.
-The $K=3$ budget appears to be a reasonable operating point: it captures most of the
-attainable gain while keeping total LLM calls below 3.0 per task on average.
-
-\subsection{Sensitivity to Formal Case Count}
-
-The formal checker generates up to 64 conformance cases per task for final strict
-scoring, but uses only 16 cases per iteration during the repair loop.
-The 16-case internal budget trades coverage for latency; the 64-case strict pass
-improves sensitivity to guard-overlap faults on the final reported score.
-Increasing the internal case count from 16 to 32 would improve counterexample precision
-at the cost of approximately 50\% more Z3 time per iteration---a trade-off identified
-for future empirical investigation.
-
-\subsection{Sensitivity to LLM Choice}
-
-All experiments used Qwen2.5-27B-Instruct (\textsf{Qwen-27B}).
-The experimental design is not specific to this model; the only model-specific
-assumptions are (a)~the model can follow a structured Python code generation prompt,
-and (b)~the model can incorporate counterexample inputs into a repair prompt.
-A stronger base model would likely improve all LLM-based modes
-proportionally, with the B1/M gap potentially widening if that model learns to
-avoid ordering errors from the first attempt.
-Conversely, a weaker model would benefit more from the repair loop, increasing M's
-relative advantage.
-
-%=============================================================================
-\section{Statistical Test Summary}
-\label{sec:results:stats}
-%=============================================================================
-
-\input{tables/stats_summary}
-
-The decision implication of Table~\ref{tab:stats} is metric choice.
-Strict-success comparisons among LLM modes are not significant after
-Holm correction ($p{=}1.000$): the conjunctive gate is selective by design.
-Latency comparisons confirm the expected cost of M over B2
-(Mann--Whitney $p{<}0.001$, $4.05\times$ slower).
-Aggregate conformance gaps on pre-fix canonical E1 were not Holm-significant
-(M vs.\ B2 $p{=}1.0$); fixed-oracle E1 reports M vs.\ B2 as win rate and means
-only (2/120 wins, ${+}1.7$\,pp; no Holm claim).
-E6 (+7.7\,pp vs.\ unstructured test-only under full~M; E14 scopes
-traces) remains the adoption mechanism signal.
-Per-task win rate (2/120 fixed-oracle E1; E12 mean-across-seeds: 0 wins /
-1 loss / 119 ties) and overlap stratification (E3; fixed-oracle E10:
-M ${+}1.0$\,pp) supplement the headline means.
-These align with the per-task distributions
-in Figures~\ref{fig:conf-distribution} and~\ref{fig:conf-cdf}.
-
-\bigskip
-
-\noindent Taken together: fixed-oracle E1 shows M 100.0\% $>$ B2 98.3\% $>$ B1
-84.2\% (${+}1.7$\,pp; 2/120 wins vs.\ B2)---a strengthened \emph{bundle}, not
-single-factor C2.
-Fixed-oracle E10: M 100.0\% vs.\ B2 99.0\% (${+}1.0$\,pp); E12: B2 100.0\% /
-M 99.7\% (B2 first every seed---do not claim M dominates all seeds).
-The lead causal evidence remains E6 (+7.7\,pp vs.\ unstructured test-only under
-full~M, $K{=}3$; E14: \texttt{semantic\_ir} 75.1\% $\neq$
-\texttt{execution\_trace\_matched} 85.4\%, paired 5/19/96) and prevention
-(PDR/FAR);
-deployment should follow Table~\ref{tab:deployment-boundary}, not headline
-percentages alone.
+Near-ceiling fixed-oracle ranking is saturation context for the B2 default,
+not the lead claim.
+Detailed seed tables, Pareto/latency archive figures, E8/E10--E12, E13/B6,
+sensitivity sweeps, and the \code{compute\_tax} narrative case study live in
+Appendix~\ref{app:stress}.
+
+Fixed-oracle E1 (\texttt{run\_e1\_m\_win\_v2}): B1/B2/M mean Conf.\
+84.2\%~/~98.3\%~/~100.0\% (${+}1.7$\,pp; 2/120 wins) under a strengthened
+$K{=}5$ bundle---a multi-factor configuration, not single-factor C2.
+E12: B2 first every seed near the ceiling (B2 100.0\% / M 99.7\%); M does
+not lead every seed.
+Authoritative wall-clock on that run: M ${\approx}10.5$\,s vs.\ B2
+${\approx}9.6$\,s at comparable mean llm\_calls (${\approx}1.16$ vs.\
+${\approx}1.18$).
+Pre-fix latency premiums and pre-fix Conf.\ tables are historical only.
+
+\noindent The lead causal evidence remains E6 (catch-all rescue under
+headroom), E2 (FAR/PDR), equal-$K$ Conf.\ ranking, the ACL interception case,
+and Table~\ref{tab:deployment-boundary}.
 
 % -----------------------------------------------------------------------------
 \section*{Chapter Summary}
 \addcontentsline{toc}{section}{Chapter Summary}
 % -----------------------------------------------------------------------------
 
-Five empirical answers organise the evidence (mechanism-first).
-RQ1/C2: E6 (+7.7\,pp vs.\ unstructured test-only under full~M, $K{=}3$) is
-the primary single-factor C2 lever; E14 shows length-matched
-\texttt{semantic\_ir} 75.1\% does not match \texttt{execution\_trace\_matched}
-85.4\% (paired 5/19/96)---Semantic IR is not uniquely best among structured
-variants; fixed-oracle E1 M vs.\ B2 is a bundle, not C2 isolation;
-\emph{historical} Conf.\ ablations on pre-fix corpus:
-A2 $-$6.0\,pp $>$ A3 $-$3.9\,pp $>$ A1 $-$0.8\,pp---not comparable to
-fixed-oracle E1 100\%.
-RQ2/C1: overlap tertiles are non-monotone on canonical E3; E6 (+7.7\,pp,
-scoped as above); fixed-oracle E10 M ${+}1.0$\,pp near ceiling; E12 B2
-slightly more seed-stable (100.0\% vs.\ M 99.7\%).
-RQ3/C3: conjunctive gate improves prevention (PDR 95.0\%, FAR 5.0\% vs.\ B2);
-E17 shows advisory logging preserves Conf.; measure hard-guard prevention via
-E2 PDR/FAR (historical A2 hurts Conf.\ most on the pre-fix corpus).
-RQ4: deployment boundary synthesises E3, E10, E12, E11, and E8c
-(Table~\ref{tab:deployment-boundary}).
-RQ5/E1 fixed-oracle: M 100.0\%, B2 98.3\%, B1 84.2\% (${+}1.7$\,pp; 2/120
-wins vs.\ B2; mean llm\_calls ${\approx}1.16$ vs.\ ${\approx}1.18$);
-E6 remains the mechanism anchor; escalate to~M for Accept/PDR when required.
-Chapter~\ref{ch:discussion} interprets what these numbers mean, what still
-fails, and how a sprint team should act.
+The main-text spine follows the evidence ladder.
+RQ1/C2: E6 (+7.7\,pp; 14/14 catch-all rescues, 0/14 ordering) with E14 and
+field-structure scope.
+RQ3/C3: conjunctive Accept improves FAR/PDR (E2: M 95.0\%/5.0\% vs.\ B2
+91.2\%/8.8\%).
+RQ4/C4: B2 default; escalate for Accept/FAR under headroom; equal-$K$
+${+}2.5$\,pp; public ACL case shows tests green, Accept red.
+RQ2: overlap tertiles are non-monotone (negative bound).
+Near-ceiling E1/E12 are ranking archive, not the safety headline.
+Chapter~\ref{ch:discussion} states saturation scope honestly.

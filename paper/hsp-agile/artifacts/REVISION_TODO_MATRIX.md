@@ -207,7 +207,7 @@ flowchart TD
 |-----------|--------|
 | **ID** | `REV-6b` |
 | **Commands** | `python paper/hsp-agile/scripts/prepare_paper_data.py --extended-run-dir artifacts/run_ccf_b_extended_v1 --extended-repeat 0` |
-| **Then** | `update_stats_table.py`; `plot_mpl_figures.py`; `build_pdf.ps1` |
+| **Then** | `update_stats_table.py`; `plot_mpl_figures.py`; `build.ps1 -Which long` |
 | **Paper** | Restore B3–B5 rows in `ch07` (removed in prior credibility fix) **only after validated data** |
 
 ### Task 7 — VerifierLoop-FSF baseline (optional)

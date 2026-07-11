@@ -1,0 +1,258 @@
+{
+  "n": 28,
+  "fails": 0,
+  "rows": [
+    {
+      "taskId": "PubIndPilot.CrossingApproach",
+      "n_cases": 12,
+      "missing_scenarios": [],
+      "ref_ok": true,
+      "ok": true,
+      "error": null,
+      "source": "liu1998railwaycrossing"
+    },
+    {
+      "taskId": "PubIndPilot.CrossingClear",
+      "n_cases": 12,
+      "missing_scenarios": [],
+      "ref_ok": true,
+      "ok": true,
+      "error": null,
+      "source": "liu1998railwaycrossing"
+    },
+    {
+      "taskId": "PubIndPilot.RouteLock",
+      "n_cases": 12,
+      "missing_scenarios": [],
+      "ref_ok": true,
+      "ok": true,
+      "error": null,
+      "source": "luo2017railway"
+    },
+    {
+      "taskId": "PubIndPilot.SignalAspect",
+      "n_cases": 12,
+      "missing_scenarios": [],
+      "ref_ok": true,
+      "ok": true,
+      "error": null,
+      "source": "luo2017railway"
+    },
+    {
+      "taskId": "PubIndPilot.PointMove",
+      "n_cases": 12,
+      "missing_scenarios": [],
+      "ref_ok": true,
+      "ok": true,
+      "error": null,
+      "source": "luo2017railway"
+    },
+    {
+      "taskId": "PubIndPilot.AtmAuth",
+      "n_cases": 12,
+      "missing_scenarios": [],
+      "ref_ok": true,
+      "ok": true,
+      "error": null,
+      "source": "liu2004soflbook"
+    },
+    {
+      "taskId": "PubIndPilot.AtmWithdraw",
+      "n_cases": 12,
+      "missing_scenarios": [],
+      "ref_ok": true,
+      "ok": true,
+      "error": null,
+      "source": "liu2004soflbook"
+    },
+    {
+      "taskId": "PubIndPilot.HotelBook",
+      "n_cases": 12,
+      "missing_scenarios": [],
+      "ref_ok": true,
+      "ok": true,
+      "error": null,
+      "source": "liu_sofl_hotel"
+    },
+    {
+      "taskId": "PubIndPilot.TransferGuard",
+      "n_cases": 12,
+      "missing_scenarios": [],
+      "ref_ok": true,
+      "ok": true,
+      "error": null,
+      "source": "liu_sofl_online_banking"
+    },
+    {
+      "taskId": "PubIndPilot.FraudHold",
+      "n_cases": 12,
+      "missing_scenarios": [],
+      "ref_ok": true,
+      "ok": true,
+      "error": null,
+      "source": "liu_sofl_online_banking"
+    },
+    {
+      "taskId": "PubIndPilot.AtmDeposit",
+      "n_cases": 12,
+      "missing_scenarios": [],
+      "ref_ok": true,
+      "ok": true,
+      "error": null,
+      "source": "li2022qrs_companion"
+    },
+    {
+      "taskId": "PubIndPilot.AtmTransfer",
+      "n_cases": 15,
+      "missing_scenarios": [],
+      "ref_ok": true,
+      "ok": true,
+      "error": null,
+      "source": "li2022qrs_companion"
+    },
+    {
+      "taskId": "PubIndPilot.AtmInquire",
+      "n_cases": 12,
+      "missing_scenarios": [],
+      "ref_ok": true,
+      "ok": true,
+      "error": null,
+      "source": "li2022qrs_companion"
+    },
+    {
+      "taskId": "PubIndPilot.DailyWithdrawCap",
+      "n_cases": 12,
+      "missing_scenarios": [],
+      "ref_ok": true,
+      "ok": true,
+      "error": null,
+      "source": "li2022qrs_companion"
+    },
+    {
+      "taskId": "PubIndPilot.RouteConflict",
+      "n_cases": 12,
+      "missing_scenarios": [],
+      "ref_ok": true,
+      "ok": true,
+      "error": null,
+      "source": "luo2017railway"
+    },
+    {
+      "taskId": "PubIndPilot.FlankProtect",
+      "n_cases": 12,
+      "missing_scenarios": [],
+      "ref_ok": true,
+      "ok": true,
+      "error": null,
+      "source": "luo2017railway"
+    },
+    {
+      "taskId": "PubIndPilot.ApproachLock",
+      "n_cases": 12,
+      "missing_scenarios": [],
+      "ref_ok": true,
+      "ok": true,
+      "error": null,
+      "source": "liu1998railwaycrossing"
+    },
+    {
+      "taskId": "PubIndPilot.SignalClear",
+      "n_cases": 12,
+      "missing_scenarios": [],
+      "ref_ok": true,
+      "ok": true,
+      "error": null,
+      "source": "luo2017railway"
+    },
+    {
+      "taskId": "PubIndPilot.LibraryBorrow",
+      "n_cases": 12,
+      "missing_scenarios": [],
+      "ref_ok": true,
+      "ok": true,
+      "error": null,
+      "source": "liu2004soflbook"
+    },
+    {
+      "taskId": "PubIndPilot.LibraryReturn",
+      "n_cases": 12,
+      "missing_scenarios": [],
+      "ref_ok": true,
+      "ok": true,
+      "error": null,
+      "source": "liu2004soflbook"
+    },
+    {
+      "taskId": "PubIndPilot.WaterTank",
+      "n_cases": 12,
+      "missing_scenarios": [],
+      "ref_ok": true,
+      "ok": true,
+      "error": null,
+      "source": "liu2004soflbook"
+    },
+    {
+      "taskId": "PubIndPilot.HotelCheckout",
+      "n_cases": 12,
+      "missing_scenarios": [],
+      "ref_ok": true,
+      "ok": true,
+      "error": null,
+      "source": "liu_sofl_hotel"
+    },
+    {
+      "taskId": "PubIndPilot.AccessBadge",
+      "n_cases": 12,
+      "missing_scenarios": [],
+      "ref_ok": true,
+      "ok": true,
+      "error": null,
+      "source": "li2023iet_faultprevention"
+    },
+    {
+      "taskId": "PubIndPilot.MedDose",
+      "n_cases": 12,
+      "missing_scenarios": [],
+      "ref_ok": true,
+      "ok": true,
+      "error": null,
+      "source": "li2023iet_faultprevention"
+    },
+    {
+      "taskId": "PubIndPilot.PowerTrip",
+      "n_cases": 12,
+      "missing_scenarios": [],
+      "ref_ok": true,
+      "ok": true,
+      "error": null,
+      "source": "li2023iet_faultprevention"
+    },
+    {
+      "taskId": "PubIndPilot.TrafficPriority",
+      "n_cases": 12,
+      "missing_scenarios": [],
+      "ref_ok": true,
+      "ok": true,
+      "error": null,
+      "source": "liu2004soflbook"
+    },
+    {
+      "taskId": "PubIndPilot.InsuranceClaim",
+      "n_cases": 12,
+      "missing_scenarios": [],
+      "ref_ok": true,
+      "ok": true,
+      "error": null,
+      "source": "li2023iet_faultprevention"
+    },
+    {
+      "taskId": "PubIndPilot.InventoryReorder",
+      "n_cases": 9,
+      "missing_scenarios": [],
+      "ref_ok": true,
+      "ok": true,
+      "error": null,
+      "source": "liu2004soflbook"
+    }
+  ]
+}

@@ -1,86 +1,30 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""Best-effort GitHub / public-spec harvest hints for RealSpec expansion.
+"""Deprecated entrypoint — use scripts/harvest_github_wave3.py.
 
-Without a GitHub token this writes a curated seed list and optional local scan.
-With `gh` available it can search repositories (best-effort).
+Keeps the old path working:
+  python paper/hsp-agile/scripts/strengthening/harvest_github_specs.py --live-search
 """
 
 from __future__ import annotations
 
-import argparse
-import json
-import subprocess
+import runpy
+import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[4]
-OUT = (
-    ROOT
-    / "paper"
-    / "hsp-agile"
-    / "artifacts"
-    / "strengthening_sprint"
-    / "agent_d_industrial"
-    / "github_seed_list.json"
-)
-
-SEEDS = [
-    {
-        "query": "SOFL formal specification",
-        "notes": "Academic SOFL examples; prefer published case studies already in bib",
-    },
-    {
-        "query": "extension:mzn MiniZinc",
-        "notes": "Constraint problems ???candidate SpecIR lowering",
-    },
-    {
-        "query": "state machine transition guard yaml OR json",
-        "notes": "FSM transition tables",
-    },
-    {
-        "query": "decision table requirements OR protocol",
-        "notes": "Decision tables with ordered rules",
-    },
-    {
-        "path_globs": ["*.fsm", "*.spec", "*statemachine*.json", "*decision*table*"],
-        "notes": "Local / mirror scan patterns",
-    },
-]
-
-
-def try_gh_search(query: str, limit: int = 5) -> list[dict]:
-    try:
-        proc = subprocess.run(
-            ["gh", "search", "repos", query, "--limit", str(limit), "--json", "fullName,url,description"],
-            capture_output=True,
-            text=True,
-            timeout=60,
-            check=False,
-        )
-        if proc.returncode != 0:
-            return [{"error": proc.stderr.strip() or "gh failed", "query": query}]
-        return json.loads(proc.stdout or "[]")
-    except Exception as e:  # noqa: BLE001
-        return [{"error": str(e), "query": query}]
-
-
-def main() -> None:
-    ap = argparse.ArgumentParser()
-    ap.add_argument("--live-search", action="store_true", help="Call gh search (needs network + gh auth)")
-    args = ap.parse_args()
-    OUT.parent.mkdir(parents=True, exist_ok=True)
-
-    payload = {"seeds": SEEDS, "live_results": []}
-    if args.live_search:
-        for s in SEEDS:
-            q = s.get("query")
-            if not q:
-                continue
-            payload["live_results"].append({"query": q, "repos": try_gh_search(q)})
-
-    OUT.write_text(json.dumps(payload, indent=2), encoding="utf-8")
-    print(f"Wrote {OUT}")
-
+TARGET = ROOT / "scripts" / "harvest_github_wave3.py"
 
 if __name__ == "__main__":
-    main()
+    # Map legacy flag
+    argv = []
+    for a in sys.argv[1:]:
+        if a == "--live-search":
+            argv.append("--live")
+        else:
+            argv.append(a)
+    if "--live" not in argv and "--dry-run-auth" not in argv:
+        argv = ["--dry-run-auth", *argv]
+    sys.argv = [str(TARGET), *argv]
+    print(f"[deprecated] redirecting to {TARGET.relative_to(ROOT)}")
+    runpy.run_path(str(TARGET), run_name="__main__")

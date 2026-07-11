@@ -1,0 +1,17 @@
+# compute_tax(income: int, is_foreign: int) -> bracket: str
+#
+# Ordered FSF scenarios (first-match): the first true guard wins.
+# S2 and S3 overlap when income >= 120000 and is_foreign = 1;
+# precedence requires ForeignHigh before DomesticMid.
+#
+# S1: WHEN income < 0
+#         THEN bracket = "Invalid"
+#
+# S2: WHEN income >= 120000 AND is_foreign = 1
+#         THEN bracket = "ForeignHigh"
+#
+# S3: WHEN income >= 50000
+#         THEN bracket = "DomesticMid"
+#
+# S4: OTHERWISE                 -- catch-all others
+#         THEN bracket = "Low"

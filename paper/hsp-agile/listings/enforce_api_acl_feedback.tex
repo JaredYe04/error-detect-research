@@ -1,0 +1,18 @@
+% Compact IR record for ACL interception case (hand-authored for paper).
+\begin{lstlisting}[language={},basicstyle=\ttfamily\footnotesize,frame=single,
+  caption={Semantic Feedback IR on the ACL catch-all witness
+    $(\mathit{role}{=}2,\mathit{scope}{=}2,\mathit{mfa}{=}1)$:
+    busy guest/admin tests passed; residual fail-open is exposed.},
+  label={lst:acl-ir}]
+{
+  "violation_type": "output",
+  "scenario_index": 5,
+  "constraint_text": "OTHERWISE (no prior guard)",
+  "inputs": {"role": 2, "scope": 2, "mfa": 1},
+  "expected": {"permit": 0, "step_up": 0},
+  "observed": {"permit": 1, "step_up": 0},
+  "reason": "catch-all must fail-closed; candidate fail-opens",
+  "priority": "high",
+  "suggested_fix": "return deny on residual ACL band"
+}
+\end{lstlisting}

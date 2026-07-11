@@ -2,7 +2,8 @@
 % Source: artifacts/AUTHORITATIVE_NUMBERS.md + e6_paired_summary.json
 \begin{table}[t]
   \centering
-  \caption{Authoritative numbers card (cite these; do not mix corpora).}
+  \caption{Authoritative numbers card (cite these; do not mix corpora).
+    Tier-1 spine: E6 $\to$ E2 $\to$ C4; SpecIR is an engineering hinge.}
   \label{tab:authoritative-numbers}
   \footnotesize
   \begin{tabular}{@{}p{0.28\linewidth}p{0.66\linewidth}@{}}
@@ -12,25 +13,36 @@
     E6 lead (C2), $K{=}3$
       & A/B/C Conf.\ 79.1\,/\,78.9\,/\,86.9\%;
         C$-$A ${+}7.7$\,pp; paired 14/4/102;
-        95\% CI $[2.3,\,13.6]$; Wilcoxon $p{=}0.018$ \\
+        95\% CI $[2.3,\,13.6]$; Wilcoxon $p{=}0.018$;
+        qualitative: \textbf{14/14} catch-all \texttt{others},
+        \textbf{0/14} ordering \\
     E14 scope (not uniqueness)
       & \texttt{semantic\_ir} 75.1\% $\neq$
         \texttt{execution\_trace\_matched} 85.4\%
-        (paired 5/19/96) \\
+        (paired 5/19/96);
+        prefer IR for localisation, trace for Conf.;
+        default M may use trace; E6 isolates \texttt{semantic\_ir} \\
+    Field probe (supporting)
+      & gemini combo pooled $n{=}80{\times}3$: FULL vs.\ test\_only
+        ${+}26.5$\,pp (CI excl.~0); vs.\ ir\_no\_expected
+        CI includes~0 \\
     E2 prevention (C3)
       & M PDR 95.0\% / FAR 5.0\% vs.\ B2 91.2\% / 8.8\%
         (impl-screening; bootstrap CI excludes 0) \\
+    Equal-$K$ Conf.\ (\texttt{M\_eq})
+      & \texttt{run\_e1\_equal\_k\_v1}: B2 97.5\% /
+        \texttt{M\_eq} 100.0\% (${+}2.5$\,pp; 3/0/117);
+        secondary to E6 \\
     Fixed-oracle stress (bundle $K{=}5$)
       & E1: B1 84.2 / B2 98.3 / M 100.0
         (${+}1.7$\,pp; 2/120 wins);
         E10 ${+}1.0$\,pp; E12 B2 100.0 / M 99.7
         (B2 first every seed) \\
-    Equal-$K$ Conf.\ (\texttt{M\_eq})
-      & \texttt{run\_e1\_equal\_k\_v1}: B2 97.5\% /
-        \texttt{M\_eq} 100.0\% (${+}2.5$\,pp; 3/0/117) \\
-    Industrial C4
-      & $n{=}31$: B2 100\% Conf.\ under gpt-4o / Claude;
-        B1/M 95.5\% --- prefer B2 by default \\
+    Industrial / GitHub C4
+      & GitHub harvest $n{=}48$: B2/\texttt{M\_eq} 89.9\% vs.\ B1 85.8\%;
+        HKCA09 FSF $n{=}35$: B1 74.3\% / B2=\texttt{M\_eq} 100\%;
+        published desensitized $n{=}28$ saturates at 100\%;
+        not live production SOFL; ranking ties $\neq$ C2 null \\
     \bottomrule
   \end{tabular}
 \end{table}

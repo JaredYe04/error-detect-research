@@ -1,0 +1,22 @@
+% GitHub live harvest evaluation (Wave-3).
+\begin{table}[t]
+  \centering
+  \caption{GitHub live harvest corpus
+    (\texttt{run\_github\_harvest\_v1}; $n{=}48$; equal $K{=}3$;
+    \texttt{ecnu-plus}).
+    Auto-extracted from public Agile-SOFL \texttt{.asfl} examples
+    (ecommerce, smart-city, hospital, library; Z3-validated).
+    Not proprietary vendor dumps. B2 and \texttt{M\_eq} tie on mean Conf.;
+    both beat B1---supports C4 default B2 on public GitHub FSF.}
+  \label{tab:github-harvest}
+  \footnotesize
+  \begin{tabular}{lcccc}
+    \toprule
+    Mode & Mean Conf.\ (\%) & Strict (\%) & vs.\ B2 (W/L/T) \\
+    \midrule
+    B1 & 85.8 & 75.0 & --- \\
+    B2 & \textbf{89.9} & 79.2 & --- \\
+    \texttt{M\_eq} & 89.9 & 79.2 & 1/1/46 \\
+    \bottomrule
+  \end{tabular}
+\end{table}

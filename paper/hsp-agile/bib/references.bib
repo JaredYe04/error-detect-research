@@ -1,5 +1,7 @@
-%% references.bib ? Bibliography for HSP-Agile Thesis
+%% references.bib --- Bibliography for HSP-Agile Thesis
 %% Ye Xujun, East China Normal University, July 2026
+%% Verified against Crossref / arXiv / publisher metadata (2026-07-11);
+%% cite keys aligned with publication years.
 
 %% --- SOFL / Agile-SOFL foundations ------------------------------------------
 
@@ -53,7 +55,9 @@
              others},
   title   = {Evaluating Large Language Models Trained on Code},
   journal = {arXiv preprint arXiv:2107.03374},
-  year    = {2021}
+  year    = {2021},
+  eprint  = {2107.03374},
+  archivePrefix = {arXiv}
 }
 
 @article{dakhel2023copilot,
@@ -69,7 +73,7 @@
 
 @article{li2022alphacode,
   author  = {Li, Yujia and Choi, David and Chung, Junyoung and Kushman, Nate and
-             Schrittwieser, Julian and Leblond, R?mi and Eccles, Tom and
+             Schrittwieser, Julian and Leblond, R{\'e}mi and Eccles, Tom and
              Keeling, James and Gimeno, Felix and Dal Lago, Agustin and others},
   title   = {Competition-Level Code Generation with {AlphaCode}},
   journal = {Science},
@@ -85,6 +89,8 @@
   title       = {{GPT-4} Technical Report},
   institution = {OpenAI},
   year        = {2023},
+  eprint      = {2303.08774},
+  archivePrefix = {arXiv},
   note        = {arXiv:2303.08774}
 }
 
@@ -93,16 +99,25 @@
   title     = {Clover: Closed-Loop Verifiable Code Generation},
   booktitle = {Proc.\ 1st Int.\ Symp.\ {AI} Verification ({SAIV} 2024)},
   series    = {Lecture Notes in Computer Science},
+  volume    = {14846},
+  pages     = {134--155},
   year      = {2024},
+  publisher = {Springer},
+  doi       = {10.1007/978-3-031-65112-0_7},
   eprint    = {2310.17807},
   archivePrefix = {arXiv}
 }
 
-@article{loughman2024dafnybench,
-  author  = {Loughman, Jacob and Ringer, Talia},
+@article{loughridge2024dafnybench,
+  author  = {Loughridge, Chloe and Sun, Qinyi and Ahrenbach, Seth and
+             Cassano, Federico and Sun, Chuyue and Sheng, Ying and
+             Mudide, Anish and Misu, Md Rakib Hossain and Amin, Nada and
+             Tegmark, Max},
   title   = {{DafnyBench}: A Benchmark for Formal Software Verification},
   journal = {arXiv preprint arXiv:2406.08467},
-  year    = {2024}
+  year    = {2024},
+  eprint  = {2406.08467},
+  archivePrefix = {arXiv}
 }
 
 @article{yang2024qwen25,
@@ -118,7 +133,9 @@
              Zhang, Zhenru and Qiu, Zihan},
   title   = {{Qwen2.5} Technical Report},
   journal = {arXiv preprint arXiv:2412.15115},
-  year    = {2024}
+  year    = {2024},
+  eprint  = {2412.15115},
+  archivePrefix = {arXiv}
 }
 
 %% --- Formal methods ----------------------------------------------------------
@@ -140,7 +157,8 @@
   author = {Solar-Lezama, Armando},
   title  = {Program Synthesis by Sketching},
   school = {University of California, Berkeley},
-  year   = {2008}
+  year   = {2008},
+  note   = {Technical Report UCB/EECS-2008-176}
 }
 
 @inproceedings{leino2010dafny,
@@ -162,7 +180,7 @@
   booktitle = {Proc.\ 10th {IEEE} Int.\ Symp.\ Software Metrics},
   pages     = {58--69},
   year      = {2004},
-  doi       = {10.1109/metrics.2004.30}
+  doi       = {10.1109/METRIC.2004.1357891}
 }
 
 %% --- Static analysis ---------------------------------------------------------
@@ -253,13 +271,22 @@
 
 %% --- Agile methods -----------------------------------------------------------
 
-@book{beck2001xp,
-  author    = {Beck, Kent},
+@book{beck2004xp,
+  author    = {Beck, Kent and Andres, Cynthia},
   title     = {Extreme Programming Explained: Embrace Change},
   edition   = {2nd},
   publisher = {Addison-Wesley},
   year      = {2004},
-  address   = {Boston, MA}
+  address   = {Boston, MA},
+  note      = {Second edition; first edition 1999}
+}
+
+@book{clarke1999modelchecking,
+  author    = {Clarke, Edmund M. and Grumberg, Orna and Peled, Doron A.},
+  title     = {Model Checking},
+  publisher = {{MIT} Press},
+  year      = {1999},
+  address   = {Cambridge, MA}
 }
 
 %% --- Requirements engineering ------------------------------------------------
@@ -275,13 +302,16 @@
 
 %% --- Supplementary references ----------------------------------------------
 
-@article{barrett2018smt,
-  author  = {Barrett, Clark and Tinelli, Cesare},
-  title   = {Satisfiability Modulo Theories},
-  journal = {Handbook of Model Checking},
-  pages   = {305--343},
-  year    = {2018},
-  doi     = {10.1007/978-3-319-10575-8_11}
+@incollection{barrett2018smt,
+  author    = {Barrett, Clark and Tinelli, Cesare},
+  title     = {Satisfiability Modulo Theories},
+  booktitle = {Handbook of Model Checking},
+  editor    = {Clarke, Edmund M. and Henzinger, Thomas A. and Veith, Helmut and
+               Bloem, Roderick},
+  pages     = {305--343},
+  year      = {2018},
+  publisher = {Springer},
+  doi       = {10.1007/978-3-319-10575-8_11}
 }
 
 @article{woodcock2009formalsurvey,
@@ -328,69 +358,98 @@
 }
 
 @article{wang2024opendevin,
-  title   = {{OpenDevin: An Open Platform for AI Software Developers as Generalist Agents}},
-  author  = {Wang, Xingyao and others},
+  author  = {Wang, Xingyao and Li, Boxuan and Song, Yufan and Xu, Frank F. and
+             Tang, Xiangru and Zhuge, Mingchen and Pan, Jiayi and Song, Yueqi and
+             others},
+  title   = {{OpenHands}: An Open Platform for {AI} Software Developers as Generalist Agents},
   journal = {arXiv preprint arXiv:2407.16741},
-  year    = {2024}
+  year    = {2024},
+  eprint  = {2407.16741},
+  archivePrefix = {arXiv},
+  note    = {Formerly known as OpenDevin}
 }
 
 @article{yang2024sweagent,
-  title   = {{SWE-agent: Agent-Computer Interfaces Enable Automated Software Engineering}},
-  author  = {Yang, John and others},
+  author  = {Yang, John and Jimenez, Carlos E. and Wettig, Alexander and
+             Lieret, Kilian and Yao, Shunyu and Narasimhan, Karthik and
+             Press, Ofir},
+  title   = {{SWE-agent}: Agent-Computer Interfaces Enable Automated Software Engineering},
   journal = {arXiv preprint arXiv:2405.15793},
-  year    = {2024}
+  year    = {2024},
+  eprint  = {2405.15793},
+  archivePrefix = {arXiv}
 }
 
 %% --- Extended baselines / positioning ---------------------------------------
 
 @inproceedings{madaan2023selfrefine,
-  author    = {Madaan, Aman and others},
+  author    = {Madaan, Aman and Tandon, Niket and Gupta, Prakhar and
+               Hallinan, Skyler and Gao, Luyu and Wiegreffe, Sarah and
+               Alon, Uri and Dziri, Nouha and Prabhumoye, Shrimai and
+               Yang, Yiming and others},
   title     = {Self-Refine: Iterative Refinement with Self-Feedback},
   booktitle = {Advances in Neural Information Processing Systems ({NeurIPS})},
   year      = {2023}
 }
 
-@inproceedings{chen2023selfdebug,
-  author    = {Chen, Xinyun and others},
+@inproceedings{chen2024selfdebug,
+  author    = {Chen, Xinyun and Lin, Maxwell and Sch{\"a}rli, Nathanael and
+               Zhou, Denny},
   title     = {Teaching Large Language Models to Self-Debug},
   booktitle = {International Conference on Learning Representations ({ICLR})},
-  year      = {2024}
+  year      = {2024},
+  eprint    = {2304.05128},
+  archivePrefix = {arXiv}
 }
 
 @inproceedings{shinn2023reflexion,
-  author    = {Shinn, Noah and others},
+  author    = {Shinn, Noah and Cassano, Federico and Gopinath, Ashwin and
+               Narasimhan, Karthik and Yao, Shunyu},
   title     = {Reflexion: Language Agents with Verbal Reinforcement Learning},
   booktitle = {Advances in Neural Information Processing Systems ({NeurIPS})},
   year      = {2023}
 }
 
-@inproceedings{chen2022codet,
-  author    = {Chen, Bei and others},
+@inproceedings{chen2023codet,
+  author    = {Chen, Bei and Zhang, Fengji and Nguyen, Anh and Zan, Daoguang and
+               Lin, Zeqi and Lou, Jian-Guang and Chen, Weizhu},
   title     = {{CodeT}: Code Generation with Generated Tests},
   booktitle = {International Conference on Learning Representations ({ICLR})},
-  year      = {2023}
+  year      = {2023},
+  eprint    = {2207.10397},
+  archivePrefix = {arXiv}
 }
 
 @article{austin2021mbpp,
-  author  = {Austin, Jacob and others},
+  author  = {Austin, Jacob and Odena, Augustus and Nye, Maxwell and
+             Bosma, Maarten and Michalewski, Henryk and Dohan, David and
+             Jiang, Ellen and Cai, Carrie and Terry, Michael and Le, Quoc and
+             others},
   title   = {Program Synthesis with Large Language Models},
   journal = {arXiv preprint arXiv:2108.07732},
-  year    = {2021}
+  year    = {2021},
+  eprint  = {2108.07732},
+  archivePrefix = {arXiv},
+  note    = {Introduces the MBPP benchmark}
 }
 
-@inproceedings{xia2023chatrepair,
+@inproceedings{xia2024chatrepair,
   author    = {Xia, Chunqiu Steven and Zhang, Lingming},
-  title     = {Keep the Conversation Going: Fixing 162 out of 337 bugs for \$0.42 each using {ChatGPT}},
-  booktitle = {Proceedings of the 32nd {ACM} {SIGSOFT} International Symposium on Software Testing and Analysis ({ISSTA})},
-  year      = {2023},
-  note      = {ChatRepair; LLM-based APR}
+  title     = {Automated Program Repair via Conversation: Fixing 162 out of 337 Bugs for \$0.42 Each using {ChatGPT}},
+  booktitle = {Proceedings of the 33rd {ACM} {SIGSOFT} International Symposium on Software Testing and Analysis ({ISSTA})},
+  pages     = {819--831},
+  year      = {2024},
+  doi       = {10.1145/3650212.3680323},
+  note      = {ChatRepair; earlier arXiv title: Keep the Conversation Going}
 }
 
 @inproceedings{jiang2023impact,
   author    = {Jiang, Nan and Liu, Kevin and Lutellier, Thibaud and Tan, Lin},
   title     = {Impact of Code Language Models on Automated Program Repair},
   booktitle = {Proceedings of the 45th International Conference on Software Engineering ({ICSE})},
-  year      = {2023}
+  pages     = {1430--1442},
+  year      = {2023},
+  doi       = {10.1109/ICSE48619.2023.00125}
 }
 
 @article{jackson2002alloy,
@@ -400,7 +459,8 @@
   volume  = {11},
   number  = {2},
   pages   = {256--290},
-  year    = {2002}
+  year    = {2002},
+  doi     = {10.1145/505145.505149}
 }
 
 @inproceedings{luo2017railway,
@@ -411,7 +471,8 @@
   volume    = {10189},
   pages     = {160--177},
   year      = {2017},
-  publisher = {Springer}
+  publisher = {Springer},
+  doi       = {10.1007/978-3-319-57708-1_10}
 }
 
 @inproceedings{liu1998railwaycrossing,
@@ -419,14 +480,8 @@
   title     = {Applying {SOFL} to Specify a Railway Crossing Controller for Industry},
   booktitle = {Proceedings of the 2nd IEEE Workshop on Industrial Strength Formal Specification Techniques},
   year      = {1998},
-  pages     = {16--27}
-}
-
-@inproceedings{yasunaga2021graph2tree,
-  author    = {Yasunaga, Michihiro and Liang, Percy},
-  title     = {Break-It-Fix-It: Unsupervised Learning for Program Repair},
-  booktitle = {Proceedings of the 38th International Conference on Machine Learning ({ICML})},
-  year      = {2021}
+  pages     = {16--27},
+  doi       = {10.1109/WIFT.1998.766294}
 }
 
 @book{lamport2002tla,
@@ -440,7 +495,400 @@
 @inproceedings{yasunaga2021breakitfix,
   author    = {Yasunaga, Michihiro and Liang, Percy},
   title     = {Break-It-Fix-It: Unsupervised Learning for Program Repair},
-  booktitle = {Proc.\ 38th Int.\ Conf.\ Machine Learning ({ICML})},
+  booktitle = {Proceedings of the 38th International Conference on Machine Learning ({ICML})},
+  pages     = {11941--11952},
+  year      = {2021}
+}
+
+%% --- Expanded related work (CCF-B Weak Accept push) -------------------------
+
+@article{jia2011mutation,
+  author  = {Jia, Yue and Harman, Mark},
+  title   = {An Analysis and Survey of the Development of Mutation Testing},
+  journal = {IEEE Transactions on Software Engineering},
+  volume  = {37},
+  number  = {5},
+  pages   = {649--678},
+  year    = {2011},
+  doi     = {10.1109/TSE.2010.62}
+}
+
+@book{wohlin2012experimentation,
+  author    = {Wohlin, Claes and Runeson, Per and H{\"o}st, Martin and
+               Ohlsson, Magnus C. and Regnell, Bj{\"o}rn and Wessl{\'e}n, Anders},
+  title     = {Experimentation in Software Engineering},
+  publisher = {Springer},
+  year      = {2012},
+  doi       = {10.1007/978-3-642-29044-2}
+}
+
+@article{barr2015oracle,
+  author  = {Barr, Earl T. and Harman, Mark and McMinn, Phil and
+             Shahbaz, Muzammil and Yoo, Shin},
+  title   = {The Oracle Problem in Software Testing: A Survey},
+  journal = {IEEE Transactions on Software Engineering},
+  volume  = {41},
+  number  = {5},
+  pages   = {507--525},
+  year    = {2015},
+  doi     = {10.1109/TSE.2014.2372785}
+}
+
+@inproceedings{aniche2019testing,
+  author    = {Aniche, Maur{\'i}cio and Hermans, Felienne and van Deursen, Arie},
+  title     = {Pragmatic Software Testing Education},
+  booktitle = {Proceedings of the 50th {ACM} Technical Symposium on Computer Science Education ({SIGCSE})},
+  pages     = {414--420},
+  year      = {2019},
+  doi       = {10.1145/3287324.3287461}
+}
+
+@article{maciver2019hypothesis,
+  author  = {MacIver, David R. and Hatfield-Dodds, Zac},
+  title   = {Hypothesis: A New Approach to Property-Based Testing},
+  journal = {Journal of Open Source Software},
+  volume  = {4},
+  number  = {43},
+  pages   = {1891},
+  year    = {2019},
+  doi     = {10.21105/joss.01891}
+}
+
+@book{meyer1997oosc,
+  author    = {Meyer, Bertrand},
+  title     = {Object-Oriented Software Construction},
+  edition   = {2},
+  publisher = {Prentice Hall},
+  year      = {1997},
+  note      = {Design by Contract}
+}
+
+@inproceedings{fahndrich2010codecontracts,
+  author    = {F{\"a}hndrich, Manuel and Barnett, Mike and Logozzo, Francesco},
+  title     = {Embedded Contract Languages},
+  booktitle = {Proceedings of the 2010 {ACM} Symposium on Applied Computing ({SAC})},
+  pages     = {2103--2110},
+  year      = {2010},
+  doi       = {10.1145/1774088.1774531}
+}
+
+@article{le2012genprog,
+  author  = {Le Goues, Claire and Nguyen, ThanhVu and Forrest, Stephanie and
+             Weimer, Westley},
+  title   = {{GenProg}: A Generic Method for Automatic Software Repair},
+  journal = {IEEE Transactions on Software Engineering},
+  volume  = {38},
+  number  = {1},
+  pages   = {54--72},
+  year    = {2012},
+  doi     = {10.1109/TSE.2011.104}
+}
+
+@article{legoues2019apr,
+  author  = {Le Goues, Claire and Pradel, Michael and Roychoudhury, Abhik},
+  title   = {Automated Program Repair},
+  journal = {Communications of the {ACM}},
+  volume  = {62},
+  number  = {12},
+  pages   = {56--65},
+  year    = {2019},
+  doi     = {10.1145/3318162}
+}
+
+@inproceedings{xia2025agentless,
+  author    = {Xia, Chunqiu Steven and Deng, Yinlin and Dunn, Soren and
+               Zhang, Lingming},
+  title     = {Demystifying {LLM}-Based Software Engineering Agents},
+  booktitle = {Proceedings of the {ACM} on Software Engineering ({PACMSE})},
+  volume    = {2},
+  number    = {{FSE}},
+  articleno = {{FSE037}},
+  pages     = {801--824},
+  year      = {2025},
+  doi       = {10.1145/3715754},
+  eprint    = {2407.01489},
+  archivePrefix = {arXiv},
+  note      = {Agentless; arXiv:2407.01489}
+}
+
+@article{bouzenia2024repairagent,
+  author  = {Bouzenia, Islem and Devanbu, Prem and Pradel, Michael},
+  title   = {{RepairAgent}: An Autonomous, {LLM}-Based Agent for Program Repair},
+  journal = {arXiv preprint arXiv:2403.17134},
+  year    = {2024},
+  eprint  = {2403.17134},
+  archivePrefix = {arXiv}
+}
+
+@inproceedings{sobania2023chatgptapr,
+  author    = {Sobania, Dominik and Briesch, Martin and Hanna, Carol and
+               Petke, Justyna},
+  title     = {An Analysis of the Automatic Bug Fixing Performance of {ChatGPT}},
+  booktitle = {{IEEE}/{ACM} International Workshop on Automated Program Repair ({APR})},
+  pages     = {23--30},
+  year      = {2023},
+  doi       = {10.1109/APR59189.2023.00012}
+}
+
+@inproceedings{fan2023llmrepair,
+  author    = {Fan, Zhiyu and Gao, Xiang and Mirchev, Martin and
+               Roychoudhury, Abhik and Tan, Shin Hwei},
+  title     = {Automated Repair of Programs from Large Language Models},
+  booktitle = {Proceedings of the 45th International Conference on Software
+               Engineering ({ICSE})},
+  pages     = {1469--1481},
+  year      = {2023},
+  doi       = {10.1109/ICSE48619.2023.00128}
+}
+
+@inproceedings{wei2023copiloteval,
+  author    = {Wei, Yuxiang and Xia, Chunqiu Steven and Zhang, Lingming},
+  title     = {Copiloting the Copilots: Fusing Large Language Models with
+               Completion Engines for Automated Program Repair},
+  booktitle = {Proceedings of the 31st {ACM} Joint European Software Engineering
+               Conference and Symposium on the Foundations of Software Engineering
+               ({ESEC}/{FSE})},
+  pages     = {172--184},
+  year      = {2023},
+  doi       = {10.1145/3611643.3616271}
+}
+
+@inproceedings{first2023baldur,
+  author    = {First, Emily and Rabe, Markus N. and Ringer, Talia and
+               Brun, Yuriy},
+  title     = {Baldur: Whole-Proof Generation and Repair with Large Language Models},
+  booktitle = {Proceedings of the 31st {ACM} Joint European Software Engineering
+               Conference and Symposium on the Foundations of Software Engineering
+               ({ESEC}/{FSE})},
+  pages     = {1229--1241},
+  year      = {2023},
+  doi       = {10.1145/3611643.3616243}
+}
+
+@inproceedings{lu2021codexglue,
+  author    = {Lu, Shuai and Guo, Daya and Ren, Shuo and Huang, Junjie and
+               Svyatkovskiy, Alexey and Blanco, Ambrosio and Clement, Colin and
+               Drain, Dawn and Jiang, Daxin and Tang, Duyu and others},
+  title     = {{CodeXGLUE}: A Machine Learning Benchmark Dataset for Code
+               Understanding and Generation},
+  booktitle = {Proceedings of the Neural Information Processing Systems Track
+               on Datasets and Benchmarks},
   year      = {2021},
-  pages     = {11941--11952}
+  eprint    = {2102.04664},
+  archivePrefix = {arXiv}
+}
+
+@inproceedings{olausson2024selfrepair,
+  author    = {Olausson, Theo X. and Inala, Jeevana Priya and Wang, Chenglong and
+               Gao, Jianfeng and Solar-Lezama, Armando},
+  title     = {Is Self-Repair a Silver Bullet for Code Generation?},
+  booktitle = {International Conference on Learning Representations ({ICLR})},
+  year      = {2024}
+}
+
+@inproceedings{zhang2023repocoder,
+  author    = {Zhang, Fengji and Chen, Bei and Zhang, Yue and Keung, Jacky and
+               Liu, Jin and Zan, Daoguang and Mao, Yi and Lou, Jian-Guang and
+               Chen, Weizhu},
+  title     = {{RepoCoder}: Repository-Level Code Completion Through Iterative
+               Retrieval and Generation},
+  booktitle = {Proceedings of the 2023 Conference on Empirical Methods in
+               Natural Language Processing ({EMNLP})},
+  pages     = {2471--2484},
+  year      = {2023},
+  doi       = {10.18653/v1/2023.emnlp-main.151}
+}
+
+@inproceedings{jimenez2024swebench,
+  author    = {Jimenez, Carlos E. and Yang, John and Wettig, Alexander and
+               Yao, Shunyu and Pei, Kexin and Press, Ofir and
+               Narasimhan, Karthik},
+  title     = {{SWE-bench}: Can Language Models Resolve Real-World {GitHub} Issues?},
+  booktitle = {International Conference on Learning Representations ({ICLR})},
+  year      = {2024}
+}
+
+@inproceedings{fraser2011evosuite,
+  author    = {Fraser, Gordon and Arcuri, Andrea},
+  title     = {{EvoSuite}: Automatic Test Suite Generation for Object-Oriented
+               Software},
+  booktitle = {Proceedings of the 19th {ACM} {SIGSOFT} Symposium and the 13th
+               European Conference on Foundations of Software Engineering
+               ({ESEC}/{FSE})},
+  pages     = {416--419},
+  year      = {2011},
+  doi       = {10.1145/2025113.2025179}
+}
+
+@article{anand2013symbolic,
+  author  = {Anand, Saswat and Burke, Edmund K. and Chen, Tsong Yueh and
+             Clark, John and Cohen, Myra B. and Grieskamp, Wolfgang and
+             Harman, Mark and Harrold, Mary Jean and McMinn, Phil},
+  title   = {An Orchestrated Survey of Methodologies for Automated Software
+             Test Case Generation},
+  journal = {Journal of Systems and Software},
+  volume  = {86},
+  number  = {8},
+  pages   = {1978--2001},
+  year    = {2013},
+  doi     = {10.1016/j.jss.2013.02.061}
+}
+
+@inproceedings{tillmann2008pex,
+  author    = {Tillmann, Nikolai and de Halleux, Jonathan},
+  title     = {Pex---White Box Test Generation for {.NET}},
+  booktitle = {Tests and Proofs ({TAP})},
+  series    = {LNCS},
+  volume    = {4966},
+  pages     = {134--153},
+  year      = {2008},
+  publisher = {Springer},
+  doi       = {10.1007/978-3-540-79124-9_10},
+  note      = {Pex / parameterized unit tests}
+}
+
+@inproceedings{cadar2008klee,
+  author    = {Cadar, Cristian and Dunbar, Daniel and Engler, Dawson},
+  title     = {{KLEE}: Unassisted and Automatic Generation of High-Coverage
+               Tests for Complex Systems Programs},
+  booktitle = {Proceedings of the 8th {USENIX} Symposium on Operating Systems
+               Design and Implementation ({OSDI})},
+  pages     = {209--224},
+  year      = {2008}
+}
+
+@article{kamath2023invariants,
+  author  = {Kamath, Adharsh and Senthilnathan, Aditya and Chakraborty, Saikat and
+             Deligiannis, Pantazis and Lahiri, Shuvendu K. and Lal, Akash and
+             Rastogi, Aseem and Roy, Subhajit},
+  title   = {Finding Inductive Loop Invariants using Large Language Models},
+  journal = {arXiv preprint arXiv:2311.07948},
+  year    = {2023},
+  eprint  = {2311.07948},
+  archivePrefix = {arXiv}
+}
+
+@article{thakur2024verigen,
+  author  = {Thakur, Shailja and Ahmad, Baleegh and Pearce, Hammond and
+             Tan, Benjamin and Dolan-Gavitt, Brendan and Karri, Ramesh and
+             Garg, Siddharth},
+  title   = {{VeriGen}: A Large Language Model for Verilog Code Generation},
+  journal = {ACM Transactions on Design Automation of Electronic Systems},
+  volume  = {29},
+  number  = {3},
+  pages   = {1--31},
+  year    = {2024},
+  doi     = {10.1145/3643681}
+}
+
+@inproceedings{moura2021lean4,
+  author    = {de Moura, Leonardo and Ullrich, Sebastian},
+  title     = {The {Lean}~4 Theorem Prover and Programming Language},
+  booktitle = {Automated Deduction -- {CADE} 28},
+  series    = {LNCS},
+  volume    = {12699},
+  pages     = {625--635},
+  year      = {2021},
+  publisher = {Springer},
+  doi       = {10.1007/978-3-030-79876-5_37}
+}
+
+@book{nipkow2002isabelle,
+  author    = {Nipkow, Tobias and Paulson, Lawrence C. and Wenzel, Markus},
+  title     = {Isabelle/{HOL}: A Proof Assistant for Higher-Order Logic},
+  series    = {Lecture Notes in Computer Science},
+  volume    = {2283},
+  publisher = {Springer},
+  year      = {2002},
+  doi       = {10.1007/3-540-45949-9}
+}
+
+@article{hierons2012oracle,
+  author  = {Hierons, Robert M.},
+  title   = {Oracles for Distributed Testing},
+  journal = {IEEE Transactions on Software Engineering},
+  volume  = {38},
+  number  = {3},
+  pages   = {629--641},
+  year    = {2012},
+  doi     = {10.1109/TSE.2011.45}
+}
+
+@article{fraser2015mutation,
+  author  = {Fraser, Gordon and Arcuri, Andrea},
+  title   = {Achieving Scalable Mutation-Based Generation of Whole Test Suites},
+  journal = {Empirical Software Engineering},
+  volume  = {20},
+  number  = {3},
+  pages   = {783--812},
+  year    = {2015},
+  doi     = {10.1007/s10664-013-9299-z}
+}
+
+@article{panichella2018sbse,
+  author  = {Panichella, Annibale and Kifetew, Fitsum Meshesha and
+             Tonella, Paolo},
+  title   = {Automated Test Case Generation as a Many-Objective Optimisation
+             Problem with Dynamic Selection of the Targets},
+  journal = {IEEE Transactions on Software Engineering},
+  volume  = {44},
+  number  = {2},
+  pages   = {122--158},
+  year    = {2018},
+  doi     = {10.1109/TSE.2017.2663435}
+}
+
+@article{huang2023agentcoder,
+  author  = {Huang, Dong and Zhang, Jie M. and Luck, Michael and
+             Bu, Qingwen and Qing, Yuhao and Cui, Heming},
+  title   = {{AgentCoder}: Multi-Agent-based Code Generation with Iterative
+             Testing and Optimisation},
+  journal = {arXiv preprint arXiv:2312.13010},
+  year    = {2023},
+  eprint  = {2312.13010},
+  archivePrefix = {arXiv}
+}
+
+@inproceedings{zhang2024autocoderover,
+  author    = {Zhang, Yuntong and Ruan, Haifeng and Fan, Zhiyu and
+               Roychoudhury, Abhik},
+  title     = {{AutoCodeRover}: Autonomous Program Improvement},
+  booktitle = {Proceedings of the 33rd {ACM} {SIGSOFT} International Symposium
+               on Software Testing and Analysis ({ISSTA})},
+  pages     = {1592--1604},
+  year      = {2024},
+  doi       = {10.1145/3650212.3680384}
+}
+
+@inproceedings{liu2019tbar,
+  author    = {Liu, Kui and Koyuncu, Anil and Kim, Dongsun and
+               Bissyand{\'e}, Tegawend{\'e} F.},
+  title     = {{TBar}: Revisiting Template-based Automated Program Repair},
+  booktitle = {Proceedings of the 28th {ACM} {SIGSOFT} International Symposium
+               on Software Testing and Analysis ({ISSTA})},
+  pages     = {31--42},
+  year      = {2019},
+  doi       = {10.1145/3293882.3330577}
+}
+
+@article{wang2023codet5plus,
+  author  = {Wang, Yue and Le, Hung and Gotmare, Akhilesh Deepak and
+             Bui, Nghi D. Q. and Li, Junnan and Hoi, Steven C. H.},
+  title   = {{CodeT5+}: Open Code Large Language Models for Code Understanding
+             and Generation},
+  journal = {arXiv preprint arXiv:2305.07922},
+  year    = {2023},
+  eprint  = {2305.07922},
+  archivePrefix = {arXiv}
+}
+
+@article{roziere2023codellama,
+  author  = {Rozi{\`e}re, Baptiste and Gehring, Jonas and Gloeckle, Fabian and
+             Sootla, Sten and Gat, Itai and Tan, Xiaoqing Ellen and Adi, Yossi and
+             Liu, Jing and Sauvestre, Romain and Remez, Tal and others},
+  title   = {Code {Llama}: Open Foundation Models for Code},
+  journal = {arXiv preprint arXiv:2308.12950},
+  year    = {2023},
+  eprint  = {2308.12950},
+  archivePrefix = {arXiv}
 }

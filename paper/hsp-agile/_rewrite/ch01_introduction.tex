@@ -1,0 +1,330 @@
+\chapter{Introduction}
+\label{ch:intro}
+
+A release dashboard can look healthy while a residual specification region is
+already broken.
+That is the defect this report studies---not whether a model can write more
+tests that pass, but whether a team can \emph{refuse} to ship LLM-generated
+code when the specification still has a thin slice that everyday suites never
+exercise.
+
+\textbf{Acceptance safety} is that refusal rule.
+Release requires every specification-derived witness to match \emph{and} a
+structural screen to clear:
+$\mathrm{Accept}\Leftrightarrow\mathrm{Conf}{=}1\wedge\mathrm{Screen}{=}\mathit{pass}$.
+A candidate that ``looks right'' on busy inputs, yet mishandles a catch-all or
+overlap region, must not sail through on mean pass rate alone.
+We call the decision rule a \textbf{conjunctive release decision framework}.
+HSP-Agile is the SOFL/FSF vehicle that makes the rule executable: SpecIR
+regions, typed Semantic Feedback IR for repair when headroom remains, and a
+pluggable $\mathrm{Screen}$.
+
+Conjunctive Accept cuts escaped defects at comparable mean conformance (E2);
+structured feedback rescues catch-all failures when repair still has headroom
+(E6); prefer test-feedback (B2) by default and escalate to full mode~M when
+release requires $\mathrm{Accept}{=}1$ or FAR${\le}5\%$ and headroom remains.
+
+
+\section{Primary Vignette: Catch-All That Ships}
+\label{sec:intro:running-example}
+
+Start from the failure mode that drives our strongest Conf.\ evidence.
+
+Imagine a tier classifier for incoming support tickets
+(Listing~\ref{lst:others-fsf}).
+Two named guards handle the easy cases: reject negative scores; pass scores at
+or above a floor.
+Everything else falls into \texttt{OTHERWISE} and must return
+\texttt{Review}---a human queue, not an automatic green light.
+An LLM candidate that looks ``logically smooth'' collapses that residual into
+\texttt{Pass} (Listing~\ref{lst:others-bug}).
+Unit tests drawn from Reject and Pass bands all succeed.
+The dashboard reports a high pass rate.
+In production, the mid-band---the catch-all---never reaches a human; the bug
+is an escaped defect, not a failed build.
+
+That is false acceptance in miniature.
+A pass/fail dump tells the repair model only that ``something failed'' if a
+rare mid-band test ever appears; it does not name scenario~$S_3$
+(\texttt{others}), the expected constant, or why the residual matters.
+A typed feedback record does.
+Under controlled E6, all 14 Conf.\ wins for full Semantic Feedback IR over
+test-only concentrate on this catch-all regime
+(Tables~\ref{tab:e6-win-profile},~\ref{tab:e6-win-loss},~\ref{tab:e6-qual});
+none are ordering-precedence repairs on BENCH-120.
+
+\inputfsf{listings/others_rescue.fsf}{Primary vignette: catch-all
+  \texttt{others} must return \texttt{Review}. Busy Reject/Pass tests miss
+  the residual---the E6-aligned repair regime.}{lst:others-fsf}
+\inputpython{listings/others_rescue_bug.py}{Looks coherent, ships the wrong
+  catch-all: mid-band returns \texttt{Pass} instead of \texttt{Review}.}{lst:others-bug}
+
+
+\section{Problem Statement}
+\label{sec:intro:problem}
+
+\subsection{Setting}
+SOFL \citep{liu1998sofl,liu2004soflbook} provides the Functional Specification
+Format (FSF): an ordered list of scenarios, each pairing a guard with a
+postcondition under first-match precedence.
+Agile-SOFL \citep{li2022qrs_companion} embeds those artefacts in sprint
+workflows as design documents, oracles, and acceptance criteria.
+LLM-assisted generation accelerates that workflow
+\cite{chen2021codex,openai2023gpt4}, but synthesises by pattern completion
+rather than by respecting specification structure
+\cite{dakhel2023copilot,sun2024clover}.
+Two failure modes matter: (i)~catch-all / output mismatches on residual
+regions that unstructured dumps fail to localise (primary vignette above),
+and (ii)~overlap slices where first-match order is decisive (secondary
+vignette below).
+Random suites undersample both \citep{zhu1997specification}; when they fail,
+pass/fail bits still omit scenario identity.
+
+\subsection{High Pass Rate, Weak Acceptance Safety}
+A specification-conformance defect is a bug that unit tests rarely catch---or
+catch without enough structure to repair.
+On the tier classifier, a candidate can clear every Reject/Pass sample and
+still mis-route every mid-band ticket.
+A release gate that only looks at mean pass rate may \emph{accept} that
+candidate anyway.
+
+We write $\mathrm{FAR}$ for the \textbf{False Accept Rate}: among injected
+faulty implementations (mutants), the fraction that a mode incorrectly
+releases.
+$\mathrm{PDR}$ (Prevention Detection Rate) is the complementary rejection
+rate on that set.
+Strong mean conformance---agreement on a finite witness suite---does not
+imply low FAR.
+
+\subsection{Acceptance Predicate}
+Given task~$t$ with ordered scenarios $\mathcal{S}_t = (S_1,\ldots,S_n)$ and
+budget~$K$, is candidate~$c$ safe to release?
+Every specification-derived witness must match, \emph{and} no critical
+structural anti-pattern may remain:
+\begin{equation}
+  \mathrm{Accept}(c, t)
+  \;\iff\;
+  \mathrm{Conf}(c, t) \geq \tau
+  \;\wedge\;
+  P^H(c) = 0,
+  \label{eq:acceptance}
+\end{equation}
+where $\mathrm{Conf}(c,t)\in[0,1]$ is the fraction of witnesses on which $c$
+matches the oracle, $\tau=1.0$ here, and $P^H(c)=0$ asserts that the
+pluggable high-severity $\mathrm{Screen}$ is clear.
+A witness for scenario~$S_i$ must land in the \emph{priority region}
+\begin{equation}
+  \Phi_i(\mathbf{x})
+  \;\triangleq\;
+  G_i(\mathbf{x}) \wedge \bigwedge_{j<i}\neg G_j(\mathbf{x})
+  \label{eq:phi-intro}
+\end{equation}
+---including, for catch-alls, an input that satisfies no earlier guard.
+Figure~\ref{fig:defect-vs-test} contrasts a busy test cloud with a surgical
+SMT cut; the geometry applies to residual regions as well as overlaps.
+
+\begin{figure}[t]
+  \centering
+  \tikzinput{diagrams/tikz/defect_vs_test}
+  \caption{\textbf{Acceptance safety needs witnesses, not denser random tests.}
+    Left: unit tests concentrate on busy bands, so a catch-all or overlap bug
+    can still look like a high pass rate.
+    Right: an SMT model of a thin $\Phi_i$ (Equation~\eqref{eq:phi-intro})
+    forces the region the release gate must clear---why FAR, not mean Conf.\
+    alone, is the release metric.
+    Catch-all rescue under structured feedback is the primary E6 Conf.\
+    mechanism (Listings~\ref{lst:others-fsf}--\ref{lst:others-bug});
+    ordering/overlap motivates witnesses and E2.}
+  \label{fig:defect-vs-test}
+\end{figure}
+
+\subsection{Secondary Vignette: Ordering / Overlap}
+Overlap explains a second way tests miss bugs and motivates $\Phi_i$ witnesses.
+Listing~\ref{lst:tax-fsf} is an ordered tax-bracket contract: on
+$(\mathit{income},\mathit{is\_foreign})=(150000,1)$, both a foreign-high
+surcharge and a domestic mid bracket hold, yet first-match requires
+\texttt{ForeignHigh}.
+Listing~\ref{lst:tax-bug} tests mid first---wrong, but often invisible to
+domestic-heavy suites.
+This vignette anchors witness design and E2 structural mutants; it is
+\emph{not} the dominant E6 win regime
+(Table~\ref{tab:defect-evidence-map}).
+
+\inputfsf{listings/compute_tax.fsf}{Secondary vignette: ordered tax brackets.
+  First-match: $S_2$ preempts $S_3$ on the foreign-high overlap.}{lst:tax-fsf}
+\inputpython{listings/compute_tax_bug.py}{Bracket-order bug: mid guard before
+  foreign-high surcharge---witness/E2 motivation, not E6 win coding.}{lst:tax-bug}
+
+
+\section{Research Challenges}
+\label{sec:intro:challenges}
+
+\subsection{Name the Failed Region}
+Checking scenario~$S_i$ requires an input in $\Phi_i$
+(Equation~\eqref{eq:phi-intro})---including catch-alls that random tests miss
+\cite{barrett2018smt}.
+The check must preserve first-match partitions without rewriting the pipeline
+per surface notation (Chapter~\ref{ch:formalization}).
+
+\subsection{Typed Failures for Repair}
+Test-feedback loops lack specification-level structure
+\cite{sun2024clover}: the model may patch one counterexample without knowing
+whether a catch-all output or an ordering clash failed.
+Repair needs a record that names the violated scenario \emph{before} any
+natural-language prompt is rendered (Chapter~\ref{ch:method}).
+
+\subsection{Conjunctive Release under Budget~$K$}
+Full verification is impractical for unannotated LLM output
+\cite{leino2010dafny,loughridge2024dafnybench}.
+What is needed is calibrated acceptance safety: stronger than pass-rate gates
+\cite{chen2021codex}, weaker than deductive proof, and fast enough for sprint
+budgets \citep{beck2004xp,li2022qrs_companion}---Equation~\eqref{eq:acceptance}
+under hard~$K$ ($K{=}3$ in controlled E6).
+
+
+\section{Proposed Approach}
+\label{sec:intro:approach}
+
+The same specification that exposes the catch-all defect can drive prevention
+if three ideas hold: shared semantic regions, typed repair feedback, and
+conjunctive release.
+\textsc{SgDP} (Specification-guided Defect Prevention) does three jobs:
+(1)~carve first-match regions with an SMT solver; (2)~tell the LLM
+\emph{which} region failed; (3)~refuse release unless every region and the
+pluggable screen clear.
+Figure~\ref{fig:sgdp-overview} is that loop.
+Adapters and SMT lowering are necessary engineering, not separate scientific
+claims.
+Chapter~\ref{ch:method} walks the decision path end to end;
+Chapter~\ref{ch:results} leads with mechanism and prevention, not aggregate
+pass-rate crowns.
+
+\begin{figure}[t]
+  \centering
+  \tikzinput{diagrams/tikz/sgdp_framework_overview}
+  \caption{\textbf{Three ideas, one release loop:} SpecIR regions, Semantic
+    Feedback IR, conjunctive $\mathrm{Accept}$ under budget~$K$.
+    On the catch-all vignette, the loop forces the residual $\Phi_i$, names
+    the others/output violation, and releases only when Accept holds
+    (Equation~\eqref{eq:acceptance}).
+    Left to right for one attempt; dashed orange arc is repair; dashed branch
+    is FSF lowering and the pluggable pattern screen.}
+  \label{fig:sgdp-overview}
+\end{figure}
+
+
+\section{Contributions}
+\label{sec:intro:contributions}
+
+This report contributes a \textbf{conjunctive release decision framework} and
+evidence for when to pay for repair structure
+(Figure~\ref{fig:contribution-map}; Table~\ref{tab:evidence-ladder}).
+The headline is acceptance safety (C3): the gate that refuses to ship a
+lucky-pass residual when mean Conf.\ against test-feedback looks fine.
+SpecIR adapters, SMT lowering, and the hard benchmark are engineering that
+makes the decision rule runnable.
+
+\input{tables/evidence_ladder}
+
+\begin{figure}[t]
+  \centering
+  \tikzinput{diagrams/tikz/contribution_map}
+  \caption{\textbf{Tier-1 claims are C2--C4}, with acceptance safety (C3) as
+    the release headline.
+    SpecIR is the shared engineering hinge, not a monotone-overlap ranking
+    claim.
+    C3 gates release; C2 enables rescue under headroom; C4 chooses when to
+    pay for the full loop.}
+  \label{fig:contribution-map}
+\end{figure}
+
+\paragraph{Engineering premise (SpecIR).}
+Prevention must depend on \emph{semantic regions}, not surface syntax---the
+$\Phi_i$ cut in Figure~\ref{fig:defect-vs-test}.
+Overlap tertiles on E3 are non-monotone: denser overlap does not by itself
+prescribe deploying M (a negative bound on C4).
+
+\begin{enumerate}
+  \item[\textbf{C3.}]
+    Release must be \emph{conjunctive}: every specification-derived witness
+    matches \emph{and} no high-severity structural pattern remains
+    (Equation~\eqref{eq:acceptance}).
+    Pass-rate alone is not enough---as the catch-all vignette shows, a
+    candidate can look strong on busy tests and still ship a broken residual.
+    On E2 impl-screening ($n{=}852$), M reaches PDR 95.0\% / FAR 5.0\% vs.\
+    B2 91.2\% / 8.8\% (bootstrap CIs on the gaps exclude zero).
+    Ordering and preemption mutants motivate the gate beyond E6 Conf.\ gains.
+    Limitation: near-ceiling mean-Conf.\ ranking across corpora is secondary
+    appendix material; C3 is scored by Accept/FAR, not by Conf.\ crowns.
+
+  \item[\textbf{C2.}]
+    When repair has headroom, it needs \emph{specification-indexed structured
+    feedback}, not raw pass/fail bits.
+    E6 isolates feedback under full~M, equal $K{=}3$: semantic\_ir reaches
+    86.9\% vs.\ test\_only 79.1\% (${+}7.7$\,pp; paired W/L/T $14/4/102$;
+    95\% CI $[2.3,\,13.6]$\,pp; Wilcoxon $p{=}0.018$).
+    Qualitative coding of all 14 wins (Table~\ref{tab:e6-qual}):
+    \textbf{14/14 catch-all (\texttt{others}) rescues};
+    \textbf{0/14 ordering-precedence repairs}.
+    Field structure (Table~\ref{tab:field-structure}): FULL beats NL-only
+    dumps of the same facts (${+}28.0$\,pp; CI excludes~0).
+    Limitation: E14 shows length-matched structured traces can beat bare
+    Semantic Feedback IR on aggregate Conf.; the E6 win profile on BENCH-120
+    is catch-all rescue, not ordering-precedence repair.
+
+  \item[\textbf{C4.}]
+    Prefer test-feedback (B2) by default for mean conformance and latency;
+    escalate to full HSP-Agile (M) when release requires
+    $\mathrm{Accept}{=}1$ or target FAR${\le}5\%$ \emph{and} repair headroom
+    remains (Table~\ref{tab:deployment-boundary}).
+    When contracts are simple enough that baselines already saturate, B2 is
+    enough---that is a deployment boundary, not a failure of the decision
+    rule.
+    Equal-$K$ \texttt{M\_eq} is ${+}2.5$\,pp vs.\ B2 ($100.0\%$ vs.\ $97.5\%$;
+    $3/0/117$); external pilots often tie on mean Conf.; a public ACL-style
+    case (Section~\ref{sec:results:acl-case}) shows the gate intercepting a
+    lucky-pass candidate.
+    Limitation: live vendor CI replication remains future work; present
+    pilots support the deployment heuristic, not production KPIs.
+\end{enumerate}
+
+Primary evidence is E2, E6, equal-$K$ Conf.\ ranking, and the deployment table.
+Near-ceiling fixed-oracle ranking runs (E1/E10/E12) are appendix material:
+E1 places B1/B2/M at $84.2\%/98.3\%/100.0\%$ under a $K{=}5$ bundle for M;
+E12 shows B2 at $100\%$ every seed and M at $99.7\%$---M does not lead every
+seed.
+
+
+\section{Research Questions}
+\label{sec:intro:rq}
+
+Evaluation is mechanism- and safety-first; aggregate ranking is secondary.
+
+\textbf{RQ1}---does specification-indexed Semantic Feedback IR improve repair
+beyond unstructured test-only feedback? (E6; qualitative win coding; field
+probe);
+\textbf{RQ2}---does the M--baseline gap grow monotonically with guard-overlap
+density? (E3, E10; negative bound on C4);
+\textbf{RQ3}---does conjunctive $\mathrm{Accept}$ improve acceptance safety
+(PDR/FAR) vs.\ mean conformance alone? (E2);
+\textbf{RQ4}---under what conditions should practitioners deploy M vs.\ B2?
+(deployment boundary; equal-$K$; ACL case);
+\textbf{RQ5}---quality--overhead trade-off (appendix ranking runs at
+comparable Conf.).
+
+
+\section{Report Organisation}
+\label{sec:intro:organisation}
+
+Chapter~\ref{ch:background} surveys background and related work (including
+LLM-as-judge structured feedback).
+Chapter~\ref{ch:formalization} develops the mathematical core.
+Chapter~\ref{ch:method} designs SpecIR, typed IR, and the pluggable Screen.
+Chapter~\ref{ch:implementation} is supporting engineering (Screen
+pluggability over module taxonomy).
+Chapters~\ref{ch:experiments}--\ref{ch:results} lead with E6, E2, equal-$K$,
+and C4; near-ceiling corpora appear in the appendix.
+Chapter~\ref{ch:discussion} states scope when baselines saturate;
+Chapter~\ref{ch:conclusion} restates the decision framework.
+Appendices cover reproducibility, benchmark construction, the pattern
+catalogue, and near-ceiling ranking runs (Appendix~\ref{app:stress}).

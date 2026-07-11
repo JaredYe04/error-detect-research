@@ -1,0 +1,1197 @@
+%% Appendix D: Near-ceiling stress-tests and supporting corpora
+%% Demoted from Chapter 7 main spine (breakout iteration).
+%% Most labels preserved so existing \ref{} targets keep working.
+
+\chapter{Near-Ceiling Stress-Tests and Supporting Corpora}
+\label{app:stress}
+
+This appendix holds material that supports---but must not lead---the
+conjunctive-release argument.
+Main-text claims rest on E6, E2, equal-$K$, C4, and the ACL interception case
+(Chapter~\ref{ch:results}).
+Numbers below are fixed-oracle unless an archive/pre-fix caption says
+otherwise; do not mix corpora in one claim sentence.
+
+%=============================================================================
+\section{Quality--Overhead Archive (Pareto / Latency)}
+% label kept on Chapter pointer: sec:results:rq5
+%=============================================================================
+
+Archive Pareto/latency figures below use pre-fix exports where captioned;
+authoritative cost is the fixed-oracle one-line card in Chapter~\ref{ch:results}.
+
+\begin{figure}[t]
+  \centering
+  \widefig{figures/mode_distribution_latency.pdf}
+  \caption{\textbf{Archive figure (pre-fix E1 export):} historical latency
+    mass under the buggy others-witness oracle / hard gate.
+    \textbf{Authoritative cost story} is fixed-oracle E1
+    (\texttt{run\_e1\_m\_win\_v2}): M 10.5\,s vs.\ B2 9.6\,s at comparable
+    mean llm\_calls (${\approx}1.16$ vs.\ ${\approx}1.18$)---do not cite this
+    figure as the current premium.
+    \textbf{How to read:} log-scale wall-clock latency per task on the
+    historical export only.}
+  \label{fig:latency-distribution}
+\end{figure}
+
+The latency distribution (Figure~\ref{fig:latency-distribution}) shows repair
+modes paying a clear premium: M and A1 spread toward higher wall-clock times,
+while B1/B2 remain near one-call latencies.
+
+\begin{figure}[t]
+  \centering
+  \widefig{figures/pareto_quality_vs_latency.pdf}
+  \caption{\textbf{Claim (latency axis from pre-fix Pareto export):}
+    B2 is the cheaper mean-Conf.\ / latency operating point; M buys
+    prevention / conjunctive Accept at ${\approx}3.3\times$ latency
+    (46.2\,s vs.\ B2 13.9\,s on that export).
+    Primary fixed-oracle Conf.\ is M~100.0\% / B2~98.3\%
+    (Table~\ref{tab:main-results})---do not read the figure's pre-fix
+    Conf.\ annotations (B2~87.7\%, M~86.3\%) as current primary quality.
+    \textbf{How to read:} right/up is better quality, left is cheaper; the
+    dashed polyline is the Pareto frontier and the annotation marks mode~M.}
+  \label{fig:pareto}
+\end{figure}
+
+The insight in Figure~\ref{fig:pareto} is a trade-off, not a free lunch.
+On the pre-fix latency export, M pays $3.3\times$ vs.\ B2
+(46.2\,s vs.\ 13.9\,s), mostly extra LLM calls (2.08 vs.\ 1.24)---acceptable
+for parallel CI, not for interactive IDE use.
+Historical A2 (39.9\,s, 80.3\% Conf.\ on pre-fix E1) traded prevention for
+modest latency savings vs.\ that run's M; pre-fix B2 (13.9\,s, 87.7\%) was
+the cheaper mean-Conf.\ point on that export.
+Under the fixed oracle, primary quality is M~100.0\% vs.\ B2~98.3\% at
+comparable llm\_calls (Table~\ref{tab:main-results}); the $3.3\times$ latency
+premium remains the cost framing for deploying full~M when Accept/PDR justify
+it.
+Mann-Whitney confirms the latency gap is not a sampling artefact
+($p{<}0.001$).
+
+\paragraph{Answer to RQ5.}
+Best prevention (PDR/FAR) at ${\approx}3.3\times$ B2 latency (pre-fix cost
+export); default to B2 for mean Conf.\ / latency and deploy M when
+Accept/PDR-FAR justify the cost.
+Fixed-oracle E1 aggregate ranking (Section~\ref{sec:results:e1-detail}) is the
+stress-test companion to this Pareto reading---not a claim that M dominates
+B2 on every corpus.
+
+%=============================================================================
+\section{E1 Aggregate Stress-Test}
+\label{sec:results:e1-detail}
+%=============================================================================
+
+\textbf{Claim (C2--C4 jointly; RQ5 stress-test).}
+The full loop should raise mean Conf.\ over one-shot and
+test-feedback baselines; under the fixed others-witness oracle with
+strengthened~M ($K{=}5$, best-effort selection, advisory critical-only gate),
+Strict tracks Conf.\ closely on BENCH-120.
+Aggregate E1 ranking is reported here as an overlap stress-test under RQ5,
+not as a universal-effectiveness headline across unfiltered corpora.
+
+\paragraph{Equal-$K$ hygiene (cross-ref).}
+Primary equal-$K$ Conf.\ ranking is Table~\ref{tab:equal-k} in
+Section~\ref{sec:results:rq4} (\texttt{M\_eq} ${+}2.5$\,pp vs.\ B2).
+Lead mechanism evidence remains E6 (within~M, $K{=}3$, ${+}7.7$\,pp with CI
+excluding zero).
+Strengthened E1 M-win ($K{=}5$ bundle) below is a near-ceiling stress-test.
+
+\subsection{Main Results}
+
+The headline question for this E1 stress-test is whether specification-guided
+repair improves \emph{conformance} under a fair first-match witness oracle.
+Table~\ref{tab:main-results} answers with B1/B2/M on 120 tasks each from
+\texttt{run\_e1\_m\_win\_v2}; ablation and extended-baseline rows from the
+pre-fix canonical run are retained only as historical context
+(footnote).
+
+\begin{table}[H]
+  \caption{Main comparison results ($n = 120$ tasks per mode).
+    \textbf{B1/B2/M} from fixed-oracle \texttt{run\_e1\_m\_win\_v2}
+    (strengthened~M: best-effort $\arg\max$ Conf., E14-informed
+    \texttt{execution\_trace\_matched}, advisory critical-only pattern gate,
+    $K{=}5$, \texttt{formal\_max\_cases}${}{=}32$).
+    Strict = strict success / acceptance rate
+    ($\mathrm{Accept}{=}1$); Conf.\ = mean formal conformance
+    ($\overline{\mathrm{Conf}}$); Kill = mutation kill rate (checker precision on
+    injected mutants, not generator quality---see \S\ref{sec:results:e1-detail}); Fail.\ = mean
+    strict evaluation failures per task.
+    \emph{Note:} Primary B1/B2/M use the fixed first-match others-witness
+    oracle (\texttt{run\_e1\_m\_win\_v2}).
+    Fixed-oracle component ablations (A1--A3) are Table~\ref{tab:ablation-fixed}
+    (\texttt{run\_e1\_ablation\_fixed\_v1}).
+    B3--B5 and daggered A1--A3 rows below are historical
+    \texttt{run\_e1\_canonical\_v1} under the buggy others-witness oracle and
+    are \emph{not} primary claims.
+    Report M vs.\ B2 as win rate and means (2/120 wins, 0 losses, 118 ties;
+    ${+}1.7$\,pp); no Holm claim is asserted for this run.
+    Equal-$K$ Conf.\ ranking is Table~\ref{tab:equal-k} (\texttt{M\_eq} vs.\ B2).}
+  \label{tab:main-results}
+  \centering
+  \thesistable{%
+    \footnotesize
+    \renewcommand{\arraystretch}{1.12}
+    \begin{tabular*}{\linewidth}{@{\extracolsep{\fill}}l r r r r r@{}}
+      \toprule
+      Mode & Strict & Conf. & Kill & Lat.\ (ms) & Fail. \\
+      \midrule
+      B0$^\dagger$   & 5.0\%           & 89.2\%        & 48.6\%       & 165           & 0.00 \\
+      B1   & 84.2\%          & 84.2\%        & 52.4\%       & 17{,}193      & 0.00 \\
+      B2   & 98.3\%          & 98.3\%        & 49.1\%       & 9{,}576       & 0.00 \\
+      B3$^\dagger$   & 5.0\%           & 81.9\%        & 51.0\%       & 13{,}210      & 2.33 \\
+      B4$^\dagger$   & 5.0\%           & 87.1\%        & 49.3\%       & 10{,}758      & 2.49 \\
+      B5$^\dagger$   & 5.0\%           & 81.1\%        & 50.6\%       & 6{,}212       & 2.33 \\
+      M    & \textbf{100.0\%} & \textbf{100.0\%} & 48.6\%    & 10{,}457      & 0.00 \\
+      A1$^\dagger$   & 5.0\%           & 85.5\%        & 54.0\%       & 4{,}791       & 0.00 \\
+      A2$^\dagger$   & 5.0\%           & 80.3\%        & 49.1\%       & 6{,}405       & 0.00 \\
+      A3$^\dagger$   & 3.3\%           & 82.4\%        & 53.3\%       & 4{,}333       & 0.00 \\
+      \bottomrule
+      \multicolumn{6}{l}{\footnotesize $^\dagger$Historical pre-fix
+        (\texttt{run\_e1\_canonical\_v1}; not primary).} \\
+    \end{tabular*}%
+  }
+\end{table}
+
+Table~\ref{tab:main-results} states the aggregate means under the fixed
+oracle: M reaches 100\% Conf./Strict, ahead of B2 (98.3\%) and B1 (84.2\%).
+Primary component ranking is the fixed-oracle ablation
+(Table~\ref{tab:ablation-fixed}: A3 $-$25.8\,pp, A1 $-$17.5\,pp, A2 $0.0$\,pp);
+daggered historical A1--A3 rows are archive only.
+
+\begin{figure}[t]
+  \centering
+  \widefig{figures/mode_distribution_strict_conformance.pdf}
+  \caption{\textbf{Claim (pre-fix export):} M concentrates mass in the upper
+    conformance band; B0 does not.
+    \textbf{How to read:} each violin/box is per-task $\mathit{Conf}(c,t)$ over
+    120 tasks; compare the right-hand mass of M with B0's low mode.
+    Primary fixed-oracle means are in Table~\ref{tab:main-results}.}
+  \label{fig:conf-distribution}
+\end{figure}
+
+Figure~\ref{fig:conf-distribution} separates difficulty calibration from
+LLM quality on the pre-fix export: B0's bimodal spread marks template
+failure on hard tasks, while B1--M cluster in the 60--100\% band.
+
+\begin{figure}[t]
+  \centering
+  \widefig{figures/formal_conformance_cdf.pdf}
+  \caption{\textbf{Claim (pre-fix export):} B2 and A2 dominate the upper CDF
+    tail on the historical corpus.
+    \textbf{How to read:} curves farther right mean higher conformance for more
+    tasks; B0's steep early rise marks template failure on hard tasks.
+    Primary fixed-oracle means are in Table~\ref{tab:main-results}.}
+  \label{fig:conf-cdf}
+\end{figure}
+
+The CDF in Figure~\ref{fig:conf-cdf} is from the pre-fix export: B2 and A2
+occupy the upper tail on that corpus; do not treat it as the fixed-oracle
+ranking (M~100.0\% $>$ B2~98.3\%).
+
+\begin{figure}[t]
+  \centering
+  \widefig{figures/summary_metrics_by_mode.pdf}
+  \caption{\textbf{Claim (pre-fix export):} highest mean Conf.\ coincides with
+    the most LLM calls on that corpus.
+    \textbf{How to read:} left axis = Strict / Conf.; right axis = mean LLM
+    calls; M's 2.08 calls show the repair loop is exercised, not idle.
+    Fixed-oracle llm\_calls are ${\approx}1.16$ (M) vs.\ ${\approx}1.18$ (B2).}
+  \label{fig:summary-metrics}
+\end{figure}
+
+Figure~\ref{fig:summary-metrics} links quality to cost on the pre-fix
+export; under the fixed oracle, M and B2 have comparable mean llm\_calls
+near one call (Table~\ref{tab:main-results}).
+
+\begin{figure}[t]
+  \centering
+  \widefig{figures/llm_calls_distribution.pdf}
+  \caption{\textbf{Claim:} budget $K=3$ is actively used, not decorative
+    (pre-fix call-count export).
+    \textbf{How to read:} M and A1 mass at 2--3 calls; B1 stays at one.}
+  \label{fig:llm-calls}
+\end{figure}
+
+The call-count histogram (Figure~\ref{fig:llm-calls}) confirms that budget
+$K{=}3$ is exercised on the pre-fix export: M and A1 concentrate at two or
+three calls, whereas B1 remains at a single generation attempt.
+
+\begin{figure}[t]
+  \centering
+  \widefig{figures/radar_metrics.pdf}
+  \caption{\textbf{Claim (pre-fix export):} M trades latency for conformance;
+    B2 is the cheaper moderate alternative on that corpus.
+    \textbf{How to read:} axes are normalised Conf., Strict, kill rate, and
+    inverse latency; larger area is not uniformly better.
+    Primary fixed-oracle Conf.\ ranking is Table~\ref{tab:main-results}.}
+  \label{fig:radar-metrics}
+\end{figure}
+
+Figure~\ref{fig:radar-metrics} summarises the multi-metric trade-off on the
+pre-fix export; fixed-oracle primary quality remains M~100.0\% vs.\ B2~98.3\%.
+
+Table~\ref{tab:main-results} is the aggregate on fixed-oracle E1: M at
+100.0\% Conf.\ / Strict leads B2 (98.3\%) and B1 (84.2\%).
+Against B2, M wins 2/120 paired tasks (${+}1.7$\,pp; losses~0, ties~118);
+mean llm\_calls are comparable (${\approx}1.16$ vs.\ ${\approx}1.18$).
+We report win rate and means only---no Holm significance is claimed for this
+run.
+That is the honest primary-quality reading: structured specification feedback
+matters in controlled E6 (+7.7\,pp vs.\ unstructured test-only under full~M;
+E14: length-matched \texttt{semantic\_ir} 75.1\% does not match
+\texttt{execution\_trace\_matched} 85.4\%) and E11 deployment slices;
+fixed-oracle E10/E12 place M and B2 near ceiling without M dominating every
+seed.
+Historical B3--B5 / A1--A3 rows under the buggy others-witness oracle
+(${\approx}5\%$ Strict) are not primary claims.
+
+\subsection{Reading the Distributions}
+
+Three readings settle the rest of the E1 stress-test.
+
+\textbf{Strict now tracks Conf.}
+Under the fixed oracle, B1/B2/M Strict matches Conf.\ (84.2 / 98.3 /
+100.0\%): the historical uniform ${\approx}5\%$ Strict on
+\texttt{run\_e1\_canonical\_v1} was an others-witness measurement artefact,
+not the current primary result.
+
+\textbf{The M--B2 margin is real but thin.}
+M leads B2 by ${+}1.7$\,pp with only 2/120 decisive wins (118 ties);
+mean llm\_calls stay near one call (${\approx}1.16$ vs.\ ${\approx}1.18$).
+
+\textbf{Mutation kill is about the checker, not the generator.}
+Kill rates of ${\approx}49$--$52\%$ across modes still measure checker
+\emph{precision} against injected syntactic faults, not generator quality.
+
+\paragraph{E1 stress-test note (RQ5).}
+Fixed-oracle E1: M 100.0\% $>$ B2 98.3\% $>$ B1 84.2\% (win rate 2/120 vs.\ B2;
+no Holm claim).
+E6 confirms typed feedback mechanism (+7.7\,pp vs.\ unstructured test-only
+under full~M; E14 scopes against length-matched traces).
+Prevention (PDR/FAR) remains the complementary discriminator for conjunctive
+release; fixed-oracle E10/E12 (Sections~\ref{sec:results:e10},~\ref{sec:results:e12})
+bound seed stability and unfiltered ranking.
+
+%=============================================================================
+\section{Boundary Density (E4)}
+\label{sec:results:e4}
+%=============================================================================
+
+Test-feedback looks strong until witness sampling is held constant.
+If denser random tests already covered first-match regions, SMT witnesses
+would be optional; Figure~\ref{fig:boundary} demonstrates they are not.
+
+\begin{figure}[t]
+  \centering
+  \widefig{figures/boundary_coverage_by_density.pdf}
+  \caption{\textbf{Claim:} random sampling collapses in the Dense tier; SMT
+    does not.
+    \textbf{How to read:} coverage vs.\ case budget by density; compare SMT
+    vs.\ random within the Dense row at budget~$\ge 8$.}
+  \label{fig:boundary}
+\end{figure}
+
+At budget 16, random sampling covers far less of the Dense tier than
+SMT-guided generation; the gap shrinks in the Sparse tier.
+That is why test-feedback baselines look adequate on simple specifications
+and degrade on hard ones---the same story as the overlap-tertile split in
+Section~\ref{sec:results:rq2}, now measured at the sampling layer alone.
+
+%=============================================================================
+\section{Generalisation Study (E8)}
+\label{ch:generalization}
+%=============================================================================
+
+External validity asks whether SpecIR adapters carry the prevention loop
+beyond SOFL syntax, or whether the gains are notation-specific.
+Table~\ref{tab:generalisation} and Figure~\ref{fig:generalisation} answer
+that question.
+
+\begin{figure}[t]
+  \centering
+  \widefig{figures/generalisation_bar.pdf}
+  \caption{\textbf{Claim:} structured feedback helps across notations, but
+    adapter transfer is partial on the expanded $n{=}30$ corpus.
+    \textbf{How to read:} bars are mean Conf.\ by notation and mode; compare
+    M vs.\ B1 within each group (M leads on both adapters), then M vs.\ B2.}
+  \label{fig:generalisation}
+\end{figure}
+
+On SOFL/FSF (fixed-oracle E1), M leads at 100.0\% versus B2 98.3\% and B1 84.2\%.
+On the expanded adapter corpora ($n{=}30$ each, \texttt{run\_e8b\_expanded\_v1}),
+M beats B1 on Mini-StateMachine (41.6\% vs.\ 24.7\%) and Mini-Z (23.3\% vs.\
+5.8\%); M is within 0.8~pp of B2 on Mini-StateMachine and leads B2 by 5.0~pp
+on Mini-Z.
+Absolute conformance on adapter notations remains low (23--42\%), reflecting
+notation-specific generation difficulty rather than SOFL-level overlap structure;
+HumanEval/MBPP rows in Table~\ref{tab:generalisation} show stronger transfer on
+real-derived guards.
+Chapter~\ref{ch:discussion} interprets these boundaries.
+
+\begin{table}[H]
+  \caption{\textbf{Key observation:} M leads B1 on all notations; adapter
+    absolute conformance is low on the expanded $n{=}30$ corpus (E8b).
+    HumanEval-FSF and MBPP-FSF rows report full B1/B2/M from
+    \texttt{run\_e8c\_full\_v1}.}
+  \label{tab:generalisation}
+  \centering
+  \thesistable{%
+    \small
+    \begin{tabular}{lccc}
+      \toprule
+      Notation & B1 Conf.\% & B2 Conf.\% & M Conf.\% \\
+      \midrule
+      SOFL/FSF (120 tasks) & 84.2 & 98.3 & \textbf{100.0} \\
+      Mini-StateMachine (30 tasks) & 24.7 & 40.8 & \textbf{41.6} \\
+      Mini-Z (30 tasks) & 5.8 & 18.3 & \textbf{23.3} \\
+      HumanEval-FSF (20 tasks) & 89.7 & \textbf{98.8} & 87.1 \\
+      MBPP-FSF (20 tasks) & 90.0 & 95.0 & 95.0 \\
+      \bottomrule
+    \end{tabular}%
+  }
+\end{table}
+
+%=============================================================================
+\subsection{External Validity: Real-Derived Benchmark (E8c)}
+\label{subsec:results:real-derived}
+%=============================================================================
+
+Table~\ref{tab:benchmark-by-source} reports conformance across benchmark subsets.
+Mode~M reaches 95.0\% on MBPP-FSF (matching B2) and 87.1\% on HumanEval-FSF
+(where B2 leads at 98.8\%).
+MBPP confirms partial transfer to real-world guard structure; HumanEval shows
+that test-feedback baselines can dominate when branches are sparse.
+
+\begin{inlinetable}{Conformance by benchmark source (mode M, $K=3$).}
+  \label{tab:benchmark-by-source}
+  \footnotesize
+  \begin{tabular}{lrrr}
+    \toprule
+    Subset & $n$ & M Conf (\%) & M Strict (\%) \\
+    \midrule
+    Synthetic hard (E1)          & 120 & 100.0 & 100.0 \\
+    HumanEval-FSF (E8c)          & 20  & 87.1 & 70.0 \\
+    MBPP-FSF (E8c)               & 20  & 95.0 & 85.0 \\
+    Mini-Z (E8b expanded)        & 30  & 23.3 & --- \\
+    Mini-StateMachine (E8b)      & 30  & 41.6 & --- \\
+    \bottomrule
+  \end{tabular}
+\end{inlinetable}
+
+The higher strict-success rate on real-derived tasks (70--85\%) versus the
+historical pre-fix synthetic Strict (${\approx}5\%$) reflected the buggy
+others-witness oracle as much as simpler HumanEval/MBPP guard structure;
+under the fixed oracle, synthetic hard E1 Strict for~M is 100.0\%
+(Table~\ref{tab:main-results}).
+Full B1/B2/M baselines on HumanEval-FSF and MBPP-FSF are reported in
+Table~\ref{tab:generalisation} from \texttt{run\_e8c\_full\_v2}.
+
+%=============================================================================
+\section{Random Benchmark (E10)}
+\label{sec:results:e10}
+%=============================================================================
+
+E10 tests whether aggregate M beats B2 on an unfiltered random sample
+(Section~\ref{sec:exp:e10}).
+Table~\ref{tab:e10-random} reports fixed-oracle results from
+\texttt{run\_e10\_m\_win\_v1} ($n{=}100$ per mode).
+On this \emph{unfiltered} sample, M reaches 100.0\% mean Conf.\ vs.\ B2
+99.0\% (${+}1.0$\,pp; wins 1/100, losses~0, ties~99) and B1 81.0\%---consistent
+with E1's near-ceiling M$\ge$B2 reading, not a large unfiltered gap.
+
+\begin{table}[H]
+  \caption{Random benchmark results (E10, fixed others-witness oracle).
+    Uniformly sampled tasks without Z3 overlap filter; modes B1, B2, M;
+    \texttt{run\_e10\_m\_win\_v1}.
+    M leads B2 by ${+}1.0$\,pp (1/100 wins).}
+  \label{tab:e10-random}
+  \centering
+  \thesistable{%
+    \small
+    \begin{tabular}{lccc}
+      \toprule
+      Mode & Conf.\ (\%) & Win vs.\ B2 & Notes \\
+      \midrule
+      B1 & 81.0 & --- & --- \\
+      B2 & 99.0 & ref. & --- \\
+      M  & \textbf{100.0} & 1/100 & ${+}1.0$\,pp; 0 losses, 99 ties \\
+      \bottomrule
+    \end{tabular}%
+  }
+\end{table}
+
+The decision criterion remains qualitative: fixed-oracle E10 places M slightly
+ahead of B2 near ceiling; Figure~\ref{fig:e10-overlap} tertiles should be read
+together with E3 (Table~\ref{tab:e3-tiers})---neither shows monotone M
+dominance by overlap alone.
+The honest claim is overlap-\emph{conditional} deployment (C4), with E6 as the
+mechanism anchor.
+(Pre-fix \texttt{run\_e10\_random\_v2} had favoured B2 89.1\% vs.\ M 83.1\%
+under the buggy others-witness oracle and is not primary.)
+
+\begin{figure}[t]
+  \centering
+  \widefig{figures/performance_vs_overlap.pdf}
+  \caption{E10: mean conformance by overlap-rate tertile on the unfiltered random
+    benchmark (figure from pre-fix export; read aggregate means from
+    Table~\ref{tab:e10-random}).}
+  \label{fig:e10-overlap}
+\end{figure}
+
+%=============================================================================
+\section{External SOFL Benchmark (E11)}
+\label{sec:results:e11}
+%=============================================================================
+
+E11 evaluates curated, non-synthetic FSF tasks with citable external provenance
+(Section~\ref{sec:exp:e11}).
+Table~\ref{tab:e11-external} reports repeat~0 results from
+\texttt{run\_e11\_external\_v1} ($n{=}22$; zero ID overlap with E1).
+
+\begin{table}[H]
+  \caption{External SOFL benchmark (E11).  Hand-curated from textbook and IET
+    pattern sources; not generated by \texttt{HardTaskGenerator}.}
+  \label{tab:e11-external}
+  \centering
+  \thesistable{%
+    \small
+    \begin{tabular}{lcccc}
+      \toprule
+      Mode & $n$ & Strict (\%) & Conf.\ (\%) & Lat.\ (ms) \\
+      \midrule
+      B1 & 22 & 63.6 & 89.8 & 2{,}018 \\
+      B2 & 22 & 63.6 & 89.8 & 4{,}171 \\
+      M  & 22 & 59.1 & 81.9 & 5{,}103 \\
+      \bottomrule
+    \end{tabular}%
+  }
+\end{table}
+
+On the external corpus under the primary endpoint (\texttt{ecnu-plus}),
+B1 and B2 tie at 89.8\% mean conformance; M trails
+(81.9\%)---these curated tasks have moderate guard overlap and simpler branch
+structure than the E1 hard set, consistent with the deployment boundary in
+Chapter~\ref{ch:discussion}.
+Replicating E11 on \texttt{ecnu-max} (\texttt{run\_e11\_ecnu\_max\_v1}) yields
+a three-way tie at 89.8\% Conf.\ / 63.6\% Strict for B1/B2/M: the stronger
+endpoint closes the primary-model M gap without reversing B2 as the default
+mean-Conf.\ choice.
+Provenance for each task is recorded in \texttt{benchmarks/external\_sofl.json}.
+E15 stratification (overlap-density tiers on the external corpus) explains why
+M trails B1/B2 on \texttt{ecnu-plus}: curated tasks have moderate overlap and
+simpler branch structure than the E1 stress-test
+(see \texttt{e11\_overlap\_stratified.csv}).
+
+%=============================================================================
+\section{Multi-Seed Stability (E12)}
+\label{sec:results:e12}
+%=============================================================================
+
+E12 addresses LLM stochasticity on the \textbf{full} 120-task hard benchmark
+(Section~\ref{sec:exp:e12}).
+Table~\ref{tab:e12-stability} reports fixed-oracle E12-full from
+\texttt{run\_e12\_m\_win\_v1} (120 tasks $\times$ seeds $\{0,1,2\}$ $\times$
+modes B1, B2, M; 1080 jobs).
+Overall means: B1 88.6\%, B2 100.0\%, M 99.7\%.
+B2 is first every seed (ties with M at 100\% on seeds~0 and~2); M's sole
+failure is seed~1 HardCase069 (Conf.\ 0).
+Mean-across-seeds pairing: M wins 0, losses~1, ties~119 vs.\ B2.
+Honest framing: both near ceiling; E1/E10 show M$\ge$B2 on aggregate, while
+E12 shows B2 slightly more seed-stable (100.0\% vs.\ 99.7\%)---do \emph{not}
+claim M dominates all seeds.
+
+\begin{table}[H]
+  \caption{E12-full multi-seed stability under fixed others-witness oracle
+    (\texttt{run\_e12\_m\_win\_v1}; 120 tasks, seeds $\{0,1,2\}$).
+    Per-seed mean formal conformance (\%).}
+  \label{tab:e12-stability}
+  \centering
+  \thesistable{%
+    \small
+    \begin{tabular}{lcccc}
+      \toprule
+      Mode & Mean Conf.\ (\%) & Seed 0 & Seed 1 & Seed 2 \\
+      \midrule
+      B1 & 88.6 & 95.0 & 75.8 & 95.0 \\
+      B2 & \textbf{100.0} & 100.0 & 100.0 & 100.0 \\
+      M  & 99.7 & 100.0 & 99.2 & 100.0 \\
+      \addlinespace
+      \multicolumn{5}{l}{\textit{Mean-across-seeds M vs.\ B2: wins 0, losses 1, ties 119}} \\
+      \multicolumn{5}{l}{\textit{Ranking: B2 first every seed (ties M @100\% on seeds 0, 2)}} \\
+      \bottomrule
+    \end{tabular}%
+  }
+\end{table}
+
+\subsection{Second-Model Replication (E16)}
+\label{sec:results:e16}
+
+E16 replicates B1/B2/M on the \textbf{full} 120-task BENCH-120 using
+\texttt{ecnu-max} (DeepSeek-family) while E1/E12 use \texttt{ecnu-plus}
+(Qwen-family) (\texttt{run\_e16\_canonical\_v1}, $n{=}120$ per mode).
+All three modes tie at \textbf{89.2\%} mean strict conformance---endpoint
+choice does not reverse the deployment boundary
+(Table~\ref{tab:deployment-boundary}), though absolute gaps shrink vs.\ the
+primary model.
+The controlled E6 protocol on the same endpoint
+(Table~\ref{tab:feedback-e6-max}) likewise saturates (${\approx}89.2\%$ for
+A/B/C), confirming that typed-IR gains require repair headroom.
+The prior 29-task pilot (\texttt{run\_e16\_model\_pilot\_v1}) is superseded.
+
+\begin{table}[H]
+  \caption{E16 second-model replication (\texttt{ecnu-max}, $n{=}120$).}
+  \label{tab:e16-canonical}
+  \centering
+  \thesistable{%
+    \small
+    \begin{tabular}{lcc}
+      \toprule
+      Mode & Conf.\ (\%) & Lat.\ (ms) \\
+      \midrule
+      B1 & 89.2 & 3{,}374 \\
+      B2 & 89.2 & 4{,}139 \\
+      M  & 89.2 & 10{,}072 \\
+      \bottomrule
+    \end{tabular}%
+  }
+\end{table}
+
+%=============================================================================
+\section{Commercial Cross-Model Replication (n1n)}
+\label{sec:results:n1n}
+%=============================================================================
+
+Campus endpoints alone leave a residual single-gateway threat.
+We replicate the controlled E6 A/B/C sweep and B1/B2/M ranking on commercial
+models via the n1n OpenAI-compatible gateway
+(\url{https://api.n1n.ai/pricing}): \texttt{gpt-4o},
+\texttt{claude-sonnet-4-6}, and \texttt{deepseek-v3.2}, on the same
+29-task stratified subset as E12
+(\texttt{benchmarks/e12\_stratified\_30.json}).
+
+\input{tables/cross_model_e6}
+
+\paragraph{Reading Table~\ref{tab:cross-model-e6}.}
+On \texttt{gpt-4o}, A and C tie at 88.9\% (saturation, $\Delta{=}0$).
+On \texttt{claude-sonnet-4-6}, typed IR yields a modest
+\textbf{+1.0\,pp} (87.5$\rightarrow$88.5).
+On \texttt{deepseek-v3.2}, C trails A by 3.9\,pp (75.0$\rightarrow$71.1):
+longer structured prompts can hurt weaker commercial endpoints.
+Together with primary E6 (+7.7\,pp on \texttt{ecnu-plus}) and E6-max
+saturation (${+}0.03$\,pp), the mechanism claim is headroom- and
+model-dependent, not universal.
+
+\input{tables/cross_model_e16}
+
+On the same stratified hard subset, \texttt{gpt-4o} ranks
+B1${=}$B2 at 100\% Conf.\ with M at 88.9\%---again no case for replacing B2
+as the mean-Conf.\ default.
+
+%=============================================================================
+\section{Industrial SOFL Corpus}
+\label{sec:results:industrial}
+%=============================================================================
+
+\subsection{Real-Priority Micro-Benchmark}
+\label{sec:results:real-priority}
+
+Table~\ref{tab:real-priority-micro} reports equal-$K$ B1/B2/\texttt{M\_eq}
+on the curated real-priority micro-benchmark
+(Section~\ref{sec:exp:real-priority}): firewall / role / billing / tax
+adaptations plus industrial, GitHub, HKCA09, and published-industrial
+slices---not HardSynthetic tasks.
+Reading follows C4: if mean Conf.\ ties or saturates, the reason to deploy
+full~M remains acceptance safety (Accept / FAR), not a Conf.\ crown; if B1
+leaves headroom, the corpus still shows that the pipeline runs on
+practitioner-style ordered guards outside the lab generator.
+
+\input{tables/real_priority_micro}
+
+\subsection{SMT Domain Scalability}
+\label{sec:results:smt-scalability}
+
+Table~\ref{tab:smt-scalability} and Figure~\ref{fig:smt-domain-latency}
+answer the ``Z3 only works on $[-5,20]$'' concern for the guards that
+matter here.
+On \texttt{real\_priority\_micro\_v1}, mean witness time stays
+${\approx}30$\,ms from $[-5,20]$ through $[-1000,1000]$; a Z3
+\texttt{Real} encoding of the same predicates is even slightly cheaper
+(${\approx}18$\,ms).
+In short: \emph{widening the LIA box does not explode} for these
+first-match linear guards.
+Stress probes with more variables or a mild nonlinear product remain
+sub-second on this hardware
+(\texttt{artifacts/smt\_scalability\_v1/stress\_probe.json}).
+When solvers would time out or return \texttt{unknown} on richer theories,
+Section~\ref{sec:disc:smt-hybrid} specifies the hybrid fuzzing fallback
+rather than claiming universal SMT scalability.
+
+\input{tables/smt_scalability}
+
+\begin{figure}[t]
+  \centering
+  \widefig{figures/smt_domain_latency.pdf}
+  \caption{\textbf{Claim:} for FSF-style linear first-match guards on the
+    real-priority micro-benchmark, widening the integer domain (and probing
+    Z3 Reals) does not produce a latency cliff.
+    \textbf{How to read:} solid $=$ mean ms/task; dashed $=$ p95.
+    Nonlinear / high-dimensional stress is discussed in
+    Section~\ref{sec:disc:smt-hybrid}, not hidden.}
+  \label{fig:smt-domain-latency}
+\end{figure}
+
+Beyond textbook/IET external SOFL (E11), we evaluate a curated
+industrial-pattern corpus
+(\texttt{benchmarks/industrial\_sofl.json}, $n{=}31$): banking, telecom,
+access control, medical alerts, SCADA-like thresholds, insurance, and related
+ordered-guard decision tables, with provenance
+\texttt{liu2004soflbook} / \texttt{li2023iet\_faultprevention} /
+\texttt{industrial\_pattern:<domain>}
+(\emph{not} production vendor traces; see
+\texttt{benchmarks/INDUSTRIAL\_SOFL\_README.md}).
+
+\input{tables/cross_model_industrial}
+
+\paragraph{Reading Table~\ref{tab:cross-model-industrial}.}
+Under both \texttt{gpt-4o} and \texttt{claude-sonnet-4-6}, test-feedback B2
+reaches \textbf{100\%} mean Conf.\ while B1 and M sit at 95.5\%, with
+identical Strict 67.7\%.
+On \texttt{deepseek-v3.2} absolute Conf.\ is lower, but the ranking is
+unchanged: B2 (80.7\%) $>$ M (72.5\%) $>$ B1 (52.7\%).
+This is the strongest external-validity support for the deployment rule:
+on practitioner-style ordered-guard specs, prefer B2 for mean conformance;
+reserve full~M when conjunctive $\mathrm{Accept}$ or PDR/FAR gates are required.
+
+\paragraph{Published-industrial / desensitized real SOFL pilot.}
+Beyond pattern corpora, we evaluate $n{=}28$ FSF tasks
+\emph{reconstructed and desensitized} from published industrial SOFL case
+studies---railway crossing~\cite{liu1998railwaycrossing}, interlocking
+\cite{luo2017railway}, Agile-SOFL ATM constraints~\cite{li2022qrs_companion},
+and book applications~\cite{liu2004soflbook,li2023iet_faultprevention}
+(\texttt{benchmarks/published\_industrial\_pilot.json};
+\texttt{run\_desens\_real\_sofl\_v1}; Z3 validation 0 fails).
+Under equal $K{=}3$ on \texttt{ecnu-plus}: B1/B2/\texttt{M\_eq} all reach
+\textbf{100.0\%} mean Conf.\ / Strict (paired M\_eq vs.\ B2: 0/0/28)
+(Table~\ref{tab:desens-real-sofl}).
+This is \textbf{not} a proprietary Casco/Mitsubishi dump; vendor
+\texttt{.asfl} files merge when placed under
+\texttt{vendor/agile-sofl-toolchain/examples} (see \texttt{vendor/README.md}).
+Saturation under a strong endpoint reinforces C4: mean Conf.\ alone does not
+justify escalating from B2 on published-industrial ordered-guard tasks.
+
+\input{tables/desens_real_sofl_pilot}
+
+\paragraph{GitHub live harvest (Wave-3).}
+Using authenticated GitHub search we downloaded public formal-spec artefacts
+and auto-extracted FSF processes from Agile-SOFL \texttt{.asfl} examples
+(\texttt{JaredYe04/agile-sofl-toolchain}; also discovered
+\texttt{HKCA09/SOFL-Maintainability-Experiment-Dataset} and
+\texttt{ICARUSxyz/FCoTFL}).
+After Z3 validation, $n{=}48$ tasks form
+\texttt{benchmarks/github\_harvest\_v1.json}
+(\texttt{run\_github\_harvest\_v1}).
+Under equal $K{=}3$ on \texttt{ecnu-plus}: B1 85.8\%, B2 89.9\%,
+\texttt{M\_eq} 89.9\% (paired M\_eq vs.\ B2 1/1/46)
+(Table~\ref{tab:github-harvest}).
+Unlike the saturated published-industrial pilot, this public harvest leaves
+headroom---and still selects B2 (tied with \texttt{M\_eq}) over B1 for mean
+Conf., reinforcing C4.
+
+\input{tables/github_harvest_eval}
+
+\paragraph{HKCA09 SOFL modules $\rightarrow$ FSF (expansion).}
+Full SOFL texts from
+\texttt{HKCA09/SOFL-Maintainability-Experiment-Dataset}
+(ATM, course/hospital registration, vending, stock, transit) are not
+auto-encodable as SMT FSF (maps/sequences).
+We reconstruct $n{=}35$ ordered-guard integer processes that preserve
+decision precedence
+(\texttt{benchmarks/hkca09\_sofl\_fsf.json}; RealSpec total $203$).
+Equal-$K$ ranking (\texttt{run\_hkca09\_b1b2m\_v1}): B1 74.3\%,
+B2/\texttt{M\_eq} 100\% (0/0/35)---B1 headroom with B2 sufficient for
+\textbf{C4} (Table~\ref{tab:hkca09-ranking}).
+One-shot E6 on a 57-task real/headroom slice saturates at Conf.\ $=1$ for
+all feedback variants: aggregate Conf.\ on this slice cannot carry C2.
+Hard-seed repair under \texttt{ecnu-plus}
+(\texttt{run\_hkca09\_hard\_seed\_e6\_v1}) is \emph{directional} on
+\texttt{wrong\_relop} (semantic\_ir 82.0\% vs.\ test\_only 69.3\%;
+${+}12.7$\,pp; 9/5/12; CI includes~0) and mixed on structural seeds
+(Table~\ref{tab:hkca09-hard-seed}).
+We therefore treat HKCA09 as C4 external validity plus a scoped hard-seed
+probe---\textbf{not} a second C2 headline.
+The publishable C2 advantage remains BENCH-120 E6 (${+}7.7$\,pp, CI
+excludes~0) and hard combo-seed support on \texttt{gemini-2.5-flash}
+(Table~\ref{tab:gemini-combo-n80}).
+
+\input{tables/hkca09_ranking}
+\input{tables/hkca09_hard_seed}
+
+\paragraph{Industrial decision procedure (C4).}
+Escalate to~M \emph{iff} the release bar requires $\mathrm{Accept}{=}1$
+\emph{or} a prevention target FAR${\le}5\%$ (E2 operating point) \emph{and}
+repair headroom remains; otherwise keep B2.
+Do \emph{not} escalate from overlap tertiles alone (E3 non-monotone).
+On industrial-pattern and desensitized published-industrial pilots, mean-Conf.\
+alone already selects B2 under strong endpoints.
+
+%=============================================================================
+\section{VerifierLoop-FSF Baseline (E13 / B6)}
+\label{sec:results:b6}
+%=============================================================================
+
+REV-7 implements mode~B6: SMT witnesses during repair with structured
+counterexample prompts but without Semantic Feedback IR or pattern guard
+(Section~\ref{sec:exp:methods}).
+Table~\ref{tab:b6-stratified} compares B6 with B2 and M on the same 30-task
+stratified subset as E12 (\texttt{run\_b6\_stratified\_v1}, repeat~0).
+B6 (86.0\% mean conformance) matches B2 (86.2\%) within 0.2~pp while M trails
+(83.3\%) on this subset---showing that witness-guided repair without the full IR
+recovers test-feedback-level aggregate performance, but does not close the gap to
+M on the full hard benchmark (Table~\ref{tab:b6-full}).
+
+\begin{table}[H]
+  \caption{VerifierLoop-FSF (B6) vs.\ B2/M on 30-task stratified subset (E13).
+    Same tasks and $K{=}3$ as E12; single repeat.}
+  \label{tab:b6-stratified}
+  \centering
+  \thesistable{%
+    \small
+    \begin{tabular}{lccc}
+      \toprule
+      Mode & $n$ & Conf.\ (\%) & Lat.\ (ms) \\
+      \midrule
+      B2 & 30 & 86.2 & 5{,}416 \\
+      B6 & 30 & 86.0 & 16{,}245 \\
+      M  & 30 & 83.3 & 15{,}099 \\
+      \bottomrule
+    \end{tabular}%
+  }
+\end{table}
+
+\begin{inlinetable}{B6 full hard-benchmark run (\texttt{run\_b6\_full\_v2}, $n{=}120$).}
+  \label{tab:b6-full}
+  \footnotesize
+  \begin{tabular}{lrrrr}
+    \toprule
+    Mode & Strict (\%) & Conf.\ (\%) & Kill (\%) & Lat.\ (ms) \\
+    \midrule
+    B2 & 5.0 & 88.2 & 61.4 & 7{,}189 \\
+    B6 & 5.0 & 81.1 & 51.0 & 21{,}440 \\
+    M  & 5.0 & 82.0 & 60.6 & 22{,}507 \\
+    \bottomrule
+  \end{tabular}
+\end{inlinetable}
+
+On the paired full 120-task export (\texttt{run\_b6\_full\_v2},
+Table~\ref{tab:b6-full}), B2 reaches 88.2\% Conf., B6 81.1\%, and M 82.0\%.
+Thus any SMT counterexample in the loop is \emph{not} enough for an aggregate
+Conf.\ win: B6 ${\approx}$~M, and both trail B2.
+Typed Semantic Feedback IR's value is shown under the controlled E6 setting
+(and in conjunctive $\mathrm{Accept}$ / PDR--FAR), not as ``M beats B6 on mean
+Conf.''
+B6 latency ($\approx$21\,s) exceeds B2 ($\approx$7\,s) but stays near this run's M
+($\approx$23\,s), consistent with formal checking inside the loop without
+pattern screening.
+
+\subsection{M\_lite: Witness + Semantic IR (E18)}
+\label{sec:results:m-lite}
+
+Mode \texttt{M\_lite} combines B6-style SMT witnesses in the repair loop with
+Semantic Feedback IR but \emph{without} the pattern guard
+(\texttt{run\_m\_lite\_v1}, $n{=}120$).
+Table~\ref{tab:m-lite} answers whether B2$+$typed IR is enough: M\_lite
+(79.0\%) trails B6 (81.8\%) and that run's B2 (89.3\%)---naive stacking fails.
+The E6 +7.7\,pp effect (vs.\ unstructured test-only under full~M) requires the
+full mode~M repair integration (IR$+$hard gate), not witnesses plus IR alone;
+practitioners should choose B2 (default mean Conf./latency) or full~M
+(Accept/PDR at ${\approx}3.3\times$ latency), not M\_lite as a shortcut.
+
+\begin{table}[H]
+  \caption{M\_lite vs.\ B6 vs.\ B2 on 120-task hard benchmark (E18).}
+  \label{tab:m-lite}
+  \centering
+  \thesistable{%
+    \small
+    \begin{tabular}{lccc}
+      \toprule
+      Mode & Conf.\ (\%) & Strict (\%) & Lat.\ (ms) \\
+      \midrule
+      B2      & 89.3 & 5.0 & 9{,}066 \\
+      B6      & 81.8 & 4.2 & 36{,}747 \\
+      M\_lite & 79.0 & 5.0 & 37{,}219 \\
+      M (E1)$^\dagger$  & 86.3 & 5.0 & 46{,}161 \\
+      \bottomrule
+      \multicolumn{4}{l}{\footnotesize $^\dagger$Historical pre-fix M
+        (\texttt{run\_e1\_canonical\_v1}); primary fixed-oracle M is 100.0\%.} \\
+    \end{tabular}%
+  }
+\end{table}
+
+%=============================================================================
+\section{Sensitivity Analysis}
+\label{sec:results:sensitivity}
+%=============================================================================
+
+The sensitivity question is whether the reported operating point is brittle.
+Figure~\ref{fig:sensitivity-heatmap} maps mean strict formal conformance against
+guard-overlap density and repair budget across modes.
+
+\begin{figure}[t]
+  \centering
+  \widefig{figures/sensitivity_heatmap.pdf}
+  \caption{Sensitivity heatmap: mean strict formal conformance as a function of
+    task complexity (guard-overlap tertile) and pipeline configuration.
+    Overlap tertiles are non-monotone for M vs.\ B2 on canonical E3; read with
+    Table~\ref{tab:e3-tiers}.}
+  \label{fig:sensitivity-heatmap}
+\end{figure}
+
+\subsection{Sensitivity to Task Complexity}
+
+The 120-task benchmark spans a range of complexity in terms of guard-overlap density
+and scenario count.
+Partitioning tasks into three tertiles based on guard-overlap rate shows
+non-monotone M vs.\ B2 ranking on canonical E3 (Table~\ref{tab:e3-tiers});
+higher overlap does not uniformly favour M.
+The sensitivity heatmap in Figure~\ref{fig:sensitivity-heatmap} visualises the
+same heterogeneity across all ten primary and ablation modes.
+
+\subsection{Sensitivity to Budget $K$}
+
+The budget parameter $K$ controls the maximum number of LLM calls in the repair
+loop.
+Mode A3 ($K=1$ effectively) achieves 82.4\% conformance on the
+\emph{historical} pre-fix corpus; full mode~M ($K=3$) reaches 86.3\% on
+pre-fix canonical E1 at seed~0---repair budget alone does not close the
+B1/B2 gap without overlap-conditional deployment.
+(Primary fixed-oracle E1: M~100.0\% / B2~98.3\%; A1--A3 not re-run.)
+The marginal return of the second iteration (roughly 3--4\,pp) is higher than that of
+the third (roughly 2--3\,pp), consistent with diminishing returns
+(Figure~\ref{fig:convergence}).
+Extrapolating, $K=2$ would likely yield conformance in the range 87--88\% on that
+historical corpus, comparable to pre-fix B2 but with Z3-guided feedback.
+The $K=3$ budget appears to be a reasonable operating point: it captures most of the
+attainable gain while keeping total LLM calls below 3.0 per task on average.
+
+\subsection{Sensitivity to Formal Case Count}
+
+The formal checker generates up to 64 conformance cases per task for final strict
+scoring, but uses only 16 cases per iteration during the repair loop.
+The 16-case internal budget trades coverage for latency; the 64-case strict pass
+improves sensitivity to guard-overlap faults on the final reported score.
+Increasing the internal case count from 16 to 32 would improve counterexample precision
+at the cost of approximately 50\% more Z3 time per iteration---a trade-off identified
+for future empirical investigation.
+
+\subsection{Sensitivity to LLM Choice}
+
+All experiments used Qwen2.5-27B-Instruct (\textsf{Qwen-27B}).
+The experimental design is not specific to this model; the only model-specific
+assumptions are (a)~the model can follow a structured Python code generation prompt,
+and (b)~the model can incorporate counterexample inputs into a repair prompt.
+A stronger base model would likely improve all LLM-based modes
+proportionally, with the B1/M gap potentially widening if that model learns to
+avoid ordering errors from the first attempt.
+Conversely, a weaker model would benefit more from the repair loop, increasing M's
+relative advantage.
+
+%=============================================================================
+\section{Statistical Test Summary}
+\label{sec:results:stats}
+%=============================================================================
+
+\input{tables/stats_summary}
+
+The decision implication of Table~\ref{tab:stats} is metric choice.
+Strict-success comparisons among LLM modes are not significant after
+Holm correction ($p{=}1.000$): the conjunctive gate is selective by design.
+Latency comparisons confirm the expected cost of M over B2
+(Mann--Whitney $p{<}0.001$, $4.05\times$ slower).
+Aggregate conformance gaps on pre-fix canonical E1 were not Holm-significant
+(M vs.\ B2 $p{=}1.0$); fixed-oracle E1 reports M vs.\ B2 as win rate and means
+only (2/120 wins, ${+}1.7$\,pp; no Holm claim).
+E6 (+7.7\,pp vs.\ unstructured test-only under full~M; E14 scopes
+traces) remains the adoption mechanism signal.
+Per-task win rate (2/120 fixed-oracle E1; E12 mean-across-seeds: 0 wins /
+1 loss / 119 ties) and overlap stratification (E3; fixed-oracle E10:
+M ${+}1.0$\,pp) supplement the headline means.
+These align with the per-task distributions
+in Figures~\ref{fig:conf-distribution} and~\ref{fig:conf-cdf}.
+
+%=============================================================================
+\section{Case Study: The Tax Bracket That Fooled the Unit Tests}
+\label{sec:results:case-study}
+%=============================================================================
+
+Aggregate tables answer \emph{how often}; this section answers \emph{what it
+felt like} when structured feedback actually moved a candidate.
+We walk one confrontation on the running example \code{compute\_tax}
+(Listings~\ref{lst:tax-fsf}--\ref{lst:tax-bug} in Chapter~\ref{ch:intro}):
+foreign-high surcharge must preempt the domestic mid bracket whenever both
+guards hold.
+The numbers below are representative of the E6 rescue regime
+(Tables~\ref{tab:e6-win-profile},~\ref{tab:e6-win-loss})---collapsed
+test-only feedback, then a typed IR that names the violated scenario.
+
+\subsection*{Act I --- The Plausible Bug}
+
+The first LLM draft looked almost careful.
+It rejected negative incomes, handled a mid bracket, and even mentioned the
+foreign-high surcharge---but in the wrong order:
+
+\inputpython{listings/compute_tax_bug.py}{First draft: mid bracket evaluated
+  before foreign-high surcharge.}{lst:case-bug}
+
+On everyday domestic incomes the function looks fine.
+A hand-written unit suite that samples
+$(\mathit{income},\mathit{is\_foreign})\in\{(30000,0),(60000,0),(90000,0)\}$
+returns \texttt{Low}/\texttt{DomesticMid} as expected and never draws a
+foreign earner above $120{,}000$.
+Pass rate on that suite: $3/3$.
+The bug is not ``the model cannot code''; it is that the model coded the
+\emph{natural} order of if-statements instead of the \emph{contracted}
+first-match order.
+
+\subsection*{Act II --- Why Ordinary Tests Let It Slip}
+
+Figure~\ref{fig:defect-vs-test} is exactly this geometry.
+Random or developer tests concentrate on $\mathit{is\_foreign}{=}0$ and mid
+incomes---the blue cloud on the left.
+The fatal overlap
+$\mathit{income}{\ge}120000 \wedge \mathit{is\_foreign}{=}1$ is a thin
+orange slice; without an SMT witness for $\Phi_2$, the suite never opens
+that door.
+Unstructured test-feedback repair, if it fires at all, typically says only
+``assertion failed'' or dumps raw I/O.
+That is the E6 \texttt{test\_only} regime: the model is told \emph{that}
+something failed, not \emph{which scenario under first-match} failed.
+In several E6 wins the test-only Conf.\ collapses to~$0$ while the typed IR
+still localises the residual region
+(Table~\ref{tab:e6-win-profile}).
+
+\subsection*{Act III --- Semantic Feedback IR Names the Wound}
+
+HSP-Agile does not argue with the blue cloud.
+It asks Z3 for a model of $\Phi_2$
+(Equation~\eqref{eq:phi-intro}) and gets $(150000,1)$.
+Oracle: \texttt{ForeignHigh}. Candidate: \texttt{DomesticMid}.
+The failure is packaged as a typed record before any English is rendered
+(Listing~\ref{lst:case-ir}).
+
+\begin{lstlisting}[language={},basicstyle=\ttfamily\footnotesize,frame=single,
+  caption={Semantic Feedback IR for the foreign-high miss (abbreviated).},
+  label={lst:case-ir}]
+{
+  "violation_type": "ordering",
+  "scenario_index": 2,
+  "constraint_text": "income >= 120000 && is_foreign == 1",
+  "inputs": {"income": 150000, "is_foreign": 1},
+  "expected": {"bracket": "ForeignHigh"},
+  "observed": {"bracket": "DomesticMid"},
+  "reason": "Scenario S2 must preempt S3 under first-match.",
+  "suggested_fix": "Evaluate foreign-high before domestic mid."
+}
+\end{lstlisting}
+
+The repair prompt then says, in substance:
+\begin{quote}
+\textit{For inputs} $(\mathit{income}{=}150000,\;\mathit{is\_foreign}{=}1)$,
+\textit{your code returned} \texttt{DomesticMid}, \textit{but the
+specification requires} \texttt{ForeignHigh}.
+\textit{This input satisfies Scenario~$S_2$}
+(\texttt{income >= 120000 \&\& is\_foreign == 1}),
+\textit{which must be matched before Scenario~$S_3$}.
+\textit{Suggested fix: evaluate the foreign-high surcharge before the
+domestic mid bracket.}
+\end{quote}
+That paragraph is the difference between E6 variants A/B and C: not more
+tokens for their own sake, but scenario identity, expected value, and a
+precedence hint the model can act on.
+
+\subsection*{Act IV --- The Rewrite}
+
+After one repair call ($T_\text{repair}{=}0$), the candidate restores
+contract order:
+
+\inputpython{listings/compute_tax_fixed.py}{Repaired candidate: foreign-high
+  before domestic mid.}{lst:case-fixed}
+
+Every SpecIR witness now matches, including $(150000,1)$; the structural
+screen is clear of RF07-style unconditional success; $\mathrm{Accept}{=}1$.
+Mean Conf.\ on the task jumps from a rescue-from-zero regime under
+test-only feedback to full witness agreement under typed IR---the same
+qualitative arc as the 13/14 E6 C$-$A wins that began with
+\texttt{test\_only} Conf${=}0$.
+
+\subsection*{What the Story Is Not}
+
+This case is an \emph{ordering} confrontation that motivates witnesses and
+the Accept gate.
+The dominant E6 Conf.\ \emph{gain} on BENCH-120 is still catch-all
+\texttt{others}/arithmetic rescue
+(Table~\ref{tab:defect-evidence-map}); we chose \code{compute\_tax} here
+because the running example makes the missed overlap legible without a
+synthetic HardCase id.
+The moral is the same either way: unstructured pass/fail leaves the model
+guessing; Semantic Feedback IR points at the wound and asks for a rewrite.
+
+\bigskip
+
+
+\section{Historical Failure Analysis (E9 Archive)}
+\label{sec:app:e9}
+% label on Chapter~8 pointer: sec:disc:failure-analysis
+%=============================================================================
+
+\paragraph{Archive status.}
+E9 was collected under the \emph{pre-fix} others-witness oracle, where
+\textbf{114 of 120 tasks (95.0\%)} failed conjunctive acceptance after
+$K{=}3$.
+Under fixed-oracle strengthened~M (\texttt{run\_e1\_m\_win\_v2}), Strict for~M
+is 100.0\%---so the E9 pie describes \textbf{historical residual mass only},
+not the current primary Strict rate.
+We retain it as a qualitative catalogue of failure \emph{modes} (ordering,
+boundary, arithmetic) that still guide future witness/IR design; we do
+\emph{not} cite E9 percentages as current effectiveness evidence.
+(Re-running E9 under the fixed oracle is future work: near-ceiling Strict
+leaves too few residuals for a powered taxonomy.)
+
+Despite strong mean conformance on several tiers, the historical E9 residual
+taxonomy assigned a primary failure category to \textbf{90} of 114
+non-accepted tasks under the pre-fix oracle.
+The pie in Figure~\ref{fig:failure-taxonomy} maps that archive residual mass.
+
+\begin{figure}[t]
+  \centering
+  \thesisfig[max width=0.72\linewidth]{figures/failure_taxonomy_pie.pdf}
+  \caption{\textbf{Claim (historical / pre-fix oracle):} residual failures
+    after $K=3$ on \texttt{run\_e1\_canonical\_v1} are dominated by ordering
+    and boundary errors, not random noise.
+    Under fixed-oracle E1, M Strict is 100.0\%---this pie is not the current
+    primary residual mass.
+    \textbf{How to read:} slices are shares of the $n{=}90$ E9-labelled
+    non-accepted tasks under mode~M (of 114 total non-accepted).}
+  \label{fig:failure-taxonomy}
+\end{figure}
+
+Of the 90 E9-labelled non-accepted tasks after $K{=}3$: OrderingError 31.1\% (LLM re-asserts
+wrong order), BoundaryError 26.7\% (off-by-one), ArithmeticError 17.8\%,
+StateError 13.3\%, Hallucination 5.6\% (often RF07), MissingConstraint /
+Other the rest.
+Implication: richer ordering/arithmetic feedback and denser boundary
+witnesses target the majority; multi-step witnesses target StateError.
+
+%-----------------------------------------------------------------------------
+\subsection{Named Failure Patterns}
+\label{sec:disc:failure-patterns}
+%-----------------------------------------------------------------------------
+
+Five recurring failure patterns account for the bulk of the 90 residual errors.
+
+\paragraph{Arithmetic reasoning failure.}
+The LLM produces a formula that is structurally correct (correct branches,
+correct variable references) but arithmetically wrong---for example, computing a
+weighted sum with the wrong denominator or using integer division where float
+division is required.
+HSP-Agile misses these because Z3 witnesses are generated from guard predicates,
+not from output expressions; the formal checker therefore cannot witness an
+expression-level arithmetic fault unless it happens to coincide with a guard
+boundary.
+
+\paragraph{Long-range dependency.}
+Some FSF specifications require the output of scenario~$i$ to depend on the
+\emph{cumulative} effect of scenarios $1, \ldots, i-1$ (e.g.\ a running total or
+a sequence-sensitive state machine transition).
+The repair loop issues one witness per scenario in isolation; it cannot construct
+a multi-step witness that would expose the accumulated-state fault.
+This structural limitation of the E9 formal checker (single-scenario witnesses)
+is the primary driver of \emph{OrderingError} and \emph{StateError} failures.
+
+\paragraph{State update confusion.}
+When two or more FSF scenarios modify the same output variable, the LLM
+occasionally generates code in which later scenarios overwrite rather than
+accumulate the earlier value.
+The counterexample-guided repair prompt identifies the violated scenario but does
+not explicitly communicate the accumulation invariant, so the LLM corrects the
+reported case while re-introducing the error in an adjacent scenario.
+Extending the Semantic Feedback IR with an explicit \texttt{accumulation\_mode}
+field would address this pattern.
+
+\paragraph{Unsatisfiable guard (Unsat guard).}
+A small number of FSF specifications contain scenario guards that Z3 proves
+mutually satisfiable but that the LLM interprets as mutually exclusive---producing
+dead branches or guard conditions that can never be simultaneously true.
+Because the implementation is syntactically valid and passes individual-scenario
+witnesses, the formal checker does not flag the dead branch; only a path-coverage
+oracle (not currently part of the pipeline) would detect it.
+
+\paragraph{Hallucinated API call.}
+The LLM occasionally calls a library function that does not exist in the
+permitted API surface defined by the FSF signature---for example, calling
+\texttt{math.log\_base(x, b)} instead of \texttt{math.log(x) / math.log(b)}.
+Pattern guard RF07 catches this post-generation, but the repair loop does not
+receive a structured signal about the illegal call; it receives only a generic
+runtime error counterexample, leading to repeated hallucinations across repair
+attempts.
+A dedicated RF07-triggered repair template that injects the legal API surface into
+the repair prompt would break this cycle.
+
+\subsection{Failure Trace: Scenario Ordering}
+\label{subsec:failure-trace-ordering}
+
+The failed \code{classify\_signal} candidate evaluates Scenario~2 before
+Scenario~1 (Listing~\ref{lst:llm-incorrect}, Section~\ref{sec:intro:problem}).
+Witness $\mathbf{x}^*=(\texttt{level}{=}{-3},\,\texttt{threshold}{=}{-10})$
+activates $S_1$ under first-match semantics; the checker emits:
+
+\begin{lstlisting}[language={},caption={Semantic Feedback IR (iteration 1).},
+  label=lst:classify-signal-ir]
+{
+  "violation_type": "ordering",
+  "scenario_index": 1,
+  "constraint_text": "level < 0",
+  "inputs": {"level": -3, "threshold": -10},
+  "expected": {"status": "Error"},
+  "observed": {"status": "Critical"},
+  "reason": "Scenario 1 violated under first-match guard precedence.",
+  "priority": 1,
+  "suggested_fix": "reorder guard evaluation to match specification precedence"
+}
+\end{lstlisting}
+
+\texttt{FeedbackRenderer} projects this JSON record into the repair prompt;
+at $k=2$ the candidate fixes the negative-threshold branch but re-introduces
+an ordering error on a different overlap region---illustrating why E9
+\emph{OrderingError} remains the largest residual category despite structured IR.
+
+\subsection{Failure Trace: Boundary Reasoning}
+\label{subsec:failure-trace}
+
+Task \texttt{HardCase036} specifies five scenarios with overlapping boundary
+guards.  At repair iteration $k=2$, witness $\mathbf{x}^*=(a=2,b=6,c=3)$
+activates Scenario~1 under first-match semantics.  The Semantic Feedback IR is:
+
+\begin{lstlisting}[language={},caption={Semantic Feedback IR (iteration 2).},
+  label=lst:failure-ir]
+{
+  "violation_type": "ordering",
+  "scenario_index": 1,
+  "constraint_text": "a le 3 && b gt 5",
+  "inputs": {"a": 2, "b": 6, "c": 3},
+  "expected": {"risk": 2, "action": 1},
+  "observed": {"risk": 1, "action": 3},
+  "reason": "guard evaluated out of order",
+  "priority": 1,
+  "suggested_fix": "reorder"
+}
+\end{lstlisting}
+
+Despite structured IR at $k=2$, repair at $k=3$ introduces a new ordering
+violation, illustrating \emph{long-range dependency} beyond single-step repair.
+
+\paragraph{Guard-graph pattern matching (future).}
+Representing SpecIR cases as a guard dependency graph enables reachability-based
+detection of shadow guards and unreachable paths beyond the current PoC
+smell catalogue---or by swapping in a stronger pluggable $\mathrm{Screen}$.
+
+
+%=============================================================================

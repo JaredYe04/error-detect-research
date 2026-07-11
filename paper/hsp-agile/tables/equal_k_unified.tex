@@ -1,0 +1,28 @@
+% Unified equal-K B1/B2/M_eq ranking across corpora (Accept hygiene).
+\begin{table}[t]
+  \centering
+  \caption{\textbf{Unified equal-$K$ ranking} ($K{=}3$ everywhere;
+    \texttt{M\_eq} $=$ witnesses + \texttt{semantic\_ir} + advisory gate).
+    Primary fair Conf.\ row is BENCH-120.
+    External rows often tie---supporting C4 default B2, not C2.
+    Real-priority micro is the non-synthetic ACL/billing/firewall mix.}
+  \label{tab:equal-k-unified}
+  \footnotesize
+  \renewcommand{\arraystretch}{1.12}
+  \begin{tabular}{@{}lcccc@{}}
+    \toprule
+    Corpus & B1 & B2 & \texttt{M\_eq} & vs.\ B2 \\
+    \midrule
+    BENCH-120 (\texttt{run\_e1\_equal\_k\_v1})
+      & --- & 97.5 & \textbf{100.0} & ${+}2.5$\,pp (3/0/117) \\
+    Real-priority micro ($n{=}30$)
+      & 95.6 & \textbf{100.0} & 100.0 & 0/0/30 \\
+    GitHub harvest ($n{=}48$)
+      & 85.8 & \textbf{89.9} & 89.9 & 1/1/46 \\
+    HKCA09$\rightarrow$FSF ($n{=}35$)
+      & 74.3 & \textbf{100.0} & 100.0 & 0/0/35 \\
+    Desens.\ published ($n{=}28$)
+      & 100.0 & 100.0 & 100.0 & 0/0/28 \\
+    \bottomrule
+  \end{tabular}
+\end{table}

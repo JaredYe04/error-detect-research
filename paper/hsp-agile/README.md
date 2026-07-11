@@ -1,9 +1,10 @@
 # HSP-Agile / SgDP — CCF-B Research Report
 
-> **Title:** *Deployment-Aware Specification-Guided Repair for Ordered Guard Specifications*  
+> **Title:** *Acceptance Safety: A Conjunctive Release Framework for LLM-Generated Guard Specifications*  
 > **Subtitle:** HSP-Agile: A SOFL/FSF Instantiation  
-> **Format:** A4 report (`report` class + `thesis.sty`), ~120 pages  
-> **Target:** CCF-B venues (SANER / ICSME / QRS / ICFEM; stretch ASE/TOSEM)
+> **Format:** A4 report (`report` class + `thesis.sty`)  
+> **Target:** CCF-B venues (SANER / ICSME / QRS / ICFEM); conference cut in `paper/hsp-agile-conference/`  
+> **Lead claim:** acceptance safety via conjunctive release (witnesses ∧ Screen), not Conf.\ dominance
 
 This directory contains the **expanded CCF-B research report**, upgraded from the short acmart conference draft. It reuses the thesis typography, diagrams, listings, and experimental figures while preserving the **SgDP framework narrative** (RQ1–RQ5, C1–C4, Theorems 1–3, E1–E16).
 
@@ -23,15 +24,14 @@ A shorter **conference cut** lives in [`paper/hsp-agile-conference/`](../hsp-agi
 | Ch 7 | `chapters/ch07_results.tex` | Mechanism-first results + all figures |
 | Ch 8 | `chapters/ch08_discussion.tex` | Failure analysis, paradox, threats, implications |
 | Ch 9 | `chapters/ch09_conclusion.tex` | Findings + future work |
-| App A–C | `appendices/app_*.tex` | Reproducibility, benchmark, pattern catalogue |
-
-Legacy short conference sections remain in `sections/` for reference; the **canonical source** is `chapters/`.
+| App A–D | `appendices/app_*.tex` | Reproducibility, benchmark, patterns, **stress-tests (E1/E8–E12/E9)** |
+|---------|------|---------|
 
 ## Build
 
 ```powershell
 # Full pipeline: refresh data → generate figures → compile PDF
-powershell -File scripts/build.ps1 -Clean
+powershell -File scripts/build.ps1 -Which all
 
 # Output
 # build/main.pdf

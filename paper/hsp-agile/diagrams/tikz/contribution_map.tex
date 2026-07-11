@@ -1,4 +1,4 @@
-% Research Contribution Map — Ch. 1 (V4: three Tier-1 insights only)
+% Research Contribution Map — Ch. 1 (V5: C2--C4 Tier-1; SpecIR premise)
 % Fragment: \input{diagrams/tikz/contribution_map} inside a figure environment.
 \usetikzlibrary{arrows.meta,shadows}
 
@@ -18,27 +18,32 @@
 \node[
   draw=blue!70!black, fill=blue!75!black, text=white,
   rounded corners=7pt,
-  minimum width=3.6cm, minimum height=1.2cm,
+  minimum width=3.8cm, minimum height=1.2cm,
   align=center, inner sep=8pt,
   font=\normalsize\sffamily\bfseries,
   drop shadow={shadow xshift=0.4ex, shadow yshift=-0.4ex,
                shadow opacity=0.30}
-] (hsp) at (0,0) {Three insights};
+] (hsp) at (0,0) {Tier-1: C2--C4};
 
-\node[cnode=blue]   (c1) at (-4.8,  2.4) {%
-  \textbf{C1: SpecIR}\\[2pt]
-  Prevention depends on\\semantic regions,\\not surface syntax};
+\node[cnode=gray]   (prem) at (-4.8,  2.4) {%
+  \textbf{Premise: SpecIR}\\[2pt]
+  First-match regions\\(engineering hinge;\\not monotone-overlap)};
 
 \node[cnode=green]  (c2) at ( 4.8,  2.4) {%
   \textbf{C2: Feedback IR}\\[2pt]
-  Repair needs a typed\\scenario failure,\\not raw test bits};
+  Spec-indexed structure\\beats unstructured\\test dumps (E6)};
 
-\node[cnode=orange] (c3) at ( 0.0, -2.8) {%
+\node[cnode=orange] (c3) at (-2.6, -2.8) {%
   \textbf{C3: Accept gate}\\[2pt]
-  Release $=$ full witness\\conformance $\wedge$\\clear pattern screen};
+  Release $=$ Conf${=}1$\\$\wedge$ clear pattern\\screen (E2)};
 
-\draw[->, ultra thick, blue!55!black]   (hsp) -- (c1);
-\draw[->, ultra thick, green!55!black]  (hsp) -- (c2);
-\draw[->, ultra thick, orange!65!black] (hsp) -- (c3);
+\node[cnode=purple] (c4) at ( 2.6, -2.8) {%
+  \textbf{C4: Deploy}\\[2pt]
+  B2 default; escalate\\iff Accept or\\FAR${\le}5\%$};
+
+\draw[->, thick, gray!70!black, dashed] (hsp) -- (prem);
+\draw[->, ultra thick, green!50!black]  (hsp) -- (c2);
+\draw[->, ultra thick, orange!60!black] (hsp) -- (c3);
+\draw[->, ultra thick, purple!60!black] (hsp) -- (c4);
 
 \end{tikzpicture}

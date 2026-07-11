@@ -174,6 +174,279 @@ PUBLISHED_INDUSTRIAL_PILOT_TASKS: list[dict[str, Any]] = [
         source="liu_sofl_online_banking",
         section="Fraud hold priority over routine transfer clearance",
     ),
+    # =========================================================================
+    # Wave-2 expansion (2026-07): desensitized reconstructions from additional
+    # *public* SOFL / interlocking / Agile-SOFL sources. Compact integer scales;
+    # no proprietary IDs, station names, or vendor dumps.
+    # =========================================================================
+    # --- Agile-SOFL ATM informal+formal example (Waseda Agile-SOFL PDF) ---
+    _task(
+        "PubIndPilot.AtmDeposit",
+        "atm_deposit",
+        inputs=[("auth", "int"), ("amount", "int"), ("cap", "int")],
+        outputs=[("ok", "int"), ("status", "int")],
+        scenarios=[
+            ("auth eq 0", "ok eq 0 && status eq 2"),
+            ("amount le 0", "ok eq 0 && status eq 1"),
+            ("amount gt cap", "ok eq 0 && status eq 1"),
+            ("auth gt 0 && amount gt 0 && amount le cap", "ok eq 1 && status eq 0"),
+        ],
+        source="li2022qrs_companion",
+        section="Agile-SOFL ATM deposit constraints (public teaching/industrial "
+        "example; amount cap mirrors published JPY limits scaled to ints)",
+    ),
+    _task(
+        "PubIndPilot.AtmTransfer",
+        "atm_transfer",
+        inputs=[("auth", "int"), ("balance", "int"), ("amount", "int"), ("xfer_cap", "int")],
+        outputs=[("ok", "int"), ("reason", "int")],
+        scenarios=[
+            ("auth eq 0", "ok eq 0 && reason eq 4"),
+            ("amount le 0", "ok eq 0 && reason eq 1"),
+            ("amount gt balance", "ok eq 0 && reason eq 2"),
+            ("amount gt xfer_cap", "ok eq 0 && reason eq 3"),
+            (
+                "auth gt 0 && amount gt 0 && amount le balance && amount le xfer_cap",
+                "ok eq 1 && reason eq 0",
+            ),
+        ],
+        source="li2022qrs_companion",
+        section="ATM/online transfer under auth/balance/cap (Agile-SOFL ATM "
+        "transfer function; desensitized)",
+    ),
+    _task(
+        "PubIndPilot.AtmInquire",
+        "atm_inquire",
+        inputs=[("auth", "int"), ("account_ok", "int")],
+        outputs=[("show", "int"), ("deny", "int")],
+        scenarios=[
+            ("auth eq 0", "show eq 0 && deny eq 1"),
+            ("account_ok eq 0", "show eq 0 && deny eq 1"),
+            ("auth gt 0 && account_ok gt 0", "show eq 1 && deny eq 0"),
+        ],
+        source="li2022qrs_companion",
+        section="ATM balance inquire; auth and account validity first",
+    ),
+    _task(
+        "PubIndPilot.DailyWithdrawCap",
+        "daily_withdraw_cap",
+        inputs=[("auth", "int"), ("amount", "int"), ("remaining", "int")],
+        outputs=[("cash", "int"), ("status", "int")],
+        scenarios=[
+            ("auth eq 0", "cash eq 0 && status eq 2"),
+            ("amount le 0", "cash eq 0 && status eq 1"),
+            ("amount gt remaining", "cash eq 0 && status eq 3"),
+            (
+                "auth gt 0 && amount gt 0 && amount le remaining",
+                "cash eq 1 && status eq 0",
+            ),
+        ],
+        source="li2022qrs_companion",
+        section="Daily withdrawal remaining-cap check (Agile-SOFL constraint "
+        "3.1 family; remaining = cap - used, desensitized)",
+    ),
+    # --- Extra interlocking decision tables (Luo/Casco + public interlocking lit) ---
+    _task(
+        "PubIndPilot.RouteConflict",
+        "route_conflict_check",
+        inputs=[("req_a", "int"), ("req_b", "int"), ("share_plat", "int")],
+        outputs=[("conflict", "int"), ("allow", "int")],
+        scenarios=[
+            ("req_a gt 0 && req_b gt 0 && share_plat gt 0", "conflict eq 1 && allow eq 0"),
+            ("req_a gt 0 && req_b eq 0", "conflict eq 0 && allow eq 1"),
+            ("req_b gt 0 && req_a eq 0", "conflict eq 0 && allow eq 1"),
+        ],
+        source="luo2017railway",
+        section="Conflicting routes sharing platform (industrial interlocking "
+        "pattern; cf. published compositional interlocking examples)",
+    ),
+    _task(
+        "PubIndPilot.FlankProtect",
+        "flank_protect",
+        inputs=[("route_set", "int"), ("flank_clear", "int"), ("override", "int")],
+        outputs=[("proceed", "int"), ("block", "int")],
+        scenarios=[
+            ("override gt 0", "proceed eq 0 && block eq 2"),
+            ("route_set eq 0", "proceed eq 0 && block eq 1"),
+            ("flank_clear eq 0", "proceed eq 0 && block eq 1"),
+            ("route_set gt 0 && flank_clear gt 0 && override eq 0", "proceed eq 1 && block eq 0"),
+        ],
+        source="luo2017railway",
+        section="Flank protection gate before proceed (desensitized from "
+        "public interlocking-table literature; SOFL-shaped FSF)",
+    ),
+    _task(
+        "PubIndPilot.ApproachLock",
+        "approach_lock",
+        inputs=[("train_app", "int"), ("signal_clear", "int"), ("timer", "int")],
+        outputs=[("locked", "int"), ("release", "int")],
+        scenarios=[
+            ("train_app gt 0 && signal_clear gt 0", "locked eq 1 && release eq 0"),
+            ("train_app gt 0 && timer lt 3", "locked eq 1 && release eq 0"),
+            ("train_app eq 0 && timer ge 3", "locked eq 0 && release eq 1"),
+        ],
+        source="liu1998railwaycrossing",
+        section="Approach locking / timed release (railway crossing + "
+        "interlocking public patterns)",
+    ),
+    _task(
+        "PubIndPilot.SignalClear",
+        "signal_clear_permit",
+        inputs=[("route_ok", "int"), ("track_clear", "int"), ("fault", "int")],
+        outputs=[("clear", "int"), ("restrict", "int")],
+        scenarios=[
+            ("fault gt 0", "clear eq 0 && restrict eq 2"),
+            ("route_ok eq 0", "clear eq 0 && restrict eq 1"),
+            ("track_clear eq 0", "clear eq 0 && restrict eq 1"),
+            ("route_ok gt 0 && track_clear gt 0 && fault eq 0", "clear eq 1 && restrict eq 0"),
+        ],
+        source="luo2017railway",
+        section="Signal clear only when route+track OK and no fault",
+    ),
+    # --- Liu SOFL book classic industrial teaching cases ---
+    _task(
+        "PubIndPilot.LibraryBorrow",
+        "library_borrow",
+        inputs=[("member_ok", "int"), ("copies", "int"), ("overdue", "int")],
+        outputs=[("loan", "int"), ("deny", "int")],
+        scenarios=[
+            ("member_ok eq 0", "loan eq 0 && deny eq 2"),
+            ("overdue gt 0", "loan eq 0 && deny eq 1"),
+            ("copies le 0", "loan eq 0 && deny eq 1"),
+            ("member_ok gt 0 && overdue eq 0 && copies gt 0", "loan eq 1 && deny eq 0"),
+        ],
+        source="liu2004soflbook",
+        section="Library borrow process (SOFL book industrial teaching case)",
+    ),
+    _task(
+        "PubIndPilot.LibraryReturn",
+        "library_return",
+        inputs=[("loan_active", "int"), ("days_late", "int")],
+        outputs=[("closed", "int"), ("fine", "int")],
+        scenarios=[
+            ("loan_active eq 0", "closed eq 0 && fine eq 0"),
+            ("days_late gt 0", "closed eq 1 && fine eq 1"),
+            ("loan_active gt 0 && days_late eq 0", "closed eq 1 && fine eq 0"),
+        ],
+        source="liu2004soflbook",
+        section="Library return with late fine priority",
+    ),
+    _task(
+        "PubIndPilot.WaterTank",
+        "water_tank_control",
+        inputs=[("level", "int"), ("inflow", "int"), ("alarm", "int")],
+        outputs=[("valve", "int"), ("pump", "int")],
+        scenarios=[
+            ("alarm gt 0", "valve eq 0 && pump eq 0"),
+            ("level ge 9", "valve eq 0 && pump eq 0"),
+            ("level le 2", "valve eq 1 && pump eq 1"),
+            ("level gt 2 && level lt 9", "valve eq 1 && pump eq 0"),
+        ],
+        source="liu2004soflbook",
+        section="Water-tank / process-control SOFL example (alarm preempts)",
+    ),
+    _task(
+        "PubIndPilot.HotelCheckout",
+        "hotel_checkout",
+        inputs=[("occupied", "int"), ("paid", "int"), ("damage", "int")],
+        outputs=[("release", "int"), ("bill", "int")],
+        scenarios=[
+            ("occupied eq 0", "release eq 0 && bill eq 0"),
+            ("paid eq 0", "release eq 0 && bill eq 2"),
+            ("damage gt 0", "release eq 0 && bill eq 1"),
+            ("occupied gt 0 && paid gt 0 && damage eq 0", "release eq 1 && bill eq 0"),
+        ],
+        source="liu_sofl_hotel",
+        section="Hotel checkout release under payment/damage guards",
+    ),
+    # --- IET fault-prevention / Agile-SOFL industrial modelling patterns ---
+    _task(
+        "PubIndPilot.AccessBadge",
+        "access_badge",
+        inputs=[("badge_ok", "int"), ("zone", "int"), ("time_ok", "int")],
+        outputs=[("open", "int"), ("alarm", "int")],
+        scenarios=[
+            ("badge_ok eq 0", "open eq 0 && alarm eq 2"),
+            ("time_ok eq 0", "open eq 0 && alarm eq 1"),
+            ("zone ge 3 && badge_ok gt 0", "open eq 0 && alarm eq 1"),
+            ("badge_ok gt 0 && time_ok gt 0 && zone lt 3", "open eq 1 && alarm eq 0"),
+        ],
+        source="li2023iet_faultprevention",
+        section="Physical access control ordered guards (IET SOFL "
+        "fault-prevention industrial modelling style)",
+    ),
+    _task(
+        "PubIndPilot.MedDose",
+        "med_dose_check",
+        inputs=[("weight", "int"), ("dose", "int"), ("allergy", "int")],
+        outputs=[("approve", "int"), ("flag", "int")],
+        scenarios=[
+            ("allergy gt 0", "approve eq 0 && flag eq 2"),
+            ("dose le 0", "approve eq 0 && flag eq 1"),
+            ("dose gt weight", "approve eq 0 && flag eq 1"),
+            ("allergy eq 0 && dose gt 0 && dose le weight", "approve eq 1 && flag eq 0"),
+        ],
+        source="li2023iet_faultprevention",
+        section="Medication dose safety checks (published SOFL healthcare "
+        "modelling pattern; desensitized units)",
+    ),
+    _task(
+        "PubIndPilot.PowerTrip",
+        "power_trip_protect",
+        inputs=[("current", "int"), ("temp", "int"), ("manual", "int")],
+        outputs=[("trip", "int"), ("warn", "int")],
+        scenarios=[
+            ("manual gt 0", "trip eq 1 && warn eq 2"),
+            ("current ge 9", "trip eq 1 && warn eq 2"),
+            ("temp ge 8", "trip eq 1 && warn eq 1"),
+            ("current lt 9 && temp lt 8", "trip eq 0 && warn eq 0"),
+        ],
+        source="li2023iet_faultprevention",
+        section="Power protection trip priority (industrial control FSF)",
+    ),
+    _task(
+        "PubIndPilot.TrafficPriority",
+        "traffic_signal_priority",
+        inputs=[("emergency", "int"), ("ped", "int"), ("phase", "int")],
+        outputs=[("light", "int"), ("hold", "int")],
+        scenarios=[
+            ("emergency gt 0", "light eq 0 && hold eq 2"),
+            ("ped gt 0 && phase eq 1", "light eq 1 && hold eq 1"),
+            ("phase eq 2", "light eq 2 && hold eq 0"),
+            ("phase eq 0", "light eq 0 && hold eq 0"),
+        ],
+        source="liu2004soflbook",
+        section="Traffic signal priority with emergency preempt "
+        "(SOFL-style ordered scenarios)",
+    ),
+    _task(
+        "PubIndPilot.InsuranceClaim",
+        "insurance_claim_triage",
+        inputs=[("fraud_score", "int"), ("amount", "int"), ("docs_ok", "int")],
+        outputs=[("pay", "int"), ("review", "int")],
+        scenarios=[
+            ("fraud_score ge 8", "pay eq 0 && review eq 2"),
+            ("docs_ok eq 0", "pay eq 0 && review eq 1"),
+            ("amount ge 9", "pay eq 0 && review eq 1"),
+            ("fraud_score lt 8 && docs_ok gt 0 && amount lt 9", "pay eq 1 && review eq 0"),
+        ],
+        source="li2023iet_faultprevention",
+        section="Insurance claim triage with fraud preempt (IET-style "
+        "requirements fault-prevention modelling)",
+    ),
+    _task(
+        "PubIndPilot.InventoryReorder",
+        "inventory_reorder",
+        inputs=[("stock", "int"), ("reorder_pt", "int"), ("on_order", "int")],
+        outputs=[("order", "int"), ("qty", "int")],
+        scenarios=[
+            ("on_order gt 0", "order eq 0 && qty eq 0"),
+            ("stock le reorder_pt", "order eq 1 && qty eq 2"),
+            ("stock gt reorder_pt", "order eq 0 && qty eq 0"),
+        ],
+        source="liu2004soflbook",
+        section="Inventory reorder decision (SOFL book / teaching industrial case)",
+    ),
 ]
 
 

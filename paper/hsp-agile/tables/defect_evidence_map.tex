@@ -1,0 +1,31 @@
+% Hand-maintained evidence map (P0 accept push).
+\begin{table}[t]
+  \centering
+  \caption{\textbf{Defect-class $\leftrightarrow$ evidence map.}
+    Ordering/preemption defects motivate $\Phi_i$ witnesses and E2 mutants;
+    E6's Conf.\ gain is a scenario-indexed \emph{rescue} under collapsed
+    unstructured feedback (catch-all \texttt{others}/arithmetic), not an
+    ordering-uniqueness proof on BENCH-120.}
+  \label{tab:defect-evidence-map}
+  \footnotesize
+  \renewcommand{\arraystretch}{1.12}
+  \begin{tabular}{@{}p{0.22\linewidth}p{0.28\linewidth}p{0.40\linewidth}@{}}
+    \toprule
+    \textbf{Defect class} & \textbf{Primary evidence} & \textbf{What it supports} \\
+    \midrule
+    Guard-order / preemption
+      & \texttt{compute\_tax} running example; $\Phi_i$ design;
+        E2 SNO/ORO/WRO mutants
+      & C3 acceptance safety + witness necessity (not E6 win set) \\
+    Catch-all \texttt{others} / output arithmetic
+      & E6 win coding (14/14 arithmetic @ scen.~8); C$-$A rescue
+      & C2 vs.\ unstructured dumps under headroom \\
+    Boundary / relop
+      & Hard combo-seed (gemini $n{=}80$); E9 historical residual
+      & Supporting C2 under harder injected bugs \\
+    Saturated easy endpoints
+      & Industrial-pattern $n{=}31$; desens.\ $n{=}28$; GitHub $n{=}48$; HKCA09 $n{=}35$
+      & C4 default B2 (often B2${=}$\texttt{M\_eq}) \\
+    \bottomrule
+  \end{tabular}
+\end{table}

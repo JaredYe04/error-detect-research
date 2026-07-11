@@ -1,0 +1,32 @@
+% Qualitative coding of all 14 E6 C-A wins (Agent A evidence).
+% Source: artifacts/strengthening_sprint/agent_a_evidence/E6_WIN_QUALITATIVE.md
+\begin{table}[t]
+  \centering
+  \caption{\textbf{E6 win qualitative coding} (all 14 C$-$A wins on
+    \texttt{run\_feedback\_v2}).
+    Every win is a catch-all \texttt{others} rescue (scenario index~8;
+    \texttt{violation\_type=arithmetic} / output-expression mismatch).
+    \textbf{Zero} wins are ordering-precedence repairs.
+    This answers the ``single-template vs.\ mechanism'' concern: the gain is
+    scenario-indexed residual repair under collapsed test-only Conf., not a
+    hidden ordering story on BENCH-120.}
+  \label{tab:e6-qual}
+  \footnotesize
+  \renewcommand{\arraystretch}{1.12}
+  \begin{tabular}{@{}lc@{}}
+    \toprule
+    Code & Count among 14 wins \\
+    \midrule
+    Catch-all \texttt{others} / output-expression rescue
+      & \textbf{14/14} \\
+    Ordering / first-match precedence repair
+      & \textbf{0/14} \\
+    Wins with \texttt{test\_only} Conf${=}0$ (collapsed dump)
+      & 13/14 \\
+    IR records: \texttt{scenario\_index}${=}8$ only
+      & 14/14 \\
+    IR records: \texttt{violation\_type}${=}$arithmetic
+      & 14/14 \\
+    \bottomrule
+  \end{tabular}
+\end{table}

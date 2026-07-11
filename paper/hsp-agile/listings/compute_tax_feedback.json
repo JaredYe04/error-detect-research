@@ -1,0 +1,11 @@
+{
+  "violation_type": "ordering",
+  "scenario_index": 2,
+  "constraint_text": "income >= 120000 && is_foreign == 1",
+  "inputs": {"income": 150000, "is_foreign": 1},
+  "expected": {"bracket": "ForeignHigh"},
+  "observed": {"bracket": "DomesticMid"},
+  "reason": "Scenario S2 must preempt S3 under first-match; both guards hold on this witness.",
+  "priority": 1,
+  "suggested_fix": "Evaluate the foreign-high surcharge before the domestic mid bracket."
+}

@@ -1,0 +1,34 @@
+% Field-structure ablation on hard combo seeds (gemini-2.5-flash).
+% Source: artifacts/run_ir_combo_seed_gemini_n40_v1 (n=120 paired cells).
+\begin{table}[t]
+  \centering
+  \caption{\textbf{Minimal structure vs.\ unstructured dumps}
+    (\texttt{run\_ir\_combo\_seed\_gemini\_n40\_v1}; freeze buggy code $\to$
+    one $T{=}0$ repair; $n{=}120$ paired cells).
+    FULL (\texttt{semantic\_ir}) beats \texttt{test\_only},
+    \texttt{test\_expected}, and NL-only dumps of the same facts
+    (CI excludes~0).
+    Dropping any \emph{single} IR field does \emph{not} uniquely kill the
+    gain (CIs include~0)---so C2 is a \emph{structure-vs-unstructured}
+    claim, not a one-field necessity theorem.
+    Lead C2 remains E6 on \texttt{ecnu-plus}; this table answers the
+    reviewer question on minimal sufficient structure under headroom.}
+  \label{tab:field-structure}
+  \footnotesize
+  \renewcommand{\arraystretch}{1.12}
+  \begin{tabular}{@{}lcccc@{}}
+    \toprule
+    Contrast (FULL $-$ $X$) & $\Delta$ (pp) & W/L/T & 95\% CI & Excl.~0 \\
+    \midrule
+    vs.\ \texttt{test\_only} & \textbf{+33.2} & 47/8/65 & $[24.7,\,41.7]$ & Yes \\
+    vs.\ \texttt{test\_expected} & \textbf{+32.6} & 47/8/65 & $[24.3,\,41.0]$ & Yes \\
+    vs.\ \texttt{ir\_nl\_only} & \textbf{+28.0} & 46/12/62 & $[19.1,\,36.9]$ & Yes \\
+    \midrule
+    vs.\ \texttt{ir\_no\_scenario\_id} & $-0.9$ & 22/17/81 & $[-9.3,\,7.1]$ & No \\
+    vs.\ \texttt{ir\_no\_expected} & $+5.0$ & 29/17/74 & $[-3.4,\,13.5]$ & No \\
+    vs.\ \texttt{ir\_no\_constraint} & $0.0$ & 21/18/81 & $[-8.4,\,8.2]$ & No \\
+    vs.\ \texttt{ir\_no\_reason} & $+1.6$ & 22/14/84 & $[-6.0,\,9.0]$ & No \\
+    vs.\ \texttt{ir\_no\_suggested\_fix} & $+7.3$ & 24/17/79 & $[-0.3,\,14.9]$ & No \\
+    \bottomrule
+  \end{tabular}
+\end{table}

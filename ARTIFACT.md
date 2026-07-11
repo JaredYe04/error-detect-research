@@ -33,7 +33,7 @@ pip install -e .
 python experiments/run_all.py --quick          # smoke: B0,B1,M × 1 repeat
 python experiments/run_sweep.py --experiment feedback_variants --run-name run_feedback_v2
 python paper/hsp-agile/scripts/prepare_mechanism_data.py --feedback-dir artifacts/run_feedback_v2/feedback_variants
-cd paper/hsp-agile && powershell -File scripts/build_pdf.ps1 -SkipRefresh
+cd paper/hsp-agile && powershell -File scripts/build.ps1 -Which long -SkipRefresh
 ```
 
 ## ASE / SANER artifact checklist (self-check)
@@ -47,7 +47,7 @@ cd paper/hsp-agile && powershell -File scripts/build_pdf.ps1 -SkipRefresh
 | **Schemas** | Yes | `schemas/spec_ir.schema.json`, `schemas/semantic_feedback.schema.json` |
 | **Tests** | Yes | `tests/test_spec_ir.py`, `test_feedback_ir.py`, `test_schema_validate.py` |
 | **Raw logs** | Partial | `artifacts/run_feedback_v2/` (E6); main E1 run bundled separately |
-| **Paper build** | Yes | `paper/hsp-agile/scripts/build_pdf.ps1` |
+| **Paper build** | Yes | `paper/hsp-agile/scripts/build.ps1 -Which all` |
 
 ## Key paths
 

@@ -1,5 +1,6 @@
 %% diagrams/tikz/defect_vs_test.tex
-%% Left: random tests miss negative-threshold region; Right: SMT witness hits it.
+%% Running example compute_tax: random tests miss foreign-high overlap;
+%% SMT witness for Phi_2 hits (150000, 1).
 \input{diagrams/tikz/_theme}
 
 \begin{tikzpicture}[
@@ -15,17 +16,17 @@
   \draw[gray!50, fill=gray!6, thick]
     (-2.2,-1.9) rectangle (2.2,2.2);
   \node[font=\scriptsize\sffamily, gray!60!black] at (0,2.0)
-    {Input space $(\mathit{level},\mathit{threshold})$};
+    {Input space $(\mathit{income},\mathit{is\_foreign})$};
 
-  % Non-negative threshold band (sampled)
+  % Domestic / common band (sampled)
   \fill[SpecBlue!25] (-2.0,-0.2) rectangle (2.0,1.7);
-  \node[font=\scriptsize\sffamily, SpecBlue!70!black] at (0,0.75)
-    {Typical tests: $\mathit{threshold}\ge 0$};
+  \node[font=\scriptsize\sffamily, SpecBlue!70!black, align=center]
+    at (0,0.75) {Typical tests:\\$\mathit{is\_foreign}{=}0$\\or mid incomes};
 
-  % Negative threshold region (missed)
+  % Foreign-high overlap (missed)
   \fill[SpecOrange!20] (-2.0,-1.7) rectangle (2.0,-0.35);
   \node[font=\scriptsize\sffamily, SpecOrange!80!black, align=center]
-    at (0,-1.05) {Missed region\\$\mathit{threshold}<0$\\(ordering defect)};
+    at (0,-1.05) {Missed overlap\\$\mathit{income}{\ge}120\mathrm{k}$\\$\wedge\;\mathit{is\_foreign}{=}1$};
 
   \foreach \x/\y in {-1.2/1.2, -0.3/0.4, 0.8/1.0, 1.4/0.2, -0.8/1.5}
     \fill[SpecBlue!80!black] (\x,\y) circle (2.2pt);
@@ -39,7 +40,7 @@
 % Right panel: SMT witness
 \begin{scope}[xshift=6.0cm, local bounding box=right]
   \node[font=\bfseries\sffamily, anchor=south] at (0,2.55)
-    {SMT witness ($\Phi_1$)};
+    {SMT witness ($\Phi_2$)};
   \draw[gray!50, fill=gray!6, thick]
     (-2.2,-1.9) rectangle (2.2,2.2);
   \node[font=\scriptsize\sffamily, gray!60!black] at (0,2.0)
@@ -48,7 +49,7 @@
   \fill[SpecBlue!12] (-2.0,-0.2) rectangle (2.0,1.7);
   \fill[SpecGreen!25] (-2.0,-1.7) rectangle (2.0,-0.35);
   \node[font=\scriptsize\sffamily, SpecGreen!70!black, align=center]
-    at (0,-1.05) {Forced hit:\\$(-3,-10)$\\activates $S_1$ first};
+    at (0,-1.05) {Forced hit:\\$(150000,1)$\\activates $S_2$ first};
 
   \fill[SpecGreen!80!black] (-0.4,-1.05) circle (3.5pt);
   \draw[SpecOrange!90!black, thick] (-0.4,-1.05) circle (5.5pt);

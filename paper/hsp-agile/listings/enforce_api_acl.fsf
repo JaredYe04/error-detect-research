@@ -1,0 +1,20 @@
+# enforce_api_acl(role: int, scope: int, mfa: int) -> (permit, step_up)
+#
+# Public ACL-style ordered contract (RealSpec / GitHub-harvest family):
+# deny guests; step-up when high scope lacks MFA; permit admin/reader bands;
+# OTHERWISE must deny (catch-all fail-closed).
+#
+# S1: WHEN role eq 0
+#         THEN permit = 0 && step_up = 0
+#
+# S2: WHEN scope ge 3 && mfa eq 0
+#         THEN permit = 0 && step_up = 1
+#
+# S3: WHEN role ge 3 && scope le 3
+#         THEN permit = 1 && step_up = 0
+#
+# S4: WHEN role ge 1 && scope le 1
+#         THEN permit = 1 && step_up = 0
+#
+# S5: OTHERWISE
+#         THEN permit = 0 && step_up = 0   -- fail-closed residual

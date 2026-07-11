@@ -1,0 +1,53 @@
+{
+  "path": "D:\\repos\\error-detect-research\\benchmarks\\real_priority_micro_v1.json",
+  "n_built": 30,
+  "n_ok": 30,
+  "n_fail": 0,
+  "failures": [],
+  "task_ids": [
+    "RealPriority.FirewallAcl",
+    "RealPriority.SolidityRoleGate",
+    "RealPriority.ComputeTax",
+    "RealPriority.BillingTier",
+    "RealPriority.NftRoyalty",
+    "RealPriority.RoutePriority",
+    "IndustrialSOFL.LoanUnderwrite",
+    "IndustrialSOFL.WireTransferGate",
+    "IndustrialSOFL.CallRoute",
+    "IndustrialSOFL.SmsThrottle",
+    "IndustrialSOFL.BadgeAccess",
+    "IndustrialSOFL.ApiAcl",
+    "IndustrialSOFL.DoseAlert",
+    "IndustrialSOFL.PickPriority",
+    "IndustrialSOFL.FareRule",
+    "IndustrialSOFL.ClaimTriage",
+    "IndustrialSOFL.BoilerInterlock",
+    "IndustrialSOFL.ApiRateLimit",
+    "IndustrialSOFL.CardFraud",
+    "IndustrialSOFL.OvertimePay",
+    "GitHubHarvest.ASFL_AddToCart",
+    "GitHubHarvest.ASFL_Checkout",
+    "GitHubHarvest.ASFL_Refund",
+    "GitHubHarvest.ASFL_Authorize",
+    "GitHubHarvest.ASFL_Capture",
+    "GitHubHarvest.ASFL_CollectFee",
+    "GitHubHarvest.ASFL_RefundFee",
+    "GitHubHarvest.ASFL_AdmitUrgent",
+    "GitHubHarvest.ManualSeed_TelecomSeverity",
+    "HKCA09.Atm.Auth"
+  ],
+  "domains": [
+    [
+      -100,
+      100
+    ],
+    [
+      -5,
+      20
+    ],
+    [
+      -5,
+      2048
+    ]
+  ]
+}

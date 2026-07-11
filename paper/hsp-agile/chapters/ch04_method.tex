@@ -1,19 +1,24 @@
 %% ch04_method.tex  —  Chapter 4: The SgDP Framework and HSP-Agile Instantiation
 %% HSP-Agile Thesis, East China Normal University, 2026
+%% Staging rewrite: paper/hsp-agile/_rewrite/ch04_method.tex
 
 \chapter{The \textsc{SgDP} Framework and HSP-Agile Instantiation}
 \label{ch:method}
 
-This chapter realises the three insights of Chapter~\ref{ch:intro}:
-SpecIR semantic regions (C1), Semantic Feedback IR (C2), and conjunctive
-acceptance (C3).
+This chapter realises the two mechanisms introduced in
+Chapter~\ref{ch:intro}: structured scenario-aware repair feedback~(C2) and
+dual-gate acceptance~(C3), on top of the SpecIR engineering hinge.
 Chapter~\ref{ch:formalization} fixed the objects; here they become a loop an
 LLM can participate in.
 Adapters and FSF lowering are necessary engineering for the HSP-Agile
 instantiation, not claimed contributions.
-The industrial-monitoring example \code{classify\_signal} is run end to end
-\emph{before} the interfaces are stated---so the four stages are seen as
-artefact transforms, not as a taxonomy.
+
+The walkthrough opens with the \emph{primary} vignette from
+Chapter~\ref{ch:intro}---the catch-all / \texttt{OTHERWISE} tier classifier---so
+the four stages are seen as artefact transforms before the interfaces are
+named.
+Ordered-overlap examples (\code{classify\_signal}, \code{compute\_tax}) appear
+as a \emph{secondary} thread for witness priority formulas $\Phi_i$.
 Notation is inherited:
 $t = (\mathcal{S}_t, \mathcal{X}_t, \mathcal{Y}_t)$, oracle $g_t$, and
 first-match semantics over $\mathcal{S}_t = \langle s_1,\ldots,s_n\rangle$.
@@ -21,66 +26,60 @@ first-match semantics over $\mathcal{S}_t = \langle s_1,\ldots,s_n\rangle$.
 \section{Pipeline Intuition}
 \label{sec:method:intuition}
 
-One sentence: synthesise from FSF text, check on first-match SMT witnesses,
-repair from a typed failure record, release only when every witness matches
-and no high-severity pattern remains.
+Synthesise from FSF text, check on first-match SMT witnesses, repair from a
+typed failure record, and release only when every witness matches \emph{and} no
+high-severity structural pattern remains.
 Figure~\ref{fig:sgdp-overview} (Chapter~\ref{ch:intro}) is that loop; the
 dashed orange arc is budget~$K=3$.
 
-\section{Worked Example: \texttt{classify\_signal} End to End}
+\section{Worked Example: Catch-All Rescue End to End}
 \label{sec:method:worked}
 
-Observation first: the buggy candidate of Listing~\ref{lst:llm-incorrect}
-returns \texttt{"Critical"} on $(-3,-10)$ where the oracle requires
-\texttt{"Error"}.
+\paragraph{Primary vignette.}
+Listings~\ref{lst:others-fsf}--\ref{lst:others-bug} define a three-scenario
+tier classifier: Reject on negative scores, Pass at or above a floor, and
+\texttt{OTHERWISE} must return \texttt{Review}.
+The buggy candidate collapses the residual into \texttt{Pass}.
+Busy Reject/Pass tests all succeed; the mid-band never reaches a human.
+
 The walkthrough below shows how each stage transforms that failure into a
 repairable record and, after one iteration, into $\mathrm{Accept}=1$.
-Figure~\ref{fig:worked-example-trace} is the artefact trail.
-
-\begin{figure}[t]
-  \centering
-  \tikzinput{diagrams/tikz/worked_example_trace}
-  \caption{\textbf{Worked example trace for \code{classify\_signal}.}
-    FSF text yields an $S_1$ witness $(-3,-10)$; the buggy candidate returns
-    \texttt{Critical}; the Semantic Feedback IR names the ordering violation;
-    repair restores $S_1$-first evaluation and reaches $\mathrm{Conf}=1$.
-    Takeaway: each stage consumes a typed artefact from the previous stage.}
-  \label{fig:worked-example-trace}
-\end{figure}
 
 \paragraph{Stage~1 (synthesis).}
-The LLM receives the FSF text of Listing~\ref{lst:fsf-spec} and emits a Python
-function.
-A common first attempt is Listing~\ref{lst:llm-incorrect}: it tests
-$\mathit{level}\ge\mathit{threshold}$ before $\mathit{level}<0$.
+The LLM receives the FSF text of Listing~\ref{lst:others-fsf} and emits a
+Python function.
+A common first attempt is Listing~\ref{lst:others-bug}: the named guards look
+correct, but the catch-all returns the wrong constant.
 
 \paragraph{Stage~2 (witnesses and check).}
-The priority formulas for the three scenarios are
+The priority formulas for the three scenarios include a residual witness for
+the catch-all:
 \begin{align}
-  \Phi_1 &\triangleq \mathit{level}<0, \label{eq:phi1-example}\\
-  \Phi_2 &\triangleq \mathit{level}\ge\mathit{threshold}
-           \;\land\; \neg(\mathit{level}<0), \label{eq:phi2-example}\\
-  \Phi_3 &\triangleq \neg(\mathit{level}<0)
-           \;\land\; \neg(\mathit{level}\ge\mathit{threshold}).
+  \Phi_1 &\triangleq \mathit{score}<0, \\
+  \Phi_2 &\triangleq \mathit{score}\ge\mathit{floor}
+           \;\land\; \neg(\mathit{score}<0), \\
+  \Phi_3 &\triangleq \neg(\mathit{score}<0)
+           \;\land\; \neg(\mathit{score}\ge\mathit{floor}).
+  \label{eq:phi-catchall}
 \end{align}
-Z3 returns, among others, the model $(-3,-10)$ for $\Phi_1$.
-The oracle requires \texttt{"Error"}; the buggy candidate returns
-\texttt{"Critical"}, so $\mathrm{Conf}(c_1,t)<1$.
+Z3 returns, for $\Phi_3$, a mid-band model such as $(\mathit{score},\mathit{floor})=(3,10)$.
+The oracle requires \texttt{"Review"}; the buggy candidate returns
+\texttt{"Pass"}, so $\mathrm{Conf}(c_1,t)<1$.
 
 \paragraph{Stage~3 (Semantic Feedback IR).}
 The failure is recorded as a typed JSON object, then rendered to a repair
 prompt.  In abbreviated form:
 \begin{quote}
-\textit{``For inputs $(\mathit{level}{=}{-}3,\;\mathit{threshold}{=}{-}10)$,
-your code returned \texttt{Critical}, but the specification requires
-\texttt{Error}.
-This input satisfies Scenario~S1 ($\mathit{level}<0$), which must be matched
-before Scenario~S2.''}
+\textit{``For inputs $(\mathit{score}{=}3,\;\mathit{floor}{=}10)$,
+your code returned \texttt{Pass}, but the specification requires
+\texttt{Review}.
+This input satisfies Scenario~S3 (\texttt{others}/\texttt{OTHERWISE}), the
+catch-all residual after Reject and Pass.''}
 \end{quote}
 
 \paragraph{Stage~4 and acceptance.}
-After repair restores $S_1$-first evaluation, every witness matches and the
-pattern screen is clear, so $\mathrm{Accept}(c_2,t)=1$.
+After repair restores the correct catch-all constant, every witness matches and
+the pattern screen is clear, so $\mathrm{Accept}(c_2,t)=1$.
 Figure~\ref{fig:accept-tree} makes the conjunctive decision explicit:
 conformance alone never releases a candidate.
 
@@ -94,6 +93,37 @@ conformance alone never releases a candidate.
     witnesses or patterns still fail.}
   \label{fig:accept-tree}
 \end{figure}
+
+\paragraph{Secondary vignette (ordering / $\Phi_i$).}
+Ordered overlaps motivate the negated higher-priority guards inside
+Equation~\eqref{eq:priority}.
+On \code{classify\_signal}, $\Phi_1$ forces $\mathit{level}<0$ before the
+Critical band; a buggy candidate that tests $\mathit{level}\ge\mathit{threshold}$
+first returns \texttt{Critical} on $(-3,-10)$ where the oracle requires
+\texttt{Error}.
+Figure~\ref{fig:worked-example-trace} is that secondary artefact trail;
+Listings~\ref{lst:tax-fsf}--\ref{lst:tax-bug} are the tax-bracket twin used in
+Chapter~\ref{ch:intro}.
+
+\begin{figure}[t]
+  \centering
+  \tikzinput{diagrams/tikz/worked_example_trace}
+  \caption{\textbf{Secondary worked-example trail (\code{classify\_signal}).}
+    Ordering bug on $\Phi_1$: FSF text yields witness $(-3,-10)$; the buggy
+    candidate returns \texttt{Critical}; Semantic Feedback IR names the
+    precedence violation; repair restores $S_1$-first evaluation.
+    Primary vignette remains the catch-all tier classifier above.}
+  \label{fig:worked-example-trace}
+\end{figure}
+
+For the secondary example the priority formulas are
+\begin{align}
+  \Phi_1 &\triangleq \mathit{level}<0, \label{eq:phi1-example}\\
+  \Phi_2 &\triangleq \mathit{level}\ge\mathit{threshold}
+           \;\land\; \neg(\mathit{level}<0), \label{eq:phi2-example}\\
+  \Phi_3 &\triangleq \neg(\mathit{level}<0)
+           \;\land\; \neg(\mathit{level}\ge\mathit{threshold}).
+\end{align}
 
 \section{The \textsc{SgDP} Framework}
 \label{sec:method:sgdp}
@@ -112,8 +142,8 @@ Those ideas are the language-independent core of \textsc{SgDP}.
     An executable oracle derived from the formal specification, without a
     reference implementation.
   \item \textbf{Constraint-guided Witness Generator} ($\mathcal{W}$).
-    SMT-based witnesses aimed at the boundary regions where conformance
-    defects appear.
+    SMT-based witnesses aimed at the boundary and residual regions where
+    conformance defects appear.
   \item \textbf{Scenario-aware Semantic Feedback IR} ($\mathcal{F}$).
     Structured failure records that carry specification-level semantics into
     repair prompts, instead of raw pass/fail bits.
@@ -130,7 +160,8 @@ An instantiation for language $\mathcal{L}$ provides:
 (iv)~optional lowerer $\text{Lower}_{\text{FSF}}$ (HSP-Agile) $\to$ FSF TaskSpec;
 (v)~Semantic Feedback IR per \texttt{schemas/semantic\_feedback.schema.json},
     rendered by $\rho : \mathcal{F} \to \text{Prompt}$.
-Synthesis, repair, pattern guard, and acceptance are shared core components.
+Synthesis, repair, the pluggable structural screen, and acceptance are
+shared core components.
 
 \begin{figure}[t]
   \centering
@@ -158,10 +189,10 @@ The FSF oracle requires no reference implementation:
 \subsection{Constraint-guided Witness Generation}
 \label{subsec:witness-gen}
 
-Random tests rarely land where two guards overlap.
+Random tests rarely land in thin first-match regions---neither catch-all
+residuals nor multi-conjunct overlaps.
 What is needed is one input per scenario that activates that scenario
-\emph{and no higher-priority one}---exactly the region where ordering bugs
-appear.
+\emph{and no higher-priority one}.
 For scenario $s_i$, the witness generator therefore solves the
 \emph{priority formula}
 \begin{equation}
@@ -169,23 +200,20 @@ For scenario $s_i$, the witness generator therefore solves the
   \Phi_i \;\triangleq\; \hat{g}_i(\mathbf{x}) \;\land\; \bigwedge_{j=1}^{i-1} \lnot\hat{g}_j(\mathbf{x}),
 \end{equation}
 where $\hat{g}_j$ is the Z3 encoding of $g_j$.
-The negated higher guards are not optional: without them, a model of $g_i$
-alone may still belong to $s_j$ for some $j<i$.
+The negated higher guards are essential: without them, a model of $g_i$
+alone may still belong to $s_j$ for some $j<i$, and a catch-all encoded as
+\texttt{True} without negations would not isolate the residual.
 The witness set is $\mathcal{D}(t) = \{\mathbf{x}_1^*, \ldots, \mathbf{x}_n^*\}$.
 
 \begin{proposition}[Scenario-aware Witness Soundness]
 \label{thm:witness-soundness}
-If $\hat{g}_i$ soundly encodes $g_i$ and Z3 returns model $\mathbf{x}^*$ satisfying
-$\Phi_i$, then $g_i(\mathbf{x}^*)$ holds and $g_j(\mathbf{x}^*)$ is false for all $j < i$;
+Assume $\hat{g}_i$ soundly encodes $g_i$ and Z3 returns a model $\mathbf{x}^*$ of
+$\Phi_i$.
+Then $g_i(\mathbf{x}^*)$ holds and $g_j(\mathbf{x}^*)$ is false for all $j < i$;
 hence $g_t(\mathbf{x}^*) = \phi_i(\mathbf{x}^*)$.
-Soundness is conditional on a faithful SMT encoding of the SpecIR guards;
-it is a corollary of that encoding assumption rather than an independent
-correctness theorem for the deployed pipeline.
 \end{proposition}
 \begin{proof}
-By assumption, $\hat{g}_i$ soundly encodes $g_i$ and Z3 returns a model
-$\mathbf{x}^*$ of $\Phi_i$.
-Soundness of the encoding and of Z3 therefore yield
+By the encoding assumption and Z3 soundness,
 $g_i(\mathbf{x}^*)$ and $\lnot g_j(\mathbf{x}^*)$ for every $j<i$.
 By Definition~\ref{def:oracle},
 $i=\min\{j:g_j(\mathbf{x}^*)\}$, so
@@ -195,12 +223,18 @@ $g_t(\mathbf{x}^*)=\phi_i(\mathbf{x}^*)$.
 \subsection{Scenario-aware Semantic Feedback IR}
 \label{subsec:feedback-ir}
 
-Sending raw failing tests back to the LLM is not enough.
-The model needs to know \emph{which scenario} failed, \emph{why} the ordering
-matters, and \emph{what} the oracle expected.
+Raw failing tests omit the information the repair model needs:
+\emph{which} scenario failed, \emph{why} the region matters (catch-all residual
+or ordering precedence), and \emph{what} the oracle expected.
 That information is organised into a structured semantic record before any
-natural-language prompt is rendered.
-The record is the Semantic Feedback IR.
+natural-language prompt is rendered---the Semantic Feedback IR.
+
+The IR is designed so that scenario identity, guard text, observed/expected
+outputs, and a typed violation reason travel together into the repair prompt,
+rather than as an unstructured pass/fail dump.
+Empirical comparisons of feedback surfaces (E6, E14, and related ablations)
+are reported in Chapter~\ref{ch:results}; here we fix the representation and
+the renderer contract.
 
 \begin{equation}
   \mathcal{F}(i, c, t) = \langle \textit{type},\ s_i,\ g_i,\ \mathbf{x}_i^*,
@@ -210,102 +244,115 @@ The record is the Semantic Feedback IR.
 with \textit{type} $\in \{\text{ordering}, \text{boundary}, \text{arithmetic},
 \text{output}\}$, ranked \textit{priority}, and suggested \textit{fix}.
 A template then renders the IR into a repair prompt that names the violated
-scenario, states the guard, and enforces first-match ordering.
+scenario, states the guard, and states the expected postcondition.
 
-\paragraph{Example (classify\_signal).}
-The buggy candidate of Listing~\ref{lst:llm-incorrect} yields the JSON record
+\paragraph{Example (primary: catch-all).}
+The buggy candidate of Listing~\ref{lst:others-bug} yields the JSON record
 below (abbreviated).  The renderer projects the same object into the
 natural-language quote of Section~\ref{sec:method:worked}:
 \begin{lstlisting}[language={},basicstyle=\ttfamily\footnotesize,frame=single]
 {
-  "violation_type": "ordering",
-  "scenario_index": 1,
-  "constraint_text": "level < 0",
-  "inputs": {"level": -3, "threshold": -10},
-  "observed": "Critical",
-  "expected": "Error",
-  "reason": "S2 evaluated before S1",
+  "violation_type": "output",
+  "scenario_index": 3,
+  "constraint_text": "OTHERWISE (not Reject, not Pass)",
+  "inputs": {"score": 3, "floor": 10},
+  "observed": "Pass",
+  "expected": "Review",
+  "reason": "catch-all others returned wrong constant",
   "priority": "high",
-  "fix": "test level < 0 first"
+  "fix": "return Review on residual band"
 }
 \end{lstlisting}
-Serialisation follows \texttt{schemas/semantic\_feedback.schema.json};
-\texttt{FeedbackRenderer} projects the same IR onto E6 variants
-(\texttt{test\_only}, \texttt{test\_expected}, full \texttt{semantic\_ir})
-and the E14 length-matched surface \texttt{execution\_trace\_matched},
+Serialisation follows \texttt{schemas/semantic\_feedback.schema.json}.
+\texttt{FeedbackRenderer} projects the same IR onto the controlled E6 surfaces
+(\texttt{test\_only}, \texttt{test\_expected}, full \texttt{semantic\_ir}) and
+length-matched E14 surfaces (including \texttt{execution\_trace\_matched}),
 separating failure structure from prompt text.
 Default mode~M may render \texttt{execution\_trace\_matched} for repair;
-E6 holds the controlled isolation of \texttt{semantic\_ir} vs.\
-\texttt{test\_only} (primary C2 evidence).
-We do \emph{not} claim \texttt{semantic\_ir} is uniquely best among all
-structured traces---E14 shows length-matched
-\texttt{execution\_trace\_matched} can exceed it on mean Conf.
+E6 isolates \texttt{semantic\_ir} vs.\ \texttt{test\_only} as the primary C2
+comparison (Chapter~\ref{ch:results}).
+
+\paragraph{Example (secondary: ordering).}
+On \code{classify\_signal}, an ordering failure on $(-3,-10)$ is recorded with
+\texttt{violation\_type}: \texttt{ordering}, scenario index~1, observed
+\texttt{Critical}, expected \texttt{Error}, and a fix hint that restores
+$S_1$-first evaluation---the Semantic IR behind
+Figure~\ref{fig:worked-example-trace}.
 
 \subsection{Formal Conformance and Acceptance Predicate}
 \label{subsec:conformance-acceptance}
 
 Conformance answers a continuous question: on what fraction of witnesses does
 the candidate match the oracle?
-Acceptance answers a binary release question: is the candidate safe enough to
-ship under the conjunctive gate of Figure~\ref{fig:accept-tree}?
+Acceptance answers a binary \emph{acceptance-safety} question: is the
+candidate safe enough to ship under the conjunctive gate of
+Figure~\ref{fig:accept-tree}---witnesses \emph{and} a structural screen?
 
 \begin{equation}
   \label{eq:conformance}
   \mathrm{Conf}(c,t) = \frac{1}{|\mathcal{D}(t)|} \sum_{\mathbf{x} \in \mathcal{D}(t)}
   \mathbf{1}\bigl[f_c(\mathbf{x}) = g_t(\mathbf{x})\bigr].
 \end{equation}
-Let $\mathcal{P}^H$ be the nine high-severity RF patterns (Table~\ref{tab:patterns}).
-Release then requires both full witness agreement and a clear pattern screen:
+Let $\mathrm{Screen}(c,t)$ be the Stage~4 structural oracle
+(Section~\ref{sec:method:screen}).
+In this report's PoC, $\mathrm{Screen}$ fails iff any smell in the
+high-severity set $\mathcal{P}^H$ fires (Table~\ref{tab:patterns}); the
+interface itself is not tied to that catalogue.
+Release then requires both full witness agreement and a clear screen:
 \begin{equation}
   \label{eq:accept}
   \mathrm{Accept}(c,t) \;\iff\;
   \mathrm{Conf}(c,t) = 1 \;\land\;
-  \sum_{p \in \mathcal{P}^H} \mathbf{1}[p(c,t)] = 0.
+  \mathrm{Screen}(c,t) = \mathit{pass}.
 \end{equation}
+Equivalently, with the PoC encoding
+$\mathrm{Screen}(c,t)=\mathit{pass} \iff
+\sum_{p \in \mathcal{P}^H} \mathbf{1}[p(c,t)] = 0$.
+On the secondary tax vignette, Equation~\eqref{eq:accept} rejects both a
+foreign-high ordering bug exposed by $\Phi_2$ (Conf${<}1$) and an
+unconditional \texttt{return "Low"} shortcut that might still look clean on
+a lucky domestic suite (Screen fails via RF07).
 
-\begin{theorem}[Finite-Sample FAR Bound]
+\begin{proposition}[Finite-Sample FAR Bound under Independent Exposure]
 \label{thm:far-bound}
-For a task $t$ with $|\mathcal{D}(t)| = n$ SMT-generated witnesses drawn
-independently, the false-acceptance rate satisfies
-$\mathrm{FAR} \leq (1-\varepsilon)^n$,
-where $\varepsilon > 0$ is the minimum per-witness fault-exposure probability
-(Definition~\ref{def:fault-exposure}).
-The bound holds under independent (non-adversarial) witness draws and a
-faithful SMT encoding of first-match regions
-(Proposition~\ref{thm:witness-soundness}); it is motivational for the
-deployed deterministic $\Phi_i$ suite and does not constitute full
-correctness: a candidate accepted under~$\mathrm{Accept}(c,t)$ may still
-fail on inputs outside $\mathcal{D}(t)$.
-\end{theorem}
+\emph{Assumptions.}
+Fix a faulty candidate and a task~$t$ with $|\mathcal{D}(t)|=n$ witnesses.
+Assume (i)~each witness exposes the fault independently with probability at
+least $\varepsilon>0$ (Definition~\ref{def:fault-exposure}), and
+(ii)~witness draws are non-adversarial (i.i.d.\ relative to the fault).
+Then
+\[
+  \mathrm{FAR} \;\leq\; (1-\varepsilon)^n.
+\]
+\end{proposition}
 \begin{proof}
-Fix a faulty candidate and write $E_i$ for the event that witness $i$ fails to
-expose the fault.
-Independence of the $n$ witnesses and
-$\Pr[E_i]\le 1-\varepsilon$ give
+Write $E_i$ for the event that witness $i$ fails to expose the fault.
+Independence and $\Pr[E_i]\le 1-\varepsilon$ give
 \[
   \Pr[\text{all pass}\mid\text{faulty}]
   \;=\; \prod_{i=1}^{n}\Pr[E_i]
   \;\le\; (1-\varepsilon)^n.
 \]
 Hence $\mathrm{FAR}\le(1-\varepsilon)^n$.
-Proposition~\ref{thm:witness-soundness} ensures each
-$\mathbf{x}\in\mathcal{D}(t)$ lies in a strict first-match region under a
-faithful encoding, so
-$\varepsilon$ is bounded away from zero for the mutation operators of
-Section~\ref{sec:exp:mutants}; Corollary~\ref{cor:random-vs-smt} further places
-witnesses on precedence-critical boundaries.
-The bound is finite-sample only: acceptance under $\mathrm{Accept}(c,t)$ does
-not imply correctness on $\mathcal{X}_t\setminus\mathcal{D}(t)$.
 \end{proof}
 
-\noindent
-The bound is \emph{motivational} under i.i.d.\ witness assumptions and does
-\emph{not} constitute a correctness guarantee for $\mathrm{Accept}$: the
-deployed pipeline uses deterministic priority-encoded models
-(Equation~\eqref{eq:priority}), not independent random draws.
+\begin{remark}[Scope relative to the deployed suite]
+\label{rem:far-bound-scope}
+Proposition~\ref{thm:far-bound} is a finite-sample envelope under the stated
+i.i.d.\ exposure assumptions.
+The deployed pipeline uses deterministic priority-encoded models
+(Equation~\eqref{eq:priority}), not independent random draws; Proposition~\ref{thm:witness-soundness}
+ensures each $\mathbf{x}\in\mathcal{D}(t)$ lies in a strict first-match region
+under a faithful encoding, so $\varepsilon$ is bounded away from zero for the
+mutation operators of Section~\ref{sec:exp:mutants}
+(Corollary~\ref{cor:random-vs-smt}).
+Acceptance under $\mathrm{Accept}(c,t)$ does not imply correctness on
+$\mathcal{X}_t\setminus\mathcal{D}(t)$.
 Witness cardinality also differs by stage: the repair loop uses up to
-$N_{\max}$ cases (16 for mode~M); strict evaluation uses 64 cases; the FAR
-illustrative calculation below uses $n{=}9$ as an example only.
+$N_{\max}$ cases (16 for mode~M); strict evaluation uses 64 cases; the
+illustrative calculation in Section~\ref{subsec:far-validation} uses $n{=}9$
+as an example only.
+\end{remark}
 
 \subsection{Structured Feedback and Repair Hypothesis}
 \label{subsec:repair-monotonicity}
@@ -319,29 +366,30 @@ by plain test-pass/fail feedback.
 \end{hypothesis}
 
 \noindent
-Figures~\ref{fig:convergence} and~\ref{fig:feedback-variant}
-(Chapter~\ref{ch:results}) support the claim empirically; a fully formal
+Chapter~\ref{ch:results} tests this hypothesis empirically
+(Figures~\ref{fig:convergence} and~\ref{fig:feedback-variant}); a fully formal
 stochastic model of LLM repair is beyond current theory.
 
-\subsection{Empirical FAR Validation}
+\subsection{Empirical FAR Envelope}
 \label{subsec:far-validation}
 
 With $\varepsilon = 0.08$ and illustrative $n = 9$ (not the pipeline's
-$N_{\max}{=}16$ or strict-eval 64), Theorem~\ref{thm:far-bound} predicts
-$\mathrm{FAR} \leq (0.92)^9 \approx 0.473$; mode~M in E2 measures $0.14$
-(Table~\ref{tab:far-validation}), well inside the conservative bound
-(Section~\ref{sec:results:rq3}).
+$N_{\max}{=}16$ or strict-eval 64), Proposition~\ref{thm:far-bound} gives
+$\mathrm{FAR} \leq (0.92)^9 \approx 0.473$ ($\approx 47\%$).
+Chapter~\ref{ch:results} reports the operational E2 impl-screening rates
+(mode~M FAR $5.0\%$, B2 $8.8\%$; PDR $95.0\%$ / $91.2\%$;
+Table~\ref{tab:far-validation})---well inside that conservative envelope.
 
-\begin{inlinetable}{Theoretical FAR bound vs.\ empirical FAR (mode M, E2).}
+\begin{inlinetable}{Finite-sample FAR envelope vs.\ empirical E2 FAR
+  (impl-screening; full protocol in Section~\ref{sec:results:rq3}).}
   \label{tab:far-validation}
   \footnotesize
-  \begin{tabular}{lrr}
+  \begin{tabular}{lrrr}
     \toprule
-    Mode & Empirical FAR & Bound $(1-\varepsilon)^n$ \\
+    Mode & Empirical PDR & Empirical FAR & Bound $(1-\varepsilon)^n$ \\
     \midrule
-    B1  & 0.38 & --- \\
-    B2  & 0.22 & --- \\
-    M   & 0.14 & 0.47 \\
+    B2  & 91.2\% & 8.8\% & --- \\
+    M   & 95.0\% & 5.0\% & $\approx 47\%$ \\
     \bottomrule
   \end{tabular}
 \end{inlinetable}
@@ -396,7 +444,7 @@ E3--E4 confirm sub-linear cost relative to conformance gain
   \State $\mathcal{J}_k \leftarrow \textsc{ToJson}(\mathcal{F}(\text{failures}_k))$
         \Comment{schema: \texttt{semantic\_feedback.schema.json}}
   \State $\text{feedback}_k \leftarrow \rho(\mathcal{J}_k)$
-        \Comment{\texttt{FeedbackRenderer} projection (E6 / E14 variants)}
+        \Comment{\texttt{FeedbackRenderer} projection (E6 / E14 surfaces)}
   \State $\text{feedback}_k \mathrel{+}= \text{top-}5$ pattern violations from $\text{patterns}_k$
   \State update $\text{best}$ if $\mathrm{Conf}(c_k,t) > \mathrm{Conf}(\text{best},t)$
         \Comment{track $\arg\max$ Conf.\ over attempts}
@@ -410,16 +458,10 @@ E3--E4 confirm sub-linear cost relative to conformance gain
 On budget exhaustion the implementation returns the best-effort candidate
 $\arg\max_{k\le K}\mathrm{Conf}(c_k,t)$ among attempts (ties broken by formal
 pass and fewer blocking pattern hits), not necessarily $c_K$.
-\texttt{FeedbackRenderer} projects the same IR onto E6 variants
-(\texttt{test\_only}, \texttt{test\_expected}, \texttt{semantic\_ir}) and the
-E14 length-matched surface \texttt{execution\_trace\_matched}; default mode~M
-may use \texttt{execution\_trace\_matched} for repair prompts, while E6
-isolates \texttt{semantic\_ir} vs.\ \texttt{test\_only} under controlled
-comparison (C2 vs.\ unstructured feedback, not uniqueness among structured
-surfaces).
 Each iteration also logs
 $\langle k, \mathrm{Conf}(c_k,t), |\text{failures}_k|, |\text{patterns}_k|\rangle$
-to \texttt{attempt\_history} for E5--E6 analyses.
+to \texttt{attempt\_history} for repair-dynamics analyses in
+Chapter~\ref{ch:results}.
 
 \input{tables/symbols}
 \input{tables/glossary}
@@ -525,8 +567,8 @@ the Z3 encoding for one scenario.
 \subsection{Why SMT Over Random Testing}
 \label{subsec:method:smt-rationale}
 
-Random sampling rarely hits multi-conjunct first-match regions
-\citep{claessen2000quickcheck, zhu1997specification}.
+Random sampling rarely hits multi-conjunct first-match regions or catch-all
+residuals~\citep{claessen2000quickcheck, zhu1997specification}.
 $\Phi_i$ places each witness in scenario~$i$'s exclusive region
 (Proposition~\ref{thm:witness-soundness}), so oracle labels are unambiguous.
 
@@ -535,33 +577,74 @@ $\Phi_i$ places each witness in scenario~$i$'s exclusive region
 
 Stage~3 builds the Semantic Feedback IR
 (Section~\ref{subsec:feedback-ir}) and renders it via $\rho$;
-Figure~\ref{fig:repair-feedback} shows the
-\code{classify\_signal} arc (quote in Section~\ref{sec:method:worked}).
+Figure~\ref{fig:repair-feedback} shows the feedback arc for the primary
+catch-all vignette (quote in Section~\ref{sec:method:worked}).
 This is CEGIS with the LLM as synthesiser and the checker as
 verifier~\citep{sun2024clover, solarlezama2008sketching}.
 
 \begin{figure}[t]
   \centering
   \tikzinput{diagrams/tikz/repair_feedback}
-  \caption{\textbf{Key observation (C2):} repair names the violated scenario,
-    not only raw I/O (E6 vs.\ test-only; not a uniqueness claim vs.\ every
-    structured trace---see E14).
+  \caption{\textbf{Key observation (C2):} repair names the violated scenario
+    and expected postcondition, not only raw I/O.
     \textbf{How to read:} failed attempt $\to$ Semantic Feedback IR $\to$ next
-    synthesis.}
+    synthesis.
+    Controlled feedback comparisons are in Chapter~\ref{ch:results}.}
   \label{fig:repair-feedback}
 \end{figure}
 
-\section{Stage 4: Requirement Pattern Guard}
+\section{Stage 4: Configurable Static Screen inside Dual-Gate Acceptance}
+\label{sec:method:screen}
 \label{sec:method:guard}
 
-Witness agreement alone is insufficient~\citep{hovemeyer2004findbugs, li2023iet_faultprevention}.
-Stage~4 applies Table~\ref{tab:patterns}; nine high-severity patterns form
-$\mathcal{P}^H$ in equation~\eqref{eq:accept}.
+\subsection{Why Witnesses Alone Are Not Enough}
+\label{subsec:method:why-screen}
+
+Finite SMT witnesses answer a \emph{pointwise} question: does the candidate
+match the oracle on forced first-match regions?
+They do not answer a \emph{structural} question: did the model cheat the suite?
+A degenerate candidate that always returns a constant success flag can survive
+a thin suite that never exercises an overlap or a catch-all residual---the LLM
+``shortcut'' failure mode~\cite{dakhel2023copilot,hovemeyer2004findbugs}.
+Acceptance safety therefore needs a second conjunct after Conf.
+
+Stage~4 is any oracle
+\begin{equation}
+  \mathrm{Screen} : (\mathit{code},\, t) \longrightarrow
+  \{\mathit{pass},\mathit{fail}\}
+\end{equation}
+that emits severity-tagged hits into repair context.
+Conjunctive Accept requires
+$\mathrm{Conf}(c,t){=}1$ \emph{and}
+$\mathrm{Screen}(c,t){=}\mathit{pass}$
+(Figure~\ref{fig:accept-tree}; Equation~\eqref{eq:accept}).
+On the ACL case (Section~\ref{sec:results:acl-case}), witnesses already refuse
+the fail-open residual; Screen is the second latch when a sparse suite is
+unlucky.
+
+\subsection{Concrete Instantiation: AST Code-Smell Patterns (PoC)}
+\label{subsec:method:smell-poc}
+
+This study instantiates $\mathrm{Screen}$ as a catalogue of
+requirements-level smells RF01--RF14~\citep{li2023iet_faultprevention}
+(Appendix~\ref{app:patterns}).
+Detectors operate primarily on the Python AST (control-flow and return shape),
+with light surface checks where a smell is lexical.
+Table~\ref{tab:patterns} lists the fourteen smells; nine high-severity ones
+form the blocking set $\mathcal{P}^H$ in Equation~\eqref{eq:accept}, with RF07
+(\emph{unconditional success}) as the canonical critical shortcut on
+fail-closed contracts.
+The catalogue is a reproducible screen instance, not an exhaustive defect
+model.  Its operators are grounded in prior SOFL fault-prevention patterns,
+whereas E2 also includes first-match and postcondition mutants that do not map
+one-to-one onto these smells.  This separation prevents the prevention result
+from reducing to a detector tested only on its own templates.
 
 \begin{table}[H]
-  \caption{HSP-Agile Error Pattern Catalog ($|\mathcal{P}| = 14$).
-           \textbf{critical} patterns fail immediately; \textit{high} patterns
-           belong to $\mathcal{P}^H$.}
+  \caption{PoC structural smell catalogue ($|\mathcal{P}| = 14$).
+           Instance of the pluggable $\mathrm{Screen}$ interface.
+           \textbf{critical} smells fail immediately; \textit{high} smells
+           belong to the blocking set $\mathcal{P}^H$.}
   \label{tab:patterns}
   \centering
   \thesistable{%
@@ -590,14 +673,28 @@ $\mathcal{P}^H$ in equation~\eqref{eq:accept}.
   }
 \end{table}
 
-\subsection{Detection Method}
+\subsection{Configurable Screen Interface}
+\label{subsec:method:pluggable-screen}
+
+The evaluated mechanism is the second-gate role of a static screen inside
+$\mathrm{Accept}$; RF01--RF14 are a reproducible PoC chosen for
+alignment with prior SOFL fault-prevention patterns~\citep{li2023iet_faultprevention}.
+Any component that consumes $(c,t)$ and emits severity-tagged hits---a project
+smell pack, a CI static analyser
+\cite{hovemeyer2004findbugs,ayewah2007findbugs}, or an LLM review
+agent---can replace the PoC detectors without changing SpecIR witnesses,
+Semantic Feedback IR, or Equation~\eqref{eq:accept}.
+
+\subsection{Detection Method (PoC Wiring)}
 \label{subsec:method:detection}
 
-Each $p \in \mathcal{P}$ has detector $\delta_p$; structural patterns use AST
-analysis, surface patterns use regex, and guard-comparison patterns
-cross-reference FSF guards with candidate conditionals.
+Each PoC smell $p \in \mathcal{P}$ has detector $\delta_p$; structural smells
+use AST analysis, a minority use surface matching, and guard-comparison
+smells cross-reference FSF guards with candidate conditionals.
 $\mathrm{Hits}(c,t) = \{p : \delta_p(c,t)=1\}$; only $\mathcal{P}^H$ blocks
 acceptance.
+Replacing $\{\delta_p\}$ with another $\mathrm{Screen}$ implementation leaves
+Equations~\eqref{eq:conformance}--\eqref{eq:accept} unchanged.
 
 \section{Pipeline Stage Summary}
 \label{sec:method:summary}
@@ -617,8 +714,8 @@ Feedback IR~(C2), and conjunctive acceptance~(C3).
     1     & Synthesis     & $t$, $\mathit{fb}$  & $c_k$                      & stochastic \\
     2     & Formal Check  & $c_k$, $t$          & $\mathrm{Conf}$, $\mathit{cexs}$ & sound (Prop.~\ref{thm:witness-soundness}) \\
     3     & Repair        & $\mathit{cexs}$, $\mathit{hits}$ & $\mathit{fb}_k$ & CEGIS bridge \\
-    4     & Pattern Guard & $c_k$, $t$          & $\mathit{hits}$            & finite catalog \\
-    ---   & Accept        & $\mathrm{Conf}$, $\mathit{hits}$ & $\{0,1\}$     & conjunctive (motiv.\ bound~\ref{thm:far-bound}) \\
+    4     & Structural Screen & $c_k$, $t$          & $\mathit{hits}$ / veto     & pluggable ($\mathrm{Screen}$) \\
+    ---   & Accept        & $\mathrm{Conf}$, $\mathrm{Screen}$ & $\{0,1\}$     & conjunctive (Prop.~\ref{thm:far-bound}) \\
     \bottomrule
   \end{tabularx}
 \end{inlinetable}

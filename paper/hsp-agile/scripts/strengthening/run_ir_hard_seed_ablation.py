@@ -277,7 +277,28 @@ def main() -> None:
     ap.add_argument("--out-dir", type=Path, default=OUT_DEFAULT)
     ap.add_argument("--parallelism", type=int, default=4)
     ap.add_argument("--task-limit", type=int, default=None)
+    ap.add_argument(
+        "--variants",
+        nargs="+",
+        default=None,
+        help="Subset of feedback variants (default: full field ablation list)",
+    )
     args = ap.parse_args()
+
+    global VARIANTS
+    if args.variants:
+        label = {
+            "test_only": "A",
+            "test_expected": "B",
+            "semantic_ir": "FULL",
+            "ir_no_scenario_id": "NO_SID",
+            "ir_no_expected": "NO_EXP",
+            "ir_no_constraint": "NO_CON",
+            "ir_no_reason": "NO_REA",
+            "ir_no_suggested_fix": "NO_FIX",
+            "ir_nl_only": "NL",
+        }
+        VARIANTS = [(v, label.get(v, v[:8].upper())) for v in args.variants]
 
     raw = json.loads(args.task_ids.read_text(encoding="utf-8"))
     if isinstance(raw, dict) and "semantic_ir_wins" in raw:

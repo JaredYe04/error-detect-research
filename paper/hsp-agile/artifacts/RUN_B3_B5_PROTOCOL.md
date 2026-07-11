@@ -1,4 +1,4 @@
-﻿# B3--B5 extended baseline protocol (E1-ext)
+# B3--B5 extended baseline protocol (E1-ext)
 
 ## Status (2026-07-10, post REV-0)
 
@@ -73,4 +73,4 @@ python paper/hsp-agile/scripts/prepare_paper_data.py `
   --extended-repeat 0
 ```
 
-Then `paper/hsp-agile/scripts/build_pdf.ps1`.
+Then `powershell -File paper/hsp-agile/scripts/build.ps1 -Which long`.

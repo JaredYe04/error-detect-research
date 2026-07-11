@@ -1,40 +1,45 @@
-# CCF-B Accept Revision Status
+# Accept-Bar Revision Status (Breakout Iteration)
 
-Status for the HSP-Agile CCF-B Accept push as of 2026-07-10.
+**Date:** 2026-07-11  
+**Goal:** Borderline (~50%) → stable Weak Accept / Accept  
+**Policy:** Narrative reframing + evidence pruning; lead = conjunctive release
 
-## P0 — complete
+## Completed
 
-- Protocol card and fixed-oracle evidence roles are synchronized.
-- The abstract leads with E6 typed-feedback evidence, E2 prevention results,
-  and C4 deployment framing.
+| ID | Item | Status | Where |
+|----|------|--------|-------|
+| N1–N3 | Narrative + decision framework + ladder once | **DONE** | ch01, abstract, conference |
+| E1–E3 | Results spine + E6 qualitative + demote ceiling | **DONE** | ch07 |
+| R1–R3 | ACL case, LLM-as-judge, pluggable Screen | **DONE** | listings, ch02, ch04 |
+| D1 | Saturation honesty | **DONE** | ch08 |
+| C1 | Conference cut aligned | **DONE** | hsp-agile-conference |
+| **O1** | **Physical move E1/E8–E12/E13/sensitivity/case → App D** | **DONE** | `appendices/app_d_stress_tests.tex` |
+| **O1b** | **Physical move E9 failure analysis → App D** | **DONE** | same; ch08 pointer |
+| **O2** | Pre-fix Pareto/latency figures out of main ch07 | **DONE** | now only in App D |
 
-Authoritative run IDs, protocol boundaries, and headline values are recorded in
-[AUTHORITATIVE_NUMBERS.md](AUTHORITATIVE_NUMBERS.md).
+## Line counts (approx.)
 
-## P1 — complete (updated 2026-07-11)
+| File | Before | After |
+|------|--------|-------|
+| `ch07_results.tex` | ~1700 | **~698** |
+| `ch08_discussion.tex` | ~768 | **~622** |
+| `app_d_stress_tests.tex` | — | **~1196** (new) |
 
-- Fixed-oracle A1–A3 promoted: A3 −25.8 / A1 −17.5 / A2 0.0 (advisory+ceiling).
-- Equal-K `M_eq` +2.5 pp cited in abstract / Ch7 / conference.
-- E14 paired analysis scopes C2 uniqueness.
-- Strengthening-sprint IR uniqueness: **partial** — see
-  `strengthening_sprint/DATA_VERDICT.md`; gemini combo n=40 expand running.
+## Still open (optional next)
 
-## Remaining
+| ID | Item | Why |
+|----|------|-----|
+| O3 | Live vendor SOFL pilot | True external validity |
+| O4 | Screen swap experiment | Designer-bias threat |
+| O5 | Deeper De-AIGC on ch03–ch06 | Long formal/method prose |
+| O6 | Compile PDF + fix any broken refs | Verify App D labels |
 
-- **Gemini combo n=40** (`run_ir_combo_seed_gemini_n40_v1`): expand only non-saturated
-  endpoint; promote to paper **only if** CI-stable FULL−A / FULL−B across seeds.
-- **Single-factor B2 vs M′ (semantic_ir only):** optional; equal-K M_eq already
-  closer than K=5 bundle.
+## Estimated bar
 
-## Paper sync checklist
+| Before breakout | After narrative | After physical prune |
+|-----------------|-----------------|----------------------|
+| ~50% Borderline | ~58–65% Weak Accept | **~62–70% Weak Accept** (if conference spine-only) |
 
-| Artifact | Status |
-|----------|--------|
-| Long-paper Ch6 protocol card | Done |
-| Abstract / Ch1 / Ch9 lead = E6+E2+C4 | Done |
-| Ch7 ablation **fixed-oracle primary** (A3 −25.8 / A1 −17.5 / A2 0.0) | Done |
-| Conference stubs + README | Done |
-| E14 paired W/L/T | Done (`e14_paired_summary`) |
-| Ch2 repair-loop table caption | Done |
-| `stats_summary.tex` pre-fix note | Done |
-| `run_e1_ablation_fixed_v1` (360 jobs) | Done |
+## Scientific hypothesis (locked)
+
+> On ordered-guard contracts, escaped defects that mean pass rate hides can be reduced by specification-indexed feedback under headroom **and** a conjunctive release decision (witnesses ∧ Screen)—not by claiming a universally better code generator.

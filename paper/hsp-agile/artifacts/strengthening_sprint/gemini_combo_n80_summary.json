@@ -1,0 +1,95 @@
+{
+  "run": "pooled n40 + extra40",
+  "model": "gemini-2.5-flash",
+  "n_tasks": 80,
+  "n_paired_cells": 240,
+  "n_rows": 840,
+  "pooled": {
+    "test_only": {
+      "n": 240,
+      "full_mean": 0.30364583333333334,
+      "comp_mean": 0.0390625,
+      "delta_pp": 26.458333333333332,
+      "wins": 78,
+      "losses": 27,
+      "ties": 135,
+      "ci95_pp": [
+        20.989583333333332,
+        32.239583333333336
+      ],
+      "ci_excludes_0": true
+    },
+    "test_expected": {
+      "n": 240,
+      "full_mean": 0.30364583333333334,
+      "comp_mean": 0.03697916666666667,
+      "delta_pp": 26.666666666666668,
+      "wins": 79,
+      "losses": 18,
+      "ties": 143,
+      "ci95_pp": [
+        21.041666666666668,
+        32.34375
+      ],
+      "ci_excludes_0": true
+    },
+    "ir_no_expected": {
+      "n": 120,
+      "full_mean": 0.3770833333333333,
+      "comp_mean": 0.32708333333333334,
+      "delta_pp": 5.0,
+      "wins": 29,
+      "losses": 17,
+      "ties": 74,
+      "ci95_pp": [
+        -3.3333333333333335,
+        13.645833333333332
+      ],
+      "ci_excludes_0": false
+    }
+  },
+  "by_seed_vs_test_only": {
+    "combo_invert_relop": {
+      "n": 80,
+      "full_mean": 0.2765625,
+      "comp_mean": 0.0421875,
+      "delta_pp": 23.4375,
+      "wins": 25,
+      "losses": 8,
+      "ties": 47,
+      "ci95_pp": [
+        14.374999999999998,
+        32.96875
+      ],
+      "ci_excludes_0": true
+    },
+    "combo_swap_relop": {
+      "n": 80,
+      "full_mean": 0.3140625,
+      "comp_mean": 0.046875,
+      "delta_pp": 26.71875,
+      "wins": 25,
+      "losses": 8,
+      "ties": 47,
+      "ci95_pp": [
+        17.1875,
+        36.875
+      ],
+      "ci_excludes_0": true
+    },
+    "drop_first_guard": {
+      "n": 80,
+      "full_mean": 0.3203125,
+      "comp_mean": 0.028125,
+      "delta_pp": 29.21875,
+      "wins": 28,
+      "losses": 11,
+      "ties": 41,
+      "ci95_pp": [
+        19.53125,
+        40.0
+      ],
+      "ci_excludes_0": true
+    }
+  }
+}

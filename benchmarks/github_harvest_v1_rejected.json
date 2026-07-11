@@ -1,0 +1,196 @@
+[
+  {
+    "taskId": "GitHubHarvest.ASFL_InitCity",
+    "file": "JaredYe04_agile-sofl-toolchain__examples_graph-showcase.asfl",
+    "status": {
+      "ok": false,
+      "n_cases": 3,
+      "missing": [],
+      "ref_ok": false
+    }
+  },
+  {
+    "taskId": "GitHubHarvest.ASFL_ReconcileZones",
+    "file": "JaredYe04_agile-sofl-toolchain__examples_graph-showcase.asfl",
+    "status": {
+      "ok": false,
+      "n_cases": 3,
+      "missing": [],
+      "ref_ok": false
+    }
+  },
+  {
+    "taskId": "GitHubHarvest.ASFL_SyncSensors",
+    "file": "JaredYe04_agile-sofl-toolchain__examples_graph-showcase.asfl",
+    "status": {
+      "ok": false,
+      "n_cases": 3,
+      "missing": [],
+      "ref_ok": false
+    }
+  },
+  {
+    "taskId": "GitHubHarvest.ASFL_P",
+    "file": "JaredYe04_agile-sofl-toolchain__examples_highlight-edge-cases.asfl",
+    "status": {
+      "ok": false,
+      "n_cases": 3,
+      "missing": [
+        1
+      ],
+      "ref_ok": false
+    }
+  },
+  {
+    "taskId": "GitHubHarvest.ASFL_Triage",
+    "file": "JaredYe04_agile-sofl-toolchain__examples_hospital-registration.asfl",
+    "status": {
+      "ok": false,
+      "n_cases": 9,
+      "missing": [],
+      "ref_ok": false
+    }
+  },
+  {
+    "taskId": "GitHubHarvest.ASFL_SetComp",
+    "file": "JaredYe04_agile-sofl-toolchain__packages_parser_tests_fixtures_grammar_expressions_comprehension-types.asfl",
+    "status": {
+      "ok": false,
+      "n_cases": 3,
+      "missing": [],
+      "ref_ok": false
+    }
+  },
+  {
+    "taskId": "GitHubHarvest.ASFL_SeqComp",
+    "file": "JaredYe04_agile-sofl-toolchain__packages_parser_tests_fixtures_grammar_expressions_comprehension-types.asfl",
+    "status": {
+      "ok": false,
+      "n_cases": 3,
+      "missing": [],
+      "ref_ok": false
+    }
+  },
+  {
+    "taskId": "GitHubHarvest.ASFL_MapComp",
+    "file": "JaredYe04_agile-sofl-toolchain__packages_parser_tests_fixtures_grammar_expressions_comprehension-types.asfl",
+    "status": {
+      "ok": false,
+      "n_cases": 3,
+      "missing": [],
+      "ref_ok": false
+    }
+  },
+  {
+    "taskId": "GitHubHarvest.ASFL_P",
+    "file": "JaredYe04_agile-sofl-toolchain__packages_parser_tests_fixtures_grammar_expressions_comprehension.asfl",
+    "status": {
+      "ok": false,
+      "n_cases": 3,
+      "missing": [],
+      "ref_ok": false
+    }
+  },
+  {
+    "taskId": "GitHubHarvest.ASFL_Q",
+    "file": "JaredYe04_agile-sofl-toolchain__packages_parser_tests_fixtures_grammar_expressions_comprehension.asfl",
+    "status": {
+      "ok": false,
+      "n_cases": 3,
+      "missing": [],
+      "ref_ok": false
+    }
+  },
+  {
+    "taskId": "GitHubHarvest.ASFL_MapComp",
+    "file": "JaredYe04_agile-sofl-toolchain__packages_parser_tests_fixtures_grammar_expressions_map-comprehension.asfl",
+    "status": {
+      "ok": false,
+      "n_cases": 3,
+      "missing": [],
+      "ref_ok": false
+    }
+  },
+  {
+    "taskId": "GitHubHarvest.ASFL_P",
+    "file": "JaredYe04_agile-sofl-toolchain__packages_parser_tests_fixtures_grammar_fsf_multi-scenario.asfl",
+    "status": {
+      "ok": false,
+      "n_cases": 3,
+      "missing": [
+        1
+      ],
+      "ref_ok": false
+    }
+  },
+  {
+    "taskId": "GitHubHarvest.ASFL_P",
+    "file": "JaredYe04_agile-sofl-toolchain__packages_parser_tests_fixtures_grammar_modules_const-expr.asfl",
+    "status": {
+      "ok": false,
+      "n_cases": 3,
+      "missing": [],
+      "ref_ok": false
+    }
+  },
+  {
+    "taskId": "GitHubHarvest.ASFL_Init",
+    "file": "JaredYe04_agile-sofl-toolchain__packages_parser_tests_fixtures_grammar_modules_init-process.asfl",
+    "status": {
+      "ok": false,
+      "n_cases": 3,
+      "missing": [],
+      "ref_ok": false
+    }
+  },
+  {
+    "taskId": "GitHubHarvest.ASFL_P",
+    "file": "JaredYe04_agile-sofl-toolchain__packages_parser_tests_fixtures_grammar_negative_bad-comprehension.asfl",
+    "status": {
+      "ok": false,
+      "n_cases": 3,
+      "missing": [],
+      "ref_ok": false
+    }
+  },
+  {
+    "taskId": "GitHubHarvest.ASFL_P",
+    "file": "JaredYe04_agile-sofl-toolchain__packages_parser_tests_fixtures_grammar_negative_invalid-ext.asfl",
+    "status": {
+      "ok": false,
+      "n_cases": 3,
+      "missing": [],
+      "ref_ok": false
+    }
+  },
+  {
+    "taskId": "GitHubHarvest.ASFL_P",
+    "file": "JaredYe04_agile-sofl-toolchain__packages_parser_tests_fixtures_grammar_negative_unclosed-process.asfl",
+    "status": {
+      "ok": false,
+      "n_cases": 3,
+      "missing": [],
+      "ref_ok": false
+    }
+  },
+  {
+    "taskId": "GitHubHarvest.ASFL_Worker",
+    "file": "JaredYe04_agile-sofl-toolchain__packages_parser_tests_fixtures_grammar_processes_ext-alias.asfl",
+    "status": {
+      "ok": false,
+      "n_cases": 3,
+      "missing": [],
+      "ref_ok": false
+    }
+  },
+  {
+    "taskId": "GitHubHarvest.ASFL_P",
+    "file": "JaredYe04_agile-sofl-toolchain__packages_parser_tests_fixtures_grammar_processes_ext-alias.asfl",
+    "status": {
+      "ok": false,
+      "n_cases": 3,
+      "missing": [],
+      "ref_ok": false
+    }
+  }
+]

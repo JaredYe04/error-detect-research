@@ -1,0 +1,35 @@
+% When typed IR helps vs saturates — Accept-bar external/headroom card.
+\begin{table}[t]
+  \centering
+  \caption{\textbf{Headroom map (when C2 fires).}
+    Typed IR beats unstructured dumps only under repair headroom.
+    Saturated / tied rows support \textbf{C4 default B2}, not a C2 null.
+    Non-saturating rows are the transfer / public-model supports.}
+  \label{tab:headroom-map}
+  \footnotesize
+  \renewcommand{\arraystretch}{1.12}
+  \begin{tabular}{@{}p{0.34\linewidth}p{0.18\linewidth}p{0.40\linewidth}@{}}
+    \toprule
+    \textbf{Corpus / endpoint} & \textbf{Regime} & \textbf{Reading} \\
+    \midrule
+    E6 BENCH-120 @ \texttt{ecnu-plus}
+      & \textbf{Headroom}
+      & C$-$A ${+}7.7$\,pp (CI excl.~0); lead C2 \\
+    Hard combo @ \texttt{gemini-2.5-flash}
+      & \textbf{Headroom}
+      & FULL$-$test\_only ${+}26.5$\,pp; field table~\ref{tab:field-structure} \\
+    E6 @ \texttt{claude-sonnet-4-6} ($n{=}29$)
+      & Modest
+      & ${+}1.0$\,pp (commercial replication) \\
+    HKCA09 hard-seed \texttt{wrong\_relop}
+      & Directional
+      & ${+}12.7$\,pp; CI includes~0; scoped support \\
+    E6 @ \texttt{ecnu-max} / \texttt{gpt-4o}
+      & Saturated
+      & $\Delta{\approx}0$; prefer B2 for mean Conf. \\
+    Desens.\ / HKCA09 ranking / GitHub / real-priority micro
+      & Tied / saturated
+      & B2${=}$\texttt{M\_eq}; \textbf{C4 only} (micro: B1 95.6\%) \\
+    \bottomrule
+  \end{tabular}
+\end{table}

@@ -14,7 +14,7 @@ the canonical report.
 To build the paper:
 
 ```powershell
-powershell -File paper/hsp-agile/scripts/build.ps1 -Clean
+powershell -File paper/hsp-agile/scripts/build.ps1 -Which all
 ```
 
 Data and figures are refreshed automatically via `scripts/refresh_paper_assets.py`.

@@ -1,0 +1,468 @@
+%% ch08_discussion.tex  —  Chapter 8: Discussion and Threats to Validity
+%% HSP-Agile CCF-B Report, East China Normal University, 2026
+%% Rewrite staging: _rewrite/ (Formalist+Pedagogue)
+
+\chapter{Discussion and Threats to Validity}
+\label{ch:discussion}
+
+Chapter~\ref{ch:results} reports the measurements.
+This chapter interprets them for sprint practice: when the conjunctive release
+bar justifies the full loop, where claims stop, and which validity threats
+remain in view.
+A short preview appeared in Section~\ref{sec:exp:threats-preview}; the
+analysis below is the authoritative reading.
+
+
+%=============================================================================
+\section{Interpretation of Core Findings}
+\label{sec:disc:interpretation}
+%=============================================================================
+
+Acceptance safety is the lead finding.
+Conjunctive release
+\[
+  \mathrm{Accept}(c,t) \iff \mathrm{Conf}(c,t)=1 \land \mathrm{Screen}(c)=\mathrm{pass}
+\]
+binds witness conformance to a structural screen
+(Equation~\eqref{eq:accept}).
+A candidate that greens a busy unit suite can still fail Accept when a
+critical pattern remains---or when a thin residual region was never exercised.
+
+Two controlled results support that reading.
+Under feedback isolation (E6), scenario-indexed Semantic Feedback IR lifts
+mean Conf.\ from 79.1\% (\texttt{test\_only}) to 86.9\%
+(\texttt{semantic\_ir}): ${+}7.7$\,pp, W/L/T $14/4/102$,
+95\% CI $[2.3,13.6]$, Wilcoxon $p{=}0.018$.
+All fourteen Conf.\ wins are catch-all/\texttt{others} rescues; none are
+ordering-only uniqueness wins.
+That profile matches the primary vignette: Reject and Pass tests stay green
+while the residual \texttt{OTHERWISE} branch still returns Pass instead of
+Review.
+Under implementation screening (E2), mode~M reaches PDR 95.0\% / FAR 5.0\%
+versus B2's 91.2\% / 8.8\%, so fewer first-order mutants escape the
+conjunctive gate.
+
+Equal-$K$ Conf.\ ranking places M\_eq at 100.0\% mean Conf.\ against B2's 97.5\%
+(${+}2.5$\,pp; $3/0/117$) when both modes share $K{=}3$.
+Near-ceiling Conf.\ rankings on the strengthened $K{=}5$ bundle (fixed-oracle
+E1/E10) and the multi-seed E12 matrix are saturation context rather than a
+Conf.\ crown: B2 reaches 100\% Conf.\ on every E12 seed while M averages
+99.7\%.
+Aggregate E1/E10 place M at or above B2; seed stability slightly favours B2.
+The practical reading is therefore conditional---prefer B2 for mean Conf.\ and
+latency; escalate to~M when $\mathrm{Accept}{=}1$ or FAR${\le}5\%$ is required
+and repair headroom remains (Table~\ref{tab:deployment-boundary}).
+
+\paragraph{When baselines already saturate.}
+Industrial-pattern, desensitized, and several harvest slices often tie B2 with
+M\_eq at 100\% mean Conf.
+When test feedback already clears every witness, B2 is the correct deployment
+choice.
+Value concentrates on contracts with logical traps---catch-all fail-closed
+residuals, MFA step-up bands, ordered overlaps---where a green dashboard can
+still hide an escaped defect (Section~\ref{sec:results:acl-case}).
+
+\paragraph{Strengthened mode~M and measurement.}
+Default mode~M on the fixed-oracle ranking runs combines several engineering
+axes distinct from the single-factor E6 claim: best-effort
+$\arg\max_k\mathrm{Conf}$ selection, length-matched
+\texttt{execution\_trace\_matched} repair feedback (E14), advisory pattern
+gate with hard block reserved for critical severity (E17), $K{=}5$, and
+\texttt{formal\_max\_cases}${=}32$.
+E6 continues to isolate \texttt{semantic\_ir} versus unstructured
+\texttt{test\_only} under controlled $K{=}3$ comparison.
+A prior others-witness bug (catch-all region encoded as True without
+$\neg$prior guards) inflated false failures on historical E1; fixing
+first-match others witnesses is a measurement correction that enables fair
+evaluation and is disclosed under threats
+(Section~\ref{sec:disc:threats}).
+
+
+%=============================================================================
+\section{The Quality--Pass-Rate Paradox}
+\label{sec:disc:paradox}
+%=============================================================================
+
+Mean formal conformance and strict success answer different questions.
+$\mathrm{Conf}$ is continuous over a finite witness set: a candidate that
+satisfies nine of ten cases contributes $0.9$ to the average.
+Strict success is binary and conjunctive: $\mathrm{Accept}$ demands full
+witness conformance \emph{and} a clear critical pattern screen.
+On fixed-oracle BENCH-120 the two track closely for B1/B2/M, with only a
+narrow M--B2 Conf.\ margin.
+
+When release quality is measured by escaped defects rather than average
+agreement, prevention metrics dominate the reading.
+The conjunctive gate can still reject candidates that pass all witnesses yet
+exhibit high-severity pattern violations---candidates that B1/B2's
+single-criterion gate would accept---yielding the E2 FAR reduction from
+8.8\% to 5.0\%.
+Earlier snapshots in which Conf.\ and Strict diverged under the buggy
+others-witness oracle are superseded; the enduring lesson is conjunctive
+selectivity plus honest measurement, not a single Strict headline.
+
+
+%=============================================================================
+\section{Implications for Practice}
+\label{sec:disc:implications}
+%=============================================================================
+
+\subsection{Sprint Integration and Deployment Heuristic}
+
+\textsc{SgDP} sits between test-feedback (fast, spec-unaware) and full
+deductive verification (slow, annotation-heavy): a heuristic for FSF-style
+ordered-guard workflows pending live industrial replication.
+On fixed-oracle E1, mode~M and B2 incur comparable mean wall-clock latency
+($10{,}457$\,ms vs.\ $9{,}576$\,ms) at similar mean llm\_calls
+(${\approx}1.16$ vs.\ ${\approx}1.18$).
+When mean Conf.\ and latency suffice, Table~\ref{tab:deployment-boundary}
+prescribes B2; escalate to~M only when $\mathrm{Accept}{=}1$ or
+FAR${\le}5\%$ is required.
+The conjunctive predicate additionally yields an auditable decision
+record---which witnesses and patterns were decisive---rather than a bare
+pass/fail bit~\citep{harman2004maff,beck2004xp}.
+
+\subsection{The Formal Checker as a Lightweight Oracle}
+
+The Z3-based conformance checker occupies a middle ground between no formal
+verification and full deductive tools such as Dafny~\citep{leino2010dafny}
+or Coq~\citep{woodcock2009formalsurvey}.
+It provides \emph{bounded} guarantees over a finite, specification-derived
+witness suite at less than $100$\,ms per task---negligible relative to
+pipeline latency---without requiring verification annotations or dedicated
+verification engineers.
+Ablations under the fixed oracle show that removing the checker (A1) or the
+repair loop (A3) costs substantial Conf.; removing the advisory pattern gate
+(A2) costs none on Conf.\ at ceiling, so the screen's deployment rationale
+remains prevention (E2), not Conf.\ ranking.
+
+\subsection{Structural Screen Selectivity, Advisory Use, and Pluggability}
+
+For most smells, advisory warnings are preferable to hard rejections,
+following severity-modulated static-analysis practice
+\cite{hovemeyer2004findbugs,ayewah2007findbugs}, with hard rejection reserved
+for RF07-class shortcuts; E17 evaluates that advisory operating point.
+The screen is a living, pluggable slot
+(Section~\ref{subsec:method:pluggable-screen}): new failure modes observed in
+production can be added as smells without retraining the synthesis LLM, or the
+entire PoC catalogue can be swapped for a CI analyser or LLM review agent that
+emits the same severity-tagged vetoes.
+E7's per-smell F1 guides catalogue expansion; it does not freeze fourteen
+rules as the only admissible $\mathrm{Screen}$.
+
+\paragraph{Finite-sample FAR envelope versus operational FAR.}
+Proposition~\ref{thm:far-bound} is a finite-sample envelope under
+independent witness draws; the deployed $\Phi_i$ suite is deterministic and
+does not assume that independence.
+Release decisions should cite empirical E2 FAR (5.0\% vs.\ B2 8.8\%), not the
+symbolic $(1-\varepsilon)^n$ expression.
+
+
+%=============================================================================
+\section{Generalisation Boundaries}
+\label{sec:disc:generalisation}
+%=============================================================================
+
+The framework assumes deterministic, enumerable guards encodable as SMT
+constraints---FSF-style ordered scenarios, finite-state transition guards,
+and simplified Z/TLA+ preconditions over bounded domains.
+Generalisation experiments (E8) show that M outperforms B1 across SOFL/FSF,
+Mini-StateMachine, and Mini-Z with adapter-level changes, supporting a
+framework claim rather than a single-notation artefact.
+Absolute Conf.\ on expanded Mini adapters remains low because foreign syntax
+constrains generation; real-derived HumanEval/MBPP transfers are stronger,
+with B2 leading on the sparser HumanEval-FSF subset.
+
+\paragraph{When test-feedback is enough.}
+B2 matches or beats the full pipeline when guards barely overlap (sparse
+HumanEval-FSF and E11 external slices), branching is shallow
+(typically ${\le}4$ branches), or each branch returns a simple scalar so that
+ordinary failures already expose assignment mistakes.
+Under those conditions the lightweight loop is the rational default.
+M's contribution on the hard benchmark is therefore conditional: E6 typed
+feedback under headroom, E2 prevention, and conjunctive $\mathrm{Accept}$
+when those release bars apply.
+
+\subsection{Deployment Boundary Conditions}
+\label{sec:disc:deployment}
+
+Table~\ref{tab:deployment-boundary} summarises the decision: match feedback
+depth to the release bar, not to overlap tertiles alone (canonical E3 is
+non-monotone).
+
+\begin{table}[t]
+  \centering
+  \caption{\textbf{Deployment boundary:} release bar + headroom (not overlap).
+    Prefer B2 for mean Conf./latency; escalate to~M when Accept or FAR targets
+    apply \emph{and} repair headroom remains.
+    Within M, prefer \texttt{semantic\_ir} for localisation/audit and
+    \texttt{execution\_trace\_matched} for mean Conf.\ (E14).
+    Overlap tertiles (E3) are non-monotone---not a deployment trigger.}
+  \label{tab:deployment-boundary}
+  \footnotesize
+  \renewcommand{\arraystretch}{1.12}
+  \begin{tabular}{@{}p{0.28\linewidth}p{0.32\linewidth}p{0.32\linewidth}@{}}
+    \toprule
+    \textbf{Signal} & \textbf{Prefer B2} & \textbf{Prefer M} \\
+    \midrule
+    Default & Mean Conf.\ / latency & --- \\
+    Release bar & Mean Conf.\ sufficient & $\mathrm{Accept}{=}1$ \\
+    Prevention & --- & FAR${\le}5\%$ (E2) \\
+    Headroom & Saturated endpoint / ties & Collapsed test-only Conf.\ (E6) \\
+    Feedback render & Unstructured OK if Conf.\ holds & IR (audit) / trace (Conf.) \\
+    Seed stability & B2 first every E12 seed & E1/E10 M$\ge$B2 aggregate \\
+    Hybrid cost & M\_lite not a shortcut (E18) & Full IR$+$gate integration \\
+    Overlap tertile & Non-monotone (E3/E10) & \textbf{Not} alone \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+\paragraph{Hybrid baselines.}
+For mean Conf.\ alone, prefer B2 over verifier-loop hybrids (E13).
+M\_lite (E18) and B6 do not reproduce M's prevention profile: deploy full
+IR$+$gate integration or stay on B2.
+
+The framework does not yet encode temporal LTL/CTL properties, infinite-domain
+arithmetic beyond LIA, or probabilistic semantics.
+Industrial replication on practitioner SOFL/FSF projects remains necessary
+before quantitative production claims~\citep{li2022qrs_companion,pohl2010requirements}.
+
+
+%=============================================================================
+\section{Limitations}
+\label{sec:disc:limitations}
+%=============================================================================
+
+\paragraph{Benchmark scale and construction.}
+BENCH-120 balances overlap-filtered discriminative tasks against LLM API cost.
+Post-hoc power for the tiny fixed-oracle M--B2 Conf.\ gap is low
+($|\delta|{\approx}0.014$); doubling $n$ would not materially change
+inference.
+We therefore emphasise per-task win rate, equal-$K$ Conf.\ ranking, E10
+(unfiltered), E12 (multi-seed), and prevention metrics alongside aggregate
+means.
+Author-construction bias is mitigated by the real-priority micro-benchmark
+($n{=}30$), GitHub harvest, HKCA09, and desensitized published-industrial
+pilots---still not live vendor traces.
+Industrial specifications may add state, external services, or composite
+scenario structure absent from the template family.
+
+\paragraph{Overlap filter and claim scope.}
+The Z3 overlap filter retains tasks where first-match ordering defects are
+possible; without overlap, precedence bugs are rare and test-feedback is
+advantaged.
+E10 removes the filter; E3 stratifies by overlap tertile.
+Claims are scoped to overlap-intensive ordered-guard specifications, not
+universal code generation.
+
+\paragraph{Model endpoints.}
+Primary results use \texttt{ecnu-plus} (Qwen-family); E16/E6-max use
+\texttt{ecnu-max} (DeepSeek-family); commercial replication uses n1n
+\texttt{gpt-4o}, \texttt{claude-sonnet-4-6}, and \texttt{deepseek-v3.2}
+(Section~\ref{sec:results:n1n}).
+Cross-endpoint evidence shows saturation or modest gains rather than ranking
+reversal; on industrial-pattern tasks B2 reaches 100\% Conf.\ under gpt-4o and
+Claude (Section~\ref{sec:results:industrial}).
+The ${+}7.7$\,pp typed-IR result remains primary-endpoint evidence under
+repair headroom.
+
+\paragraph{Witness coverage and SMT theory class.}
+The checker generates a small number of witnesses per branch inside a
+parameterized integer box (default $[-5,20]$; overridable per task or CLI).
+Table~\ref{tab:smt-scalability} shows that widening to $[-100,100]$ or
+$[-1000,1000]$---and probing Z3 Reals---does not create a latency cliff on
+the real-priority micro-benchmark's linear guards.
+Denser boundary perturbation would raise fault-detection sensitivity at higher
+latency; the current regime likely underestimates M's advantage versus a denser
+suite.
+The honest limit is theory class: nonlinear arithmetic, large bit-vectors, or
+unbounded heap shapes can make SMT return \texttt{unknown} or time out.
+
+\subsection{Hybrid Fallback: SMT Timeout $\to$ Fuzzing + Heuristics}
+\label{sec:disc:smt-hybrid}
+
+When the witness generator hits a wall, \textsc{SgDP} should not silently skip
+the region.
+The prescribed contingency---to be instrumented as a first-class pipeline mode
+in follow-on work---is:
+
+\begin{enumerate}
+  \item \textbf{Budgeted SMT first.} Attempt $\Phi_i$ with the configured
+        domain box and a hard wall-clock budget.
+  \item \textbf{Fuzz the residual.} If SMT fails, sample toward guard
+        boundaries (perturb neighbouring witnesses; flip relational operators;
+        draw from empirical traffic if available).
+  \item \textbf{Heuristic region seeds.} For ordered guards such as
+        \code{compute\_tax}, inject geometric overlap corners from
+        Figure~\ref{fig:defect-vs-test} even when the solver cannot prove them.
+  \item \textbf{Degrade Accept, do not fake it.} Fuzz witnesses are labelled
+        \texttt{heuristic} in the Semantic Feedback IR; conjunctive
+        $\mathrm{Accept}$ may stay advisory until SMT recovers.
+\end{enumerate}
+
+\noindent
+Figure~\ref{fig:smt-domain-latency} motivates treating the hybrid as a
+contingency rather than the default: on the FSF LIA fragment that dominates
+our corpora, pure SMT stays in tens of milliseconds after domain widening.
+
+\paragraph{Repair budget.}
+$K$ is fixed across tasks.
+Harder tasks may benefit from larger $K$; simpler tasks waste iterations.
+Adaptive allocation based on observed Conf.\ improvement per round remains
+future work.
+
+\paragraph{Historical residual taxonomy.}
+E9 failure patterns were collected under the pre-fix others-witness oracle
+and are historical archive only (Appendix~\ref{app:stress},
+Section~\ref{sec:app:e9}); they are not current Strict evidence under the
+fixed oracle.
+
+
+%=============================================================================
+\section{Comparison to Related Approaches}
+\label{sec:disc:related}
+%=============================================================================
+
+\paragraph{DafnyBench and full deductive verification.}
+DafnyBench~\citep{loughridge2024dafnybench} evaluates LLM synthesis of Dafny
+programs with machine-checked proofs.
+Full deductive verification provides stronger guarantees than bounded Z3
+checking but requires annotations absent from FSF.
+HSP-Agile applies directly to SOFL/FSF inputs without verification
+annotations, occupying a complementary position on the verification-cost
+spectrum.
+
+\paragraph{CEGIS-inspired approaches (Sun et al., Clover).}
+Clover~\citep{sun2024clover} uses proof-obligation counterexamples to guide
+LLM repair in Dafny.
+HSP-Agile likewise turns witnessed failures into repair prompts, but the
+counterexamples come from Z3-driven tests derived from FSF scenario semantics.
+The checker is lighter-weight and the guarantees correspondingly weaker.
+
+\paragraph{VerifierLoop-style FSF baseline (B6).}
+Mode~B6 implements SMT witness checking inside the repair loop with structured
+counterexample prompts, equal $K$ and witness budget as M, but without
+Semantic Feedback IR or pattern guard.
+On stratified and full hard exports, aggregate Conf.\ rankings are
+seed-sensitive near ceiling (cf.\ E12); the irreducible increment of full~M
+over such hybrids remains conjunctive $\mathrm{Accept}$ together with
+PDR/FAR---and the E6 typed-IR gain when operating inside M's repair loop.
+Clover remains the verified CEGIS reference for Dafny; B6 is our FSF
+adaptation, not a drop-in of a third-party FSF product.
+
+\paragraph{Standard LLM baselines (B1 and B2).}
+Adoption should follow the deployment table and per-task evidence rather than
+a blanket ranking across industrial corpora~\citep{dakhel2023copilot,chen2021codex}.
+HSP-Agile targets quality gates where downstream formal costs dominate, not
+real-time code completion.
+
+
+%=============================================================================
+\section{Threats to Validity}
+\label{sec:disc:threats}
+%=============================================================================
+
+We follow the standard split into construct, internal, external, and
+conclusion validity
+\cite{ammann2016testing,wohlin2012experimentation}.
+
+\paragraph{Internal validity --- author-built screens and corpora.}
+The Stage~4 PoC smell catalogue (RF01--RF14) was written by the same team that
+designed the pipeline, creating a risk of designer bias toward faults expected
+on BENCH-120 and SOFL-derived mutants.
+Ablations (A2), advisory mode (E17), and E7 per-smell F1 make the PoC
+measurable but do not prove the fourteen rules unique or unbiased.
+Mitigations: treat RF01--RF14 as a pluggable instance of $\mathrm{Screen}$
+(Section~\ref{subsec:method:pluggable-screen}); fix seeds and
+$T_\text{repair}{=}0$ for repair calls; report E12 multi-seed stability;
+include baselines B3--B6 and equal-$K$ Conf.\ ranking.
+Residual risk remains: a different smell pack or review agent could shift
+which candidates Accept rejects.
+
+\paragraph{External validity --- first-match is not every business rule.}
+Primary tables lean on synthetic overlap-heavy FSF tasks plus curated
+micro-benchmarks.
+Enterprise logic is often stateful, temporal, or table-driven in ways that do
+not reduce cleanly to ordered first-match guards.
+Adapters (E8) and the real-priority micro-benchmark
+(Section~\ref{sec:results:real-priority}) show transfer when the contract
+\emph{is} FSF-shaped; they do not show that arbitrary production rules can be
+rewritten as SpecIR without semantic loss.
+Claims are scoped to ordered-guard / FSF-style workflows; live vendor
+replication remains future work.
+
+\paragraph{Construct validity --- Conf., PDR, and FAR.}
+$\mathrm{Conf}$ approximates oracle agreement on a finite witness set
+$\mathcal{D}(t)$; $\mathrm{PDR}$/$\mathrm{FAR}$ score rejection of
+first-order mutants under the conjunctive Accept gate.
+Neither construct covers higher-order faults, environment faults outside the
+FSF signature, timing/concurrency, or inputs outside the SMT domain box.
+Theorem~\ref{thm:far-bound} does not license operational release decisions;
+cite empirical E2 FAR instead.
+\emph{Disclosure:} a prior others-witness bug inflated false failures on
+canonical E1; primary B1/B2/M aggregates cite the fixed-oracle
+\texttt{run\_e1\_m\_win\_v2} only
+(Section~\ref{sec:disc:interpretation}).
+
+\paragraph{Conclusion validity --- seeds, Strict, and screen ablations.}
+Authoritative E1 cites a single generative seed (\texttt{run\_e1\_m\_win\_v2},
+repeat~0) with win rate and means; fixed-oracle E12 re-ran all 120 tasks
+across three seeds for B1, B2, and M.
+B2 leads every seed at 100.0\% mean Conf.; M averages 99.7\% (one failure on
+seed~1).
+Both are near ceiling; we report win rate and means for fixed-oracle E1
+(M vs.\ B2: $2/120$ wins, ${+}1.7$\,pp) without a Holm claim on that narrow
+gap.
+Full E2 supersedes preliminary $n{=}40$ prevention numbers.
+Under the fixed oracle, Strict tracks Conf.; the historical uniform
+${\approx}5\%$ Strict on pre-fix E1 was largely a measurement artefact.
+A2's Conf.\ delta under the advisory gate at ceiling is zero on the fixed
+ablation; the screen's primary evaluation remains E2 PDR/FAR, with E17 as the
+latency-friendly advisory alternative when a hard gate is too strict.
+
+
+%=============================================================================
+\section{SpecIR Scope Assumptions and Future Extensions}
+\label{sec:disc:specir-scope}
+%=============================================================================
+
+The current SpecIR design (Definitions~\ref{def:specir}--\ref{def:specir-wf})
+makes explicit assumptions that bound framework generality.
+Table~\ref{tab:specir-scope} maps each assumption to a natural extension;
+Section~\ref{sec:conc:future} prioritises these directions.
+
+\begin{table}[t]
+  \centering
+  \caption{\textbf{SpecIR scope assumptions and extension paths.}
+    Each row states a current design choice, its limitation, and a research
+    direction beyond the HSP-Agile evaluation.}
+  \label{tab:specir-scope}
+  \footnotesize
+  \renewcommand{\arraystretch}{1.15}
+  \begin{tabular}{@{}p{0.22\linewidth}p{0.30\linewidth}p{0.38\linewidth}@{}}
+    \toprule
+    \textbf{Assumption} & \textbf{Limitation} & \textbf{Extension} \\
+    \midrule
+    Deterministic guards &
+    Cannot express probabilistic thresholds or noisy sensors &
+    Probabilistic guards with confidence intervals \\
+    First-match ordering &
+    No temporal ``always/eventually'' constraints &
+    LTL/CTL adapters over transition systems \\
+    Single oracle $g_t$ &
+    No distributed or multi-service contracts &
+    Compositional oracles with interface contracts \\
+    Linear integer arithmetic (LIA) &
+    Non-linear and floating-point guards fail encoding &
+    NIA/QF\_FP backends with staged fallback \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+These assumptions are deliberate scoping choices for a first framework
+instantiation.
+E8 shows that adapter-level extensions preserve the shared pipeline; temporal
+and probabilistic semantics would need new adapter and witness modules while
+retaining the Semantic Feedback IR and acceptance predicate.
+
+\input{chapters/ch08_industrial_case}

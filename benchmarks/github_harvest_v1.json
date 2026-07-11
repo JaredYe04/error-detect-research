@@ -1,0 +1,3267 @@
+[
+  {
+    "taskId": "GitHubHarvest.ASFL_AddToCart",
+    "kind": "process",
+    "name": "AddToCart",
+    "signature": {
+      "inputs": [
+        {
+          "name": "customer",
+          "type": "int"
+        },
+        {
+          "name": "product",
+          "type": "int"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "ok",
+          "type": "int"
+        },
+        {
+          "name": "inventory",
+          "type": "int"
+        },
+        {
+          "name": "price_keys",
+          "type": "int"
+        },
+        {
+          "name": "inventory",
+          "type": "int"
+        }
+      ]
+    },
+    "fsfScenarios": [
+      {
+        "index": 1,
+        "kind": "scenario",
+        "test": "customer gt 0",
+        "def": "ok eq 1"
+      },
+      {
+        "index": 2,
+        "kind": "scenario",
+        "test": "product eq 0",
+        "def": "ok eq 0"
+      },
+      {
+        "index": 3,
+        "kind": "others",
+        "test": "others",
+        "def": "ok eq 0"
+      }
+    ],
+    "ext": [],
+    "promptSpec": "Process AddToCart(customer, product) -> (ok, inventory, price_keys, inventory)\n\nFSF specification:\nif (customer gt 0) => ok eq 1\nif (product eq 0) => ok eq 0\nothers => ok eq 0",
+    "sourceFile": "github://JaredYe04/agile-sofl-toolchain/examples/ecommerce.asfl",
+    "sourceBasename": "examples/ecommerce.asfl",
+    "module": "GitHubASFL",
+    "externalProvenance": {
+      "source": "github_asfl_lite",
+      "corpus": "github_harvest",
+      "repo": "JaredYe04/agile-sofl-toolchain",
+      "path": "examples/ecommerce.asfl",
+      "html_url": null
+    },
+    "realspec": {
+      "source_type": "github_harvest",
+      "provenance": {
+        "repo": "JaredYe04/agile-sofl-toolchain",
+        "path": "examples/ecommerce.asfl",
+        "local": "D:\\repos\\error-detect-research\\artifacts\\github_harvest\\wave3_targeted_v1\\downloaded\\JaredYe04_agile-sofl-toolchain__examples_ecommerce.asfl"
+      }
+    },
+    "referenceCode": "def AddToCart(customer: int, product: int) -> dict:\n    \"\"\"Reference implementation auto-generated from FSF.\"\"\"\n    if customer > 0:\n        return {\"ok\": 1}\n    elif product == 0:\n        return {\"ok\": 0}\n    else:\n        return {\"ok\": 0}\n",
+    "complexity": {
+      "scenario_count": 2,
+      "guard_complexity": "Simple",
+      "overlap_rate": 0.778,
+      "has_external_vars": false,
+      "overlap_density_tier": "high"
+    }
+  },
+  {
+    "taskId": "GitHubHarvest.ASFL_Checkout",
+    "kind": "process",
+    "name": "Checkout",
+    "signature": {
+      "inputs": [
+        {
+          "name": "customer",
+          "type": "int"
+        },
+        {
+          "name": "total",
+          "type": "int"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "receipt",
+          "type": "int"
+        },
+        {
+          "name": "inventory",
+          "type": "int"
+        },
+        {
+          "name": "price_keys",
+          "type": "int"
+        },
+        {
+          "name": "inventory",
+          "type": "int"
+        }
+      ]
+    },
+    "fsfScenarios": [
+      {
+        "index": 1,
+        "kind": "scenario",
+        "test": "total eq 0",
+        "def": "receipt eq 0"
+      },
+      {
+        "index": 2,
+        "kind": "others",
+        "test": "others",
+        "def": "receipt eq 0"
+      }
+    ],
+    "ext": [],
+    "promptSpec": "Process Checkout(customer, total) -> (receipt, inventory, price_keys, inventory)\n\nFSF specification:\nif (total eq 0) => receipt eq 0\nothers => receipt eq 0",
+    "sourceFile": "github://JaredYe04/agile-sofl-toolchain/examples/ecommerce.asfl",
+    "sourceBasename": "examples/ecommerce.asfl",
+    "module": "GitHubASFL",
+    "externalProvenance": {
+      "source": "github_asfl_lite",
+      "corpus": "github_harvest",
+      "repo": "JaredYe04/agile-sofl-toolchain",
+      "path": "examples/ecommerce.asfl",
+      "html_url": null
+    },
+    "realspec": {
+      "source_type": "github_harvest",
+      "provenance": {
+        "repo": "JaredYe04/agile-sofl-toolchain",
+        "path": "examples/ecommerce.asfl",
+        "local": "D:\\repos\\error-detect-research\\artifacts\\github_harvest\\wave3_targeted_v1\\downloaded\\JaredYe04_agile-sofl-toolchain__examples_ecommerce.asfl"
+      }
+    },
+    "referenceCode": "def Checkout(customer: int, total: int) -> dict:\n    \"\"\"Reference implementation auto-generated from FSF.\"\"\"\n    if total == 0:\n        return {\"receipt\": 0}\n    else:\n        return {\"receipt\": 0}\n",
+    "complexity": {
+      "scenario_count": 1,
+      "guard_complexity": "Simple",
+      "overlap_rate": 0.5,
+      "has_external_vars": false,
+      "overlap_density_tier": "low"
+    }
+  },
+  {
+    "taskId": "GitHubHarvest.ASFL_Refund",
+    "kind": "process",
+    "name": "Refund",
+    "signature": {
+      "inputs": [
+        {
+          "name": "order",
+          "type": "int"
+        },
+        {
+          "name": "amount",
+          "type": "int"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "cleared",
+          "type": "int"
+        }
+      ]
+    },
+    "fsfScenarios": [
+      {
+        "index": 1,
+        "kind": "scenario",
+        "test": "order gt 0",
+        "def": "cleared eq 1"
+      },
+      {
+        "index": 2,
+        "kind": "scenario",
+        "test": "order eq 0",
+        "def": "cleared eq 0"
+      },
+      {
+        "index": 3,
+        "kind": "others",
+        "test": "others",
+        "def": "cleared eq 0"
+      }
+    ],
+    "ext": [],
+    "promptSpec": "Process Refund(order, amount) -> (cleared)\n\nFSF specification:\nif (order gt 0) => cleared eq 1\nif (order eq 0) => cleared eq 0\nothers => cleared eq 0",
+    "sourceFile": "github://JaredYe04/agile-sofl-toolchain/examples/ecommerce.asfl",
+    "sourceBasename": "examples/ecommerce.asfl",
+    "module": "GitHubASFL",
+    "externalProvenance": {
+      "source": "github_asfl_lite",
+      "corpus": "github_harvest",
+      "repo": "JaredYe04/agile-sofl-toolchain",
+      "path": "examples/ecommerce.asfl",
+      "html_url": null
+    },
+    "realspec": {
+      "source_type": "github_harvest",
+      "provenance": {
+        "repo": "JaredYe04/agile-sofl-toolchain",
+        "path": "examples/ecommerce.asfl",
+        "local": "D:\\repos\\error-detect-research\\artifacts\\github_harvest\\wave3_targeted_v1\\downloaded\\JaredYe04_agile-sofl-toolchain__examples_ecommerce.asfl"
+      }
+    },
+    "referenceCode": "def Refund(order: int, amount: int) -> dict:\n    \"\"\"Reference implementation auto-generated from FSF.\"\"\"\n    if order > 0:\n        return {\"cleared\": 1}\n    elif order == 0:\n        return {\"cleared\": 0}\n    else:\n        return {\"cleared\": 0}\n",
+    "complexity": {
+      "scenario_count": 2,
+      "guard_complexity": "Simple",
+      "overlap_rate": 0.667,
+      "has_external_vars": false,
+      "overlap_density_tier": "high"
+    }
+  },
+  {
+    "taskId": "GitHubHarvest.ASFL_ShipOrder",
+    "kind": "process",
+    "name": "ShipOrder",
+    "signature": {
+      "inputs": [
+        {
+          "name": "order",
+          "type": "int"
+        },
+        {
+          "name": "region",
+          "type": "int"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "shipped",
+          "type": "int"
+        },
+        {
+          "name": "inventory",
+          "type": "int"
+        },
+        {
+          "name": "inventory",
+          "type": "int"
+        }
+      ]
+    },
+    "fsfScenarios": [
+      {
+        "index": 1,
+        "kind": "scenario",
+        "test": "order gt 0",
+        "def": "shipped eq 1"
+      },
+      {
+        "index": 2,
+        "kind": "others",
+        "test": "others",
+        "def": "shipped eq 0"
+      }
+    ],
+    "ext": [],
+    "promptSpec": "Process ShipOrder(order, region) -> (shipped, inventory, inventory)\n\nFSF specification:\nif (order gt 0) => shipped eq 1\nothers => shipped eq 0",
+    "sourceFile": "github://JaredYe04/agile-sofl-toolchain/examples/ecommerce.asfl",
+    "sourceBasename": "examples/ecommerce.asfl",
+    "module": "GitHubASFL",
+    "externalProvenance": {
+      "source": "github_asfl_lite",
+      "corpus": "github_harvest",
+      "repo": "JaredYe04/agile-sofl-toolchain",
+      "path": "examples/ecommerce.asfl",
+      "html_url": null
+    },
+    "realspec": {
+      "source_type": "github_harvest",
+      "provenance": {
+        "repo": "JaredYe04/agile-sofl-toolchain",
+        "path": "examples/ecommerce.asfl",
+        "local": "D:\\repos\\error-detect-research\\artifacts\\github_harvest\\wave3_targeted_v1\\downloaded\\JaredYe04_agile-sofl-toolchain__examples_ecommerce.asfl"
+      }
+    },
+    "referenceCode": "def ShipOrder(order: int, region: int) -> dict:\n    \"\"\"Reference implementation auto-generated from FSF.\"\"\"\n    if order > 0:\n        return {\"shipped\": 1}\n    else:\n        return {\"shipped\": 0}\n",
+    "complexity": {
+      "scenario_count": 1,
+      "guard_complexity": "Simple",
+      "overlap_rate": 0.5,
+      "has_external_vars": false,
+      "overlap_density_tier": "low"
+    }
+  },
+  {
+    "taskId": "GitHubHarvest.ASFL_DrainQueue",
+    "kind": "process",
+    "name": "DrainQueue",
+    "signature": {
+      "inputs": [
+        {
+          "name": "remaining",
+          "type": "int"
+        },
+        {
+          "name": "backlog",
+          "type": "int"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "result",
+          "type": "int"
+        }
+      ]
+    },
+    "fsfScenarios": [
+      {
+        "index": 1,
+        "kind": "scenario",
+        "test": "backlog gt 0",
+        "def": "remaining eq backlog - 1"
+      },
+      {
+        "index": 2,
+        "kind": "others",
+        "test": "others",
+        "def": "remaining eq 0"
+      }
+    ],
+    "ext": [],
+    "promptSpec": "Process DrainQueue(remaining, backlog) -> (result)\n\nFSF specification:\nif (backlog gt 0) => remaining eq backlog - 1\nothers => remaining eq 0",
+    "sourceFile": "github://JaredYe04/agile-sofl-toolchain/examples/ecommerce.asfl",
+    "sourceBasename": "examples/ecommerce.asfl",
+    "module": "GitHubASFL",
+    "externalProvenance": {
+      "source": "github_asfl_lite",
+      "corpus": "github_harvest",
+      "repo": "JaredYe04/agile-sofl-toolchain",
+      "path": "examples/ecommerce.asfl",
+      "html_url": null
+    },
+    "realspec": {
+      "source_type": "github_harvest",
+      "provenance": {
+        "repo": "JaredYe04/agile-sofl-toolchain",
+        "path": "examples/ecommerce.asfl",
+        "local": "D:\\repos\\error-detect-research\\artifacts\\github_harvest\\wave3_targeted_v1\\downloaded\\JaredYe04_agile-sofl-toolchain__examples_ecommerce.asfl"
+      }
+    },
+    "referenceCode": "def DrainQueue(remaining: int, backlog: int) -> dict:\n    \"\"\"Reference implementation auto-generated from FSF.\"\"\"\n    if backlog > 0:\n        return {\"remaining\": backlog - 1}\n    else:\n        return {\"remaining\": 0}\n",
+    "complexity": {
+      "scenario_count": 1,
+      "guard_complexity": "Simple",
+      "overlap_rate": 0.5,
+      "has_external_vars": true,
+      "overlap_density_tier": "low"
+    }
+  },
+  {
+    "taskId": "GitHubHarvest.ASFL_Authorize",
+    "kind": "process",
+    "name": "Authorize",
+    "signature": {
+      "inputs": [
+        {
+          "name": "customer",
+          "type": "int"
+        },
+        {
+          "name": "amount",
+          "type": "int"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "ok",
+          "type": "int"
+        }
+      ]
+    },
+    "fsfScenarios": [
+      {
+        "index": 1,
+        "kind": "scenario",
+        "test": "amount gt 0",
+        "def": "ok eq 1"
+      },
+      {
+        "index": 2,
+        "kind": "scenario",
+        "test": "amount eq 0",
+        "def": "ok eq 0"
+      },
+      {
+        "index": 3,
+        "kind": "others",
+        "test": "others",
+        "def": "ok eq 0"
+      }
+    ],
+    "ext": [],
+    "promptSpec": "Process Authorize(customer, amount) -> (ok)\n\nFSF specification:\nif (amount gt 0) => ok eq 1\nif (amount eq 0) => ok eq 0\nothers => ok eq 0",
+    "sourceFile": "github://JaredYe04/agile-sofl-toolchain/examples/ecommerce.asfl",
+    "sourceBasename": "examples/ecommerce.asfl",
+    "module": "GitHubASFL",
+    "externalProvenance": {
+      "source": "github_asfl_lite",
+      "corpus": "github_harvest",
+      "repo": "JaredYe04/agile-sofl-toolchain",
+      "path": "examples/ecommerce.asfl",
+      "html_url": null
+    },
+    "realspec": {
+      "source_type": "github_harvest",
+      "provenance": {
+        "repo": "JaredYe04/agile-sofl-toolchain",
+        "path": "examples/ecommerce.asfl",
+        "local": "D:\\repos\\error-detect-research\\artifacts\\github_harvest\\wave3_targeted_v1\\downloaded\\JaredYe04_agile-sofl-toolchain__examples_ecommerce.asfl"
+      }
+    },
+    "referenceCode": "def Authorize(customer: int, amount: int) -> dict:\n    \"\"\"Reference implementation auto-generated from FSF.\"\"\"\n    if amount > 0:\n        return {\"ok\": 1}\n    elif amount == 0:\n        return {\"ok\": 0}\n    else:\n        return {\"ok\": 0}\n",
+    "complexity": {
+      "scenario_count": 2,
+      "guard_complexity": "Simple",
+      "overlap_rate": 0.667,
+      "has_external_vars": false,
+      "overlap_density_tier": "high"
+    }
+  },
+  {
+    "taskId": "GitHubHarvest.ASFL_Capture",
+    "kind": "process",
+    "name": "Capture",
+    "signature": {
+      "inputs": [
+        {
+          "name": "order",
+          "type": "int"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "ok",
+          "type": "int"
+        },
+        {
+          "name": "pending_total",
+          "type": "int"
+        }
+      ]
+    },
+    "fsfScenarios": [
+      {
+        "index": 1,
+        "kind": "scenario",
+        "test": "order gt 0",
+        "def": "ok eq 1"
+      },
+      {
+        "index": 2,
+        "kind": "others",
+        "test": "others",
+        "def": "ok eq 0"
+      }
+    ],
+    "ext": [],
+    "promptSpec": "Process Capture(order) -> (ok, pending_total)\n\nFSF specification:\nif (order gt 0) => ok eq 1\nothers => ok eq 0",
+    "sourceFile": "github://JaredYe04/agile-sofl-toolchain/examples/ecommerce.asfl",
+    "sourceBasename": "examples/ecommerce.asfl",
+    "module": "GitHubASFL",
+    "externalProvenance": {
+      "source": "github_asfl_lite",
+      "corpus": "github_harvest",
+      "repo": "JaredYe04/agile-sofl-toolchain",
+      "path": "examples/ecommerce.asfl",
+      "html_url": null
+    },
+    "realspec": {
+      "source_type": "github_harvest",
+      "provenance": {
+        "repo": "JaredYe04/agile-sofl-toolchain",
+        "path": "examples/ecommerce.asfl",
+        "local": "D:\\repos\\error-detect-research\\artifacts\\github_harvest\\wave3_targeted_v1\\downloaded\\JaredYe04_agile-sofl-toolchain__examples_ecommerce.asfl"
+      }
+    },
+    "referenceCode": "def Capture(order: int) -> dict:\n    \"\"\"Reference implementation auto-generated from FSF.\"\"\"\n    if order > 0:\n        return {\"ok\": 1}\n    else:\n        return {\"ok\": 0}\n",
+    "complexity": {
+      "scenario_count": 1,
+      "guard_complexity": "Simple",
+      "overlap_rate": 0.5,
+      "has_external_vars": false,
+      "overlap_density_tier": "low"
+    }
+  },
+  {
+    "taskId": "GitHubHarvest.ASFL_Promote",
+    "kind": "process",
+    "name": "Promote",
+    "signature": {
+      "inputs": [
+        {
+          "name": "product",
+          "type": "int"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "featured",
+          "type": "int"
+        },
+        {
+          "name": "price_keys",
+          "type": "int"
+        }
+      ]
+    },
+    "fsfScenarios": [
+      {
+        "index": 1,
+        "kind": "scenario",
+        "test": "product gt 0",
+        "def": "featured eq 1"
+      },
+      {
+        "index": 2,
+        "kind": "others",
+        "test": "others",
+        "def": "featured eq 0"
+      }
+    ],
+    "ext": [],
+    "promptSpec": "Process Promote(product) -> (featured, price_keys)\n\nFSF specification:\nif (product gt 0) => featured eq 1\nothers => featured eq 0",
+    "sourceFile": "github://JaredYe04/agile-sofl-toolchain/examples/ecommerce.asfl",
+    "sourceBasename": "examples/ecommerce.asfl",
+    "module": "GitHubASFL",
+    "externalProvenance": {
+      "source": "github_asfl_lite",
+      "corpus": "github_harvest",
+      "repo": "JaredYe04/agile-sofl-toolchain",
+      "path": "examples/ecommerce.asfl",
+      "html_url": null
+    },
+    "realspec": {
+      "source_type": "github_harvest",
+      "provenance": {
+        "repo": "JaredYe04/agile-sofl-toolchain",
+        "path": "examples/ecommerce.asfl",
+        "local": "D:\\repos\\error-detect-research\\artifacts\\github_harvest\\wave3_targeted_v1\\downloaded\\JaredYe04_agile-sofl-toolchain__examples_ecommerce.asfl"
+      }
+    },
+    "referenceCode": "def Promote(product: int) -> dict:\n    \"\"\"Reference implementation auto-generated from FSF.\"\"\"\n    if product > 0:\n        return {\"featured\": 1}\n    else:\n        return {\"featured\": 0}\n",
+    "complexity": {
+      "scenario_count": 1,
+      "guard_complexity": "Simple",
+      "overlap_rate": 0.5,
+      "has_external_vars": false,
+      "overlap_density_tier": "low"
+    }
+  },
+  {
+    "taskId": "GitHubHarvest.ASFL_Demote",
+    "kind": "process",
+    "name": "Demote",
+    "signature": {
+      "inputs": [
+        {
+          "name": "product",
+          "type": "int"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "featured",
+          "type": "int"
+        }
+      ]
+    },
+    "fsfScenarios": [
+      {
+        "index": 1,
+        "kind": "scenario",
+        "test": "product gt 0",
+        "def": "featured eq 0"
+      },
+      {
+        "index": 2,
+        "kind": "others",
+        "test": "others",
+        "def": "featured eq 1"
+      }
+    ],
+    "ext": [],
+    "promptSpec": "Process Demote(product) -> (featured)\n\nFSF specification:\nif (product gt 0) => featured eq 0\nothers => featured eq 1",
+    "sourceFile": "github://JaredYe04/agile-sofl-toolchain/examples/ecommerce.asfl",
+    "sourceBasename": "examples/ecommerce.asfl",
+    "module": "GitHubASFL",
+    "externalProvenance": {
+      "source": "github_asfl_lite",
+      "corpus": "github_harvest",
+      "repo": "JaredYe04/agile-sofl-toolchain",
+      "path": "examples/ecommerce.asfl",
+      "html_url": null
+    },
+    "realspec": {
+      "source_type": "github_harvest",
+      "provenance": {
+        "repo": "JaredYe04/agile-sofl-toolchain",
+        "path": "examples/ecommerce.asfl",
+        "local": "D:\\repos\\error-detect-research\\artifacts\\github_harvest\\wave3_targeted_v1\\downloaded\\JaredYe04_agile-sofl-toolchain__examples_ecommerce.asfl"
+      }
+    },
+    "referenceCode": "def Demote(product: int) -> dict:\n    \"\"\"Reference implementation auto-generated from FSF.\"\"\"\n    if product > 0:\n        return {\"featured\": 0}\n    else:\n        return {\"featured\": 1}\n",
+    "complexity": {
+      "scenario_count": 1,
+      "guard_complexity": "Simple",
+      "overlap_rate": 0.5,
+      "has_external_vars": false,
+      "overlap_density_tier": "low"
+    }
+  },
+  {
+    "taskId": "GitHubHarvest.ASFL_DispatchAlert",
+    "kind": "process",
+    "name": "DispatchAlert",
+    "signature": {
+      "inputs": [
+        {
+          "name": "sensor",
+          "type": "int"
+        },
+        {
+          "name": "level",
+          "type": "int"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "ticket",
+          "type": "int"
+        },
+        {
+          "name": "sensors",
+          "type": "int"
+        },
+        {
+          "name": "alert_queue",
+          "type": "int"
+        },
+        {
+          "name": "open_alerts",
+          "type": "int"
+        }
+      ]
+    },
+    "fsfScenarios": [
+      {
+        "index": 1,
+        "kind": "scenario",
+        "test": "sensor gt 0",
+        "def": "ticket eq 1"
+      },
+      {
+        "index": 2,
+        "kind": "scenario",
+        "test": "level eq 0",
+        "def": "ticket eq 0"
+      },
+      {
+        "index": 3,
+        "kind": "others",
+        "test": "others",
+        "def": "ticket eq 0"
+      }
+    ],
+    "ext": [],
+    "promptSpec": "Process DispatchAlert(sensor, level) -> (ticket, sensors, alert_queue, open_alerts)\n\nFSF specification:\nif (sensor gt 0) => ticket eq 1\nif (level eq 0) => ticket eq 0\nothers => ticket eq 0",
+    "sourceFile": "github://JaredYe04/agile-sofl-toolchain/examples/graph-showcase.asfl",
+    "sourceBasename": "examples/graph-showcase.asfl",
+    "module": "GitHubASFL",
+    "externalProvenance": {
+      "source": "github_asfl_lite",
+      "corpus": "github_harvest",
+      "repo": "JaredYe04/agile-sofl-toolchain",
+      "path": "examples/graph-showcase.asfl",
+      "html_url": null
+    },
+    "realspec": {
+      "source_type": "github_harvest",
+      "provenance": {
+        "repo": "JaredYe04/agile-sofl-toolchain",
+        "path": "examples/graph-showcase.asfl",
+        "local": "D:\\repos\\error-detect-research\\artifacts\\github_harvest\\wave3_targeted_v1\\downloaded\\JaredYe04_agile-sofl-toolchain__examples_graph-showcase.asfl"
+      }
+    },
+    "referenceCode": "def DispatchAlert(sensor: int, level: int) -> dict:\n    \"\"\"Reference implementation auto-generated from FSF.\"\"\"\n    if sensor > 0:\n        return {\"ticket\": 1}\n    elif level == 0:\n        return {\"ticket\": 0}\n    else:\n        return {\"ticket\": 0}\n",
+    "complexity": {
+      "scenario_count": 2,
+      "guard_complexity": "AND",
+      "overlap_rate": 0.778,
+      "has_external_vars": false,
+      "overlap_density_tier": "high"
+    }
+  },
+  {
+    "taskId": "GitHubHarvest.ASFL_RegisterCitizen",
+    "kind": "process",
+    "name": "RegisterCitizen",
+    "signature": {
+      "inputs": [
+        {
+          "name": "citizen",
+          "type": "int"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "ok",
+          "type": "int"
+        },
+        {
+          "name": "citizens",
+          "type": "int"
+        },
+        {
+          "name": "citizens",
+          "type": "int"
+        }
+      ]
+    },
+    "fsfScenarios": [
+      {
+        "index": 1,
+        "kind": "scenario",
+        "test": "citizen gt 0",
+        "def": "ok eq 1"
+      },
+      {
+        "index": 2,
+        "kind": "others",
+        "test": "others",
+        "def": "ok eq 0"
+      }
+    ],
+    "ext": [],
+    "promptSpec": "Process RegisterCitizen(citizen) -> (ok, citizens, citizens)\n\nFSF specification:\nif (citizen gt 0) => ok eq 1\nothers => ok eq 0",
+    "sourceFile": "github://JaredYe04/agile-sofl-toolchain/examples/graph-showcase.asfl",
+    "sourceBasename": "examples/graph-showcase.asfl",
+    "module": "GitHubASFL",
+    "externalProvenance": {
+      "source": "github_asfl_lite",
+      "corpus": "github_harvest",
+      "repo": "JaredYe04/agile-sofl-toolchain",
+      "path": "examples/graph-showcase.asfl",
+      "html_url": null
+    },
+    "realspec": {
+      "source_type": "github_harvest",
+      "provenance": {
+        "repo": "JaredYe04/agile-sofl-toolchain",
+        "path": "examples/graph-showcase.asfl",
+        "local": "D:\\repos\\error-detect-research\\artifacts\\github_harvest\\wave3_targeted_v1\\downloaded\\JaredYe04_agile-sofl-toolchain__examples_graph-showcase.asfl"
+      }
+    },
+    "referenceCode": "def RegisterCitizen(citizen: int) -> dict:\n    \"\"\"Reference implementation auto-generated from FSF.\"\"\"\n    if citizen > 0:\n        return {\"ok\": 1}\n    else:\n        return {\"ok\": 0}\n",
+    "complexity": {
+      "scenario_count": 1,
+      "guard_complexity": "Simple",
+      "overlap_rate": 0.5,
+      "has_external_vars": false,
+      "overlap_density_tier": "low"
+    }
+  },
+  {
+    "taskId": "GitHubHarvest.ASFL_PublishNotice",
+    "kind": "process",
+    "name": "PublishNotice",
+    "signature": {
+      "inputs": [
+        {
+          "name": "zone",
+          "type": "int"
+        },
+        {
+          "name": "urgent",
+          "type": "int"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "sent",
+          "type": "int"
+        }
+      ]
+    },
+    "fsfScenarios": [
+      {
+        "index": 1,
+        "kind": "scenario",
+        "test": "zone gt 0",
+        "def": "sent eq 1"
+      },
+      {
+        "index": 2,
+        "kind": "others",
+        "test": "others",
+        "def": "sent eq 0"
+      }
+    ],
+    "ext": [],
+    "promptSpec": "Process PublishNotice(zone, urgent) -> (sent)\n\nFSF specification:\nif (zone gt 0) => sent eq 1\nothers => sent eq 0",
+    "sourceFile": "github://JaredYe04/agile-sofl-toolchain/examples/graph-showcase.asfl",
+    "sourceBasename": "examples/graph-showcase.asfl",
+    "module": "GitHubASFL",
+    "externalProvenance": {
+      "source": "github_asfl_lite",
+      "corpus": "github_harvest",
+      "repo": "JaredYe04/agile-sofl-toolchain",
+      "path": "examples/graph-showcase.asfl",
+      "html_url": null
+    },
+    "realspec": {
+      "source_type": "github_harvest",
+      "provenance": {
+        "repo": "JaredYe04/agile-sofl-toolchain",
+        "path": "examples/graph-showcase.asfl",
+        "local": "D:\\repos\\error-detect-research\\artifacts\\github_harvest\\wave3_targeted_v1\\downloaded\\JaredYe04_agile-sofl-toolchain__examples_graph-showcase.asfl"
+      }
+    },
+    "referenceCode": "def PublishNotice(zone: int, urgent: int) -> dict:\n    \"\"\"Reference implementation auto-generated from FSF.\"\"\"\n    if zone > 0:\n        return {\"sent\": 1}\n    else:\n        return {\"sent\": 0}\n",
+    "complexity": {
+      "scenario_count": 1,
+      "guard_complexity": "Simple",
+      "overlap_rate": 0.5,
+      "has_external_vars": false,
+      "overlap_density_tier": "low"
+    }
+  },
+  {
+    "taskId": "GitHubHarvest.ASFL_AggregateMetrics",
+    "kind": "process",
+    "name": "AggregateMetrics",
+    "signature": {
+      "inputs": [
+        {
+          "name": "window",
+          "type": "int"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "samples",
+          "type": "int"
+        },
+        {
+          "name": "alert_queue",
+          "type": "int"
+        }
+      ]
+    },
+    "fsfScenarios": [
+      {
+        "index": 1,
+        "kind": "scenario",
+        "test": "window gt 0",
+        "def": "samples eq 1"
+      },
+      {
+        "index": 2,
+        "kind": "others",
+        "test": "others",
+        "def": "samples eq 0"
+      }
+    ],
+    "ext": [],
+    "promptSpec": "Process AggregateMetrics(window) -> (samples, alert_queue)\n\nFSF specification:\nif (window gt 0) => samples eq 1\nothers => samples eq 0",
+    "sourceFile": "github://JaredYe04/agile-sofl-toolchain/examples/graph-showcase.asfl",
+    "sourceBasename": "examples/graph-showcase.asfl",
+    "module": "GitHubASFL",
+    "externalProvenance": {
+      "source": "github_asfl_lite",
+      "corpus": "github_harvest",
+      "repo": "JaredYe04/agile-sofl-toolchain",
+      "path": "examples/graph-showcase.asfl",
+      "html_url": null
+    },
+    "realspec": {
+      "source_type": "github_harvest",
+      "provenance": {
+        "repo": "JaredYe04/agile-sofl-toolchain",
+        "path": "examples/graph-showcase.asfl",
+        "local": "D:\\repos\\error-detect-research\\artifacts\\github_harvest\\wave3_targeted_v1\\downloaded\\JaredYe04_agile-sofl-toolchain__examples_graph-showcase.asfl"
+      }
+    },
+    "referenceCode": "def AggregateMetrics(window: int) -> dict:\n    \"\"\"Reference implementation auto-generated from FSF.\"\"\"\n    if window > 0:\n        return {\"samples\": 1}\n    else:\n        return {\"samples\": 0}\n",
+    "complexity": {
+      "scenario_count": 1,
+      "guard_complexity": "Simple",
+      "overlap_rate": 0.5,
+      "has_external_vars": false,
+      "overlap_density_tier": "low"
+    }
+  },
+  {
+    "taskId": "GitHubHarvest.ASFL_HandleAlert",
+    "kind": "process",
+    "name": "HandleAlert",
+    "signature": {
+      "inputs": [
+        {
+          "name": "sensor",
+          "type": "int"
+        },
+        {
+          "name": "level",
+          "type": "int"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "rerouted",
+          "type": "int"
+        },
+        {
+          "name": "sensors",
+          "type": "int"
+        },
+        {
+          "name": "signals",
+          "type": "int"
+        }
+      ]
+    },
+    "fsfScenarios": [
+      {
+        "index": 1,
+        "kind": "scenario",
+        "test": "level gt 0",
+        "def": "rerouted eq 1"
+      },
+      {
+        "index": 2,
+        "kind": "others",
+        "test": "others",
+        "def": "rerouted eq 0"
+      }
+    ],
+    "ext": [],
+    "promptSpec": "Process HandleAlert(sensor, level) -> (rerouted, sensors, signals)\n\nFSF specification:\nif (level gt 0) => rerouted eq 1\nothers => rerouted eq 0",
+    "sourceFile": "github://JaredYe04/agile-sofl-toolchain/examples/graph-showcase.asfl",
+    "sourceBasename": "examples/graph-showcase.asfl",
+    "module": "GitHubASFL",
+    "externalProvenance": {
+      "source": "github_asfl_lite",
+      "corpus": "github_harvest",
+      "repo": "JaredYe04/agile-sofl-toolchain",
+      "path": "examples/graph-showcase.asfl",
+      "html_url": null
+    },
+    "realspec": {
+      "source_type": "github_harvest",
+      "provenance": {
+        "repo": "JaredYe04/agile-sofl-toolchain",
+        "path": "examples/graph-showcase.asfl",
+        "local": "D:\\repos\\error-detect-research\\artifacts\\github_harvest\\wave3_targeted_v1\\downloaded\\JaredYe04_agile-sofl-toolchain__examples_graph-showcase.asfl"
+      }
+    },
+    "referenceCode": "def HandleAlert(sensor: int, level: int) -> dict:\n    \"\"\"Reference implementation auto-generated from FSF.\"\"\"\n    if level > 0:\n        return {\"rerouted\": 1}\n    else:\n        return {\"rerouted\": 0}\n",
+    "complexity": {
+      "scenario_count": 1,
+      "guard_complexity": "Simple",
+      "overlap_rate": 0.5,
+      "has_external_vars": false,
+      "overlap_density_tier": "low"
+    }
+  },
+  {
+    "taskId": "GitHubHarvest.ASFL_AdjustSignals",
+    "kind": "process",
+    "name": "AdjustSignals",
+    "signature": {
+      "inputs": [
+        {
+          "name": "intersection",
+          "type": "int"
+        },
+        {
+          "name": "phase",
+          "type": "int"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "ok",
+          "type": "int"
+        }
+      ]
+    },
+    "fsfScenarios": [
+      {
+        "index": 1,
+        "kind": "scenario",
+        "test": "intersection gt 0",
+        "def": "ok eq 1"
+      },
+      {
+        "index": 2,
+        "kind": "others",
+        "test": "others",
+        "def": "ok eq 0"
+      }
+    ],
+    "ext": [],
+    "promptSpec": "Process AdjustSignals(intersection, phase) -> (ok)\n\nFSF specification:\nif (intersection gt 0) => ok eq 1\nothers => ok eq 0",
+    "sourceFile": "github://JaredYe04/agile-sofl-toolchain/examples/graph-showcase.asfl",
+    "sourceBasename": "examples/graph-showcase.asfl",
+    "module": "GitHubASFL",
+    "externalProvenance": {
+      "source": "github_asfl_lite",
+      "corpus": "github_harvest",
+      "repo": "JaredYe04/agile-sofl-toolchain",
+      "path": "examples/graph-showcase.asfl",
+      "html_url": null
+    },
+    "realspec": {
+      "source_type": "github_harvest",
+      "provenance": {
+        "repo": "JaredYe04/agile-sofl-toolchain",
+        "path": "examples/graph-showcase.asfl",
+        "local": "D:\\repos\\error-detect-research\\artifacts\\github_harvest\\wave3_targeted_v1\\downloaded\\JaredYe04_agile-sofl-toolchain__examples_graph-showcase.asfl"
+      }
+    },
+    "referenceCode": "def AdjustSignals(intersection: int, phase: int) -> dict:\n    \"\"\"Reference implementation auto-generated from FSF.\"\"\"\n    if intersection > 0:\n        return {\"ok\": 1}\n    else:\n        return {\"ok\": 0}\n",
+    "complexity": {
+      "scenario_count": 1,
+      "guard_complexity": "Simple",
+      "overlap_rate": 0.5,
+      "has_external_vars": false,
+      "overlap_density_tier": "low"
+    }
+  },
+  {
+    "taskId": "GitHubHarvest.ASFL_ReportCongestion",
+    "kind": "process",
+    "name": "ReportCongestion",
+    "signature": {
+      "inputs": [
+        {
+          "name": "count",
+          "type": "int"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "congested",
+          "type": "int"
+        }
+      ]
+    },
+    "fsfScenarios": [
+      {
+        "index": 1,
+        "kind": "scenario",
+        "test": "count ge 0",
+        "def": "count eq count"
+      },
+      {
+        "index": 2,
+        "kind": "others",
+        "test": "others",
+        "def": "count eq 0"
+      }
+    ],
+    "ext": [],
+    "promptSpec": "Process ReportCongestion(count) -> (congested)\n\nFSF specification:\nif (count ge 0) => count eq count\nothers => count eq 0",
+    "sourceFile": "github://JaredYe04/agile-sofl-toolchain/examples/graph-showcase.asfl",
+    "sourceBasename": "examples/graph-showcase.asfl",
+    "module": "GitHubASFL",
+    "externalProvenance": {
+      "source": "github_asfl_lite",
+      "corpus": "github_harvest",
+      "repo": "JaredYe04/agile-sofl-toolchain",
+      "path": "examples/graph-showcase.asfl",
+      "html_url": null
+    },
+    "realspec": {
+      "source_type": "github_harvest",
+      "provenance": {
+        "repo": "JaredYe04/agile-sofl-toolchain",
+        "path": "examples/graph-showcase.asfl",
+        "local": "D:\\repos\\error-detect-research\\artifacts\\github_harvest\\wave3_targeted_v1\\downloaded\\JaredYe04_agile-sofl-toolchain__examples_graph-showcase.asfl"
+      }
+    },
+    "referenceCode": "def ReportCongestion(count: int) -> dict:\n    \"\"\"Reference implementation auto-generated from FSF.\"\"\"\n    if count >= 0:\n        return {\"count\": count}\n    else:\n        return {\"count\": 0}\n",
+    "complexity": {
+      "scenario_count": 1,
+      "guard_complexity": "Simple",
+      "overlap_rate": 0.5,
+      "has_external_vars": false,
+      "overlap_density_tier": "low"
+    }
+  },
+  {
+    "taskId": "GitHubHarvest.ASFL_ShedLoad",
+    "kind": "process",
+    "name": "ShedLoad",
+    "signature": {
+      "inputs": [
+        {
+          "name": "amount",
+          "type": "int"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "ok",
+          "type": "int"
+        },
+        {
+          "name": "power_load",
+          "type": "int"
+        }
+      ]
+    },
+    "fsfScenarios": [
+      {
+        "index": 1,
+        "kind": "scenario",
+        "test": "amount gt 0",
+        "def": "ok eq 1"
+      },
+      {
+        "index": 2,
+        "kind": "others",
+        "test": "others",
+        "def": "ok eq 0"
+      }
+    ],
+    "ext": [],
+    "promptSpec": "Process ShedLoad(amount) -> (ok, power_load)\n\nFSF specification:\nif (amount gt 0) => ok eq 1\nothers => ok eq 0",
+    "sourceFile": "github://JaredYe04/agile-sofl-toolchain/examples/graph-showcase.asfl",
+    "sourceBasename": "examples/graph-showcase.asfl",
+    "module": "GitHubASFL",
+    "externalProvenance": {
+      "source": "github_asfl_lite",
+      "corpus": "github_harvest",
+      "repo": "JaredYe04/agile-sofl-toolchain",
+      "path": "examples/graph-showcase.asfl",
+      "html_url": null
+    },
+    "realspec": {
+      "source_type": "github_harvest",
+      "provenance": {
+        "repo": "JaredYe04/agile-sofl-toolchain",
+        "path": "examples/graph-showcase.asfl",
+        "local": "D:\\repos\\error-detect-research\\artifacts\\github_harvest\\wave3_targeted_v1\\downloaded\\JaredYe04_agile-sofl-toolchain__examples_graph-showcase.asfl"
+      }
+    },
+    "referenceCode": "def ShedLoad(amount: int) -> dict:\n    \"\"\"Reference implementation auto-generated from FSF.\"\"\"\n    if amount > 0:\n        return {\"ok\": 1}\n    else:\n        return {\"ok\": 0}\n",
+    "complexity": {
+      "scenario_count": 1,
+      "guard_complexity": "Simple",
+      "overlap_rate": 0.5,
+      "has_external_vars": false,
+      "overlap_density_tier": "low"
+    }
+  },
+  {
+    "taskId": "GitHubHarvest.ASFL_BoostPressure",
+    "kind": "process",
+    "name": "BoostPressure",
+    "signature": {
+      "inputs": [
+        {
+          "name": "delta",
+          "type": "int"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "ok",
+          "type": "int"
+        },
+        {
+          "name": "water_pressure",
+          "type": "int"
+        }
+      ]
+    },
+    "fsfScenarios": [
+      {
+        "index": 1,
+        "kind": "scenario",
+        "test": "delta gt 0",
+        "def": "ok eq 1"
+      },
+      {
+        "index": 2,
+        "kind": "others",
+        "test": "others",
+        "def": "ok eq 0"
+      }
+    ],
+    "ext": [],
+    "promptSpec": "Process BoostPressure(delta) -> (ok, water_pressure)\n\nFSF specification:\nif (delta gt 0) => ok eq 1\nothers => ok eq 0",
+    "sourceFile": "github://JaredYe04/agile-sofl-toolchain/examples/graph-showcase.asfl",
+    "sourceBasename": "examples/graph-showcase.asfl",
+    "module": "GitHubASFL",
+    "externalProvenance": {
+      "source": "github_asfl_lite",
+      "corpus": "github_harvest",
+      "repo": "JaredYe04/agile-sofl-toolchain",
+      "path": "examples/graph-showcase.asfl",
+      "html_url": null
+    },
+    "realspec": {
+      "source_type": "github_harvest",
+      "provenance": {
+        "repo": "JaredYe04/agile-sofl-toolchain",
+        "path": "examples/graph-showcase.asfl",
+        "local": "D:\\repos\\error-detect-research\\artifacts\\github_harvest\\wave3_targeted_v1\\downloaded\\JaredYe04_agile-sofl-toolchain__examples_graph-showcase.asfl"
+      }
+    },
+    "referenceCode": "def BoostPressure(delta: int) -> dict:\n    \"\"\"Reference implementation auto-generated from FSF.\"\"\"\n    if delta > 0:\n        return {\"ok\": 1}\n    else:\n        return {\"ok\": 0}\n",
+    "complexity": {
+      "scenario_count": 1,
+      "guard_complexity": "Simple",
+      "overlap_rate": 0.5,
+      "has_external_vars": false,
+      "overlap_density_tier": "low"
+    }
+  },
+  {
+    "taskId": "GitHubHarvest.ASFL_ReadMeters",
+    "kind": "process",
+    "name": "ReadMeters",
+    "signature": {
+      "inputs": [
+        {
+          "name": "count",
+          "type": "int"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "result",
+          "type": "int"
+        }
+      ]
+    },
+    "fsfScenarios": [
+      {
+        "index": 1,
+        "kind": "scenario",
+        "test": "count gt 0",
+        "def": "count eq 1"
+      },
+      {
+        "index": 2,
+        "kind": "others",
+        "test": "others",
+        "def": "count eq 0"
+      }
+    ],
+    "ext": [],
+    "promptSpec": "Process ReadMeters(count) -> (result)\n\nFSF specification:\nif (count gt 0) => count eq 1\nothers => count eq 0",
+    "sourceFile": "github://JaredYe04/agile-sofl-toolchain/examples/graph-showcase.asfl",
+    "sourceBasename": "examples/graph-showcase.asfl",
+    "module": "GitHubASFL",
+    "externalProvenance": {
+      "source": "github_asfl_lite",
+      "corpus": "github_harvest",
+      "repo": "JaredYe04/agile-sofl-toolchain",
+      "path": "examples/graph-showcase.asfl",
+      "html_url": null
+    },
+    "realspec": {
+      "source_type": "github_harvest",
+      "provenance": {
+        "repo": "JaredYe04/agile-sofl-toolchain",
+        "path": "examples/graph-showcase.asfl",
+        "local": "D:\\repos\\error-detect-research\\artifacts\\github_harvest\\wave3_targeted_v1\\downloaded\\JaredYe04_agile-sofl-toolchain__examples_graph-showcase.asfl"
+      }
+    },
+    "referenceCode": "def ReadMeters(count: int) -> dict:\n    \"\"\"Reference implementation auto-generated from FSF.\"\"\"\n    if count > 0:\n        return {\"count\": 1}\n    else:\n        return {\"count\": 0}\n",
+    "complexity": {
+      "scenario_count": 1,
+      "guard_complexity": "Simple",
+      "overlap_rate": 0.5,
+      "has_external_vars": false,
+      "overlap_density_tier": "low"
+    }
+  },
+  {
+    "taskId": "GitHubHarvest.ASFL_DispatchUnit",
+    "kind": "process",
+    "name": "DispatchUnit",
+    "signature": {
+      "inputs": [
+        {
+          "name": "zone",
+          "type": "int"
+        },
+        {
+          "name": "severity",
+          "type": "int"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "dispatched",
+          "type": "int"
+        },
+        {
+          "name": "active_incidents",
+          "type": "int"
+        },
+        {
+          "name": "standby_units",
+          "type": "int"
+        }
+      ]
+    },
+    "fsfScenarios": [
+      {
+        "index": 1,
+        "kind": "scenario",
+        "test": "severity gt 0",
+        "def": "dispatched eq 1"
+      },
+      {
+        "index": 2,
+        "kind": "others",
+        "test": "others",
+        "def": "dispatched eq 0"
+      }
+    ],
+    "ext": [],
+    "promptSpec": "Process DispatchUnit(zone, severity) -> (dispatched, active_incidents, standby_units)\n\nFSF specification:\nif (severity gt 0) => dispatched eq 1\nothers => dispatched eq 0",
+    "sourceFile": "github://JaredYe04/agile-sofl-toolchain/examples/graph-showcase.asfl",
+    "sourceBasename": "examples/graph-showcase.asfl",
+    "module": "GitHubASFL",
+    "externalProvenance": {
+      "source": "github_asfl_lite",
+      "corpus": "github_harvest",
+      "repo": "JaredYe04/agile-sofl-toolchain",
+      "path": "examples/graph-showcase.asfl",
+      "html_url": null
+    },
+    "realspec": {
+      "source_type": "github_harvest",
+      "provenance": {
+        "repo": "JaredYe04/agile-sofl-toolchain",
+        "path": "examples/graph-showcase.asfl",
+        "local": "D:\\repos\\error-detect-research\\artifacts\\github_harvest\\wave3_targeted_v1\\downloaded\\JaredYe04_agile-sofl-toolchain__examples_graph-showcase.asfl"
+      }
+    },
+    "referenceCode": "def DispatchUnit(zone: int, severity: int) -> dict:\n    \"\"\"Reference implementation auto-generated from FSF.\"\"\"\n    if severity > 0:\n        return {\"dispatched\": 1}\n    else:\n        return {\"dispatched\": 0}\n",
+    "complexity": {
+      "scenario_count": 1,
+      "guard_complexity": "Simple",
+      "overlap_rate": 0.5,
+      "has_external_vars": false,
+      "overlap_density_tier": "low"
+    }
+  },
+  {
+    "taskId": "GitHubHarvest.ASFL_CloseIncident",
+    "kind": "process",
+    "name": "CloseIncident",
+    "signature": {
+      "inputs": [
+        {
+          "name": "incident",
+          "type": "int"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "closed",
+          "type": "int"
+        }
+      ]
+    },
+    "fsfScenarios": [
+      {
+        "index": 1,
+        "kind": "scenario",
+        "test": "incident gt 0",
+        "def": "closed eq 1"
+      },
+      {
+        "index": 2,
+        "kind": "others",
+        "test": "others",
+        "def": "closed eq 0"
+      }
+    ],
+    "ext": [],
+    "promptSpec": "Process CloseIncident(incident) -> (closed)\n\nFSF specification:\nif (incident gt 0) => closed eq 1\nothers => closed eq 0",
+    "sourceFile": "github://JaredYe04/agile-sofl-toolchain/examples/graph-showcase.asfl",
+    "sourceBasename": "examples/graph-showcase.asfl",
+    "module": "GitHubASFL",
+    "externalProvenance": {
+      "source": "github_asfl_lite",
+      "corpus": "github_harvest",
+      "repo": "JaredYe04/agile-sofl-toolchain",
+      "path": "examples/graph-showcase.asfl",
+      "html_url": null
+    },
+    "realspec": {
+      "source_type": "github_harvest",
+      "provenance": {
+        "repo": "JaredYe04/agile-sofl-toolchain",
+        "path": "examples/graph-showcase.asfl",
+        "local": "D:\\repos\\error-detect-research\\artifacts\\github_harvest\\wave3_targeted_v1\\downloaded\\JaredYe04_agile-sofl-toolchain__examples_graph-showcase.asfl"
+      }
+    },
+    "referenceCode": "def CloseIncident(incident: int) -> dict:\n    \"\"\"Reference implementation auto-generated from FSF.\"\"\"\n    if incident > 0:\n        return {\"closed\": 1}\n    else:\n        return {\"closed\": 0}\n",
+    "complexity": {
+      "scenario_count": 1,
+      "guard_complexity": "Simple",
+      "overlap_rate": 0.5,
+      "has_external_vars": false,
+      "overlap_density_tier": "low"
+    }
+  },
+  {
+    "taskId": "GitHubHarvest.ASFL_PageResponders",
+    "kind": "process",
+    "name": "PageResponders",
+    "signature": {
+      "inputs": [
+        {
+          "name": "count",
+          "type": "int"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "result",
+          "type": "int"
+        }
+      ]
+    },
+    "fsfScenarios": [
+      {
+        "index": 1,
+        "kind": "scenario",
+        "test": "count gt 0",
+        "def": "count eq 1"
+      },
+      {
+        "index": 2,
+        "kind": "others",
+        "test": "others",
+        "def": "count eq 0"
+      }
+    ],
+    "ext": [],
+    "promptSpec": "Process PageResponders(count) -> (result)\n\nFSF specification:\nif (count gt 0) => count eq 1\nothers => count eq 0",
+    "sourceFile": "github://JaredYe04/agile-sofl-toolchain/examples/graph-showcase.asfl",
+    "sourceBasename": "examples/graph-showcase.asfl",
+    "module": "GitHubASFL",
+    "externalProvenance": {
+      "source": "github_asfl_lite",
+      "corpus": "github_harvest",
+      "repo": "JaredYe04/agile-sofl-toolchain",
+      "path": "examples/graph-showcase.asfl",
+      "html_url": null
+    },
+    "realspec": {
+      "source_type": "github_harvest",
+      "provenance": {
+        "repo": "JaredYe04/agile-sofl-toolchain",
+        "path": "examples/graph-showcase.asfl",
+        "local": "D:\\repos\\error-detect-research\\artifacts\\github_harvest\\wave3_targeted_v1\\downloaded\\JaredYe04_agile-sofl-toolchain__examples_graph-showcase.asfl"
+      }
+    },
+    "referenceCode": "def PageResponders(count: int) -> dict:\n    \"\"\"Reference implementation auto-generated from FSF.\"\"\"\n    if count > 0:\n        return {\"count\": 1}\n    else:\n        return {\"count\": 0}\n",
+    "complexity": {
+      "scenario_count": 1,
+      "guard_complexity": "Simple",
+      "overlap_rate": 0.5,
+      "has_external_vars": false,
+      "overlap_density_tier": "low"
+    }
+  },
+  {
+    "taskId": "GitHubHarvest.ASFL_Register",
+    "kind": "process",
+    "name": "Register",
+    "signature": {
+      "inputs": [
+        {
+          "name": "patient",
+          "type": "int"
+        },
+        {
+          "name": "dept",
+          "type": "int"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "ticket",
+          "type": "int"
+        },
+        {
+          "name": "queue",
+          "type": "int"
+        },
+        {
+          "name": "queue",
+          "type": "int"
+        },
+        {
+          "name": "waiting_count",
+          "type": "int"
+        }
+      ]
+    },
+    "fsfScenarios": [
+      {
+        "index": 1,
+        "kind": "scenario",
+        "test": "patient gt 0",
+        "def": "ticket eq 1"
+      },
+      {
+        "index": 2,
+        "kind": "scenario",
+        "test": "dept eq 0",
+        "def": "ticket eq 0"
+      },
+      {
+        "index": 3,
+        "kind": "others",
+        "test": "others",
+        "def": "ticket eq 0"
+      }
+    ],
+    "ext": [],
+    "promptSpec": "Process Register(patient, dept) -> (ticket, queue, queue, waiting_count)\n\nFSF specification:\nif (patient gt 0) => ticket eq 1\nif (dept eq 0) => ticket eq 0\nothers => ticket eq 0",
+    "sourceFile": "github://JaredYe04/agile-sofl-toolchain/examples/hospital-registration.asfl",
+    "sourceBasename": "examples/hospital-registration.asfl",
+    "module": "GitHubASFL",
+    "externalProvenance": {
+      "source": "github_asfl_lite",
+      "corpus": "github_harvest",
+      "repo": "JaredYe04/agile-sofl-toolchain",
+      "path": "examples/hospital-registration.asfl",
+      "html_url": null
+    },
+    "realspec": {
+      "source_type": "github_harvest",
+      "provenance": {
+        "repo": "JaredYe04/agile-sofl-toolchain",
+        "path": "examples/hospital-registration.asfl",
+        "local": "D:\\repos\\error-detect-research\\artifacts\\github_harvest\\wave3_targeted_v1\\downloaded\\JaredYe04_agile-sofl-toolchain__examples_hospital-registration.asfl"
+      }
+    },
+    "referenceCode": "def Register(patient: int, dept: int) -> dict:\n    \"\"\"Reference implementation auto-generated from FSF.\"\"\"\n    if patient > 0:\n        return {\"ticket\": 1}\n    elif dept == 0:\n        return {\"ticket\": 0}\n    else:\n        return {\"ticket\": 0}\n",
+    "complexity": {
+      "scenario_count": 2,
+      "guard_complexity": "Simple",
+      "overlap_rate": 0.778,
+      "has_external_vars": false,
+      "overlap_density_tier": "high"
+    }
+  },
+  {
+    "taskId": "GitHubHarvest.ASFL_Publish",
+    "kind": "process",
+    "name": "Publish",
+    "signature": {
+      "inputs": [
+        {
+          "name": "zone",
+          "type": "int"
+        },
+        {
+          "name": "urgent",
+          "type": "int"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "sent",
+          "type": "int"
+        },
+        {
+          "name": "pending_notices",
+          "type": "int"
+        }
+      ]
+    },
+    "fsfScenarios": [
+      {
+        "index": 1,
+        "kind": "scenario",
+        "test": "zone gt 0",
+        "def": "sent eq 1"
+      },
+      {
+        "index": 2,
+        "kind": "others",
+        "test": "others",
+        "def": "sent eq 0"
+      }
+    ],
+    "ext": [],
+    "promptSpec": "Process Publish(zone, urgent) -> (sent, pending_notices)\n\nFSF specification:\nif (zone gt 0) => sent eq 1\nothers => sent eq 0",
+    "sourceFile": "github://JaredYe04/agile-sofl-toolchain/examples/graph-showcase.asfl",
+    "sourceBasename": "examples/graph-showcase.asfl",
+    "module": "GitHubASFL",
+    "externalProvenance": {
+      "source": "github_asfl_lite",
+      "corpus": "github_harvest",
+      "repo": "JaredYe04/agile-sofl-toolchain",
+      "path": "examples/graph-showcase.asfl",
+      "html_url": null
+    },
+    "realspec": {
+      "source_type": "github_harvest",
+      "provenance": {
+        "repo": "JaredYe04/agile-sofl-toolchain",
+        "path": "examples/graph-showcase.asfl",
+        "local": "D:\\repos\\error-detect-research\\artifacts\\github_harvest\\wave3_targeted_v1\\downloaded\\JaredYe04_agile-sofl-toolchain__examples_graph-showcase.asfl"
+      }
+    },
+    "referenceCode": "def Publish(zone: int, urgent: int) -> dict:\n    \"\"\"Reference implementation auto-generated from FSF.\"\"\"\n    if zone > 0:\n        return {\"sent\": 1}\n    else:\n        return {\"sent\": 0}\n",
+    "complexity": {
+      "scenario_count": 1,
+      "guard_complexity": "Simple",
+      "overlap_rate": 0.5,
+      "has_external_vars": false,
+      "overlap_density_tier": "low"
+    }
+  },
+  {
+    "taskId": "GitHubHarvest.ASFL_VerifySession",
+    "kind": "process",
+    "name": "VerifySession",
+    "signature": {
+      "inputs": [
+        {
+          "name": "citizen",
+          "type": "int"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "ok",
+          "type": "int"
+        }
+      ]
+    },
+    "fsfScenarios": [
+      {
+        "index": 1,
+        "kind": "scenario",
+        "test": "citizen gt 0",
+        "def": "ok eq 1"
+      },
+      {
+        "index": 2,
+        "kind": "others",
+        "test": "others",
+        "def": "ok eq 0"
+      }
+    ],
+    "ext": [],
+    "promptSpec": "Process VerifySession(citizen) -> (ok)\n\nFSF specification:\nif (citizen gt 0) => ok eq 1\nothers => ok eq 0",
+    "sourceFile": "github://JaredYe04/agile-sofl-toolchain/examples/graph-showcase.asfl",
+    "sourceBasename": "examples/graph-showcase.asfl",
+    "module": "GitHubASFL",
+    "externalProvenance": {
+      "source": "github_asfl_lite",
+      "corpus": "github_harvest",
+      "repo": "JaredYe04/agile-sofl-toolchain",
+      "path": "examples/graph-showcase.asfl",
+      "html_url": null
+    },
+    "realspec": {
+      "source_type": "github_harvest",
+      "provenance": {
+        "repo": "JaredYe04/agile-sofl-toolchain",
+        "path": "examples/graph-showcase.asfl",
+        "local": "D:\\repos\\error-detect-research\\artifacts\\github_harvest\\wave3_targeted_v1\\downloaded\\JaredYe04_agile-sofl-toolchain__examples_graph-showcase.asfl"
+      }
+    },
+    "referenceCode": "def VerifySession(citizen: int) -> dict:\n    \"\"\"Reference implementation auto-generated from FSF.\"\"\"\n    if citizen > 0:\n        return {\"ok\": 1}\n    else:\n        return {\"ok\": 0}\n",
+    "complexity": {
+      "scenario_count": 1,
+      "guard_complexity": "Simple",
+      "overlap_rate": 0.5,
+      "has_external_vars": false,
+      "overlap_density_tier": "low"
+    }
+  },
+  {
+    "taskId": "GitHubHarvest.ASFL_DrainNotices",
+    "kind": "process",
+    "name": "DrainNotices",
+    "signature": {
+      "inputs": [
+        {
+          "name": "remaining",
+          "type": "int"
+        },
+        {
+          "name": "pending_notices",
+          "type": "int"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "result",
+          "type": "int"
+        }
+      ]
+    },
+    "fsfScenarios": [
+      {
+        "index": 1,
+        "kind": "scenario",
+        "test": "pending_notices gt 0",
+        "def": "remaining eq pending_notices - 1"
+      },
+      {
+        "index": 2,
+        "kind": "others",
+        "test": "others",
+        "def": "remaining eq 0"
+      }
+    ],
+    "ext": [],
+    "promptSpec": "Process DrainNotices(remaining, pending_notices) -> (result)\n\nFSF specification:\nif (pending_notices gt 0) => remaining eq pending_notices - 1\nothers => remaining eq 0",
+    "sourceFile": "github://JaredYe04/agile-sofl-toolchain/examples/graph-showcase.asfl",
+    "sourceBasename": "examples/graph-showcase.asfl",
+    "module": "GitHubASFL",
+    "externalProvenance": {
+      "source": "github_asfl_lite",
+      "corpus": "github_harvest",
+      "repo": "JaredYe04/agile-sofl-toolchain",
+      "path": "examples/graph-showcase.asfl",
+      "html_url": null
+    },
+    "realspec": {
+      "source_type": "github_harvest",
+      "provenance": {
+        "repo": "JaredYe04/agile-sofl-toolchain",
+        "path": "examples/graph-showcase.asfl",
+        "local": "D:\\repos\\error-detect-research\\artifacts\\github_harvest\\wave3_targeted_v1\\downloaded\\JaredYe04_agile-sofl-toolchain__examples_graph-showcase.asfl"
+      }
+    },
+    "referenceCode": "def DrainNotices(remaining: int, pending_notices: int) -> dict:\n    \"\"\"Reference implementation auto-generated from FSF.\"\"\"\n    if pending_notices > 0:\n        return {\"remaining\": pending_notices - 1}\n    else:\n        return {\"remaining\": 0}\n",
+    "complexity": {
+      "scenario_count": 1,
+      "guard_complexity": "Simple",
+      "overlap_rate": 0.5,
+      "has_external_vars": true,
+      "overlap_density_tier": "low"
+    }
+  },
+  {
+    "taskId": "GitHubHarvest.ASFL_Ingest",
+    "kind": "process",
+    "name": "Ingest",
+    "signature": {
+      "inputs": [
+        {
+          "name": "window",
+          "type": "int"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "samples",
+          "type": "int"
+        },
+        {
+          "name": "alert_queue",
+          "type": "int"
+        },
+        {
+          "name": "sample_count",
+          "type": "int"
+        }
+      ]
+    },
+    "fsfScenarios": [
+      {
+        "index": 1,
+        "kind": "scenario",
+        "test": "window gt 0",
+        "def": "samples eq 1"
+      },
+      {
+        "index": 2,
+        "kind": "others",
+        "test": "others",
+        "def": "samples eq 0"
+      }
+    ],
+    "ext": [],
+    "promptSpec": "Process Ingest(window) -> (samples, alert_queue, sample_count)\n\nFSF specification:\nif (window gt 0) => samples eq 1\nothers => samples eq 0",
+    "sourceFile": "github://JaredYe04/agile-sofl-toolchain/examples/graph-showcase.asfl",
+    "sourceBasename": "examples/graph-showcase.asfl",
+    "module": "GitHubASFL",
+    "externalProvenance": {
+      "source": "github_asfl_lite",
+      "corpus": "github_harvest",
+      "repo": "JaredYe04/agile-sofl-toolchain",
+      "path": "examples/graph-showcase.asfl",
+      "html_url": null
+    },
+    "realspec": {
+      "source_type": "github_harvest",
+      "provenance": {
+        "repo": "JaredYe04/agile-sofl-toolchain",
+        "path": "examples/graph-showcase.asfl",
+        "local": "D:\\repos\\error-detect-research\\artifacts\\github_harvest\\wave3_targeted_v1\\downloaded\\JaredYe04_agile-sofl-toolchain__examples_graph-showcase.asfl"
+      }
+    },
+    "referenceCode": "def Ingest(window: int) -> dict:\n    \"\"\"Reference implementation auto-generated from FSF.\"\"\"\n    if window > 0:\n        return {\"samples\": 1}\n    else:\n        return {\"samples\": 0}\n",
+    "complexity": {
+      "scenario_count": 1,
+      "guard_complexity": "Simple",
+      "overlap_rate": 0.5,
+      "has_external_vars": false,
+      "overlap_density_tier": "low"
+    }
+  },
+  {
+    "taskId": "GitHubHarvest.ASFL_RollupHourly",
+    "kind": "process",
+    "name": "RollupHourly",
+    "signature": {
+      "inputs": [
+        {
+          "name": "sample_count",
+          "type": "int"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "last_rollup",
+          "type": "int"
+        }
+      ]
+    },
+    "fsfScenarios": [
+      {
+        "index": 1,
+        "kind": "scenario",
+        "test": "sample_count gt 0",
+        "def": "last_rollup eq 1"
+      },
+      {
+        "index": 2,
+        "kind": "others",
+        "test": "others",
+        "def": "last_rollup eq 0"
+      }
+    ],
+    "ext": [],
+    "promptSpec": "Process RollupHourly(sample_count) -> (last_rollup)\n\nFSF specification:\nif (sample_count gt 0) => last_rollup eq 1\nothers => last_rollup eq 0",
+    "sourceFile": "github://JaredYe04/agile-sofl-toolchain/examples/graph-showcase.asfl",
+    "sourceBasename": "examples/graph-showcase.asfl",
+    "module": "GitHubASFL",
+    "externalProvenance": {
+      "source": "github_asfl_lite",
+      "corpus": "github_harvest",
+      "repo": "JaredYe04/agile-sofl-toolchain",
+      "path": "examples/graph-showcase.asfl",
+      "html_url": null
+    },
+    "realspec": {
+      "source_type": "github_harvest",
+      "provenance": {
+        "repo": "JaredYe04/agile-sofl-toolchain",
+        "path": "examples/graph-showcase.asfl",
+        "local": "D:\\repos\\error-detect-research\\artifacts\\github_harvest\\wave3_targeted_v1\\downloaded\\JaredYe04_agile-sofl-toolchain__examples_graph-showcase.asfl"
+      }
+    },
+    "referenceCode": "def RollupHourly(sample_count: int) -> dict:\n    \"\"\"Reference implementation auto-generated from FSF.\"\"\"\n    if sample_count > 0:\n        return {\"last_rollup\": 1}\n    else:\n        return {\"last_rollup\": 0}\n",
+    "complexity": {
+      "scenario_count": 1,
+      "guard_complexity": "Simple",
+      "overlap_rate": 0.5,
+      "has_external_vars": false,
+      "overlap_density_tier": "low"
+    }
+  },
+  {
+    "taskId": "GitHubHarvest.ASFL_ExportDashboard",
+    "kind": "process",
+    "name": "ExportDashboard",
+    "signature": {
+      "inputs": [
+        {
+          "name": "rows",
+          "type": "int"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "result",
+          "type": "int"
+        }
+      ]
+    },
+    "fsfScenarios": [
+      {
+        "index": 1,
+        "kind": "scenario",
+        "test": "rows gt 0",
+        "def": "rows eq 1"
+      },
+      {
+        "index": 2,
+        "kind": "others",
+        "test": "others",
+        "def": "rows eq 0"
+      }
+    ],
+    "ext": [],
+    "promptSpec": "Process ExportDashboard(rows) -> (result)\n\nFSF specification:\nif (rows gt 0) => rows eq 1\nothers => rows eq 0",
+    "sourceFile": "github://JaredYe04/agile-sofl-toolchain/examples/graph-showcase.asfl",
+    "sourceBasename": "examples/graph-showcase.asfl",
+    "module": "GitHubASFL",
+    "externalProvenance": {
+      "source": "github_asfl_lite",
+      "corpus": "github_harvest",
+      "repo": "JaredYe04/agile-sofl-toolchain",
+      "path": "examples/graph-showcase.asfl",
+      "html_url": null
+    },
+    "realspec": {
+      "source_type": "github_harvest",
+      "provenance": {
+        "repo": "JaredYe04/agile-sofl-toolchain",
+        "path": "examples/graph-showcase.asfl",
+        "local": "D:\\repos\\error-detect-research\\artifacts\\github_harvest\\wave3_targeted_v1\\downloaded\\JaredYe04_agile-sofl-toolchain__examples_graph-showcase.asfl"
+      }
+    },
+    "referenceCode": "def ExportDashboard(rows: int) -> dict:\n    \"\"\"Reference implementation auto-generated from FSF.\"\"\"\n    if rows > 0:\n        return {\"rows\": 1}\n    else:\n        return {\"rows\": 0}\n",
+    "complexity": {
+      "scenario_count": 1,
+      "guard_complexity": "Simple",
+      "overlap_rate": 0.5,
+      "has_external_vars": false,
+      "overlap_density_tier": "low"
+    }
+  },
+  {
+    "taskId": "GitHubHarvest.ASFL_WarmSensors",
+    "kind": "process",
+    "name": "WarmSensors",
+    "signature": {
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "sensors",
+          "type": "int"
+        },
+        {
+          "name": "sensors",
+          "type": "int"
+        },
+        {
+          "name": "open_alerts",
+          "type": "int"
+        }
+      ]
+    },
+    "fsfScenarios": [
+      {
+        "index": 1,
+        "kind": "scenario",
+        "test": "true",
+        "def": "open_alerts eq 0"
+      },
+      {
+        "index": 2,
+        "kind": "others",
+        "test": "others",
+        "def": "sensors eq 0 && sensors eq 0"
+      }
+    ],
+    "ext": [],
+    "promptSpec": "Process WarmSensors() -> (sensors, sensors, open_alerts)\n\nFSF specification:\nif (true) => open_alerts eq 0\nothers => sensors eq 0 && sensors eq 0",
+    "sourceFile": "github://JaredYe04/agile-sofl-toolchain/examples/graph-showcase.asfl",
+    "sourceBasename": "examples/graph-showcase.asfl",
+    "module": "GitHubASFL",
+    "externalProvenance": {
+      "source": "github_asfl_lite",
+      "corpus": "github_harvest",
+      "repo": "JaredYe04/agile-sofl-toolchain",
+      "path": "examples/graph-showcase.asfl",
+      "html_url": null
+    },
+    "realspec": {
+      "source_type": "github_harvest",
+      "provenance": {
+        "repo": "JaredYe04/agile-sofl-toolchain",
+        "path": "examples/graph-showcase.asfl",
+        "local": "D:\\repos\\error-detect-research\\artifacts\\github_harvest\\wave3_targeted_v1\\downloaded\\JaredYe04_agile-sofl-toolchain__examples_graph-showcase.asfl"
+      }
+    },
+    "referenceCode": "def WarmSensors() -> dict:\n    \"\"\"Reference implementation auto-generated from FSF.\"\"\"\n    if True:\n        return {\"open_alerts\": 0}\n    else:\n        return {\"sensors\": 0}\n",
+    "complexity": {
+      "scenario_count": 1,
+      "guard_complexity": "Simple",
+      "overlap_rate": 1.0,
+      "has_external_vars": false,
+      "overlap_density_tier": "high"
+    }
+  },
+  {
+    "taskId": "GitHubHarvest.ASFL_SeedZones",
+    "kind": "process",
+    "name": "SeedZones",
+    "signature": {
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "zones",
+          "type": "int"
+        },
+        {
+          "name": "open_alerts",
+          "type": "int"
+        }
+      ]
+    },
+    "fsfScenarios": [
+      {
+        "index": 1,
+        "kind": "scenario",
+        "test": "true",
+        "def": "open_alerts eq 0"
+      },
+      {
+        "index": 2,
+        "kind": "others",
+        "test": "others",
+        "def": "zones eq 0"
+      }
+    ],
+    "ext": [],
+    "promptSpec": "Process SeedZones() -> (zones, open_alerts)\n\nFSF specification:\nif (true) => open_alerts eq 0\nothers => zones eq 0",
+    "sourceFile": "github://JaredYe04/agile-sofl-toolchain/examples/graph-showcase.asfl",
+    "sourceBasename": "examples/graph-showcase.asfl",
+    "module": "GitHubASFL",
+    "externalProvenance": {
+      "source": "github_asfl_lite",
+      "corpus": "github_harvest",
+      "repo": "JaredYe04/agile-sofl-toolchain",
+      "path": "examples/graph-showcase.asfl",
+      "html_url": null
+    },
+    "realspec": {
+      "source_type": "github_harvest",
+      "provenance": {
+        "repo": "JaredYe04/agile-sofl-toolchain",
+        "path": "examples/graph-showcase.asfl",
+        "local": "D:\\repos\\error-detect-research\\artifacts\\github_harvest\\wave3_targeted_v1\\downloaded\\JaredYe04_agile-sofl-toolchain__examples_graph-showcase.asfl"
+      }
+    },
+    "referenceCode": "def SeedZones() -> dict:\n    \"\"\"Reference implementation auto-generated from FSF.\"\"\"\n    if True:\n        return {\"open_alerts\": 0}\n    else:\n        return {\"zones\": 0}\n",
+    "complexity": {
+      "scenario_count": 1,
+      "guard_complexity": "Simple",
+      "overlap_rate": 1.0,
+      "has_external_vars": false,
+      "overlap_density_tier": "high"
+    }
+  },
+  {
+    "taskId": "GitHubHarvest.ASFL_AssignDoctor",
+    "kind": "process",
+    "name": "AssignDoctor",
+    "signature": {
+      "inputs": [
+        {
+          "name": "patient",
+          "type": "int"
+        },
+        {
+          "name": "doctor",
+          "type": "int"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "assigned",
+          "type": "int"
+        },
+        {
+          "name": "doctors",
+          "type": "int"
+        },
+        {
+          "name": "schedule",
+          "type": "int"
+        },
+        {
+          "name": "schedule",
+          "type": "int"
+        }
+      ]
+    },
+    "fsfScenarios": [
+      {
+        "index": 1,
+        "kind": "scenario",
+        "test": "patient gt 0",
+        "def": "assigned eq 1"
+      },
+      {
+        "index": 2,
+        "kind": "scenario",
+        "test": "doctor eq 0",
+        "def": "assigned eq 0"
+      },
+      {
+        "index": 3,
+        "kind": "others",
+        "test": "others",
+        "def": "assigned eq 0"
+      }
+    ],
+    "ext": [],
+    "promptSpec": "Process AssignDoctor(patient, doctor) -> (assigned, doctors, schedule, schedule)\n\nFSF specification:\nif (patient gt 0) => assigned eq 1\nif (doctor eq 0) => assigned eq 0\nothers => assigned eq 0",
+    "sourceFile": "github://JaredYe04/agile-sofl-toolchain/examples/hospital-registration.asfl",
+    "sourceBasename": "examples/hospital-registration.asfl",
+    "module": "GitHubASFL",
+    "externalProvenance": {
+      "source": "github_asfl_lite",
+      "corpus": "github_harvest",
+      "repo": "JaredYe04/agile-sofl-toolchain",
+      "path": "examples/hospital-registration.asfl",
+      "html_url": null
+    },
+    "realspec": {
+      "source_type": "github_harvest",
+      "provenance": {
+        "repo": "JaredYe04/agile-sofl-toolchain",
+        "path": "examples/hospital-registration.asfl",
+        "local": "D:\\repos\\error-detect-research\\artifacts\\github_harvest\\wave3_targeted_v1\\downloaded\\JaredYe04_agile-sofl-toolchain__examples_hospital-registration.asfl"
+      }
+    },
+    "referenceCode": "def AssignDoctor(patient: int, doctor: int) -> dict:\n    \"\"\"Reference implementation auto-generated from FSF.\"\"\"\n    if patient > 0:\n        return {\"assigned\": 1}\n    elif doctor == 0:\n        return {\"assigned\": 0}\n    else:\n        return {\"assigned\": 0}\n",
+    "complexity": {
+      "scenario_count": 2,
+      "guard_complexity": "AND",
+      "overlap_rate": 0.778,
+      "has_external_vars": false,
+      "overlap_density_tier": "high"
+    }
+  },
+  {
+    "taskId": "GitHubHarvest.ASFL_Discharge",
+    "kind": "process",
+    "name": "Discharge",
+    "signature": {
+      "inputs": [
+        {
+          "name": "patient",
+          "type": "int"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "cleared",
+          "type": "int"
+        },
+        {
+          "name": "waiting_count",
+          "type": "int"
+        }
+      ]
+    },
+    "fsfScenarios": [
+      {
+        "index": 1,
+        "kind": "scenario",
+        "test": "patient gt 0",
+        "def": "cleared eq 1"
+      },
+      {
+        "index": 2,
+        "kind": "others",
+        "test": "others",
+        "def": "cleared eq 0"
+      }
+    ],
+    "ext": [],
+    "promptSpec": "Process Discharge(patient) -> (cleared, waiting_count)\n\nFSF specification:\nif (patient gt 0) => cleared eq 1\nothers => cleared eq 0",
+    "sourceFile": "github://JaredYe04/agile-sofl-toolchain/examples/hospital-registration.asfl",
+    "sourceBasename": "examples/hospital-registration.asfl",
+    "module": "GitHubASFL",
+    "externalProvenance": {
+      "source": "github_asfl_lite",
+      "corpus": "github_harvest",
+      "repo": "JaredYe04/agile-sofl-toolchain",
+      "path": "examples/hospital-registration.asfl",
+      "html_url": null
+    },
+    "realspec": {
+      "source_type": "github_harvest",
+      "provenance": {
+        "repo": "JaredYe04/agile-sofl-toolchain",
+        "path": "examples/hospital-registration.asfl",
+        "local": "D:\\repos\\error-detect-research\\artifacts\\github_harvest\\wave3_targeted_v1\\downloaded\\JaredYe04_agile-sofl-toolchain__examples_hospital-registration.asfl"
+      }
+    },
+    "referenceCode": "def Discharge(patient: int) -> dict:\n    \"\"\"Reference implementation auto-generated from FSF.\"\"\"\n    if patient > 0:\n        return {\"cleared\": 1}\n    else:\n        return {\"cleared\": 0}\n",
+    "complexity": {
+      "scenario_count": 1,
+      "guard_complexity": "Simple",
+      "overlap_rate": 0.5,
+      "has_external_vars": false,
+      "overlap_density_tier": "low"
+    }
+  },
+  {
+    "taskId": "GitHubHarvest.ASFL_AdmitUrgent",
+    "kind": "process",
+    "name": "AdmitUrgent",
+    "signature": {
+      "inputs": [
+        {
+          "name": "patient",
+          "type": "int"
+        },
+        {
+          "name": "severity",
+          "type": "int"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "admitted",
+          "type": "int"
+        },
+        {
+          "name": "queue",
+          "type": "int"
+        },
+        {
+          "name": "open_beds",
+          "type": "int"
+        }
+      ]
+    },
+    "fsfScenarios": [
+      {
+        "index": 1,
+        "kind": "scenario",
+        "test": "severity gt 0",
+        "def": "admitted eq 1"
+      },
+      {
+        "index": 2,
+        "kind": "others",
+        "test": "others",
+        "def": "admitted eq 0"
+      }
+    ],
+    "ext": [],
+    "promptSpec": "Process AdmitUrgent(patient, severity) -> (admitted, queue, open_beds)\n\nFSF specification:\nif (severity gt 0) => admitted eq 1\nothers => admitted eq 0",
+    "sourceFile": "github://JaredYe04/agile-sofl-toolchain/examples/hospital-registration.asfl",
+    "sourceBasename": "examples/hospital-registration.asfl",
+    "module": "GitHubASFL",
+    "externalProvenance": {
+      "source": "github_asfl_lite",
+      "corpus": "github_harvest",
+      "repo": "JaredYe04/agile-sofl-toolchain",
+      "path": "examples/hospital-registration.asfl",
+      "html_url": null
+    },
+    "realspec": {
+      "source_type": "github_harvest",
+      "provenance": {
+        "repo": "JaredYe04/agile-sofl-toolchain",
+        "path": "examples/hospital-registration.asfl",
+        "local": "D:\\repos\\error-detect-research\\artifacts\\github_harvest\\wave3_targeted_v1\\downloaded\\JaredYe04_agile-sofl-toolchain__examples_hospital-registration.asfl"
+      }
+    },
+    "referenceCode": "def AdmitUrgent(patient: int, severity: int) -> dict:\n    \"\"\"Reference implementation auto-generated from FSF.\"\"\"\n    if severity > 0:\n        return {\"admitted\": 1}\n    else:\n        return {\"admitted\": 0}\n",
+    "complexity": {
+      "scenario_count": 1,
+      "guard_complexity": "Simple",
+      "overlap_rate": 0.5,
+      "has_external_vars": false,
+      "overlap_density_tier": "low"
+    }
+  },
+  {
+    "taskId": "GitHubHarvest.ASFL_ReleaseBed",
+    "kind": "process",
+    "name": "ReleaseBed",
+    "signature": {
+      "inputs": [
+        {
+          "name": "open_beds",
+          "type": "int"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "result",
+          "type": "int"
+        }
+      ]
+    },
+    "fsfScenarios": [
+      {
+        "index": 1,
+        "kind": "scenario",
+        "test": "open_beds gt 0",
+        "def": "open_beds eq 1"
+      },
+      {
+        "index": 2,
+        "kind": "others",
+        "test": "others",
+        "def": "open_beds eq 0"
+      }
+    ],
+    "ext": [],
+    "promptSpec": "Process ReleaseBed(open_beds) -> (result)\n\nFSF specification:\nif (open_beds gt 0) => open_beds eq 1\nothers => open_beds eq 0",
+    "sourceFile": "github://JaredYe04/agile-sofl-toolchain/examples/hospital-registration.asfl",
+    "sourceBasename": "examples/hospital-registration.asfl",
+    "module": "GitHubASFL",
+    "externalProvenance": {
+      "source": "github_asfl_lite",
+      "corpus": "github_harvest",
+      "repo": "JaredYe04/agile-sofl-toolchain",
+      "path": "examples/hospital-registration.asfl",
+      "html_url": null
+    },
+    "realspec": {
+      "source_type": "github_harvest",
+      "provenance": {
+        "repo": "JaredYe04/agile-sofl-toolchain",
+        "path": "examples/hospital-registration.asfl",
+        "local": "D:\\repos\\error-detect-research\\artifacts\\github_harvest\\wave3_targeted_v1\\downloaded\\JaredYe04_agile-sofl-toolchain__examples_hospital-registration.asfl"
+      }
+    },
+    "referenceCode": "def ReleaseBed(open_beds: int) -> dict:\n    \"\"\"Reference implementation auto-generated from FSF.\"\"\"\n    if open_beds > 0:\n        return {\"open_beds\": 1}\n    else:\n        return {\"open_beds\": 0}\n",
+    "complexity": {
+      "scenario_count": 1,
+      "guard_complexity": "Simple",
+      "overlap_rate": 0.5,
+      "has_external_vars": false,
+      "overlap_density_tier": "low"
+    }
+  },
+  {
+    "taskId": "GitHubHarvest.ASFL_CollectFee",
+    "kind": "process",
+    "name": "CollectFee",
+    "signature": {
+      "inputs": [
+        {
+          "name": "patient",
+          "type": "int"
+        },
+        {
+          "name": "amount",
+          "type": "int"
+        },
+        {
+          "name": "insurance_cap",
+          "type": "int"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "ok",
+          "type": "int"
+        },
+        {
+          "name": "collected",
+          "type": "int"
+        }
+      ]
+    },
+    "fsfScenarios": [
+      {
+        "index": 1,
+        "kind": "scenario",
+        "test": "amount gt 0",
+        "def": "ok eq 1"
+      },
+      {
+        "index": 2,
+        "kind": "scenario",
+        "test": "amount gt insurance_cap",
+        "def": "ok eq 0"
+      },
+      {
+        "index": 3,
+        "kind": "others",
+        "test": "others",
+        "def": "ok eq 0"
+      }
+    ],
+    "ext": [],
+    "promptSpec": "Process CollectFee(patient, amount, insurance_cap) -> (ok, collected)\n\nFSF specification:\nif (amount gt 0) => ok eq 1\nif (amount gt insurance_cap) => ok eq 0\nothers => ok eq 0",
+    "sourceFile": "github://JaredYe04/agile-sofl-toolchain/examples/hospital-registration.asfl",
+    "sourceBasename": "examples/hospital-registration.asfl",
+    "module": "GitHubASFL",
+    "externalProvenance": {
+      "source": "github_asfl_lite",
+      "corpus": "github_harvest",
+      "repo": "JaredYe04/agile-sofl-toolchain",
+      "path": "examples/hospital-registration.asfl",
+      "html_url": null
+    },
+    "realspec": {
+      "source_type": "github_harvest",
+      "provenance": {
+        "repo": "JaredYe04/agile-sofl-toolchain",
+        "path": "examples/hospital-registration.asfl",
+        "local": "D:\\repos\\error-detect-research\\artifacts\\github_harvest\\wave3_targeted_v1\\downloaded\\JaredYe04_agile-sofl-toolchain__examples_hospital-registration.asfl"
+      }
+    },
+    "referenceCode": "def CollectFee(patient: int, amount: int, insurance_cap: int) -> dict:\n    \"\"\"Reference implementation auto-generated from FSF.\"\"\"\n    if amount > 0:\n        return {\"ok\": 1}\n    elif amount > insurance_cap:\n        return {\"ok\": 0}\n    else:\n        return {\"ok\": 0}\n",
+    "complexity": {
+      "scenario_count": 2,
+      "guard_complexity": "Simple",
+      "overlap_rate": 1.0,
+      "has_external_vars": false,
+      "overlap_density_tier": "high"
+    }
+  },
+  {
+    "taskId": "GitHubHarvest.ASFL_RefundFee",
+    "kind": "process",
+    "name": "RefundFee",
+    "signature": {
+      "inputs": [
+        {
+          "name": "amount",
+          "type": "int"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "ok",
+          "type": "int"
+        }
+      ]
+    },
+    "fsfScenarios": [
+      {
+        "index": 1,
+        "kind": "scenario",
+        "test": "amount gt 0",
+        "def": "ok eq 1"
+      },
+      {
+        "index": 2,
+        "kind": "others",
+        "test": "others",
+        "def": "ok eq 0"
+      }
+    ],
+    "ext": [],
+    "promptSpec": "Process RefundFee(amount) -> (ok)\n\nFSF specification:\nif (amount gt 0) => ok eq 1\nothers => ok eq 0",
+    "sourceFile": "github://JaredYe04/agile-sofl-toolchain/examples/hospital-registration.asfl",
+    "sourceBasename": "examples/hospital-registration.asfl",
+    "module": "GitHubASFL",
+    "externalProvenance": {
+      "source": "github_asfl_lite",
+      "corpus": "github_harvest",
+      "repo": "JaredYe04/agile-sofl-toolchain",
+      "path": "examples/hospital-registration.asfl",
+      "html_url": null
+    },
+    "realspec": {
+      "source_type": "github_harvest",
+      "provenance": {
+        "repo": "JaredYe04/agile-sofl-toolchain",
+        "path": "examples/hospital-registration.asfl",
+        "local": "D:\\repos\\error-detect-research\\artifacts\\github_harvest\\wave3_targeted_v1\\downloaded\\JaredYe04_agile-sofl-toolchain__examples_hospital-registration.asfl"
+      }
+    },
+    "referenceCode": "def RefundFee(amount: int) -> dict:\n    \"\"\"Reference implementation auto-generated from FSF.\"\"\"\n    if amount > 0:\n        return {\"ok\": 1}\n    else:\n        return {\"ok\": 0}\n",
+    "complexity": {
+      "scenario_count": 1,
+      "guard_complexity": "Simple",
+      "overlap_rate": 0.5,
+      "has_external_vars": false,
+      "overlap_density_tier": "low"
+    }
+  },
+  {
+    "taskId": "GitHubHarvest.ASFL_ArchiveVisit",
+    "kind": "process",
+    "name": "ArchiveVisit",
+    "signature": {
+      "inputs": [
+        {
+          "name": "patient",
+          "type": "int"
+        },
+        {
+          "name": "doctor",
+          "type": "int"
+        },
+        {
+          "name": "fee",
+          "type": "int"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "stored",
+          "type": "int"
+        }
+      ]
+    },
+    "fsfScenarios": [
+      {
+        "index": 1,
+        "kind": "scenario",
+        "test": "patient gt 0",
+        "def": "stored eq 1"
+      },
+      {
+        "index": 2,
+        "kind": "others",
+        "test": "others",
+        "def": "stored eq 0"
+      }
+    ],
+    "ext": [],
+    "promptSpec": "Process ArchiveVisit(patient, doctor, fee) -> (stored)\n\nFSF specification:\nif (patient gt 0) => stored eq 1\nothers => stored eq 0",
+    "sourceFile": "github://JaredYe04/agile-sofl-toolchain/examples/hospital-registration.asfl",
+    "sourceBasename": "examples/hospital-registration.asfl",
+    "module": "GitHubASFL",
+    "externalProvenance": {
+      "source": "github_asfl_lite",
+      "corpus": "github_harvest",
+      "repo": "JaredYe04/agile-sofl-toolchain",
+      "path": "examples/hospital-registration.asfl",
+      "html_url": null
+    },
+    "realspec": {
+      "source_type": "github_harvest",
+      "provenance": {
+        "repo": "JaredYe04/agile-sofl-toolchain",
+        "path": "examples/hospital-registration.asfl",
+        "local": "D:\\repos\\error-detect-research\\artifacts\\github_harvest\\wave3_targeted_v1\\downloaded\\JaredYe04_agile-sofl-toolchain__examples_hospital-registration.asfl"
+      }
+    },
+    "referenceCode": "def ArchiveVisit(patient: int, doctor: int, fee: int) -> dict:\n    \"\"\"Reference implementation auto-generated from FSF.\"\"\"\n    if patient > 0:\n        return {\"stored\": 1}\n    else:\n        return {\"stored\": 0}\n",
+    "complexity": {
+      "scenario_count": 1,
+      "guard_complexity": "Simple",
+      "overlap_rate": 0.5,
+      "has_external_vars": false,
+      "overlap_density_tier": "low"
+    }
+  },
+  {
+    "taskId": "GitHubHarvest.ASFL_LookupVisits",
+    "kind": "process",
+    "name": "LookupVisits",
+    "signature": {
+      "inputs": [
+        {
+          "name": "count",
+          "type": "int"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "result",
+          "type": "int"
+        }
+      ]
+    },
+    "fsfScenarios": [
+      {
+        "index": 1,
+        "kind": "scenario",
+        "test": "count ge 0",
+        "def": "count eq count"
+      },
+      {
+        "index": 2,
+        "kind": "others",
+        "test": "others",
+        "def": "count eq 0"
+      }
+    ],
+    "ext": [],
+    "promptSpec": "Process LookupVisits(count) -> (result)\n\nFSF specification:\nif (count ge 0) => count eq count\nothers => count eq 0",
+    "sourceFile": "github://JaredYe04/agile-sofl-toolchain/examples/hospital-registration.asfl",
+    "sourceBasename": "examples/hospital-registration.asfl",
+    "module": "GitHubASFL",
+    "externalProvenance": {
+      "source": "github_asfl_lite",
+      "corpus": "github_harvest",
+      "repo": "JaredYe04/agile-sofl-toolchain",
+      "path": "examples/hospital-registration.asfl",
+      "html_url": null
+    },
+    "realspec": {
+      "source_type": "github_harvest",
+      "provenance": {
+        "repo": "JaredYe04/agile-sofl-toolchain",
+        "path": "examples/hospital-registration.asfl",
+        "local": "D:\\repos\\error-detect-research\\artifacts\\github_harvest\\wave3_targeted_v1\\downloaded\\JaredYe04_agile-sofl-toolchain__examples_hospital-registration.asfl"
+      }
+    },
+    "referenceCode": "def LookupVisits(count: int) -> dict:\n    \"\"\"Reference implementation auto-generated from FSF.\"\"\"\n    if count >= 0:\n        return {\"count\": count}\n    else:\n        return {\"count\": 0}\n",
+    "complexity": {
+      "scenario_count": 1,
+      "guard_complexity": "Simple",
+      "overlap_rate": 0.5,
+      "has_external_vars": false,
+      "overlap_density_tier": "low"
+    }
+  },
+  {
+    "taskId": "GitHubHarvest.ASFL_Borrow",
+    "kind": "process",
+    "name": "Borrow",
+    "signature": {
+      "inputs": [
+        {
+          "name": "member_id",
+          "type": "int"
+        },
+        {
+          "name": "book_id",
+          "type": "int"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "success",
+          "type": "int"
+        },
+        {
+          "name": "book_ids",
+          "type": "int"
+        },
+        {
+          "name": "member_ids",
+          "type": "int"
+        },
+        {
+          "name": "loan_flags",
+          "type": "int"
+        }
+      ]
+    },
+    "fsfScenarios": [
+      {
+        "index": 1,
+        "kind": "scenario",
+        "test": "member_id gt 0",
+        "def": "success eq 1"
+      },
+      {
+        "index": 2,
+        "kind": "scenario",
+        "test": "book_id eq 0",
+        "def": "success eq 0"
+      },
+      {
+        "index": 3,
+        "kind": "others",
+        "test": "others",
+        "def": "success eq 0"
+      }
+    ],
+    "ext": [],
+    "promptSpec": "Process Borrow(member_id, book_id) -> (success, book_ids, member_ids, loan_flags)\n\nFSF specification:\nif (member_id gt 0) => success eq 1\nif (book_id eq 0) => success eq 0\nothers => success eq 0",
+    "sourceFile": "github://JaredYe04/agile-sofl-toolchain/examples/library-system.asfl",
+    "sourceBasename": "examples/library-system.asfl",
+    "module": "GitHubASFL",
+    "externalProvenance": {
+      "source": "github_asfl_lite",
+      "corpus": "github_harvest",
+      "repo": "JaredYe04/agile-sofl-toolchain",
+      "path": "examples/library-system.asfl",
+      "html_url": null
+    },
+    "realspec": {
+      "source_type": "github_harvest",
+      "provenance": {
+        "repo": "JaredYe04/agile-sofl-toolchain",
+        "path": "examples/library-system.asfl",
+        "local": "D:\\repos\\error-detect-research\\artifacts\\github_harvest\\wave3_targeted_v1\\downloaded\\JaredYe04_agile-sofl-toolchain__examples_library-system.asfl"
+      }
+    },
+    "referenceCode": "def Borrow(member_id: int, book_id: int) -> dict:\n    \"\"\"Reference implementation auto-generated from FSF.\"\"\"\n    if member_id > 0:\n        return {\"success\": 1}\n    elif book_id == 0:\n        return {\"success\": 0}\n    else:\n        return {\"success\": 0}\n",
+    "complexity": {
+      "scenario_count": 2,
+      "guard_complexity": "Simple",
+      "overlap_rate": 0.778,
+      "has_external_vars": false,
+      "overlap_density_tier": "high"
+    }
+  },
+  {
+    "taskId": "GitHubHarvest.ASFL_Return",
+    "kind": "process",
+    "name": "Return",
+    "signature": {
+      "inputs": [
+        {
+          "name": "member_id",
+          "type": "int"
+        },
+        {
+          "name": "book_id",
+          "type": "int"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "success",
+          "type": "int"
+        },
+        {
+          "name": "book_ids",
+          "type": "int"
+        },
+        {
+          "name": "member_ids",
+          "type": "int"
+        },
+        {
+          "name": "loan_flags",
+          "type": "int"
+        }
+      ]
+    },
+    "fsfScenarios": [
+      {
+        "index": 1,
+        "kind": "scenario",
+        "test": "member_id gt 0",
+        "def": "success eq 1"
+      },
+      {
+        "index": 2,
+        "kind": "others",
+        "test": "others",
+        "def": "success eq 0"
+      }
+    ],
+    "ext": [],
+    "promptSpec": "Process Return(member_id, book_id) -> (success, book_ids, member_ids, loan_flags)\n\nFSF specification:\nif (member_id gt 0) => success eq 1\nothers => success eq 0",
+    "sourceFile": "github://JaredYe04/agile-sofl-toolchain/examples/library-system.asfl",
+    "sourceBasename": "examples/library-system.asfl",
+    "module": "GitHubASFL",
+    "externalProvenance": {
+      "source": "github_asfl_lite",
+      "corpus": "github_harvest",
+      "repo": "JaredYe04/agile-sofl-toolchain",
+      "path": "examples/library-system.asfl",
+      "html_url": null
+    },
+    "realspec": {
+      "source_type": "github_harvest",
+      "provenance": {
+        "repo": "JaredYe04/agile-sofl-toolchain",
+        "path": "examples/library-system.asfl",
+        "local": "D:\\repos\\error-detect-research\\artifacts\\github_harvest\\wave3_targeted_v1\\downloaded\\JaredYe04_agile-sofl-toolchain__examples_library-system.asfl"
+      }
+    },
+    "referenceCode": "def Return(member_id: int, book_id: int) -> dict:\n    \"\"\"Reference implementation auto-generated from FSF.\"\"\"\n    if member_id > 0:\n        return {\"success\": 1}\n    else:\n        return {\"success\": 0}\n",
+    "complexity": {
+      "scenario_count": 1,
+      "guard_complexity": "Simple",
+      "overlap_rate": 0.5,
+      "has_external_vars": false,
+      "overlap_density_tier": "low"
+    }
+  },
+  {
+    "taskId": "GitHubHarvest.ASFL_Reserve",
+    "kind": "process",
+    "name": "Reserve",
+    "signature": {
+      "inputs": [
+        {
+          "name": "member_id",
+          "type": "int"
+        },
+        {
+          "name": "book_id",
+          "type": "int"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "queued",
+          "type": "int"
+        },
+        {
+          "name": "book_ids",
+          "type": "int"
+        }
+      ]
+    },
+    "fsfScenarios": [
+      {
+        "index": 1,
+        "kind": "scenario",
+        "test": "book_id gt 0",
+        "def": "queued eq 1"
+      },
+      {
+        "index": 2,
+        "kind": "others",
+        "test": "others",
+        "def": "queued eq 0"
+      }
+    ],
+    "ext": [],
+    "promptSpec": "Process Reserve(member_id, book_id) -> (queued, book_ids)\n\nFSF specification:\nif (book_id gt 0) => queued eq 1\nothers => queued eq 0",
+    "sourceFile": "github://JaredYe04/agile-sofl-toolchain/examples/library-system.asfl",
+    "sourceBasename": "examples/library-system.asfl",
+    "module": "GitHubASFL",
+    "externalProvenance": {
+      "source": "github_asfl_lite",
+      "corpus": "github_harvest",
+      "repo": "JaredYe04/agile-sofl-toolchain",
+      "path": "examples/library-system.asfl",
+      "html_url": null
+    },
+    "realspec": {
+      "source_type": "github_harvest",
+      "provenance": {
+        "repo": "JaredYe04/agile-sofl-toolchain",
+        "path": "examples/library-system.asfl",
+        "local": "D:\\repos\\error-detect-research\\artifacts\\github_harvest\\wave3_targeted_v1\\downloaded\\JaredYe04_agile-sofl-toolchain__examples_library-system.asfl"
+      }
+    },
+    "referenceCode": "def Reserve(member_id: int, book_id: int) -> dict:\n    \"\"\"Reference implementation auto-generated from FSF.\"\"\"\n    if book_id > 0:\n        return {\"queued\": 1}\n    else:\n        return {\"queued\": 0}\n",
+    "complexity": {
+      "scenario_count": 1,
+      "guard_complexity": "Simple",
+      "overlap_rate": 0.5,
+      "has_external_vars": false,
+      "overlap_density_tier": "low"
+    }
+  },
+  {
+    "taskId": "GitHubHarvest.ASFL_ListCatalog",
+    "kind": "process",
+    "name": "ListCatalog",
+    "signature": {
+      "inputs": [
+        {
+          "name": "count",
+          "type": "int"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "catalog",
+          "type": "int"
+        }
+      ]
+    },
+    "fsfScenarios": [
+      {
+        "index": 1,
+        "kind": "scenario",
+        "test": "count gt 0",
+        "def": "count eq 1"
+      },
+      {
+        "index": 2,
+        "kind": "others",
+        "test": "others",
+        "def": "count eq 0"
+      }
+    ],
+    "ext": [],
+    "promptSpec": "Process ListCatalog(count) -> (catalog)\n\nFSF specification:\nif (count gt 0) => count eq 1\nothers => count eq 0",
+    "sourceFile": "github://JaredYe04/agile-sofl-toolchain/examples/library-system.asfl",
+    "sourceBasename": "examples/library-system.asfl",
+    "module": "GitHubASFL",
+    "externalProvenance": {
+      "source": "github_asfl_lite",
+      "corpus": "github_harvest",
+      "repo": "JaredYe04/agile-sofl-toolchain",
+      "path": "examples/library-system.asfl",
+      "html_url": null
+    },
+    "realspec": {
+      "source_type": "github_harvest",
+      "provenance": {
+        "repo": "JaredYe04/agile-sofl-toolchain",
+        "path": "examples/library-system.asfl",
+        "local": "D:\\repos\\error-detect-research\\artifacts\\github_harvest\\wave3_targeted_v1\\downloaded\\JaredYe04_agile-sofl-toolchain__examples_library-system.asfl"
+      }
+    },
+    "referenceCode": "def ListCatalog(count: int) -> dict:\n    \"\"\"Reference implementation auto-generated from FSF.\"\"\"\n    if count > 0:\n        return {\"count\": 1}\n    else:\n        return {\"count\": 0}\n",
+    "complexity": {
+      "scenario_count": 1,
+      "guard_complexity": "Simple",
+      "overlap_rate": 0.5,
+      "has_external_vars": false,
+      "overlap_density_tier": "low"
+    }
+  },
+  {
+    "taskId": "GitHubHarvest.ASFL_ClearPending",
+    "kind": "process",
+    "name": "ClearPending",
+    "signature": {
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "result",
+          "type": "int"
+        },
+        {
+          "name": "pending",
+          "type": "int"
+        }
+      ]
+    },
+    "fsfScenarios": [
+      {
+        "index": 1,
+        "kind": "scenario",
+        "test": "true",
+        "def": "pending eq 0"
+      },
+      {
+        "index": 2,
+        "kind": "others",
+        "test": "others",
+        "def": "result eq 0"
+      }
+    ],
+    "ext": [],
+    "promptSpec": "Process ClearPending() -> (result, pending)\n\nFSF specification:\nif (true) => pending eq 0\nothers => result eq 0",
+    "sourceFile": "github://JaredYe04/agile-sofl-toolchain/examples/library-system.asfl",
+    "sourceBasename": "examples/library-system.asfl",
+    "module": "GitHubASFL",
+    "externalProvenance": {
+      "source": "github_asfl_lite",
+      "corpus": "github_harvest",
+      "repo": "JaredYe04/agile-sofl-toolchain",
+      "path": "examples/library-system.asfl",
+      "html_url": null
+    },
+    "realspec": {
+      "source_type": "github_harvest",
+      "provenance": {
+        "repo": "JaredYe04/agile-sofl-toolchain",
+        "path": "examples/library-system.asfl",
+        "local": "D:\\repos\\error-detect-research\\artifacts\\github_harvest\\wave3_targeted_v1\\downloaded\\JaredYe04_agile-sofl-toolchain__examples_library-system.asfl"
+      }
+    },
+    "referenceCode": "def ClearPending() -> dict:\n    \"\"\"Reference implementation auto-generated from FSF.\"\"\"\n    if True:\n        return {\"pending\": 0}\n    else:\n        return {\"result\": 0}\n",
+    "complexity": {
+      "scenario_count": 1,
+      "guard_complexity": "Simple",
+      "overlap_rate": 1.0,
+      "has_external_vars": false,
+      "overlap_density_tier": "high"
+    }
+  },
+  {
+    "taskId": "GitHubHarvest.ASFL_SyncCatalog",
+    "kind": "process",
+    "name": "SyncCatalog",
+    "signature": {
+      "inputs": [
+        {
+          "name": "sync_count",
+          "type": "int"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "catalog",
+          "type": "int"
+        },
+        {
+          "name": "featured",
+          "type": "int"
+        },
+        {
+          "name": "sync_count",
+          "type": "int"
+        }
+      ]
+    },
+    "fsfScenarios": [
+      {
+        "index": 1,
+        "kind": "scenario",
+        "test": "sync_count gt 0",
+        "def": "sync_count eq sync_count"
+      },
+      {
+        "index": 2,
+        "kind": "others",
+        "test": "others",
+        "def": "sync_count eq 0"
+      }
+    ],
+    "ext": [],
+    "promptSpec": "Process SyncCatalog(sync_count) -> (catalog, featured, sync_count)\n\nFSF specification:\nif (sync_count gt 0) => sync_count eq sync_count\nothers => sync_count eq 0",
+    "sourceFile": "github://JaredYe04/agile-sofl-toolchain/examples/library-system.asfl",
+    "sourceBasename": "examples/library-system.asfl",
+    "module": "GitHubASFL",
+    "externalProvenance": {
+      "source": "github_asfl_lite",
+      "corpus": "github_harvest",
+      "repo": "JaredYe04/agile-sofl-toolchain",
+      "path": "examples/library-system.asfl",
+      "html_url": null
+    },
+    "realspec": {
+      "source_type": "github_harvest",
+      "provenance": {
+        "repo": "JaredYe04/agile-sofl-toolchain",
+        "path": "examples/library-system.asfl",
+        "local": "D:\\repos\\error-detect-research\\artifacts\\github_harvest\\wave3_targeted_v1\\downloaded\\JaredYe04_agile-sofl-toolchain__examples_library-system.asfl"
+      }
+    },
+    "referenceCode": "def SyncCatalog(sync_count: int) -> dict:\n    \"\"\"Reference implementation auto-generated from FSF.\"\"\"\n    if sync_count > 0:\n        return {\"sync_count\": sync_count}\n    else:\n        return {\"sync_count\": 0}\n",
+    "complexity": {
+      "scenario_count": 1,
+      "guard_complexity": "Simple",
+      "overlap_rate": 0.5,
+      "has_external_vars": false,
+      "overlap_density_tier": "low"
+    }
+  },
+  {
+    "taskId": "GitHubHarvest.ASFL_ResetFeatured",
+    "kind": "process",
+    "name": "ResetFeatured",
+    "signature": {
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "featured",
+          "type": "int"
+        },
+        {
+          "name": "sync_count",
+          "type": "int"
+        }
+      ]
+    },
+    "fsfScenarios": [
+      {
+        "index": 1,
+        "kind": "scenario",
+        "test": "true",
+        "def": "sync_count eq 0"
+      },
+      {
+        "index": 2,
+        "kind": "others",
+        "test": "others",
+        "def": "featured eq 0"
+      }
+    ],
+    "ext": [],
+    "promptSpec": "Process ResetFeatured() -> (featured, sync_count)\n\nFSF specification:\nif (true) => sync_count eq 0\nothers => featured eq 0",
+    "sourceFile": "github://JaredYe04/agile-sofl-toolchain/examples/library-system.asfl",
+    "sourceBasename": "examples/library-system.asfl",
+    "module": "GitHubASFL",
+    "externalProvenance": {
+      "source": "github_asfl_lite",
+      "corpus": "github_harvest",
+      "repo": "JaredYe04/agile-sofl-toolchain",
+      "path": "examples/library-system.asfl",
+      "html_url": null
+    },
+    "realspec": {
+      "source_type": "github_harvest",
+      "provenance": {
+        "repo": "JaredYe04/agile-sofl-toolchain",
+        "path": "examples/library-system.asfl",
+        "local": "D:\\repos\\error-detect-research\\artifacts\\github_harvest\\wave3_targeted_v1\\downloaded\\JaredYe04_agile-sofl-toolchain__examples_library-system.asfl"
+      }
+    },
+    "referenceCode": "def ResetFeatured() -> dict:\n    \"\"\"Reference implementation auto-generated from FSF.\"\"\"\n    if True:\n        return {\"sync_count\": 0}\n    else:\n        return {\"featured\": 0}\n",
+    "complexity": {
+      "scenario_count": 1,
+      "guard_complexity": "Simple",
+      "overlap_rate": 1.0,
+      "has_external_vars": false,
+      "overlap_density_tier": "high"
+    }
+  },
+  {
+    "taskId": "GitHubHarvest.ASFL_GenerateReport",
+    "kind": "process",
+    "name": "GenerateReport",
+    "signature": {
+      "inputs": [
+        {
+          "name": "rows",
+          "type": "int"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "catalog",
+          "type": "int"
+        }
+      ]
+    },
+    "fsfScenarios": [
+      {
+        "index": 1,
+        "kind": "scenario",
+        "test": "rows gt 0",
+        "def": "rows eq 1"
+      },
+      {
+        "index": 2,
+        "kind": "others",
+        "test": "others",
+        "def": "rows eq 0"
+      }
+    ],
+    "ext": [],
+    "promptSpec": "Process GenerateReport(rows) -> (catalog)\n\nFSF specification:\nif (rows gt 0) => rows eq 1\nothers => rows eq 0",
+    "sourceFile": "github://JaredYe04/agile-sofl-toolchain/examples/library-system.asfl",
+    "sourceBasename": "examples/library-system.asfl",
+    "module": "GitHubASFL",
+    "externalProvenance": {
+      "source": "github_asfl_lite",
+      "corpus": "github_harvest",
+      "repo": "JaredYe04/agile-sofl-toolchain",
+      "path": "examples/library-system.asfl",
+      "html_url": null
+    },
+    "realspec": {
+      "source_type": "github_harvest",
+      "provenance": {
+        "repo": "JaredYe04/agile-sofl-toolchain",
+        "path": "examples/library-system.asfl",
+        "local": "D:\\repos\\error-detect-research\\artifacts\\github_harvest\\wave3_targeted_v1\\downloaded\\JaredYe04_agile-sofl-toolchain__examples_library-system.asfl"
+      }
+    },
+    "referenceCode": "def GenerateReport(rows: int) -> dict:\n    \"\"\"Reference implementation auto-generated from FSF.\"\"\"\n    if rows > 0:\n        return {\"rows\": 1}\n    else:\n        return {\"rows\": 0}\n",
+    "complexity": {
+      "scenario_count": 1,
+      "guard_complexity": "Simple",
+      "overlap_rate": 0.5,
+      "has_external_vars": false,
+      "overlap_density_tier": "low"
+    }
+  },
+  {
+    "taskId": "GitHubHarvest.ManualSeed_TelecomSeverity",
+    "kind": "process",
+    "name": "manualseed_telecomseverity",
+    "signature": {
+      "inputs": [
+        {
+          "name": "link_down",
+          "type": "int"
+        },
+        {
+          "name": "latency",
+          "type": "int"
+        },
+        {
+          "name": "packet_loss",
+          "type": "int"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "severity",
+          "type": "int"
+        }
+      ]
+    },
+    "fsfScenarios": [
+      {
+        "index": 1,
+        "kind": "scenario",
+        "test": "link_down eq 1",
+        "def": "severity eq 3"
+      },
+      {
+        "index": 2,
+        "kind": "scenario",
+        "test": "packet_loss ge 5",
+        "def": "severity eq 2"
+      },
+      {
+        "index": 3,
+        "kind": "scenario",
+        "test": "latency gt 8",
+        "def": "severity eq 1"
+      },
+      {
+        "index": 4,
+        "kind": "others",
+        "test": "others",
+        "def": "severity eq 0"
+      }
+    ],
+    "ext": [],
+    "promptSpec": "Process ManualSeed_TelecomSeverity(link_down, latency, packet_loss) -> (severity)\n\nFSF specification:\nif (link_down eq 1) => severity eq 3\nif (packet_loss ge 5) => severity eq 2\nif (latency gt 8) => severity eq 1\nothers => severity eq 0",
+    "sourceFile": "github://manual/seed/telecom_severity.json",
+    "sourceBasename": "telecom_severity.json",
+    "externalProvenance": {
+      "source": "github_harvest",
+      "generator": "src.harvest.to_fsf",
+      "corpus": "github_harvest",
+      "repo": "manual/seed",
+      "path": "telecom_severity.json",
+      "html_url": null,
+      "query_id": "manual_seed"
+    },
+    "realspec": {
+      "source_type": "github_harvest",
+      "provenance": {
+        "repo": "manual/seed",
+        "path": "telecom_severity.json",
+        "query_id": "manual_seed"
+      }
+    },
+    "referenceCode": "def manualseed_telecomseverity(link_down: int, latency: int, packet_loss: int) -> dict:\n    \"\"\"Reference implementation auto-generated from FSF.\"\"\"\n    if link_down == 1:\n        return {\"severity\": 3}\n    elif packet_loss >= 5:\n        return {\"severity\": 2}\n    elif latency > 8:\n        return {\"severity\": 1}\n    else:\n        return {\"severity\": 0}\n",
+    "complexity": {
+      "scenario_count": 3,
+      "guard_complexity": "Simple",
+      "overlap_rate": 0.75,
+      "has_external_vars": false,
+      "overlap_density_tier": "high"
+    }
+  }
+]

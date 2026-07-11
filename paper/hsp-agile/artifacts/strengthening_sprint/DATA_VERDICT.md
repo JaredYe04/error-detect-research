@@ -1,35 +1,28 @@
-# Data Verdict — updated after gemini combo n=40
+# Data Verdict — Gemini Combo C2 Support (updated)
 
-**Date:** 2026-07-11  
-**Run:** `artifacts/run_ir_combo_seed_gemini_n40_v1` (1080/1080 rows)
+**Primary supporting run (pooled):**  
+`run_ir_combo_seed_gemini_n40_v1` + `run_ir_combo_seed_gemini_extra40_v1`  
+→ **n=80 tasks × 3 seeds = 240 paired cells** (`gemini-2.5-flash`)
 
-## Verdict: **MATCHES expectations** → update paper (done); no further expand required for this claim
+## Pooled FULL (semantic_ir) vs comparators
 
-### What we expected
-Expanding gemini combo seeds beyond n=14 would keep FULL (`semantic_ir`) ahead of
-unstructured `test_only` / `test_expected` with CI excluding 0, while uniqueness
-vs `ir_no_expected` may remain non-significant (E14-consistent).
+| Contrast | Δ pp | W/L/T | 95% CI (pp) | Excl. 0 |
+|----------|-----:|-------|-------------|---------|
+| vs test_only | **+26.5** | 78/27/135 | [21.0, 32.2] | **Yes** |
+| vs test_expected | **+26.7** | 79/18/143 | [21.0, 32.3] | **Yes** |
+| vs ir_no_expected | +5.0 | 29/17/74 | [-3.3, 13.6] | No (n40 field slice) |
 
-### What we got (pooled n=120 task×seed)
+Per-seed vs test_only (all excl 0): invert +23.4 / swap +26.7 / drop +29.2.
 
-| Contrast | Δ | W/L/T | 95% CI | Excl. 0 |
-|----------|---|-------|--------|---------|
-| FULL vs test_only | **+33.2 pp** | 47/8/65 | [25.1, 41.9] | **Yes** |
-| FULL vs test_expected | **+32.6 pp** | 47/8/65 | [24.6, 41.1] | **Yes** |
-| FULL vs ir_no_expected | +5.0 pp | 29/17/74 | [−3.5, 13.6] | No |
+## Claim hierarchy
 
-Per-seed FULL vs test_only: +27.2 / +34.4 / +38.1 pp — **all CI excl 0**.
+1. **Lead C2:** E6 BENCH-120 +7.7 pp (CI excl 0) on ecnu-plus  
+2. **Supporting C2:** this pooled gemini combo table  
+3. **C4 only:** GitHub harvest / HKCA09 ranking ties; do not read as C2 null  
+4. **Scoped / negative:** HKCA09@gemini hard-seed favors test_only — not a C2 headline
 
-### Paper actions taken
-- `tables/gemini_combo_n40.tex` + Ch7 §Hard Combo-Seed Support
-- Conference RQ1 paragraph updated
-- `AUTHORITATIVE_NUMBERS.md` corpus card + numbers
-- RQ1 answer mentions supporting evidence without uniqueness overclaim
+## Artifacts
 
-### Explicit non-actions
-- Do **not** claim typed IR beats every structured ablation
-- Do **not** cite gpt-4o-mini/deepseek combo (saturated)
-- Do **not** further expand n for this claim unless a new hypothesis appears
-
-### Core claims status (unchanged pass)
-E6 +7.7 / equal-K +2.5 / ablation A3>A1>A2≈0 / E2 PDR-FAR / C4 B2 default — all still primary.
+- `tables/gemini_combo_n80.tex` (cite)
+- `tables/gemini_combo_n40.tex` (archive slice)
+- `data/processed/gemini_combo_n80_summary.json`

@@ -1,0 +1,17 @@
+{
+  "run": "run_ir_combo_seed_gemini_n40_v1",
+  "model": "gemini-2.5-flash",
+  "n_paired_cells": 120,
+  "protocol": "freeze buggy combo seed -> one T=0 repair",
+  "full_vs": {
+    "test_only": {"delta_pp": 33.23, "wlt": "47/8/65", "ci95_pp": [24.69, 41.67], "excl0": true},
+    "test_expected": {"delta_pp": 32.6, "wlt": "47/8/65", "ci95_pp": [24.27, 41.04], "excl0": true},
+    "ir_nl_only": {"delta_pp": 28.02, "wlt": "46/12/62", "ci95_pp": [19.06, 36.88], "excl0": true},
+    "ir_no_scenario_id": {"delta_pp": -0.94, "wlt": "22/17/81", "ci95_pp": [-9.27, 7.08], "excl0": false},
+    "ir_no_expected": {"delta_pp": 5.0, "wlt": "29/17/74", "ci95_pp": [-3.44, 13.54], "excl0": false},
+    "ir_no_constraint": {"delta_pp": 0.0, "wlt": "21/18/81", "ci95_pp": [-8.44, 8.23], "excl0": false},
+    "ir_no_reason": {"delta_pp": 1.56, "wlt": "22/14/84", "ci95_pp": [-6.04, 8.96], "excl0": false},
+    "ir_no_suggested_fix": {"delta_pp": 7.29, "wlt": "24/17/79", "ci95_pp": [-0.31, 14.9], "excl0": false}
+  },
+  "interpretation": "C2 = structure vs unstructured/NL under headroom; not single-field necessity."
+}

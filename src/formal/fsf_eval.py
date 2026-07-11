@@ -220,13 +220,30 @@ def predicate_to_z3(text: str, sym: dict[str, Any]):
     return Or(*or_terms) if len(or_terms) > 1 else or_terms[0]
 
 
+# Default LIA box used by BENCH-120 / legacy industrial tasks.
+DEFAULT_INT_LO = -5
+DEFAULT_INT_HI = 20
+
+
 def generate_concrete_cases(
     scenarios: list[dict[str, Any]],
     signature: dict[str, Any],
     *,
     max_cases: int = 12,
+    int_lo: int | None = None,
+    int_hi: int | None = None,
 ) -> list[ScenarioCase]:
-    """Use Z3 to generate concrete inputs satisfying each FSF scenario test."""
+    """Use Z3 to generate concrete inputs satisfying each FSF scenario test.
+
+    Integer domain defaults to ``[DEFAULT_INT_LO, DEFAULT_INT_HI]`` (``[-5, 20]``)
+    for termination on compact benchmarks. Callers may widen the box (e.g.\
+    ``[-100, 100]``) for real-scale thresholds; see SMT scalability ablation.
+    """
+    lo = DEFAULT_INT_LO if int_lo is None else int(int_lo)
+    hi = DEFAULT_INT_HI if int_hi is None else int(int_hi)
+    if lo > hi:
+        raise ValueError(f"invalid SMT domain [{lo}, {hi}]")
+
     var_names = collect_variables(scenarios, signature)
     input_names = [p["name"] for p in signature.get("inputs", signature.get("params", []))]
     output_names = [p["name"] for p in signature.get("outputs", [])]
@@ -259,10 +276,10 @@ def generate_concrete_cases(
 
         solver = Solver()
         solver.add(test_z3)
-        # bound integers for termination
+        # bound integers for termination (parameterized; default [-5, 20])
         for n in var_names:
-            solver.add(sym[n] >= -5)
-            solver.add(sym[n] <= 20)
+            solver.add(sym[n] >= lo)
+            solver.add(sym[n] <= hi)
 
         attempts = 0
         while solver.check() == sat and attempts < 3 and len(cases) < max_cases:

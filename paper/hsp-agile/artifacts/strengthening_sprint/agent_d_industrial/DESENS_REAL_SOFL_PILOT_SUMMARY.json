@@ -1,0 +1,21 @@
+{
+  "run_id": "run_desens_real_sofl_v1",
+  "model": "ecnu-plus",
+  "benchmark": "benchmarks/published_industrial_pilot.json",
+  "n_tasks": 28,
+  "protocol": "B1/B2/M_eq, K=3 equal, repeats=1, seed=42",
+  "honesty": "Desensitized reconstructions from published SOFL/interlocking/Agile-SOFL sources; NOT proprietary vendor dumps.",
+  "mean_conf_pct": {
+    "B1": 100.0,
+    "B2": 100.0,
+    "M_eq": 100.0
+  },
+  "strict_pct": {
+    "B1": 100.0,
+    "B2": 100.0,
+    "M_eq": 100.0
+  },
+  "paired_M_eq_vs_B2": {"wins": 0, "losses": 0, "ties": 28},
+  "interpretation": "On this published-industrial desensitized pilot, all modes saturate mean Conf under ecnu-plus. Supports C4: prefer B2 by default for mean Conf; escalate to full M only when Accept=1 or FAR<=5% is required. Does not falsify E6 (typed IR under repair headroom on hard synthetic).",
+  "validation": "benchmarks/published_industrial_pilot_validation.json fails=0/28"
+}

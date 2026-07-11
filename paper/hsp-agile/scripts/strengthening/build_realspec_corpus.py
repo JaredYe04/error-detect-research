@@ -27,6 +27,8 @@ SOURCES = [
     ("benchmarks/manual_heldout.json", "textbook"),
     ("benchmarks/industrial_sofl.json", "industrial_pattern"),
     ("benchmarks/published_industrial_pilot.json", "published_case"),
+    ("benchmarks/github_harvest_v1.json", "github_harvest"),
+    ("benchmarks/hkca09_sofl_fsf.json", "github_sofl"),
     ("benchmarks/real_derived/humaneval_fsf.json", "real_derived"),
     ("benchmarks/real_derived/mbpp_fsf.json", "real_derived"),
 ]

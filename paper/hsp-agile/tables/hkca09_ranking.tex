@@ -1,0 +1,23 @@
+% HKCA09 public SOFL FSF reconstructions (Wave-3 expansion).
+\begin{table}[t]
+  \centering
+  \caption{HKCA09 public SOFL modules reconstructed as ordered-guard FSF
+    (\texttt{run\_hkca09\_b1b2m\_v1}; $n{=}35$; equal $K{=}3$;
+    \texttt{ecnu-plus}).
+    Desensitized integer guards preserve auth/capacity/balance precedence
+    from the maintainability-experiment materials (ATM, registration,
+    vending, stock, transit). Not proprietary dumps.
+    B1 has headroom (9/35 fail); B2 and \texttt{M\_eq} both reach 100\%
+    Conf.\ --- supports C4 default B2 on this slice.}
+  \label{tab:hkca09-ranking}
+  \footnotesize
+  \begin{tabular}{lcccc}
+    \toprule
+    Mode & Mean Conf.\ (\%) & Strict (\%) & vs.\ B2 (W/L/T) \\
+    \midrule
+    B1 & 74.3 & 74.3 & --- \\
+    B2 & \textbf{100.0} & 100.0 & --- \\
+    \texttt{M\_eq} & 100.0 & 100.0 & 0/0/35 \\
+    \bottomrule
+  \end{tabular}
+\end{table}

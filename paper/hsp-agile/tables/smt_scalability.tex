@@ -1,0 +1,27 @@
+% SMT domain scalability on real_priority_micro_v1 (n=30).
+\begin{table}[t]
+  \centering
+  \caption{\textbf{SMT scalability ablation}
+    (witness generation on \texttt{real\_priority\_micro\_v1}, $n{=}30$,
+    3 repeats). Widening the LIA box from the historical default
+    $[-5,20]$ to $[-1000,1000]$ does \emph{not} explode latency on these
+    first-match linear guards; a Z3 \texttt{Real} encoding of the same
+    predicates is likewise cheap. Stress probes (more variables /
+    nonlinear products) grow but stay sub-second here
+    (Figure~\ref{fig:smt-domain-latency};
+    \texttt{artifacts/smt\_scalability\_v1/}).}
+  \label{tab:smt-scalability}
+  \footnotesize
+  \renewcommand{\arraystretch}{1.12}
+  \begin{tabular}{@{}lcccc@{}}
+    \toprule
+    Domain / encoding & Mean (ms) & p50 & p95 & Max \\
+    \midrule
+    LIA $[-5,20]$ (default) & 29.1 & 31.0 & 39.1 & 46.7 \\
+    LIA $[-20,50]$ & 28.9 & 33.0 & 37.9 & 38.7 \\
+    LIA $[-100,100]$ & 29.6 & 32.8 & 39.6 & 44.6 \\
+    LIA $[-1000,1000]$ & 30.5 & 34.0 & 39.9 & 43.7 \\
+    Real $[-100,100]$ & 18.6 & 19.2 & 24.8 & 32.0 \\
+    \bottomrule
+  \end{tabular}
+\end{table}

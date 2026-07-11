@@ -26,7 +26,7 @@ than the test-case level, and a conjunctive \emph{Acceptance Predicate} that gat
 on both formal conformance and specification-derived quality criteria.
 
 We instantiate \textsc{SgDP} over the SOFL Functional Specification Format (FSF) 鈥?a specification language with ordered, precedence-sensitive scenario semantics used in
-Agile-SOFL development~\cite{liu1997sofl,liu2014sofl,li2022agilesofl}.
+Agile-SOFL development~\cite{liu1998sofl,liu2004soflbook,li2022qrs_companion}.
 This instantiation, \textbf{HSP-Agile}, is evaluated
 empirically on a benchmark of 120 precedence-sensitive tasks, with experiments ranging
 from overall effectiveness to mechanism isolation to specification complexity analysis.
@@ -39,7 +39,7 @@ encoding FSF guard precedence as SMT constraints~\cite{demoura2008z3}, not by ra
 sampling or symbolic execution on arbitrary postconditions.
 Second, our Feedback IR carries specification-level structure 鈥?violated scenario identity,
 guard predicate text, inferred violation type 鈥?that test-feedback loops
-discard~\cite{lynn2024verifierloop}.
+discard~\cite{sun2024clover}.
 Third, our evaluation protocol measures \emph{prevention} rather than generation success:
 we ask not ``does the LLM produce correct code?'' but ``does the framework prevent
 non-conforming code from entering production?''

@@ -1,0 +1,251 @@
+{
+  "wlt": [
+    14,
+    4,
+    102
+  ],
+  "wins_zero_a": 13,
+  "win_violation_types": {
+    "arithmetic": 30
+  },
+  "win_scenarios": {
+    "8": 30
+  },
+  "loss_violation_types": {
+    "output": 3,
+    "arithmetic": 3
+  },
+  "loss_scenarios": {
+    "6": 3,
+    "8": 3
+  },
+  "ties_partial_lt1": 96,
+  "wins": [
+    {
+      "task_id": "HardSynthetic.HardCase005",
+      "conf_a": 0.0,
+      "conf_c": 0.875,
+      "delta": 0.875,
+      "n_fb": 3,
+      "violation_types": {
+        "arithmetic": 3
+      },
+      "scenarios": {
+        "8": 3
+      }
+    },
+    {
+      "task_id": "HardSynthetic.HardCase004",
+      "conf_a": 0.0,
+      "conf_c": 0.9583333333333334,
+      "delta": 0.9583333333333334,
+      "n_fb": 1,
+      "violation_types": {
+        "arithmetic": 1
+      },
+      "scenarios": {
+        "8": 1
+      }
+    },
+    {
+      "task_id": "HardSynthetic.HardCase010",
+      "conf_a": 0.0,
+      "conf_c": 0.9583333333333334,
+      "delta": 0.9583333333333334,
+      "n_fb": 1,
+      "violation_types": {
+        "arithmetic": 1
+      },
+      "scenarios": {
+        "8": 1
+      }
+    },
+    {
+      "task_id": "HardSynthetic.HardCase012",
+      "conf_a": 0.0,
+      "conf_c": 0.875,
+      "delta": 0.875,
+      "n_fb": 3,
+      "violation_types": {
+        "arithmetic": 3
+      },
+      "scenarios": {
+        "8": 3
+      }
+    },
+    {
+      "task_id": "HardSynthetic.HardCase028",
+      "conf_a": 0.0,
+      "conf_c": 0.875,
+      "delta": 0.875,
+      "n_fb": 3,
+      "violation_types": {
+        "arithmetic": 3
+      },
+      "scenarios": {
+        "8": 3
+      }
+    },
+    {
+      "task_id": "HardSynthetic.HardCase037",
+      "conf_a": 0.625,
+      "conf_c": 0.9583333333333334,
+      "delta": 0.33333333333333337,
+      "n_fb": 1,
+      "violation_types": {
+        "arithmetic": 1
+      },
+      "scenarios": {
+        "8": 1
+      }
+    },
+    {
+      "task_id": "HardSynthetic.HardCase047",
+      "conf_a": 0.0,
+      "conf_c": 0.9583333333333334,
+      "delta": 0.9583333333333334,
+      "n_fb": 1,
+      "violation_types": {
+        "arithmetic": 1
+      },
+      "scenarios": {
+        "8": 1
+      }
+    },
+    {
+      "task_id": "HardSynthetic.HardCase065",
+      "conf_a": 0.0,
+      "conf_c": 0.875,
+      "delta": 0.875,
+      "n_fb": 3,
+      "violation_types": {
+        "arithmetic": 3
+      },
+      "scenarios": {
+        "8": 3
+      }
+    },
+    {
+      "task_id": "HardSynthetic.HardCase097",
+      "conf_a": 0.0,
+      "conf_c": 0.875,
+      "delta": 0.875,
+      "n_fb": 3,
+      "violation_types": {
+        "arithmetic": 3
+      },
+      "scenarios": {
+        "8": 3
+      }
+    },
+    {
+      "task_id": "HardSynthetic.HardCase104",
+      "conf_a": 0.0,
+      "conf_c": 0.875,
+      "delta": 0.875,
+      "n_fb": 3,
+      "violation_types": {
+        "arithmetic": 3
+      },
+      "scenarios": {
+        "8": 3
+      }
+    },
+    {
+      "task_id": "HardSynthetic.HardCase116",
+      "conf_a": 0.0,
+      "conf_c": 0.875,
+      "delta": 0.875,
+      "n_fb": 3,
+      "violation_types": {
+        "arithmetic": 3
+      },
+      "scenarios": {
+        "8": 3
+      }
+    },
+    {
+      "task_id": "HardSynthetic.HardCase118",
+      "conf_a": 0.0,
+      "conf_c": 0.9583333333333334,
+      "delta": 0.9583333333333334,
+      "n_fb": 1,
+      "violation_types": {
+        "arithmetic": 1
+      },
+      "scenarios": {
+        "8": 1
+      }
+    },
+    {
+      "task_id": "HardSynthetic.HardCase122",
+      "conf_a": 0.0,
+      "conf_c": 0.9583333333333334,
+      "delta": 0.9583333333333334,
+      "n_fb": 1,
+      "violation_types": {
+        "arithmetic": 1
+      },
+      "scenarios": {
+        "8": 1
+      }
+    },
+    {
+      "task_id": "HardSynthetic.HardCase124",
+      "conf_a": 0.0,
+      "conf_c": 0.875,
+      "delta": 0.875,
+      "n_fb": 3,
+      "violation_types": {
+        "arithmetic": 3
+      },
+      "scenarios": {
+        "8": 3
+      }
+    }
+  ],
+  "losses": [
+    {
+      "task_id": "HardSynthetic.HardCase067",
+      "conf_a": 0.875,
+      "conf_c": 0.0,
+      "delta": -0.875,
+      "n_fb": 0,
+      "violation_types": {},
+      "scenarios": {}
+    },
+    {
+      "task_id": "HardSynthetic.HardCase068",
+      "conf_a": 0.875,
+      "conf_c": 0.0,
+      "delta": -0.875,
+      "n_fb": 0,
+      "violation_types": {},
+      "scenarios": {}
+    },
+    {
+      "task_id": "HardSynthetic.HardCase071",
+      "conf_a": 0.875,
+      "conf_c": 0.75,
+      "delta": -0.125,
+      "n_fb": 6,
+      "violation_types": {
+        "output": 3,
+        "arithmetic": 3
+      },
+      "scenarios": {
+        "6": 3,
+        "8": 3
+      }
+    },
+    {
+      "task_id": "HardSynthetic.HardCase094",
+      "conf_a": 0.9583333333333334,
+      "conf_c": 0.0,
+      "delta": -0.9583333333333334,
+      "n_fb": 0,
+      "violation_types": {},
+      "scenarios": {}
+    }
+  ]
+}

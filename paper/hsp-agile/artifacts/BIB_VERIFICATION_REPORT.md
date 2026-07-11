@@ -140,11 +140,11 @@
 - **Found:** ISBN 978-1-107-17201-2; [DOI 10.1017/9781316771273](https://doi.org/10.1017/9781316771273); published Dec 2016.
 - **Status:** VERIFIED
 
-### beck2001xp
+### beck2004xp
 - **Claimed:** Beck, Kent. *Extreme Programming Explained: Embrace Change*, 2nd ed., Addison-Wesley, **2004** (key says 2001).
 - **Found:** 2nd edition, Nov 2004, ISBN 0321278658 (with Cynthia Andres).
 - **Status:** VERIFIED
-- **Notes:** Bib `year={2004}` is correct; cite key `beck2001xp` is misleading.
+- **Notes:** Bib `year={2004}` is correct; cite key `beck2004xp` is misleading.
 
 ### pohl2010requirements
 - **Claimed:** Pohl, Klaus. *Requirements Engineering: Fundamentals, Principles, and Techniques.* Springer, 2010.
@@ -203,7 +203,7 @@
 - **Found:** NeurIPS 2023 proceedings ([paper PDF](https://proceedings.neurips.cc/paper_files/paper/2023/file/91edff07232fb1b55a505a9e9f6c0ff3-Paper-Conference.pdf)); arXiv:2303.17651.
 - **Status:** VERIFIED
 
-### chen2023selfdebug
+### chen2024selfdebug
 - **Claimed:** Chen, Xinyun et al. "Teaching Large Language Models to Self-Debug." ICLR 2024.
 - **Found:** ICLR 2024; arXiv [2304.05128](https://arxiv.org/abs/2304.05128).
 - **Status:** VERIFIED
@@ -213,11 +213,11 @@
 - **Found:** NeurIPS 2023 ([proceedings PDF](https://proceedings.neurips.cc/paper_files/paper/2023/file/1b44b878bb782e6954cd888628510e90-Paper-Conference.pdf)).
 - **Status:** VERIFIED
 
-### chen2022codet
+### chen2023codet
 - **Claimed:** Chen, Bei et al. "CodeT: Code Generation with Generated Tests." ICLR 2023 (key says 2022).
 - **Found:** ICLR 2023 poster; arXiv:2207.10397 (July 2022 preprint).
 - **Status:** VERIFIED
-- **Notes:** Bib `year={2023}` matches conference; key `chen2022codet` reflects arXiv year.
+- **Notes:** Bib `year={2023}` matches conference; key `chen2023codet` reflects arXiv year.
 
 ### austin2021mbpp
 - **Claimed:** Austin, Jacob et al. "Program Synthesis with Large Language Models." arXiv:2108.07732, 2021 (MBPP).
@@ -252,7 +252,7 @@
 | **P2 – correct metadata** | `okun2007mutation` | NIST SP 500-297, **2013**; not mutation |
 | **P2 – correct metadata** | `ayewah2008findbugs` | PASTE **2007** |
 | **P3 – cleanup** | `dafnybench2024` | Duplicate of `loughman2024dafnybench` |
-| **P3 – cleanup** | `beck2001xp`, `chen2022codet`, keys | Keys disagree with years (optional rename) |
+| **P3 – cleanup** | `beck2004xp`, `chen2023codet`, keys | Keys disagree with years (optional rename) |
 
 ### Critical hallucinations
 

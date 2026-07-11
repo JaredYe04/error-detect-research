@@ -1,0 +1,10 @@
+# classify_tier(score: int, floor: int) -> tier: str
+#
+# S1: WHEN score < 0
+#         THEN tier = "Reject"
+#
+# S2: WHEN score >= floor
+#         THEN tier = "Pass"
+#
+# S3: OTHERWISE                 -- catch-all others
+#         THEN tier = "Review"  -- arithmetic/output must match oracle

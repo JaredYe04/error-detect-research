@@ -1,0 +1,24 @@
+% HKCA09 hard-seed feedback ablation (scoped external probe; not C2 headline).
+\begin{table}[t]
+  \centering
+  \caption{Hard-seed repair on HKCA09 FSF under \texttt{ecnu-plus}
+    (\texttt{run\_hkca09\_hard\_seed\_e6\_v1}; freeze buggy code $\rightarrow$
+    one $T{=}0$ repair).
+    One-shot E6 on the same corpus saturates at Conf.\ $=1$.
+    \texttt{wrong\_relop} is directional (${+}12.7$\,pp; CI includes~0);
+    structural seeds are mixed.
+    \textbf{Do not} treat this table as a second C2 headline---primary C2
+    remains E6 and Table~\ref{tab:gemini-combo-n80}.
+    On \texttt{gemini-2.5-flash}, the same \texttt{wrong\_relop} protocol
+    favors test-only (negative control; omitted from the lead).}
+  \label{tab:hkca09-hard-seed}
+  \footnotesize
+  \begin{tabular}{lcccc}
+    \toprule
+    Seed & test\_only & semantic\_ir & $\Delta$ (pp) & W/L/T \\
+    \midrule
+    \texttt{wrong\_relop} & 69.3 & \textbf{82.0} & $+12.7$ & 9/5/12 \\
+    \texttt{invert\_order} & 96.3 & 93.9 & $-2.3$ & 2/6/22 \\
+    \bottomrule
+  \end{tabular}
+\end{table}

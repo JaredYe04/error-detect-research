@@ -1,0 +1,47 @@
+{
+  "n_rows": 171,
+  "metric": "formal_conformance",
+  "variants": {
+    "test_only": {
+      "n": 57,
+      "mean": 1.0,
+      "strict_rate": 1.0
+    },
+    "test_expected": {
+      "n": 57,
+      "mean": 1.0,
+      "strict_rate": 1.0
+    },
+    "semantic_ir": {
+      "n": 57,
+      "mean": 1.0,
+      "strict_rate": 1.0
+    }
+  },
+  "paired": {
+    "semantic_ir_vs_test_only": {
+      "n": 57,
+      "mean_delta": 0.0,
+      "wins": 0,
+      "losses": 0,
+      "ties": 57,
+      "ci95": [
+        0.0,
+        0.0
+      ],
+      "excl0": false
+    },
+    "semantic_ir_vs_test_expected": {
+      "n": 57,
+      "mean_delta": 0.0,
+      "wins": 0,
+      "losses": 0,
+      "ties": 57,
+      "ci95": [
+        0.0,
+        0.0
+      ],
+      "excl0": false
+    }
+  }
+}

@@ -46,7 +46,7 @@ python experiments/analyze.py artifacts/run_hard_full_v2
 python paper/hsp-agile/scripts/prepare_paper_data.py
 python paper/hsp-agile/figures/scripts/plot_paper_figures.py --static-formats png pdf --dpi 300 --seed 7
 python paper/hsp-agile/scripts/update_stats_table.py
-powershell -ExecutionPolicy Bypass -File paper/hsp-agile/scripts/build_pdf.ps1
+powershell -File paper/hsp-agile/scripts/build.ps1 -Which long
 ```
 
 ## Success Criteria

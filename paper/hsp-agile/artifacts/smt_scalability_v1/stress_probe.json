@@ -1,0 +1,134 @@
+{
+  "var_chain": [
+    {
+      "n_vars": 4,
+      "box": [
+        -1000,
+        1000
+      ],
+      "mean_ms": 3.2717600115574896,
+      "max_ms": 4.706900013843551,
+      "results": [
+        "sat",
+        "sat",
+        "sat",
+        "sat",
+        "sat"
+      ]
+    },
+    {
+      "n_vars": 8,
+      "box": [
+        -1000,
+        1000
+      ],
+      "mean_ms": 3.4656599978916347,
+      "max_ms": 4.212900006677955,
+      "results": [
+        "sat",
+        "sat",
+        "sat",
+        "sat",
+        "sat"
+      ]
+    },
+    {
+      "n_vars": 16,
+      "box": [
+        -1000,
+        1000
+      ],
+      "mean_ms": 5.0084799993783236,
+      "max_ms": 5.9083999949507415,
+      "results": [
+        "sat",
+        "sat",
+        "sat",
+        "sat",
+        "sat"
+      ]
+    },
+    {
+      "n_vars": 32,
+      "box": [
+        -1000,
+        1000
+      ],
+      "mean_ms": 8.916139992652461,
+      "max_ms": 11.022599996067584,
+      "results": [
+        "sat",
+        "sat",
+        "sat",
+        "sat",
+        "sat"
+      ]
+    },
+    {
+      "n_vars": 48,
+      "box": [
+        -1000,
+        1000
+      ],
+      "mean_ms": 10.51558000035584,
+      "max_ms": 13.128899998264387,
+      "results": [
+        "sat",
+        "sat",
+        "sat",
+        "sat",
+        "sat"
+      ]
+    }
+  ],
+  "nonlinear": [
+    {
+      "kind": "nonlinear_product",
+      "box": [
+        -20,
+        20
+      ],
+      "mean_ms": 21.28481999388896,
+      "max_ms": 34.96419999282807,
+      "results": [
+        "unsat",
+        "unsat",
+        "unsat",
+        "unsat",
+        "unsat"
+      ]
+    },
+    {
+      "kind": "nonlinear_product",
+      "box": [
+        -100,
+        100
+      ],
+      "mean_ms": 10.008400003425777,
+      "max_ms": 14.876100001856685,
+      "results": [
+        "sat",
+        "sat",
+        "sat",
+        "sat",
+        "sat"
+      ]
+    },
+    {
+      "kind": "nonlinear_product",
+      "box": [
+        -1000,
+        1000
+      ],
+      "mean_ms": 38.41542000300251,
+      "max_ms": 49.22449999139644,
+      "results": [
+        "sat",
+        "sat",
+        "sat",
+        "sat",
+        "sat"
+      ]
+    }
+  ]
+}

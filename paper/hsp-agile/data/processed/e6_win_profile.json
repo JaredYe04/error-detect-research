@@ -1,0 +1,14 @@
+{
+  "n_wins": 14,
+  "zero_test_only": 13,
+  "zero_frac": 0.9285714285714286,
+  "violation_types": {
+    "arithmetic": 14
+  },
+  "scenario_indices": {
+    "8": 14
+  },
+  "wlt": "14/4/102",
+  "delta_pp": 7.7,
+  "note": "E6 wins concentrate on catch-all/others output repair (arithmetic), not ordering-precedence wins on BENCH-120."
+}

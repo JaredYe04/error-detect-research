@@ -96,12 +96,24 @@ def first_match_oracle(
     return expected, int(others.get("index", len(scenarios)) or len(scenarios))
 
 
+def _task_smt_domain(task: dict[str, Any]) -> tuple[int | None, int | None]:
+    """Optional per-task SMT box via ``smtDomain: {lo, hi}``."""
+    dom = task.get("smtDomain") or {}
+    if not isinstance(dom, dict):
+        return None, None
+    lo = dom.get("lo", dom.get("int_lo"))
+    hi = dom.get("hi", dom.get("int_hi"))
+    return (int(lo) if lo is not None else None, int(hi) if hi is not None else None)
+
+
 def run_formal_check(
     code: str,
     task: dict[str, Any],
     *,
     func_name: str | None = None,
     max_cases: int = 12,
+    int_lo: int | None = None,
+    int_hi: int | None = None,
 ) -> FormalCheckResult:
     """Check generated implementation against FSF-derived test cases."""
     name = func_name or task["name"]
@@ -119,7 +131,14 @@ def run_formal_check(
 
     scenarios = task.get("fsfScenarios", [])
     signature = task.get("signature", {})
-    cases = generate_concrete_cases(scenarios, signature, max_cases=max_cases)
+    task_lo, task_hi = _task_smt_domain(task)
+    cases = generate_concrete_cases(
+        scenarios,
+        signature,
+        max_cases=max_cases,
+        int_lo=int_lo if int_lo is not None else task_lo,
+        int_hi=int_hi if int_hi is not None else task_hi,
+    )
 
     passed = 0
     counterexamples: list[Counterexample] = []

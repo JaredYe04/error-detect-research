@@ -144,10 +144,10 @@ $statsArgs = @(
 )
 Invoke-Checked -Label "5/6 update stats table" -Exe $PythonExe -CommandArgs $statsArgs
 
-$buildPdfScript = Join-Path $PaperRoot "scripts\build_pdf.ps1"
+$BuildScript = Join-Path $PaperRoot "scripts\build.ps1"
 Write-Log "STEP" "6/6 rebuild PDF"
-Write-Host "  + powershell -ExecutionPolicy Bypass -File $buildPdfScript -SkipRefresh -Formats $Formats -Dpi $Dpi -Seed $Seed"
-& powershell -ExecutionPolicy Bypass -File $buildPdfScript -SkipRefresh -Formats $Formats -Dpi $Dpi -Seed $Seed
+Write-Host "  + powershell -ExecutionPolicy Bypass -File $BuildScript -Which long -SkipRefresh -Formats $Formats -Dpi $Dpi -Seed $Seed"
+& powershell -ExecutionPolicy Bypass -File $BuildScript -Which long -SkipRefresh -Formats $Formats -Dpi $Dpi -Seed $Seed
 if ($LASTEXITCODE -ne 0) {
     throw "Step failed (6/6 rebuild PDF), exit code: $LASTEXITCODE"
 }

@@ -1,12 +1,12 @@
 Closest LLM+verifier systems differ on whether witnesses respect first-match
 order, whether repair carries scenario structure, and whether prevention
-(PDR/FAR) is measured~\cite{loughman2024dafnybench,sun2024clover}.
+(PDR/FAR) is measured~\cite{loughridge2024dafnybench,sun2024clover}.
 DafnyBench and Clover target proof-oriented oracles; Self-Refine, Self-Debug,
 and Reflexion raise generation success via critique or verbal
-memory~\cite{madaan2023selfrefine,chen2023selfdebug,shinn2023reflexion} but do
+memory~\cite{madaan2023selfrefine,chen2024selfdebug,shinn2023reflexion} but do
 not emit region-typed failure records.
 CodeT and coding agents (OpenHands, SWE-agent) optimise repository
-tasks~\cite{chen2022codet,wang2024opendevin,yang2024sweagent} without an FSF
+tasks~\cite{chen2023codet,wang2024opendevin,yang2024sweagent} without an FSF
 oracle $g_t$.
 \textsc{SgDP} combines first-match SMT witnesses, typed Semantic Feedback IR,
 and conjunctive $\mathrm{Accept}$ under PDR/FAR---not a claim that no prior

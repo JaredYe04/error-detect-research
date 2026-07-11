@@ -15,14 +15,24 @@ Papers must distinguish three corpora. Do not mix numbers across rows.
 |------|-------------|-------------------------|----------------|---------|
 | **Primary ranking** (fixed others-witness oracle) | E1, E10, E12, **A1–A3 ablation** | `run_e1_m_win_v2`, `run_e10_m_win_v1`, `run_e12_m_win_v1`, **`run_e1_ablation_fixed_v1`** | Strengthened M: $K{=}5$ bundle — **stress-test only** | B1/B2/M Conf / Strict; ablation Δ |
 | **Equal-K Conf.** | B2 vs M_eq | **`run_e1_equal_k_v1`** | Both $K{=}3$; M_eq uses `semantic_ir` + advisory gate | **Primary equal-K Conf ranking** (+2.5 pp) |
-| **Mechanism / prevention** | E6, E2 | `run_feedback_v2`, `prevention_full_v1` | E6: $K{=}3$ feedback isolation (**lead C2**); E2: PDR/FAR | +7.7 pp (CI excludes 0); PDR/FAR |
-| **Hard-seed C2 support** | combo seeds @ gemini | **`run_ir_combo_seed_gemini_n40_v1`** | $n{=}40$×3 seeds; freeze buggy code → one T=0 repair | Supporting: FULL vs test_only/expected CI excl 0; not vs ir_no_expected |
+| **Mechanism / prevention** | E6, E2 | `run_feedback_v2`, `prevention_full_v1` | E6: $K{=}3$ feedback isolation (**lead C2**); win profile: 13/14 zero test-only, others/arithmetic (not ordering-uniqueness); E2: PDR/FAR | +7.7 pp (CI excludes 0); PDR/FAR |
+| **Hard-seed C2 support** | combo seeds @ gemini | **`run_ir_combo_seed_gemini_n40_v1` + `extra40_v1` (pooled n=80)**; **field ablation on n40** | $n{=}80$×3 seeds; freeze buggy code → one T=0 repair; field cells $n{=}120$ | Supporting: FULL vs test_only **+26.5 pp**; FULL vs **ir_nl_only +28.0 pp** (CI excl 0); single-field drops CI include 0 |
 | **Historical pre-fix** | archive only | `run_e1_canonical_v1` / `run_hard_full_parallel_v1` | Buggy others-witness (~5% Strict) | Label historical; never primary |
 
 **Causal clarity (P1):** Fixed-oracle E1 M vs B2 is a **bundle** ($K{=}5$, advisory gate, `execution_trace_matched`, argmax)—**not** single-factor C2. E14 scopes uniqueness (`semantic_ir` 75.1% ≠ `execution_trace_matched` 85.4%; paired mean Conf. 5/19/96). See `artifacts/P1_CAUSAL_NOTES.md`.
 
 **Quick primary numbers (fixed oracle):** E1 B1 84.2% / B2 98.3% / M 100.0%; E10 B1 81% / B2 99% / M 100%; E12 B1 88.6% / B2 100% / M 99.7% (B2 first every seed).  
-**Published-industrial pilot (`run_pubind_pilot_v1`, n=10):** B1 80.0% / B2 100.0% / M_eq 100.0% (equal K=3). Supports C4 default B2. Corpus: `benchmarks/published_industrial_pilot.json` (reconstructed from published railway/ATM/banking SOFL cases; not proprietary dumps). Vendor `.asfl` import: `vendor/README.md`.
+**Real-priority micro (`run_real_priority_micro_v1`, n=30):** B1 **95.6%** / B2 **100%** / M_eq **100%** (0/0/30). Includes firewall/role/tax/billing adaptations + industrial/GitHub/HKCA09. Supports C4 + external validity. See `benchmarks/REAL_PRIORITY_MICRO_README.md`.
+
+**SMT scalability (`artifacts/smt_scalability_v1`):** LIA mean witness ~29–31 ms from `[-5,20]` through `[-1000,1000]`; Real `[-100,100]` ~19 ms. No latency cliff on this fragment; hybrid fuzzing fallback discussed in ch08.
+
+**GitHub live harvest (`run_github_harvest_v1`, n=48):** B1 85.8% / B2 **89.9%** / M_eq 89.9% (equal K=3, ecnu-plus; M_eq vs B2 1/1/46). Public `.asfl` FSF auto-extract (ecommerce/smart-city/hospital/library). Supports C4.
+
+**HKCA09 SOFL→FSF (`run_hkca09_b1b2m_v1`, n=35):** B1 **74.3%** / B2 **100%** / M_eq 100% (0/0/35). Overlap-rich reconstructions from public maintainability-experiment SOFL modules. Supports C4 (B1 headroom; B2 enough). RealSpec total **203** (`github_sofl=35`).
+
+**HKCA09 hard-seed C2 (`run_hkca09_hard_seed_e6_v1`):** one-shot E6 on real/headroom saturates (all variants Conf=1). Freeze seed → T=0 repair: **wrong_relop** semantic_ir 82.0% vs test_only 69.3% (**+12.7 pp**; W/L/T 9/5/12; CI includes 0). invert_order mixed. Cite as supporting external C2, not replacement for BENCH-120 E6. See `HKCA09_FSF_EXPANSION.md`.
+
+**Published-industrial desensitized pilot (`run_desens_real_sofl_v1`, n=28):** B1/B2/M_eq all **100.0%** Conf./Strict (equal K=3, ecnu-plus; paired M_eq vs B2 0/0/28). Supports C4 default B2. Corpus: `benchmarks/published_industrial_pilot.json`. Vendor `.asfl` import: `vendor/README.md`. Provenance: `benchmarks/DESENSITIZED_REAL_SOFL_PILOT.md`.
 
 ---
 
@@ -143,23 +153,24 @@ un_e14_sweep_v1) --- uniqueness scope, not primary C2
 
 Paired mean Conf. (e14_paired_summary): semantic_ir vs execution_trace_matched **5 / 19 / 96** (W/L/T, -10.3 pp); vs test_only 18 / 16 / 86 (+1.3 pp). Script: paper/hsp-agile/scripts/e14_paired_analysis.py. Details: P1_CAUSAL_NOTES.md.
 
-### Hard combo-seed support (
-un_ir_combo_seed_gemini_n40_v1)
+### Hard combo-seed support (pooled n40 + extra40 → n=80)
 
-Model gemini-2.5-flash; n=40 tasks x 3 seed types; freeze injected buggy code then one T=0 repair (1080 jobs).
+Primary supporting run: `run_ir_combo_seed_gemini_n40_v1` + `run_ir_combo_seed_gemini_extra40_v1`
+(model gemini-2.5-flash; freeze injected buggy code → one T=0 repair).
 
-**Pooled** (n=120 task x seed cells), FULL=semantic_ir:
+**Pooled** (n=240 task × seed cells), FULL=semantic_ir:
 
 | Contrast | Delta (pp) | W/L/T | 95% CI (pp) | Excl. 0 |
 |----------|------------|-------|-------------|---------|
-| vs test_only | **+33.2** | 47/8/65 | [25.1, 41.9] | **Yes** |
-| vs test_expected | **+32.6** | 47/8/65 | [24.6, 41.1] | **Yes** |
-| vs ir_no_expected | +5.0 | 29/17/74 | [-3.5, 13.6] | No |
+| vs test_only | **+26.5** | 78/27/135 | [21.0, 32.2] | **Yes** |
+| vs test_expected | **+26.7** | 79/18/143 | [21.0, 32.3] | **Yes** |
+| vs ir_no_expected | +5.0 | 29/17/74 | [-3.3, 13.6] | No (n40 field slice) |
 
-Per-seed FULL vs test_only also CI-excl-0 (+27.2 / +34.4 / +38.1 pp).
-Cite as supporting C2 under harder bugs; not uniqueness vs every structured ablation.
-Table: 	ables/gemini_combo_n40.tex. JSON: data/processed/gemini_combo_n40_summary.json.
-gpt-4o-mini / deepseek combo saturate (~100%) --- do not cite as weak-model evidence.
+Per-seed FULL vs test_only also CI-excl-0 (+23.4 / +26.7 / +29.2 pp).
+Archive n40-only slice: +33.2 / +32.6 pp (Table `gemini_combo_n40.tex`).
+Cite pooled n80 as supporting C2 under harder bugs; not uniqueness vs every structured ablation.
+Table: `tables/gemini_combo_n80.tex`. JSON: `data/processed/gemini_combo_n80_summary.json`.
+gpt-4o-mini / deepseek combo saturate (~100%) — do not cite as weak-model evidence.
 
 ### E2 (prevention_full_v1, impl-screening n=852)
 

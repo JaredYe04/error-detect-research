@@ -1,0 +1,4916 @@
+[
+  {
+    "taskId": "HKCA09.Atm.Auth",
+    "kind": "process",
+    "sourceFile": "github://hkca09/SOFL-Maintainability-Experiment-Dataset/ATM_SYSTEM",
+    "module": "HKCA09.ATM_SYSTEM",
+    "name": "current_authorization",
+    "signature": {
+      "inputs": [
+        {
+          "name": "acct_ok",
+          "type": "int"
+        },
+        {
+          "name": "pin_ok",
+          "type": "int"
+        },
+        {
+          "name": "tries",
+          "type": "int"
+        },
+        {
+          "name": "locked",
+          "type": "int"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "permit",
+          "type": "int"
+        },
+        {
+          "name": "msg",
+          "type": "int"
+        }
+      ]
+    },
+    "fsfScenarios": [
+      {
+        "index": 1,
+        "kind": "scenario",
+        "test": "locked gt 0",
+        "def": "permit eq 0 && msg eq 4"
+      },
+      {
+        "index": 2,
+        "kind": "scenario",
+        "test": "acct_ok eq 0",
+        "def": "permit eq 0 && msg eq 3"
+      },
+      {
+        "index": 3,
+        "kind": "scenario",
+        "test": "tries ge 3",
+        "def": "permit eq 0 && msg eq 4"
+      },
+      {
+        "index": 4,
+        "kind": "scenario",
+        "test": "pin_ok eq 0",
+        "def": "permit eq 0 && msg eq 2"
+      },
+      {
+        "index": 5,
+        "kind": "scenario",
+        "test": "acct_ok gt 0 && pin_ok gt 0 && tries lt 3 && locked eq 0",
+        "def": "permit eq 1 && msg eq 0"
+      },
+      {
+        "index": 6,
+        "kind": "others",
+        "test": "others",
+        "def": "permit eq 0 && msg eq 0"
+      }
+    ],
+    "ext": [],
+    "promptSpec": "Process current_authorization(acct_ok, pin_ok, tries, locked) -> (permit, msg)\n\nFSF specification:\nif (locked gt 0) => permit eq 0 && msg eq 4\nif (acct_ok eq 0) => permit eq 0 && msg eq 3\nif (tries ge 3) => permit eq 0 && msg eq 4\nif (pin_ok eq 0) => permit eq 0 && msg eq 2\nif (acct_ok gt 0 && pin_ok gt 0 && tries lt 3 && locked eq 0) => permit eq 1 && msg eq 0\nothers => permit eq 0 && msg eq 0",
+    "sourceBasename": "hkca09/SOFL-Maintainability-Experiment-Dataset",
+    "externalProvenance": {
+      "source": "hkca09/SOFL-Maintainability-Experiment-Dataset",
+      "module": "ATM_SYSTEM",
+      "section": "Current_Authorization: account/PIN/tries/lock precedence",
+      "generator": "hkca09_sofl_fsf_reconstruction",
+      "corpus": "hkca09_github_sofl",
+      "honesty": "desensitized_int_fsf_from_public_sofl_decision_logic"
+    },
+    "referenceCode": "def current_authorization(acct_ok: int, pin_ok: int, tries: int, locked: int) -> dict:\n    \"\"\"Reference implementation auto-generated from FSF.\"\"\"\n    if locked > 0:\n        return {\"permit\": 0, \"msg\": 4}\n    elif acct_ok == 0:\n        return {\"permit\": 0, \"msg\": 3}\n    elif tries >= 3:\n        return {\"permit\": 0, \"msg\": 4}\n    elif pin_ok == 0:\n        return {\"permit\": 0, \"msg\": 2}\n    elif acct_ok > 0  and  pin_ok > 0  and  tries < 3  and  locked == 0:\n        return {\"permit\": 1, \"msg\": 0}\n    else:\n        return {\"permit\": 0, \"msg\": 0}\n",
+    "complexity": {
+      "scenario_count": 5,
+      "guard_complexity": "Nested",
+      "overlap_rate": 1.056,
+      "has_external_vars": false,
+      "overlap_density_tier": "medium"
+    }
+  },
+  {
+    "taskId": "HKCA09.Atm.Deposit",
+    "kind": "process",
+    "sourceFile": "github://hkca09/SOFL-Maintainability-Experiment-Dataset/ATM_SYSTEM",
+    "module": "HKCA09.ATM_SYSTEM",
+    "name": "current_deposit",
+    "signature": {
+      "inputs": [
+        {
+          "name": "auth",
+          "type": "int"
+        },
+        {
+          "name": "amount",
+          "type": "int"
+        },
+        {
+          "name": "max_once",
+          "type": "int"
+        },
+        {
+          "name": "balance",
+          "type": "int"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "ok",
+          "type": "int"
+        },
+        {
+          "name": "warn",
+          "type": "int"
+        }
+      ]
+    },
+    "fsfScenarios": [
+      {
+        "index": 1,
+        "kind": "scenario",
+        "test": "auth eq 0",
+        "def": "ok eq 0 && warn eq 3"
+      },
+      {
+        "index": 2,
+        "kind": "scenario",
+        "test": "amount le 0",
+        "def": "ok eq 0 && warn eq 1"
+      },
+      {
+        "index": 3,
+        "kind": "scenario",
+        "test": "amount gt max_once",
+        "def": "ok eq 0 && warn eq 2"
+      },
+      {
+        "index": 4,
+        "kind": "scenario",
+        "test": "auth gt 0 && amount gt 0 && amount le max_once",
+        "def": "ok eq 1 && warn eq 0"
+      },
+      {
+        "index": 5,
+        "kind": "others",
+        "test": "others",
+        "def": "ok eq 0 && warn eq 0"
+      }
+    ],
+    "ext": [],
+    "promptSpec": "Process current_deposit(auth, amount, max_once, balance) -> (ok, warn)\n\nFSF specification:\nif (auth eq 0) => ok eq 0 && warn eq 3\nif (amount le 0) => ok eq 0 && warn eq 1\nif (amount gt max_once) => ok eq 0 && warn eq 2\nif (auth gt 0 && amount gt 0 && amount le max_once) => ok eq 1 && warn eq 0\nothers => ok eq 0 && warn eq 0",
+    "sourceBasename": "hkca09/SOFL-Maintainability-Experiment-Dataset",
+    "externalProvenance": {
+      "source": "hkca09/SOFL-Maintainability-Experiment-Dataset",
+      "module": "ATM_SYSTEM",
+      "section": "Current_Deposit: auth + maximum_deposit_once gate",
+      "generator": "hkca09_sofl_fsf_reconstruction",
+      "corpus": "hkca09_github_sofl",
+      "honesty": "desensitized_int_fsf_from_public_sofl_decision_logic"
+    },
+    "referenceCode": "def current_deposit(auth: int, amount: int, max_once: int, balance: int) -> dict:\n    \"\"\"Reference implementation auto-generated from FSF.\"\"\"\n    if auth == 0:\n        return {\"ok\": 0, \"warn\": 3}\n    elif amount <= 0:\n        return {\"ok\": 0, \"warn\": 1}\n    elif amount > max_once:\n        return {\"ok\": 0, \"warn\": 2}\n    elif auth > 0  and  amount > 0  and  amount <= max_once:\n        return {\"ok\": 1, \"warn\": 0}\n    else:\n        return {\"ok\": 0, \"warn\": 0}\n",
+    "complexity": {
+      "scenario_count": 4,
+      "guard_complexity": "Nested",
+      "overlap_rate": 1.0,
+      "has_external_vars": false,
+      "overlap_density_tier": "low"
+    }
+  },
+  {
+    "taskId": "HKCA09.Atm.Withdraw",
+    "kind": "process",
+    "sourceFile": "github://hkca09/SOFL-Maintainability-Experiment-Dataset/ATM_SYSTEM",
+    "module": "HKCA09.ATM_SYSTEM",
+    "name": "current_withdraw",
+    "signature": {
+      "inputs": [
+        {
+          "name": "auth",
+          "type": "int"
+        },
+        {
+          "name": "amount",
+          "type": "int"
+        },
+        {
+          "name": "balance",
+          "type": "int"
+        },
+        {
+          "name": "max_once",
+          "type": "int"
+        },
+        {
+          "name": "day_remain",
+          "type": "int"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "cash",
+          "type": "int"
+        },
+        {
+          "name": "warn",
+          "type": "int"
+        }
+      ]
+    },
+    "fsfScenarios": [
+      {
+        "index": 1,
+        "kind": "scenario",
+        "test": "auth eq 0",
+        "def": "cash eq 0 && warn eq 4"
+      },
+      {
+        "index": 2,
+        "kind": "scenario",
+        "test": "amount le 0",
+        "def": "cash eq 0 && warn eq 1"
+      },
+      {
+        "index": 3,
+        "kind": "scenario",
+        "test": "amount gt max_once",
+        "def": "cash eq 0 && warn eq 2"
+      },
+      {
+        "index": 4,
+        "kind": "scenario",
+        "test": "amount gt balance",
+        "def": "cash eq 0 && warn eq 3"
+      },
+      {
+        "index": 5,
+        "kind": "scenario",
+        "test": "amount gt day_remain",
+        "def": "cash eq 0 && warn eq 2"
+      },
+      {
+        "index": 6,
+        "kind": "scenario",
+        "test": "auth gt 0 && amount gt 0 && amount le max_once && amount le balance && amount le day_remain",
+        "def": "cash eq 1 && warn eq 0"
+      },
+      {
+        "index": 7,
+        "kind": "others",
+        "test": "others",
+        "def": "cash eq 0 && warn eq 0"
+      }
+    ],
+    "ext": [],
+    "promptSpec": "Process current_withdraw(auth, amount, balance, max_once, day_remain) -> (cash, warn)\n\nFSF specification:\nif (auth eq 0) => cash eq 0 && warn eq 4\nif (amount le 0) => cash eq 0 && warn eq 1\nif (amount gt max_once) => cash eq 0 && warn eq 2\nif (amount gt balance) => cash eq 0 && warn eq 3\nif (amount gt day_remain) => cash eq 0 && warn eq 2\nif (auth gt 0 && amount gt 0 && amount le max_once && amount le balance && amount le day_remain) => cash eq 1 && warn eq 0\nothers => cash eq 0 && warn eq 0",
+    "sourceBasename": "hkca09/SOFL-Maintainability-Experiment-Dataset",
+    "externalProvenance": {
+      "source": "hkca09/SOFL-Maintainability-Experiment-Dataset",
+      "module": "ATM_SYSTEM",
+      "section": "Current_Withdraw: once/day/balance ordered rejects",
+      "generator": "hkca09_sofl_fsf_reconstruction",
+      "corpus": "hkca09_github_sofl",
+      "honesty": "desensitized_int_fsf_from_public_sofl_decision_logic"
+    },
+    "referenceCode": "def current_withdraw(auth: int, amount: int, balance: int, max_once: int, day_remain: int) -> dict:\n    \"\"\"Reference implementation auto-generated from FSF.\"\"\"\n    if auth == 0:\n        return {\"cash\": 0, \"warn\": 4}\n    elif amount <= 0:\n        return {\"cash\": 0, \"warn\": 1}\n    elif amount > max_once:\n        return {\"cash\": 0, \"warn\": 2}\n    elif amount > balance:\n        return {\"cash\": 0, \"warn\": 3}\n    elif amount > day_remain:\n        return {\"cash\": 0, \"warn\": 2}\n    elif auth > 0  and  amount > 0  and  amount <= max_once  and  amount <= balance  and  amount <= day_remain:\n        return {\"cash\": 1, \"warn\": 0}\n    else:\n        return {\"cash\": 0, \"warn\": 0}\n",
+    "complexity": {
+      "scenario_count": 6,
+      "guard_complexity": "Nested",
+      "overlap_rate": 1.429,
+      "has_external_vars": false,
+      "overlap_density_tier": "high"
+    }
+  },
+  {
+    "taskId": "HKCA09.Atm.Transfer",
+    "kind": "process",
+    "sourceFile": "github://hkca09/SOFL-Maintainability-Experiment-Dataset/ATM_SYSTEM",
+    "module": "HKCA09.ATM_SYSTEM",
+    "name": "manage_transfer",
+    "signature": {
+      "inputs": [
+        {
+          "name": "auth",
+          "type": "int"
+        },
+        {
+          "name": "amount",
+          "type": "int"
+        },
+        {
+          "name": "src_bal",
+          "type": "int"
+        },
+        {
+          "name": "dst_ok",
+          "type": "int"
+        },
+        {
+          "name": "max_xfer",
+          "type": "int"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "done",
+          "type": "int"
+        },
+        {
+          "name": "code",
+          "type": "int"
+        }
+      ]
+    },
+    "fsfScenarios": [
+      {
+        "index": 1,
+        "kind": "scenario",
+        "test": "auth eq 0",
+        "def": "done eq 0 && code eq 4"
+      },
+      {
+        "index": 2,
+        "kind": "scenario",
+        "test": "dst_ok eq 0",
+        "def": "done eq 0 && code eq 3"
+      },
+      {
+        "index": 3,
+        "kind": "scenario",
+        "test": "amount le 0",
+        "def": "done eq 0 && code eq 1"
+      },
+      {
+        "index": 4,
+        "kind": "scenario",
+        "test": "amount gt max_xfer",
+        "def": "done eq 0 && code eq 2"
+      },
+      {
+        "index": 5,
+        "kind": "scenario",
+        "test": "amount gt src_bal",
+        "def": "done eq 0 && code eq 3"
+      },
+      {
+        "index": 6,
+        "kind": "scenario",
+        "test": "auth gt 0 && dst_ok gt 0 && amount gt 0 && amount le max_xfer && amount le src_bal",
+        "def": "done eq 1 && code eq 0"
+      },
+      {
+        "index": 7,
+        "kind": "others",
+        "test": "others",
+        "def": "done eq 0 && code eq 0"
+      }
+    ],
+    "ext": [],
+    "promptSpec": "Process manage_transfer(auth, amount, src_bal, dst_ok, max_xfer) -> (done, code)\n\nFSF specification:\nif (auth eq 0) => done eq 0 && code eq 4\nif (dst_ok eq 0) => done eq 0 && code eq 3\nif (amount le 0) => done eq 0 && code eq 1\nif (amount gt max_xfer) => done eq 0 && code eq 2\nif (amount gt src_bal) => done eq 0 && code eq 3\nif (auth gt 0 && dst_ok gt 0 && amount gt 0 && amount le max_xfer && amount le src_bal) => done eq 1 && code eq 0\nothers => done eq 0 && code eq 0",
+    "sourceBasename": "hkca09/SOFL-Maintainability-Experiment-Dataset",
+    "externalProvenance": {
+      "source": "hkca09/SOFL-Maintainability-Experiment-Dataset",
+      "module": "ATM_SYSTEM",
+      "section": "Manage_Transfer: dest/limit/balance precedence",
+      "generator": "hkca09_sofl_fsf_reconstruction",
+      "corpus": "hkca09_github_sofl",
+      "honesty": "desensitized_int_fsf_from_public_sofl_decision_logic"
+    },
+    "referenceCode": "def manage_transfer(auth: int, amount: int, src_bal: int, dst_ok: int, max_xfer: int) -> dict:\n    \"\"\"Reference implementation auto-generated from FSF.\"\"\"\n    if auth == 0:\n        return {\"done\": 0, \"code\": 4}\n    elif dst_ok == 0:\n        return {\"done\": 0, \"code\": 3}\n    elif amount <= 0:\n        return {\"done\": 0, \"code\": 1}\n    elif amount > max_xfer:\n        return {\"done\": 0, \"code\": 2}\n    elif amount > src_bal:\n        return {\"done\": 0, \"code\": 3}\n    elif auth > 0  and  dst_ok > 0  and  amount > 0  and  amount <= max_xfer  and  amount <= src_bal:\n        return {\"done\": 1, \"code\": 0}\n    else:\n        return {\"done\": 0, \"code\": 0}\n",
+    "complexity": {
+      "scenario_count": 6,
+      "guard_complexity": "Nested",
+      "overlap_rate": 1.333,
+      "has_external_vars": false,
+      "overlap_density_tier": "high"
+    }
+  },
+  {
+    "taskId": "HKCA09.Atm.ChangePass",
+    "kind": "process",
+    "sourceFile": "github://hkca09/SOFL-Maintainability-Experiment-Dataset/ATM_SYSTEM",
+    "module": "HKCA09.ATM_SYSTEM",
+    "name": "change_password",
+    "signature": {
+      "inputs": [
+        {
+          "name": "auth",
+          "type": "int"
+        },
+        {
+          "name": "old_ok",
+          "type": "int"
+        },
+        {
+          "name": "new_len",
+          "type": "int"
+        },
+        {
+          "name": "same",
+          "type": "int"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "changed",
+          "type": "int"
+        },
+        {
+          "name": "err",
+          "type": "int"
+        }
+      ]
+    },
+    "fsfScenarios": [
+      {
+        "index": 1,
+        "kind": "scenario",
+        "test": "auth eq 0",
+        "def": "changed eq 0 && err eq 4"
+      },
+      {
+        "index": 2,
+        "kind": "scenario",
+        "test": "old_ok eq 0",
+        "def": "changed eq 0 && err eq 2"
+      },
+      {
+        "index": 3,
+        "kind": "scenario",
+        "test": "new_len lt 4",
+        "def": "changed eq 0 && err eq 1"
+      },
+      {
+        "index": 4,
+        "kind": "scenario",
+        "test": "same gt 0",
+        "def": "changed eq 0 && err eq 1"
+      },
+      {
+        "index": 5,
+        "kind": "scenario",
+        "test": "auth gt 0 && old_ok gt 0 && new_len ge 4 && same eq 0",
+        "def": "changed eq 1 && err eq 0"
+      },
+      {
+        "index": 6,
+        "kind": "others",
+        "test": "others",
+        "def": "changed eq 0 && err eq 0"
+      }
+    ],
+    "ext": [],
+    "promptSpec": "Process change_password(auth, old_ok, new_len, same) -> (changed, err)\n\nFSF specification:\nif (auth eq 0) => changed eq 0 && err eq 4\nif (old_ok eq 0) => changed eq 0 && err eq 2\nif (new_len lt 4) => changed eq 0 && err eq 1\nif (same gt 0) => changed eq 0 && err eq 1\nif (auth gt 0 && old_ok gt 0 && new_len ge 4 && same eq 0) => changed eq 1 && err eq 0\nothers => changed eq 0 && err eq 0",
+    "sourceBasename": "hkca09/SOFL-Maintainability-Experiment-Dataset",
+    "externalProvenance": {
+      "source": "hkca09/SOFL-Maintainability-Experiment-Dataset",
+      "module": "ATM_SYSTEM",
+      "section": "Change_Password: auth/old/new-policy ordered checks",
+      "generator": "hkca09_sofl_fsf_reconstruction",
+      "corpus": "hkca09_github_sofl",
+      "honesty": "desensitized_int_fsf_from_public_sofl_decision_logic"
+    },
+    "referenceCode": "def change_password(auth: int, old_ok: int, new_len: int, same: int) -> dict:\n    \"\"\"Reference implementation auto-generated from FSF.\"\"\"\n    if auth == 0:\n        return {\"changed\": 0, \"err\": 4}\n    elif old_ok == 0:\n        return {\"changed\": 0, \"err\": 2}\n    elif new_len < 4:\n        return {\"changed\": 0, \"err\": 1}\n    elif same > 0:\n        return {\"changed\": 0, \"err\": 1}\n    elif auth > 0  and  old_ok > 0  and  new_len >= 4  and  same == 0:\n        return {\"changed\": 1, \"err\": 0}\n    else:\n        return {\"changed\": 0, \"err\": 0}\n",
+    "complexity": {
+      "scenario_count": 5,
+      "guard_complexity": "Nested",
+      "overlap_rate": 1.222,
+      "has_external_vars": false,
+      "overlap_density_tier": "high"
+    }
+  },
+  {
+    "taskId": "HKCA09.Atm.SelectService",
+    "kind": "process",
+    "sourceFile": "github://hkca09/SOFL-Maintainability-Experiment-Dataset/ATM_SYSTEM",
+    "module": "HKCA09.ATM_SYSTEM",
+    "name": "select_services",
+    "signature": {
+      "inputs": [
+        {
+          "name": "deposit",
+          "type": "int"
+        },
+        {
+          "name": "withdraw",
+          "type": "int"
+        },
+        {
+          "name": "balance",
+          "type": "int"
+        },
+        {
+          "name": "print",
+          "type": "int"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "sel",
+          "type": "int"
+        },
+        {
+          "name": "ok",
+          "type": "int"
+        }
+      ]
+    },
+    "fsfScenarios": [
+      {
+        "index": 1,
+        "kind": "scenario",
+        "test": "deposit gt 0",
+        "def": "sel eq 1 && ok eq 1"
+      },
+      {
+        "index": 2,
+        "kind": "scenario",
+        "test": "withdraw gt 0",
+        "def": "sel eq 2 && ok eq 1"
+      },
+      {
+        "index": 3,
+        "kind": "scenario",
+        "test": "balance gt 0",
+        "def": "sel eq 3 && ok eq 1"
+      },
+      {
+        "index": 4,
+        "kind": "scenario",
+        "test": "print gt 0",
+        "def": "sel eq 4 && ok eq 1"
+      },
+      {
+        "index": 5,
+        "kind": "others",
+        "test": "others",
+        "def": "sel eq 0 && ok eq 0"
+      }
+    ],
+    "ext": [],
+    "promptSpec": "Process select_services(deposit, withdraw, balance, print) -> (sel, ok)\n\nFSF specification:\nif (deposit gt 0) => sel eq 1 && ok eq 1\nif (withdraw gt 0) => sel eq 2 && ok eq 1\nif (balance gt 0) => sel eq 3 && ok eq 1\nif (print gt 0) => sel eq 4 && ok eq 1\nothers => sel eq 0 && ok eq 0",
+    "sourceBasename": "hkca09/SOFL-Maintainability-Experiment-Dataset",
+    "externalProvenance": {
+      "source": "hkca09/SOFL-Maintainability-Experiment-Dataset",
+      "module": "ATM_SYSTEM",
+      "section": "Select_Services: bound-port priority encoding",
+      "generator": "hkca09_sofl_fsf_reconstruction",
+      "corpus": "hkca09_github_sofl",
+      "honesty": "desensitized_int_fsf_from_public_sofl_decision_logic"
+    },
+    "referenceCode": "def select_services(deposit: int, withdraw: int, balance: int, print: int) -> dict:\n    \"\"\"Reference implementation auto-generated from FSF.\"\"\"\n    if deposit > 0:\n        return {\"sel\": 1, \"ok\": 1}\n    elif withdraw > 0:\n        return {\"sel\": 2, \"ok\": 1}\n    elif balance > 0:\n        return {\"sel\": 3, \"ok\": 1}\n    elif print > 0:\n        return {\"sel\": 4, \"ok\": 1}\n    else:\n        return {\"sel\": 0, \"ok\": 0}\n",
+    "complexity": {
+      "scenario_count": 4,
+      "guard_complexity": "Simple",
+      "overlap_rate": 0.8,
+      "has_external_vars": false,
+      "overlap_density_tier": "low"
+    }
+  },
+  {
+    "taskId": "HKCA09.Course.Register",
+    "kind": "process",
+    "sourceFile": "github://hkca09/SOFL-Maintainability-Experiment-Dataset/COURSE_REGISTRATION",
+    "module": "HKCA09.COURSE_REGISTRATION",
+    "name": "register_course",
+    "signature": {
+      "inputs": [
+        {
+          "name": "catalog_ok",
+          "type": "int"
+        },
+        {
+          "name": "enrolled",
+          "type": "int"
+        },
+        {
+          "name": "already",
+          "type": "int"
+        },
+        {
+          "name": "credits",
+          "type": "int"
+        },
+        {
+          "name": "max_lim",
+          "type": "int"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "success",
+          "type": "int"
+        },
+        {
+          "name": "msg",
+          "type": "int"
+        }
+      ]
+    },
+    "fsfScenarios": [
+      {
+        "index": 1,
+        "kind": "scenario",
+        "test": "catalog_ok eq 0",
+        "def": "success eq 0 && msg eq 3"
+      },
+      {
+        "index": 2,
+        "kind": "scenario",
+        "test": "already gt 0",
+        "def": "success eq 0 && msg eq 2"
+      },
+      {
+        "index": 3,
+        "kind": "scenario",
+        "test": "enrolled ge max_lim",
+        "def": "success eq 0 && msg eq 1"
+      },
+      {
+        "index": 4,
+        "kind": "scenario",
+        "test": "credits le 0",
+        "def": "success eq 0 && msg eq 3"
+      },
+      {
+        "index": 5,
+        "kind": "scenario",
+        "test": "catalog_ok gt 0 && already eq 0 && enrolled lt max_lim && credits gt 0",
+        "def": "success eq 1 && msg eq 0"
+      },
+      {
+        "index": 6,
+        "kind": "others",
+        "test": "others",
+        "def": "success eq 0 && msg eq 0"
+      }
+    ],
+    "ext": [],
+    "promptSpec": "Process register_course(catalog_ok, enrolled, already, credits, max_lim) -> (success, msg)\n\nFSF specification:\nif (catalog_ok eq 0) => success eq 0 && msg eq 3\nif (already gt 0) => success eq 0 && msg eq 2\nif (enrolled ge max_lim) => success eq 0 && msg eq 1\nif (credits le 0) => success eq 0 && msg eq 3\nif (catalog_ok gt 0 && already eq 0 && enrolled lt max_lim && credits gt 0) => success eq 1 && msg eq 0\nothers => success eq 0 && msg eq 0",
+    "sourceBasename": "hkca09/SOFL-Maintainability-Experiment-Dataset",
+    "externalProvenance": {
+      "source": "hkca09/SOFL-Maintainability-Experiment-Dataset",
+      "module": "COURSE_REGISTRATION",
+      "section": "Register_Course: catalog/already/max_course_limit",
+      "generator": "hkca09_sofl_fsf_reconstruction",
+      "corpus": "hkca09_github_sofl",
+      "honesty": "desensitized_int_fsf_from_public_sofl_decision_logic"
+    },
+    "referenceCode": "def register_course(catalog_ok: int, enrolled: int, already: int, credits: int, max_lim: int) -> dict:\n    \"\"\"Reference implementation auto-generated from FSF.\"\"\"\n    if catalog_ok == 0:\n        return {\"success\": 0, \"msg\": 3}\n    elif already > 0:\n        return {\"success\": 0, \"msg\": 2}\n    elif enrolled >= max_lim:\n        return {\"success\": 0, \"msg\": 1}\n    elif credits <= 0:\n        return {\"success\": 0, \"msg\": 3}\n    elif catalog_ok > 0  and  already == 0  and  enrolled < max_lim  and  credits > 0:\n        return {\"success\": 1, \"msg\": 0}\n    else:\n        return {\"success\": 0, \"msg\": 0}\n",
+    "complexity": {
+      "scenario_count": 5,
+      "guard_complexity": "Nested",
+      "overlap_rate": 1.667,
+      "has_external_vars": false,
+      "overlap_density_tier": "high"
+    }
+  },
+  {
+    "taskId": "HKCA09.Course.Drop",
+    "kind": "process",
+    "sourceFile": "github://hkca09/SOFL-Maintainability-Experiment-Dataset/COURSE_REGISTRATION",
+    "module": "HKCA09.COURSE_REGISTRATION",
+    "name": "drop_course",
+    "signature": {
+      "inputs": [
+        {
+          "name": "enrolled",
+          "type": "int"
+        },
+        {
+          "name": "in_list",
+          "type": "int"
+        },
+        {
+          "name": "min_lim",
+          "type": "int"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "success",
+          "type": "int"
+        },
+        {
+          "name": "msg",
+          "type": "int"
+        }
+      ]
+    },
+    "fsfScenarios": [
+      {
+        "index": 1,
+        "kind": "scenario",
+        "test": "in_list eq 0",
+        "def": "success eq 0 && msg eq 2"
+      },
+      {
+        "index": 2,
+        "kind": "scenario",
+        "test": "enrolled le min_lim",
+        "def": "success eq 0 && msg eq 1"
+      },
+      {
+        "index": 3,
+        "kind": "scenario",
+        "test": "in_list gt 0 && enrolled gt min_lim",
+        "def": "success eq 1 && msg eq 0"
+      },
+      {
+        "index": 4,
+        "kind": "others",
+        "test": "others",
+        "def": "success eq 0 && msg eq 0"
+      }
+    ],
+    "ext": [],
+    "promptSpec": "Process drop_course(enrolled, in_list, min_lim) -> (success, msg)\n\nFSF specification:\nif (in_list eq 0) => success eq 0 && msg eq 2\nif (enrolled le min_lim) => success eq 0 && msg eq 1\nif (in_list gt 0 && enrolled gt min_lim) => success eq 1 && msg eq 0\nothers => success eq 0 && msg eq 0",
+    "sourceBasename": "hkca09/SOFL-Maintainability-Experiment-Dataset",
+    "externalProvenance": {
+      "source": "hkca09/SOFL-Maintainability-Experiment-Dataset",
+      "module": "COURSE_REGISTRATION",
+      "section": "Drop_Course: membership + min_course_limit",
+      "generator": "hkca09_sofl_fsf_reconstruction",
+      "corpus": "hkca09_github_sofl",
+      "honesty": "desensitized_int_fsf_from_public_sofl_decision_logic"
+    },
+    "referenceCode": "def drop_course(enrolled: int, in_list: int, min_lim: int) -> dict:\n    \"\"\"Reference implementation auto-generated from FSF.\"\"\"\n    if in_list == 0:\n        return {\"success\": 0, \"msg\": 2}\n    elif enrolled <= min_lim:\n        return {\"success\": 0, \"msg\": 1}\n    elif in_list > 0  and  enrolled > min_lim:\n        return {\"success\": 1, \"msg\": 0}\n    else:\n        return {\"success\": 0, \"msg\": 0}\n",
+    "complexity": {
+      "scenario_count": 3,
+      "guard_complexity": "AND",
+      "overlap_rate": 1.0,
+      "has_external_vars": false,
+      "overlap_density_tier": "low"
+    }
+  },
+  {
+    "taskId": "HKCA09.Course.AddNotify",
+    "kind": "process",
+    "sourceFile": "github://hkca09/SOFL-Maintainability-Experiment-Dataset/COURSE_REGISTRATION",
+    "module": "HKCA09.COURSE_REGISTRATION",
+    "name": "add_notification",
+    "signature": {
+      "inputs": [
+        {
+          "name": "student_ok",
+          "type": "int"
+        },
+        {
+          "name": "msg_len",
+          "type": "int"
+        },
+        {
+          "name": "quota",
+          "type": "int"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "ok",
+          "type": "int"
+        },
+        {
+          "name": "code",
+          "type": "int"
+        }
+      ]
+    },
+    "fsfScenarios": [
+      {
+        "index": 1,
+        "kind": "scenario",
+        "test": "student_ok eq 0",
+        "def": "ok eq 0 && code eq 2"
+      },
+      {
+        "index": 2,
+        "kind": "scenario",
+        "test": "msg_len le 0",
+        "def": "ok eq 0 && code eq 1"
+      },
+      {
+        "index": 3,
+        "kind": "scenario",
+        "test": "quota le 0",
+        "def": "ok eq 0 && code eq 1"
+      },
+      {
+        "index": 4,
+        "kind": "scenario",
+        "test": "student_ok gt 0 && msg_len gt 0 && quota gt 0",
+        "def": "ok eq 1 && code eq 0"
+      },
+      {
+        "index": 5,
+        "kind": "others",
+        "test": "others",
+        "def": "ok eq 0 && code eq 0"
+      }
+    ],
+    "ext": [],
+    "promptSpec": "Process add_notification(student_ok, msg_len, quota) -> (ok, code)\n\nFSF specification:\nif (student_ok eq 0) => ok eq 0 && code eq 2\nif (msg_len le 0) => ok eq 0 && code eq 1\nif (quota le 0) => ok eq 0 && code eq 1\nif (student_ok gt 0 && msg_len gt 0 && quota gt 0) => ok eq 1 && code eq 0\nothers => ok eq 0 && code eq 0",
+    "sourceBasename": "hkca09/SOFL-Maintainability-Experiment-Dataset",
+    "externalProvenance": {
+      "source": "hkca09/SOFL-Maintainability-Experiment-Dataset",
+      "module": "COURSE_REGISTRATION",
+      "section": "Add_Notification: student/message/quota gates",
+      "generator": "hkca09_sofl_fsf_reconstruction",
+      "corpus": "hkca09_github_sofl",
+      "honesty": "desensitized_int_fsf_from_public_sofl_decision_logic"
+    },
+    "referenceCode": "def add_notification(student_ok: int, msg_len: int, quota: int) -> dict:\n    \"\"\"Reference implementation auto-generated from FSF.\"\"\"\n    if student_ok == 0:\n        return {\"ok\": 0, \"code\": 2}\n    elif msg_len <= 0:\n        return {\"ok\": 0, \"code\": 1}\n    elif quota <= 0:\n        return {\"ok\": 0, \"code\": 1}\n    elif student_ok > 0  and  msg_len > 0  and  quota > 0:\n        return {\"ok\": 1, \"code\": 0}\n    else:\n        return {\"ok\": 0, \"code\": 0}\n",
+    "complexity": {
+      "scenario_count": 4,
+      "guard_complexity": "Nested",
+      "overlap_rate": 1.4,
+      "has_external_vars": false,
+      "overlap_density_tier": "high"
+    }
+  },
+  {
+    "taskId": "HKCA09.Course.ViewNotify",
+    "kind": "process",
+    "sourceFile": "github://hkca09/SOFL-Maintainability-Experiment-Dataset/COURSE_REGISTRATION",
+    "module": "HKCA09.COURSE_REGISTRATION",
+    "name": "view_notifications",
+    "signature": {
+      "inputs": [
+        {
+          "name": "student_ok",
+          "type": "int"
+        },
+        {
+          "name": "n_msg",
+          "type": "int"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "shown",
+          "type": "int"
+        },
+        {
+          "name": "empty",
+          "type": "int"
+        }
+      ]
+    },
+    "fsfScenarios": [
+      {
+        "index": 1,
+        "kind": "scenario",
+        "test": "student_ok eq 0",
+        "def": "shown eq 0 && empty eq 1"
+      },
+      {
+        "index": 2,
+        "kind": "scenario",
+        "test": "n_msg eq 0",
+        "def": "shown eq 0 && empty eq 1"
+      },
+      {
+        "index": 3,
+        "kind": "scenario",
+        "test": "student_ok gt 0 && n_msg gt 0",
+        "def": "shown eq 1 && empty eq 0"
+      },
+      {
+        "index": 4,
+        "kind": "others",
+        "test": "others",
+        "def": "shown eq 0 && empty eq 0"
+      }
+    ],
+    "ext": [],
+    "promptSpec": "Process view_notifications(student_ok, n_msg) -> (shown, empty)\n\nFSF specification:\nif (student_ok eq 0) => shown eq 0 && empty eq 1\nif (n_msg eq 0) => shown eq 0 && empty eq 1\nif (student_ok gt 0 && n_msg gt 0) => shown eq 1 && empty eq 0\nothers => shown eq 0 && empty eq 0",
+    "sourceBasename": "hkca09/SOFL-Maintainability-Experiment-Dataset",
+    "externalProvenance": {
+      "source": "hkca09/SOFL-Maintainability-Experiment-Dataset",
+      "module": "COURSE_REGISTRATION",
+      "section": "View_Notifications: empty vs present",
+      "generator": "hkca09_sofl_fsf_reconstruction",
+      "corpus": "hkca09_github_sofl",
+      "honesty": "desensitized_int_fsf_from_public_sofl_decision_logic"
+    },
+    "referenceCode": "def view_notifications(student_ok: int, n_msg: int) -> dict:\n    \"\"\"Reference implementation auto-generated from FSF.\"\"\"\n    if student_ok == 0:\n        return {\"shown\": 0, \"empty\": 1}\n    elif n_msg == 0:\n        return {\"shown\": 0, \"empty\": 1}\n    elif student_ok > 0  and  n_msg > 0:\n        return {\"shown\": 1, \"empty\": 0}\n    else:\n        return {\"shown\": 0, \"empty\": 0}\n",
+    "complexity": {
+      "scenario_count": 3,
+      "guard_complexity": "AND",
+      "overlap_rate": 0.833,
+      "has_external_vars": false,
+      "overlap_density_tier": "low"
+    }
+  },
+  {
+    "taskId": "HKCA09.Hosp.RegisterPatient",
+    "kind": "process",
+    "sourceFile": "github://hkca09/SOFL-Maintainability-Experiment-Dataset/HOSPITAL_REGISTRATION",
+    "module": "HKCA09.HOSPITAL_REGISTRATION",
+    "name": "register_patient",
+    "signature": {
+      "inputs": [
+        {
+          "name": "exists",
+          "type": "int"
+        },
+        {
+          "name": "info_ok",
+          "type": "int"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "pid_new",
+          "type": "int"
+        },
+        {
+          "name": "conf",
+          "type": "int"
+        }
+      ]
+    },
+    "fsfScenarios": [
+      {
+        "index": 1,
+        "kind": "scenario",
+        "test": "info_ok eq 0",
+        "def": "pid_new eq 0 && conf eq 0"
+      },
+      {
+        "index": 2,
+        "kind": "scenario",
+        "test": "exists gt 0",
+        "def": "pid_new eq 0 && conf eq 1"
+      },
+      {
+        "index": 3,
+        "kind": "scenario",
+        "test": "exists eq 0 && info_ok gt 0",
+        "def": "pid_new eq 1 && conf eq 2"
+      },
+      {
+        "index": 4,
+        "kind": "others",
+        "test": "others",
+        "def": "pid_new eq 0 && conf eq 0"
+      }
+    ],
+    "ext": [],
+    "promptSpec": "Process register_patient(exists, info_ok) -> (pid_new, conf)\n\nFSF specification:\nif (info_ok eq 0) => pid_new eq 0 && conf eq 0\nif (exists gt 0) => pid_new eq 0 && conf eq 1\nif (exists eq 0 && info_ok gt 0) => pid_new eq 1 && conf eq 2\nothers => pid_new eq 0 && conf eq 0",
+    "sourceBasename": "hkca09/SOFL-Maintainability-Experiment-Dataset",
+    "externalProvenance": {
+      "source": "hkca09/SOFL-Maintainability-Experiment-Dataset",
+      "module": "HOSPITAL_REGISTRATION",
+      "section": "Register_Patient: duplicate vs new",
+      "generator": "hkca09_sofl_fsf_reconstruction",
+      "corpus": "hkca09_github_sofl",
+      "honesty": "desensitized_int_fsf_from_public_sofl_decision_logic"
+    },
+    "referenceCode": "def register_patient(exists: int, info_ok: int) -> dict:\n    \"\"\"Reference implementation auto-generated from FSF.\"\"\"\n    if info_ok == 0:\n        return {\"pid_new\": 0, \"conf\": 0}\n    elif exists > 0:\n        return {\"pid_new\": 0, \"conf\": 1}\n    elif exists == 0  and  info_ok > 0:\n        return {\"pid_new\": 1, \"conf\": 2}\n    else:\n        return {\"pid_new\": 0, \"conf\": 0}\n",
+    "complexity": {
+      "scenario_count": 3,
+      "guard_complexity": "AND",
+      "overlap_rate": 0.75,
+      "has_external_vars": false,
+      "overlap_density_tier": "low"
+    }
+  },
+  {
+    "taskId": "HKCA09.Hosp.UpdateSchedule",
+    "kind": "process",
+    "sourceFile": "github://hkca09/SOFL-Maintainability-Experiment-Dataset/HOSPITAL_REGISTRATION",
+    "module": "HKCA09.HOSPITAL_REGISTRATION",
+    "name": "update_schedule",
+    "signature": {
+      "inputs": [
+        {
+          "name": "doc_known",
+          "type": "int"
+        },
+        {
+          "name": "slots",
+          "type": "int"
+        },
+        {
+          "name": "conflict",
+          "type": "int"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "success",
+          "type": "int"
+        },
+        {
+          "name": "msg",
+          "type": "int"
+        }
+      ]
+    },
+    "fsfScenarios": [
+      {
+        "index": 1,
+        "kind": "scenario",
+        "test": "slots le 0",
+        "def": "success eq 0 && msg eq 1"
+      },
+      {
+        "index": 2,
+        "kind": "scenario",
+        "test": "conflict gt 0",
+        "def": "success eq 0 && msg eq 2"
+      },
+      {
+        "index": 3,
+        "kind": "scenario",
+        "test": "doc_known eq 0 && slots gt 0 && conflict eq 0",
+        "def": "success eq 1 && msg eq 0"
+      },
+      {
+        "index": 4,
+        "kind": "scenario",
+        "test": "doc_known gt 0 && slots gt 0 && conflict eq 0",
+        "def": "success eq 1 && msg eq 3"
+      },
+      {
+        "index": 5,
+        "kind": "others",
+        "test": "others",
+        "def": "success eq 0 && msg eq 0"
+      }
+    ],
+    "ext": [],
+    "promptSpec": "Process update_schedule(doc_known, slots, conflict) -> (success, msg)\n\nFSF specification:\nif (slots le 0) => success eq 0 && msg eq 1\nif (conflict gt 0) => success eq 0 && msg eq 2\nif (doc_known eq 0 && slots gt 0 && conflict eq 0) => success eq 1 && msg eq 0\nif (doc_known gt 0 && slots gt 0 && conflict eq 0) => success eq 1 && msg eq 3\nothers => success eq 0 && msg eq 0",
+    "sourceBasename": "hkca09/SOFL-Maintainability-Experiment-Dataset",
+    "externalProvenance": {
+      "source": "hkca09/SOFL-Maintainability-Experiment-Dataset",
+      "module": "HOSPITAL_REGISTRATION",
+      "section": "Update_Schedule: new doctor vs merge; conflict preempts",
+      "generator": "hkca09_sofl_fsf_reconstruction",
+      "corpus": "hkca09_github_sofl",
+      "honesty": "desensitized_int_fsf_from_public_sofl_decision_logic"
+    },
+    "referenceCode": "def update_schedule(doc_known: int, slots: int, conflict: int) -> dict:\n    \"\"\"Reference implementation auto-generated from FSF.\"\"\"\n    if slots <= 0:\n        return {\"success\": 0, \"msg\": 1}\n    elif conflict > 0:\n        return {\"success\": 0, \"msg\": 2}\n    elif doc_known == 0  and  slots > 0  and  conflict == 0:\n        return {\"success\": 1, \"msg\": 0}\n    elif doc_known > 0  and  slots > 0  and  conflict == 0:\n        return {\"success\": 1, \"msg\": 3}\n    else:\n        return {\"success\": 0, \"msg\": 0}\n",
+    "complexity": {
+      "scenario_count": 4,
+      "guard_complexity": "Nested",
+      "overlap_rate": 0.8,
+      "has_external_vars": false,
+      "overlap_density_tier": "low"
+    }
+  },
+  {
+    "taskId": "HKCA09.Hosp.PerformReg",
+    "kind": "process",
+    "sourceFile": "github://hkca09/SOFL-Maintainability-Experiment-Dataset/HOSPITAL_REGISTRATION",
+    "module": "HKCA09.HOSPITAL_REGISTRATION",
+    "name": "perform_registration",
+    "signature": {
+      "inputs": [
+        {
+          "name": "patient_ok",
+          "type": "int"
+        },
+        {
+          "name": "doctor_ok",
+          "type": "int"
+        },
+        {
+          "name": "slot_free",
+          "type": "int"
+        },
+        {
+          "name": "doc_load",
+          "type": "int"
+        },
+        {
+          "name": "max_load",
+          "type": "int"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "reg_ok",
+          "type": "int"
+        },
+        {
+          "name": "code",
+          "type": "int"
+        }
+      ]
+    },
+    "fsfScenarios": [
+      {
+        "index": 1,
+        "kind": "scenario",
+        "test": "patient_ok eq 0",
+        "def": "reg_ok eq 0 && code eq 4"
+      },
+      {
+        "index": 2,
+        "kind": "scenario",
+        "test": "doctor_ok eq 0",
+        "def": "reg_ok eq 0 && code eq 3"
+      },
+      {
+        "index": 3,
+        "kind": "scenario",
+        "test": "slot_free eq 0",
+        "def": "reg_ok eq 0 && code eq 2"
+      },
+      {
+        "index": 4,
+        "kind": "scenario",
+        "test": "doc_load ge max_load",
+        "def": "reg_ok eq 0 && code eq 1"
+      },
+      {
+        "index": 5,
+        "kind": "scenario",
+        "test": "patient_ok gt 0 && doctor_ok gt 0 && slot_free gt 0 && doc_load lt max_load",
+        "def": "reg_ok eq 1 && code eq 0"
+      },
+      {
+        "index": 6,
+        "kind": "others",
+        "test": "others",
+        "def": "reg_ok eq 0 && code eq 0"
+      }
+    ],
+    "ext": [],
+    "promptSpec": "Process perform_registration(patient_ok, doctor_ok, slot_free, doc_load, max_load) -> (reg_ok, code)\n\nFSF specification:\nif (patient_ok eq 0) => reg_ok eq 0 && code eq 4\nif (doctor_ok eq 0) => reg_ok eq 0 && code eq 3\nif (slot_free eq 0) => reg_ok eq 0 && code eq 2\nif (doc_load ge max_load) => reg_ok eq 0 && code eq 1\nif (patient_ok gt 0 && doctor_ok gt 0 && slot_free gt 0 && doc_load lt max_load) => reg_ok eq 1 && code eq 0\nothers => reg_ok eq 0 && code eq 0",
+    "sourceBasename": "hkca09/SOFL-Maintainability-Experiment-Dataset",
+    "externalProvenance": {
+      "source": "hkca09/SOFL-Maintainability-Experiment-Dataset",
+      "module": "HOSPITAL_REGISTRATION",
+      "section": "Perform_Registration: patient/doctor/slot/load order",
+      "generator": "hkca09_sofl_fsf_reconstruction",
+      "corpus": "hkca09_github_sofl",
+      "honesty": "desensitized_int_fsf_from_public_sofl_decision_logic"
+    },
+    "referenceCode": "def perform_registration(patient_ok: int, doctor_ok: int, slot_free: int, doc_load: int, max_load: int) -> dict:\n    \"\"\"Reference implementation auto-generated from FSF.\"\"\"\n    if patient_ok == 0:\n        return {\"reg_ok\": 0, \"code\": 4}\n    elif doctor_ok == 0:\n        return {\"reg_ok\": 0, \"code\": 3}\n    elif slot_free == 0:\n        return {\"reg_ok\": 0, \"code\": 2}\n    elif doc_load >= max_load:\n        return {\"reg_ok\": 0, \"code\": 1}\n    elif patient_ok > 0  and  doctor_ok > 0  and  slot_free > 0  and  doc_load < max_load:\n        return {\"reg_ok\": 1, \"code\": 0}\n    else:\n        return {\"reg_ok\": 0, \"code\": 0}\n",
+    "complexity": {
+      "scenario_count": 5,
+      "guard_complexity": "Nested",
+      "overlap_rate": 1.5,
+      "has_external_vars": false,
+      "overlap_density_tier": "high"
+    }
+  },
+  {
+    "taskId": "HKCA09.Hosp.ManageQueue",
+    "kind": "process",
+    "sourceFile": "github://hkca09/SOFL-Maintainability-Experiment-Dataset/HOSPITAL_REGISTRATION",
+    "module": "HKCA09.HOSPITAL_REGISTRATION",
+    "name": "manage_queue",
+    "signature": {
+      "inputs": [
+        {
+          "name": "dept_ok",
+          "type": "int"
+        },
+        {
+          "name": "q_len",
+          "type": "int"
+        },
+        {
+          "name": "max_q",
+          "type": "int"
+        },
+        {
+          "name": "prio",
+          "type": "int"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "enqueued",
+          "type": "int"
+        },
+        {
+          "name": "status",
+          "type": "int"
+        }
+      ]
+    },
+    "fsfScenarios": [
+      {
+        "index": 1,
+        "kind": "scenario",
+        "test": "dept_ok eq 0",
+        "def": "enqueued eq 0 && status eq 3"
+      },
+      {
+        "index": 2,
+        "kind": "scenario",
+        "test": "q_len ge max_q",
+        "def": "enqueued eq 0 && status eq 2"
+      },
+      {
+        "index": 3,
+        "kind": "scenario",
+        "test": "prio gt 0 && dept_ok gt 0 && q_len lt max_q",
+        "def": "enqueued eq 1 && status eq 1"
+      },
+      {
+        "index": 4,
+        "kind": "scenario",
+        "test": "dept_ok gt 0 && q_len lt max_q",
+        "def": "enqueued eq 1 && status eq 0"
+      },
+      {
+        "index": 5,
+        "kind": "others",
+        "test": "others",
+        "def": "enqueued eq 0 && status eq 0"
+      }
+    ],
+    "ext": [],
+    "promptSpec": "Process manage_queue(dept_ok, q_len, max_q, prio) -> (enqueued, status)\n\nFSF specification:\nif (dept_ok eq 0) => enqueued eq 0 && status eq 3\nif (q_len ge max_q) => enqueued eq 0 && status eq 2\nif (prio gt 0 && dept_ok gt 0 && q_len lt max_q) => enqueued eq 1 && status eq 1\nif (dept_ok gt 0 && q_len lt max_q) => enqueued eq 1 && status eq 0\nothers => enqueued eq 0 && status eq 0",
+    "sourceBasename": "hkca09/SOFL-Maintainability-Experiment-Dataset",
+    "externalProvenance": {
+      "source": "hkca09/SOFL-Maintainability-Experiment-Dataset",
+      "module": "HOSPITAL_REGISTRATION",
+      "section": "Manage_Queue: capacity + priority enqueue",
+      "generator": "hkca09_sofl_fsf_reconstruction",
+      "corpus": "hkca09_github_sofl",
+      "honesty": "desensitized_int_fsf_from_public_sofl_decision_logic"
+    },
+    "referenceCode": "def manage_queue(dept_ok: int, q_len: int, max_q: int, prio: int) -> dict:\n    \"\"\"Reference implementation auto-generated from FSF.\"\"\"\n    if dept_ok == 0:\n        return {\"enqueued\": 0, \"status\": 3}\n    elif q_len >= max_q:\n        return {\"enqueued\": 0, \"status\": 2}\n    elif prio > 0  and  dept_ok > 0  and  q_len < max_q:\n        return {\"enqueued\": 1, \"status\": 1}\n    elif dept_ok > 0  and  q_len < max_q:\n        return {\"enqueued\": 1, \"status\": 0}\n    else:\n        return {\"enqueued\": 0, \"status\": 0}\n",
+    "complexity": {
+      "scenario_count": 4,
+      "guard_complexity": "Nested",
+      "overlap_rate": 1.2,
+      "has_external_vars": false,
+      "overlap_density_tier": "medium"
+    }
+  },
+  {
+    "taskId": "HKCA09.Hosp.Stats",
+    "kind": "process",
+    "sourceFile": "github://hkca09/SOFL-Maintainability-Experiment-Dataset/HOSPITAL_REGISTRATION",
+    "module": "HKCA09.HOSPITAL_REGISTRATION",
+    "name": "generate_statistics",
+    "signature": {
+      "inputs": [
+        {
+          "name": "n_reg",
+          "type": "int"
+        },
+        {
+          "name": "n_dept",
+          "type": "int"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "ready",
+          "type": "int"
+        },
+        {
+          "name": "flag",
+          "type": "int"
+        }
+      ]
+    },
+    "fsfScenarios": [
+      {
+        "index": 1,
+        "kind": "scenario",
+        "test": "n_reg le 0",
+        "def": "ready eq 0 && flag eq 1"
+      },
+      {
+        "index": 2,
+        "kind": "scenario",
+        "test": "n_dept le 0",
+        "def": "ready eq 0 && flag eq 1"
+      },
+      {
+        "index": 3,
+        "kind": "scenario",
+        "test": "n_reg gt 0 && n_dept gt 0",
+        "def": "ready eq 1 && flag eq 0"
+      },
+      {
+        "index": 4,
+        "kind": "others",
+        "test": "others",
+        "def": "ready eq 0 && flag eq 0"
+      }
+    ],
+    "ext": [],
+    "promptSpec": "Process generate_statistics(n_reg, n_dept) -> (ready, flag)\n\nFSF specification:\nif (n_reg le 0) => ready eq 0 && flag eq 1\nif (n_dept le 0) => ready eq 0 && flag eq 1\nif (n_reg gt 0 && n_dept gt 0) => ready eq 1 && flag eq 0\nothers => ready eq 0 && flag eq 0",
+    "sourceBasename": "hkca09/SOFL-Maintainability-Experiment-Dataset",
+    "externalProvenance": {
+      "source": "hkca09/SOFL-Maintainability-Experiment-Dataset",
+      "module": "HOSPITAL_REGISTRATION",
+      "section": "Generate_Statistics: empty-data guard",
+      "generator": "hkca09_sofl_fsf_reconstruction",
+      "corpus": "hkca09_github_sofl",
+      "honesty": "desensitized_int_fsf_from_public_sofl_decision_logic"
+    },
+    "referenceCode": "def generate_statistics(n_reg: int, n_dept: int) -> dict:\n    \"\"\"Reference implementation auto-generated from FSF.\"\"\"\n    if n_reg <= 0:\n        return {\"ready\": 0, \"flag\": 1}\n    elif n_dept <= 0:\n        return {\"ready\": 0, \"flag\": 1}\n    elif n_reg > 0  and  n_dept > 0:\n        return {\"ready\": 1, \"flag\": 0}\n    else:\n        return {\"ready\": 0, \"flag\": 0}\n",
+    "complexity": {
+      "scenario_count": 3,
+      "guard_complexity": "AND",
+      "overlap_rate": 1.333,
+      "has_external_vars": false,
+      "overlap_density_tier": "high"
+    }
+  },
+  {
+    "taskId": "HKCA09.Vend.AddItem",
+    "kind": "process",
+    "sourceFile": "github://hkca09/SOFL-Maintainability-Experiment-Dataset/VENDING_MACHINE",
+    "module": "HKCA09.VENDING_MACHINE",
+    "name": "add_item",
+    "signature": {
+      "inputs": [
+        {
+          "name": "qty",
+          "type": "int"
+        },
+        {
+          "name": "price",
+          "type": "int"
+        },
+        {
+          "name": "max_price",
+          "type": "int"
+        },
+        {
+          "name": "cap",
+          "type": "int"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "ok",
+          "type": "int"
+        },
+        {
+          "name": "code",
+          "type": "int"
+        }
+      ]
+    },
+    "fsfScenarios": [
+      {
+        "index": 1,
+        "kind": "scenario",
+        "test": "qty le 0",
+        "def": "ok eq 0 && code eq 1"
+      },
+      {
+        "index": 2,
+        "kind": "scenario",
+        "test": "price gt max_price",
+        "def": "ok eq 0 && code eq 2"
+      },
+      {
+        "index": 3,
+        "kind": "scenario",
+        "test": "qty gt cap",
+        "def": "ok eq 0 && code eq 2"
+      },
+      {
+        "index": 4,
+        "kind": "scenario",
+        "test": "qty gt 0 && price le max_price && qty le cap",
+        "def": "ok eq 1 && code eq 0"
+      },
+      {
+        "index": 5,
+        "kind": "others",
+        "test": "others",
+        "def": "ok eq 0 && code eq 0"
+      }
+    ],
+    "ext": [],
+    "promptSpec": "Process add_item(qty, price, max_price, cap) -> (ok, code)\n\nFSF specification:\nif (qty le 0) => ok eq 0 && code eq 1\nif (price gt max_price) => ok eq 0 && code eq 2\nif (qty gt cap) => ok eq 0 && code eq 2\nif (qty gt 0 && price le max_price && qty le cap) => ok eq 1 && code eq 0\nothers => ok eq 0 && code eq 0",
+    "sourceBasename": "hkca09/SOFL-Maintainability-Experiment-Dataset",
+    "externalProvenance": {
+      "source": "hkca09/SOFL-Maintainability-Experiment-Dataset",
+      "module": "VENDING_MACHINE",
+      "section": "Add_Item: qty/price/capacity preconditions",
+      "generator": "hkca09_sofl_fsf_reconstruction",
+      "corpus": "hkca09_github_sofl",
+      "honesty": "desensitized_int_fsf_from_public_sofl_decision_logic"
+    },
+    "referenceCode": "def add_item(qty: int, price: int, max_price: int, cap: int) -> dict:\n    \"\"\"Reference implementation auto-generated from FSF.\"\"\"\n    if qty <= 0:\n        return {\"ok\": 0, \"code\": 1}\n    elif price > max_price:\n        return {\"ok\": 0, \"code\": 2}\n    elif qty > cap:\n        return {\"ok\": 0, \"code\": 2}\n    elif qty > 0  and  price <= max_price  and  qty <= cap:\n        return {\"ok\": 1, \"code\": 0}\n    else:\n        return {\"ok\": 0, \"code\": 0}\n",
+    "complexity": {
+      "scenario_count": 4,
+      "guard_complexity": "Nested",
+      "overlap_rate": 1.25,
+      "has_external_vars": false,
+      "overlap_density_tier": "high"
+    }
+  },
+  {
+    "taskId": "HKCA09.Vend.Restock",
+    "kind": "process",
+    "sourceFile": "github://hkca09/SOFL-Maintainability-Experiment-Dataset/VENDING_MACHINE",
+    "module": "HKCA09.VENDING_MACHINE",
+    "name": "restock_item",
+    "signature": {
+      "inputs": [
+        {
+          "name": "found",
+          "type": "int"
+        },
+        {
+          "name": "qty",
+          "type": "int"
+        },
+        {
+          "name": "room",
+          "type": "int"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "ok",
+          "type": "int"
+        },
+        {
+          "name": "code",
+          "type": "int"
+        }
+      ]
+    },
+    "fsfScenarios": [
+      {
+        "index": 1,
+        "kind": "scenario",
+        "test": "found eq 0",
+        "def": "ok eq 0 && code eq 3"
+      },
+      {
+        "index": 2,
+        "kind": "scenario",
+        "test": "qty le 0",
+        "def": "ok eq 0 && code eq 1"
+      },
+      {
+        "index": 3,
+        "kind": "scenario",
+        "test": "qty gt room",
+        "def": "ok eq 0 && code eq 2"
+      },
+      {
+        "index": 4,
+        "kind": "scenario",
+        "test": "found gt 0 && qty gt 0 && qty le room",
+        "def": "ok eq 1 && code eq 0"
+      },
+      {
+        "index": 5,
+        "kind": "others",
+        "test": "others",
+        "def": "ok eq 0 && code eq 0"
+      }
+    ],
+    "ext": [],
+    "promptSpec": "Process restock_item(found, qty, room) -> (ok, code)\n\nFSF specification:\nif (found eq 0) => ok eq 0 && code eq 3\nif (qty le 0) => ok eq 0 && code eq 1\nif (qty gt room) => ok eq 0 && code eq 2\nif (found gt 0 && qty gt 0 && qty le room) => ok eq 1 && code eq 0\nothers => ok eq 0 && code eq 0",
+    "sourceBasename": "hkca09/SOFL-Maintainability-Experiment-Dataset",
+    "externalProvenance": {
+      "source": "hkca09/SOFL-Maintainability-Experiment-Dataset",
+      "module": "VENDING_MACHINE",
+      "section": "Restock_Item: exists + remaining capacity",
+      "generator": "hkca09_sofl_fsf_reconstruction",
+      "corpus": "hkca09_github_sofl",
+      "honesty": "desensitized_int_fsf_from_public_sofl_decision_logic"
+    },
+    "referenceCode": "def restock_item(found: int, qty: int, room: int) -> dict:\n    \"\"\"Reference implementation auto-generated from FSF.\"\"\"\n    if found == 0:\n        return {\"ok\": 0, \"code\": 3}\n    elif qty <= 0:\n        return {\"ok\": 0, \"code\": 1}\n    elif qty > room:\n        return {\"ok\": 0, \"code\": 2}\n    elif found > 0  and  qty > 0  and  qty <= room:\n        return {\"ok\": 1, \"code\": 0}\n    else:\n        return {\"ok\": 0, \"code\": 0}\n",
+    "complexity": {
+      "scenario_count": 4,
+      "guard_complexity": "Nested",
+      "overlap_rate": 1.0,
+      "has_external_vars": false,
+      "overlap_density_tier": "low"
+    }
+  },
+  {
+    "taskId": "HKCA09.Vend.SelectItem",
+    "kind": "process",
+    "sourceFile": "github://hkca09/SOFL-Maintainability-Experiment-Dataset/VENDING_MACHINE",
+    "module": "HKCA09.VENDING_MACHINE",
+    "name": "select_item",
+    "signature": {
+      "inputs": [
+        {
+          "name": "found",
+          "type": "int"
+        },
+        {
+          "name": "qty",
+          "type": "int"
+        },
+        {
+          "name": "stock",
+          "type": "int"
+        },
+        {
+          "name": "cost",
+          "type": "int"
+        },
+        {
+          "name": "balance",
+          "type": "int"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "vend",
+          "type": "int"
+        },
+        {
+          "name": "code",
+          "type": "int"
+        }
+      ]
+    },
+    "fsfScenarios": [
+      {
+        "index": 1,
+        "kind": "scenario",
+        "test": "found eq 0",
+        "def": "vend eq 0 && code eq 4"
+      },
+      {
+        "index": 2,
+        "kind": "scenario",
+        "test": "qty le 0",
+        "def": "vend eq 0 && code eq 1"
+      },
+      {
+        "index": 3,
+        "kind": "scenario",
+        "test": "qty gt stock",
+        "def": "vend eq 0 && code eq 2"
+      },
+      {
+        "index": 4,
+        "kind": "scenario",
+        "test": "cost gt balance",
+        "def": "vend eq 0 && code eq 3"
+      },
+      {
+        "index": 5,
+        "kind": "scenario",
+        "test": "found gt 0 && qty gt 0 && qty le stock && cost le balance",
+        "def": "vend eq 1 && code eq 0"
+      },
+      {
+        "index": 6,
+        "kind": "others",
+        "test": "others",
+        "def": "vend eq 0 && code eq 0"
+      }
+    ],
+    "ext": [],
+    "promptSpec": "Process select_item(found, qty, stock, cost, balance) -> (vend, code)\n\nFSF specification:\nif (found eq 0) => vend eq 0 && code eq 4\nif (qty le 0) => vend eq 0 && code eq 1\nif (qty gt stock) => vend eq 0 && code eq 2\nif (cost gt balance) => vend eq 0 && code eq 3\nif (found gt 0 && qty gt 0 && qty le stock && cost le balance) => vend eq 1 && code eq 0\nothers => vend eq 0 && code eq 0",
+    "sourceBasename": "hkca09/SOFL-Maintainability-Experiment-Dataset",
+    "externalProvenance": {
+      "source": "hkca09/SOFL-Maintainability-Experiment-Dataset",
+      "module": "VENDING_MACHINE",
+      "section": "Select_Item: stock vs balance ordered rejects",
+      "generator": "hkca09_sofl_fsf_reconstruction",
+      "corpus": "hkca09_github_sofl",
+      "honesty": "desensitized_int_fsf_from_public_sofl_decision_logic"
+    },
+    "referenceCode": "def select_item(found: int, qty: int, stock: int, cost: int, balance: int) -> dict:\n    \"\"\"Reference implementation auto-generated from FSF.\"\"\"\n    if found == 0:\n        return {\"vend\": 0, \"code\": 4}\n    elif qty <= 0:\n        return {\"vend\": 0, \"code\": 1}\n    elif qty > stock:\n        return {\"vend\": 0, \"code\": 2}\n    elif cost > balance:\n        return {\"vend\": 0, \"code\": 3}\n    elif found > 0  and  qty > 0  and  qty <= stock  and  cost <= balance:\n        return {\"vend\": 1, \"code\": 0}\n    else:\n        return {\"vend\": 0, \"code\": 0}\n",
+    "complexity": {
+      "scenario_count": 5,
+      "guard_complexity": "Nested",
+      "overlap_rate": 1.0,
+      "has_external_vars": false,
+      "overlap_density_tier": "low"
+    }
+  },
+  {
+    "taskId": "HKCA09.Vend.InsertMoney",
+    "kind": "process",
+    "sourceFile": "github://hkca09/SOFL-Maintainability-Experiment-Dataset/VENDING_MACHINE",
+    "module": "HKCA09.VENDING_MACHINE",
+    "name": "insert_money",
+    "signature": {
+      "inputs": [
+        {
+          "name": "amount",
+          "type": "int"
+        },
+        {
+          "name": "room",
+          "type": "int"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "ok",
+          "type": "int"
+        },
+        {
+          "name": "code",
+          "type": "int"
+        }
+      ]
+    },
+    "fsfScenarios": [
+      {
+        "index": 1,
+        "kind": "scenario",
+        "test": "amount le 0",
+        "def": "ok eq 0 && code eq 1"
+      },
+      {
+        "index": 2,
+        "kind": "scenario",
+        "test": "amount gt room",
+        "def": "ok eq 0 && code eq 2"
+      },
+      {
+        "index": 3,
+        "kind": "scenario",
+        "test": "amount gt 0 && amount le room",
+        "def": "ok eq 1 && code eq 0"
+      },
+      {
+        "index": 4,
+        "kind": "others",
+        "test": "others",
+        "def": "ok eq 0 && code eq 0"
+      }
+    ],
+    "ext": [],
+    "promptSpec": "Process insert_money(amount, room) -> (ok, code)\n\nFSF specification:\nif (amount le 0) => ok eq 0 && code eq 1\nif (amount gt room) => ok eq 0 && code eq 2\nif (amount gt 0 && amount le room) => ok eq 1 && code eq 0\nothers => ok eq 0 && code eq 0",
+    "sourceBasename": "hkca09/SOFL-Maintainability-Experiment-Dataset",
+    "externalProvenance": {
+      "source": "hkca09/SOFL-Maintainability-Experiment-Dataset",
+      "module": "VENDING_MACHINE",
+      "section": "Insert_Money: positive amount + balance room",
+      "generator": "hkca09_sofl_fsf_reconstruction",
+      "corpus": "hkca09_github_sofl",
+      "honesty": "desensitized_int_fsf_from_public_sofl_decision_logic"
+    },
+    "referenceCode": "def insert_money(amount: int, room: int) -> dict:\n    \"\"\"Reference implementation auto-generated from FSF.\"\"\"\n    if amount <= 0:\n        return {\"ok\": 0, \"code\": 1}\n    elif amount > room:\n        return {\"ok\": 0, \"code\": 2}\n    elif amount > 0  and  amount <= room:\n        return {\"ok\": 1, \"code\": 0}\n    else:\n        return {\"ok\": 0, \"code\": 0}\n",
+    "complexity": {
+      "scenario_count": 3,
+      "guard_complexity": "AND",
+      "overlap_rate": 1.0,
+      "has_external_vars": false,
+      "overlap_density_tier": "low"
+    }
+  },
+  {
+    "taskId": "HKCA09.Vend.CheckBalance",
+    "kind": "process",
+    "sourceFile": "github://hkca09/SOFL-Maintainability-Experiment-Dataset/VENDING_MACHINE",
+    "module": "HKCA09.VENDING_MACHINE",
+    "name": "check_balance",
+    "signature": {
+      "inputs": [
+        {
+          "name": "balance",
+          "type": "int"
+        },
+        {
+          "name": "warn_thr",
+          "type": "int"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "warn",
+          "type": "int"
+        },
+        {
+          "name": "ok",
+          "type": "int"
+        }
+      ]
+    },
+    "fsfScenarios": [
+      {
+        "index": 1,
+        "kind": "scenario",
+        "test": "balance lt warn_thr",
+        "def": "warn eq 1 && ok eq 0"
+      },
+      {
+        "index": 2,
+        "kind": "scenario",
+        "test": "balance ge warn_thr",
+        "def": "warn eq 0 && ok eq 1"
+      },
+      {
+        "index": 3,
+        "kind": "others",
+        "test": "others",
+        "def": "warn eq 0 && ok eq 0"
+      }
+    ],
+    "ext": [],
+    "promptSpec": "Process check_balance(balance, warn_thr) -> (warn, ok)\n\nFSF specification:\nif (balance lt warn_thr) => warn eq 1 && ok eq 0\nif (balance ge warn_thr) => warn eq 0 && ok eq 1\nothers => warn eq 0 && ok eq 0",
+    "sourceBasename": "hkca09/SOFL-Maintainability-Experiment-Dataset",
+    "externalProvenance": {
+      "source": "hkca09/SOFL-Maintainability-Experiment-Dataset",
+      "module": "VENDING_MACHINE",
+      "section": "Check_Balance: min_balance_warning threshold",
+      "generator": "hkca09_sofl_fsf_reconstruction",
+      "corpus": "hkca09_github_sofl",
+      "honesty": "desensitized_int_fsf_from_public_sofl_decision_logic"
+    },
+    "referenceCode": "def check_balance(balance: int, warn_thr: int) -> dict:\n    \"\"\"Reference implementation auto-generated from FSF.\"\"\"\n    if balance < warn_thr:\n        return {\"warn\": 1, \"ok\": 0}\n    elif balance >= warn_thr:\n        return {\"warn\": 0, \"ok\": 1}\n    else:\n        return {\"warn\": 0, \"ok\": 0}\n",
+    "complexity": {
+      "scenario_count": 2,
+      "guard_complexity": "Simple",
+      "overlap_rate": 1.0,
+      "has_external_vars": false,
+      "overlap_density_tier": "low"
+    }
+  },
+  {
+    "taskId": "HKCA09.Vend.CheckInv",
+    "kind": "process",
+    "sourceFile": "github://hkca09/SOFL-Maintainability-Experiment-Dataset/VENDING_MACHINE",
+    "module": "HKCA09.VENDING_MACHINE",
+    "name": "check_inventory_status",
+    "signature": {
+      "inputs": [
+        {
+          "name": "min_stock",
+          "type": "int"
+        },
+        {
+          "name": "n_empty",
+          "type": "int"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "healthy",
+          "type": "int"
+        },
+        {
+          "name": "alert",
+          "type": "int"
+        }
+      ]
+    },
+    "fsfScenarios": [
+      {
+        "index": 1,
+        "kind": "scenario",
+        "test": "n_empty gt 0",
+        "def": "healthy eq 0 && alert eq 2"
+      },
+      {
+        "index": 2,
+        "kind": "scenario",
+        "test": "min_stock le 0",
+        "def": "healthy eq 0 && alert eq 1"
+      },
+      {
+        "index": 3,
+        "kind": "scenario",
+        "test": "n_empty eq 0 && min_stock gt 0",
+        "def": "healthy eq 1 && alert eq 0"
+      },
+      {
+        "index": 4,
+        "kind": "others",
+        "test": "others",
+        "def": "healthy eq 0 && alert eq 0"
+      }
+    ],
+    "ext": [],
+    "promptSpec": "Process check_inventory_status(min_stock, n_empty) -> (healthy, alert)\n\nFSF specification:\nif (n_empty gt 0) => healthy eq 0 && alert eq 2\nif (min_stock le 0) => healthy eq 0 && alert eq 1\nif (n_empty eq 0 && min_stock gt 0) => healthy eq 1 && alert eq 0\nothers => healthy eq 0 && alert eq 0",
+    "sourceBasename": "hkca09/SOFL-Maintainability-Experiment-Dataset",
+    "externalProvenance": {
+      "source": "hkca09/SOFL-Maintainability-Experiment-Dataset",
+      "module": "VENDING_MACHINE",
+      "section": "Check_Inventory_Status: empty-item alert",
+      "generator": "hkca09_sofl_fsf_reconstruction",
+      "corpus": "hkca09_github_sofl",
+      "honesty": "desensitized_int_fsf_from_public_sofl_decision_logic"
+    },
+    "referenceCode": "def check_inventory_status(min_stock: int, n_empty: int) -> dict:\n    \"\"\"Reference implementation auto-generated from FSF.\"\"\"\n    if n_empty > 0:\n        return {\"healthy\": 0, \"alert\": 2}\n    elif min_stock <= 0:\n        return {\"healthy\": 0, \"alert\": 1}\n    elif n_empty == 0  and  min_stock > 0:\n        return {\"healthy\": 1, \"alert\": 0}\n    else:\n        return {\"healthy\": 0, \"alert\": 0}\n",
+    "complexity": {
+      "scenario_count": 3,
+      "guard_complexity": "AND",
+      "overlap_rate": 1.0,
+      "has_external_vars": false,
+      "overlap_density_tier": "low"
+    }
+  },
+  {
+    "taskId": "HKCA09.Stock.PlaceOrder",
+    "kind": "process",
+    "sourceFile": "github://hkca09/SOFL-Maintainability-Experiment-Dataset/STOCK_TRADING",
+    "module": "HKCA09.STOCK_TRADING",
+    "name": "place_order",
+    "signature": {
+      "inputs": [
+        {
+          "name": "user_ok",
+          "type": "int"
+        },
+        {
+          "name": "side",
+          "type": "int"
+        },
+        {
+          "name": "qty",
+          "type": "int"
+        },
+        {
+          "name": "cost",
+          "type": "int"
+        },
+        {
+          "name": "balance",
+          "type": "int"
+        },
+        {
+          "name": "holding",
+          "type": "int"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "accepted",
+          "type": "int"
+        },
+        {
+          "name": "code",
+          "type": "int"
+        }
+      ]
+    },
+    "fsfScenarios": [
+      {
+        "index": 1,
+        "kind": "scenario",
+        "test": "user_ok eq 0",
+        "def": "accepted eq 0 && code eq 4"
+      },
+      {
+        "index": 2,
+        "kind": "scenario",
+        "test": "qty le 0",
+        "def": "accepted eq 0 && code eq 1"
+      },
+      {
+        "index": 3,
+        "kind": "scenario",
+        "test": "cost le 0",
+        "def": "accepted eq 0 && code eq 1"
+      },
+      {
+        "index": 4,
+        "kind": "scenario",
+        "test": "side gt 0 && cost gt balance",
+        "def": "accepted eq 0 && code eq 2"
+      },
+      {
+        "index": 5,
+        "kind": "scenario",
+        "test": "side eq 0 && qty gt holding",
+        "def": "accepted eq 0 && code eq 3"
+      },
+      {
+        "index": 6,
+        "kind": "scenario",
+        "test": "side gt 0 && cost le balance",
+        "def": "accepted eq 1 && code eq 0"
+      },
+      {
+        "index": 7,
+        "kind": "scenario",
+        "test": "side eq 0 && qty le holding",
+        "def": "accepted eq 1 && code eq 0"
+      },
+      {
+        "index": 8,
+        "kind": "others",
+        "test": "others",
+        "def": "accepted eq 0 && code eq 0"
+      }
+    ],
+    "ext": [],
+    "promptSpec": "Process place_order(user_ok, side, qty, cost, balance, holding) -> (accepted, code)\n\nFSF specification:\nif (user_ok eq 0) => accepted eq 0 && code eq 4\nif (qty le 0) => accepted eq 0 && code eq 1\nif (cost le 0) => accepted eq 0 && code eq 1\nif (side gt 0 && cost gt balance) => accepted eq 0 && code eq 2\nif (side eq 0 && qty gt holding) => accepted eq 0 && code eq 3\nif (side gt 0 && cost le balance) => accepted eq 1 && code eq 0\nif (side eq 0 && qty le holding) => accepted eq 1 && code eq 0\nothers => accepted eq 0 && code eq 0",
+    "sourceBasename": "hkca09/SOFL-Maintainability-Experiment-Dataset",
+    "externalProvenance": {
+      "source": "hkca09/SOFL-Maintainability-Experiment-Dataset",
+      "module": "STOCK_TRADING",
+      "section": "Place_Order: buy/sell fund-holding checks",
+      "generator": "hkca09_sofl_fsf_reconstruction",
+      "corpus": "hkca09_github_sofl",
+      "honesty": "desensitized_int_fsf_from_public_sofl_decision_logic"
+    },
+    "referenceCode": "def place_order(user_ok: int, side: int, qty: int, cost: int, balance: int, holding: int) -> dict:\n    \"\"\"Reference implementation auto-generated from FSF.\"\"\"\n    if user_ok == 0:\n        return {\"accepted\": 0, \"code\": 4}\n    elif qty <= 0:\n        return {\"accepted\": 0, \"code\": 1}\n    elif cost <= 0:\n        return {\"accepted\": 0, \"code\": 1}\n    elif side > 0  and  cost > balance:\n        return {\"accepted\": 0, \"code\": 2}\n    elif side == 0  and  qty > holding:\n        return {\"accepted\": 0, \"code\": 3}\n    elif side > 0  and  cost <= balance:\n        return {\"accepted\": 1, \"code\": 0}\n    elif side == 0  and  qty <= holding:\n        return {\"accepted\": 1, \"code\": 0}\n    else:\n        return {\"accepted\": 0, \"code\": 0}\n",
+    "complexity": {
+      "scenario_count": 7,
+      "guard_complexity": "AND",
+      "overlap_rate": 1.375,
+      "has_external_vars": false,
+      "overlap_density_tier": "high"
+    }
+  },
+  {
+    "taskId": "HKCA09.Stock.CheckRisk",
+    "kind": "process",
+    "sourceFile": "github://hkca09/SOFL-Maintainability-Experiment-Dataset/STOCK_TRADING",
+    "module": "HKCA09.STOCK_TRADING",
+    "name": "check_account_risk",
+    "signature": {
+      "inputs": [
+        {
+          "name": "balance",
+          "type": "int"
+        },
+        {
+          "name": "n_hold",
+          "type": "int"
+        },
+        {
+          "name": "conc",
+          "type": "int"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "alert",
+          "type": "int"
+        },
+        {
+          "name": "level",
+          "type": "int"
+        }
+      ]
+    },
+    "fsfScenarios": [
+      {
+        "index": 1,
+        "kind": "scenario",
+        "test": "balance lt 0",
+        "def": "alert eq 1 && level eq 3"
+      },
+      {
+        "index": 2,
+        "kind": "scenario",
+        "test": "n_hold gt 10",
+        "def": "alert eq 1 && level eq 2"
+      },
+      {
+        "index": 3,
+        "kind": "scenario",
+        "test": "conc gt 7",
+        "def": "alert eq 1 && level eq 1"
+      },
+      {
+        "index": 4,
+        "kind": "scenario",
+        "test": "balance ge 0 && n_hold le 10 && conc le 7",
+        "def": "alert eq 0 && level eq 0"
+      },
+      {
+        "index": 5,
+        "kind": "others",
+        "test": "others",
+        "def": "alert eq 0 && level eq 0"
+      }
+    ],
+    "ext": [],
+    "promptSpec": "Process check_account_risk(balance, n_hold, conc) -> (alert, level)\n\nFSF specification:\nif (balance lt 0) => alert eq 1 && level eq 3\nif (n_hold gt 10) => alert eq 1 && level eq 2\nif (conc gt 7) => alert eq 1 && level eq 1\nif (balance ge 0 && n_hold le 10 && conc le 7) => alert eq 0 && level eq 0\nothers => alert eq 0 && level eq 0",
+    "sourceBasename": "hkca09/SOFL-Maintainability-Experiment-Dataset",
+    "externalProvenance": {
+      "source": "hkca09/SOFL-Maintainability-Experiment-Dataset",
+      "module": "STOCK_TRADING",
+      "section": "Check_Account_Risk: overdrawn / holdings / concentration",
+      "generator": "hkca09_sofl_fsf_reconstruction",
+      "corpus": "hkca09_github_sofl",
+      "honesty": "desensitized_int_fsf_from_public_sofl_decision_logic"
+    },
+    "referenceCode": "def check_account_risk(balance: int, n_hold: int, conc: int) -> dict:\n    \"\"\"Reference implementation auto-generated from FSF.\"\"\"\n    if balance < 0:\n        return {\"alert\": 1, \"level\": 3}\n    elif n_hold > 10:\n        return {\"alert\": 1, \"level\": 2}\n    elif conc > 7:\n        return {\"alert\": 1, \"level\": 1}\n    elif balance >= 0  and  n_hold <= 10  and  conc <= 7:\n        return {\"alert\": 0, \"level\": 0}\n    else:\n        return {\"alert\": 0, \"level\": 0}\n",
+    "complexity": {
+      "scenario_count": 4,
+      "guard_complexity": "Nested",
+      "overlap_rate": 1.0,
+      "has_external_vars": false,
+      "overlap_density_tier": "low"
+    }
+  },
+  {
+    "taskId": "HKCA09.Stock.Settle",
+    "kind": "process",
+    "sourceFile": "github://hkca09/SOFL-Maintainability-Experiment-Dataset/STOCK_TRADING",
+    "module": "HKCA09.STOCK_TRADING",
+    "name": "settle_order",
+    "signature": {
+      "inputs": [
+        {
+          "name": "valid",
+          "type": "int"
+        },
+        {
+          "name": "side",
+          "type": "int"
+        },
+        {
+          "name": "qty",
+          "type": "int"
+        },
+        {
+          "name": "cost",
+          "type": "int"
+        },
+        {
+          "name": "buyer_bal",
+          "type": "int"
+        },
+        {
+          "name": "seller_hold",
+          "type": "int"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "settled",
+          "type": "int"
+        },
+        {
+          "name": "code",
+          "type": "int"
+        }
+      ]
+    },
+    "fsfScenarios": [
+      {
+        "index": 1,
+        "kind": "scenario",
+        "test": "valid eq 0",
+        "def": "settled eq 0 && code eq 3"
+      },
+      {
+        "index": 2,
+        "kind": "scenario",
+        "test": "side gt 0 && cost gt buyer_bal",
+        "def": "settled eq 0 && code eq 2"
+      },
+      {
+        "index": 3,
+        "kind": "scenario",
+        "test": "side eq 0 && qty gt seller_hold",
+        "def": "settled eq 0 && code eq 1"
+      },
+      {
+        "index": 4,
+        "kind": "scenario",
+        "test": "valid gt 0 && side gt 0 && cost le buyer_bal",
+        "def": "settled eq 1 && code eq 0"
+      },
+      {
+        "index": 5,
+        "kind": "scenario",
+        "test": "valid gt 0 && side eq 0 && qty le seller_hold",
+        "def": "settled eq 1 && code eq 0"
+      },
+      {
+        "index": 6,
+        "kind": "others",
+        "test": "others",
+        "def": "settled eq 0 && code eq 0"
+      }
+    ],
+    "ext": [],
+    "promptSpec": "Process settle_order(valid, side, qty, cost, buyer_bal, seller_hold) -> (settled, code)\n\nFSF specification:\nif (valid eq 0) => settled eq 0 && code eq 3\nif (side gt 0 && cost gt buyer_bal) => settled eq 0 && code eq 2\nif (side eq 0 && qty gt seller_hold) => settled eq 0 && code eq 1\nif (valid gt 0 && side gt 0 && cost le buyer_bal) => settled eq 1 && code eq 0\nif (valid gt 0 && side eq 0 && qty le seller_hold) => settled eq 1 && code eq 0\nothers => settled eq 0 && code eq 0",
+    "sourceBasename": "hkca09/SOFL-Maintainability-Experiment-Dataset",
+    "externalProvenance": {
+      "source": "hkca09/SOFL-Maintainability-Experiment-Dataset",
+      "module": "STOCK_TRADING",
+      "section": "Settle_Order: buyer/seller solvency",
+      "generator": "hkca09_sofl_fsf_reconstruction",
+      "corpus": "hkca09_github_sofl",
+      "honesty": "desensitized_int_fsf_from_public_sofl_decision_logic"
+    },
+    "referenceCode": "def settle_order(valid: int, side: int, qty: int, cost: int, buyer_bal: int, seller_hold: int) -> dict:\n    \"\"\"Reference implementation auto-generated from FSF.\"\"\"\n    if valid == 0:\n        return {\"settled\": 0, \"code\": 3}\n    elif side > 0  and  cost > buyer_bal:\n        return {\"settled\": 0, \"code\": 2}\n    elif side == 0  and  qty > seller_hold:\n        return {\"settled\": 0, \"code\": 1}\n    elif valid > 0  and  side > 0  and  cost <= buyer_bal:\n        return {\"settled\": 1, \"code\": 0}\n    elif valid > 0  and  side == 0  and  qty <= seller_hold:\n        return {\"settled\": 1, \"code\": 0}\n    else:\n        return {\"settled\": 0, \"code\": 0}\n",
+    "complexity": {
+      "scenario_count": 5,
+      "guard_complexity": "Nested",
+      "overlap_rate": 0.833,
+      "has_external_vars": false,
+      "overlap_density_tier": "low"
+    }
+  },
+  {
+    "taskId": "HKCA09.Stock.CancelOrder",
+    "kind": "process",
+    "sourceFile": "github://hkca09/SOFL-Maintainability-Experiment-Dataset/STOCK_TRADING",
+    "module": "HKCA09.STOCK_TRADING",
+    "name": "cancel_order",
+    "signature": {
+      "inputs": [
+        {
+          "name": "found",
+          "type": "int"
+        },
+        {
+          "name": "owner",
+          "type": "int"
+        },
+        {
+          "name": "filled",
+          "type": "int"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "cancelled",
+          "type": "int"
+        },
+        {
+          "name": "code",
+          "type": "int"
+        }
+      ]
+    },
+    "fsfScenarios": [
+      {
+        "index": 1,
+        "kind": "scenario",
+        "test": "found eq 0",
+        "def": "cancelled eq 0 && code eq 3"
+      },
+      {
+        "index": 2,
+        "kind": "scenario",
+        "test": "owner eq 0",
+        "def": "cancelled eq 0 && code eq 2"
+      },
+      {
+        "index": 3,
+        "kind": "scenario",
+        "test": "filled gt 0",
+        "def": "cancelled eq 0 && code eq 1"
+      },
+      {
+        "index": 4,
+        "kind": "scenario",
+        "test": "found gt 0 && owner gt 0 && filled eq 0",
+        "def": "cancelled eq 1 && code eq 0"
+      },
+      {
+        "index": 5,
+        "kind": "others",
+        "test": "others",
+        "def": "cancelled eq 0 && code eq 0"
+      }
+    ],
+    "ext": [],
+    "promptSpec": "Process cancel_order(found, owner, filled) -> (cancelled, code)\n\nFSF specification:\nif (found eq 0) => cancelled eq 0 && code eq 3\nif (owner eq 0) => cancelled eq 0 && code eq 2\nif (filled gt 0) => cancelled eq 0 && code eq 1\nif (found gt 0 && owner gt 0 && filled eq 0) => cancelled eq 1 && code eq 0\nothers => cancelled eq 0 && code eq 0",
+    "sourceBasename": "hkca09/SOFL-Maintainability-Experiment-Dataset",
+    "externalProvenance": {
+      "source": "hkca09/SOFL-Maintainability-Experiment-Dataset",
+      "module": "STOCK_TRADING",
+      "section": "Cancel_Order: found/owner/filled gates",
+      "generator": "hkca09_sofl_fsf_reconstruction",
+      "corpus": "hkca09_github_sofl",
+      "honesty": "desensitized_int_fsf_from_public_sofl_decision_logic"
+    },
+    "referenceCode": "def cancel_order(found: int, owner: int, filled: int) -> dict:\n    \"\"\"Reference implementation auto-generated from FSF.\"\"\"\n    if found == 0:\n        return {\"cancelled\": 0, \"code\": 3}\n    elif owner == 0:\n        return {\"cancelled\": 0, \"code\": 2}\n    elif filled > 0:\n        return {\"cancelled\": 0, \"code\": 1}\n    elif found > 0  and  owner > 0  and  filled == 0:\n        return {\"cancelled\": 1, \"code\": 0}\n    else:\n        return {\"cancelled\": 0, \"code\": 0}\n",
+    "complexity": {
+      "scenario_count": 4,
+      "guard_complexity": "Nested",
+      "overlap_rate": 0.867,
+      "has_external_vars": false,
+      "overlap_density_tier": "low"
+    }
+  },
+  {
+    "taskId": "HKCA09.Transit.Purchase",
+    "kind": "process",
+    "sourceFile": "github://hkca09/SOFL-Maintainability-Experiment-Dataset/PUBLIC_TRANSPORT_TICKETING",
+    "module": "HKCA09.PUBLIC_TRANSPORT_TICKETING",
+    "name": "purchase_ticket",
+    "signature": {
+      "inputs": [
+        {
+          "name": "user_ok",
+          "type": "int"
+        },
+        {
+          "name": "route_ok",
+          "type": "int"
+        },
+        {
+          "name": "balance",
+          "type": "int"
+        },
+        {
+          "name": "fare",
+          "type": "int"
+        },
+        {
+          "name": "remain",
+          "type": "int"
+        },
+        {
+          "name": "min_bal",
+          "type": "int"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "ticket",
+          "type": "int"
+        },
+        {
+          "name": "msg",
+          "type": "int"
+        }
+      ]
+    },
+    "fsfScenarios": [
+      {
+        "index": 1,
+        "kind": "scenario",
+        "test": "user_ok eq 0",
+        "def": "ticket eq 0 && msg eq 4"
+      },
+      {
+        "index": 2,
+        "kind": "scenario",
+        "test": "route_ok eq 0",
+        "def": "ticket eq 0 && msg eq 3"
+      },
+      {
+        "index": 3,
+        "kind": "scenario",
+        "test": "fare le 0",
+        "def": "ticket eq 0 && msg eq 1"
+      },
+      {
+        "index": 4,
+        "kind": "scenario",
+        "test": "balance lt fare",
+        "def": "ticket eq 0 && msg eq 2"
+      },
+      {
+        "index": 5,
+        "kind": "scenario",
+        "test": "remain lt min_bal",
+        "def": "ticket eq 0 && msg eq 2"
+      },
+      {
+        "index": 6,
+        "kind": "scenario",
+        "test": "user_ok gt 0 && route_ok gt 0 && fare gt 0 && balance ge fare && remain ge min_bal",
+        "def": "ticket eq 1 && msg eq 0"
+      },
+      {
+        "index": 7,
+        "kind": "others",
+        "test": "others",
+        "def": "ticket eq 0 && msg eq 0"
+      }
+    ],
+    "ext": [],
+    "promptSpec": "Process purchase_ticket(user_ok, route_ok, balance, fare, remain, min_bal) -> (ticket, msg)\n\nFSF specification:\nif (user_ok eq 0) => ticket eq 0 && msg eq 4\nif (route_ok eq 0) => ticket eq 0 && msg eq 3\nif (fare le 0) => ticket eq 0 && msg eq 1\nif (balance lt fare) => ticket eq 0 && msg eq 2\nif (remain lt min_bal) => ticket eq 0 && msg eq 2\nif (user_ok gt 0 && route_ok gt 0 && fare gt 0 && balance ge fare && remain ge min_bal) => ticket eq 1 && msg eq 0\nothers => ticket eq 0 && msg eq 0",
+    "sourceBasename": "hkca09/SOFL-Maintainability-Experiment-Dataset",
+    "externalProvenance": {
+      "source": "hkca09/SOFL-Maintainability-Experiment-Dataset",
+      "module": "PUBLIC_TRANSPORT_TICKETING",
+      "section": "Purchase_Ticket: user/route/fare/min_balance",
+      "generator": "hkca09_sofl_fsf_reconstruction",
+      "corpus": "hkca09_github_sofl",
+      "honesty": "desensitized_int_fsf_from_public_sofl_decision_logic"
+    },
+    "referenceCode": "def purchase_ticket(user_ok: int, route_ok: int, balance: int, fare: int, remain: int, min_bal: int) -> dict:\n    \"\"\"Reference implementation auto-generated from FSF.\"\"\"\n    if user_ok == 0:\n        return {\"ticket\": 0, \"msg\": 4}\n    elif route_ok == 0:\n        return {\"ticket\": 0, \"msg\": 3}\n    elif fare <= 0:\n        return {\"ticket\": 0, \"msg\": 1}\n    elif balance < fare:\n        return {\"ticket\": 0, \"msg\": 2}\n    elif remain < min_bal:\n        return {\"ticket\": 0, \"msg\": 2}\n    elif user_ok > 0  and  route_ok > 0  and  fare > 0  and  balance >= fare  and  remain >= min_bal:\n        return {\"ticket\": 1, \"msg\": 0}\n    else:\n        return {\"ticket\": 0, \"msg\": 0}\n",
+    "complexity": {
+      "scenario_count": 6,
+      "guard_complexity": "Nested",
+      "overlap_rate": 1.286,
+      "has_external_vars": false,
+      "overlap_density_tier": "high"
+    }
+  },
+  {
+    "taskId": "HKCA09.Transit.UpdateBalance",
+    "kind": "process",
+    "sourceFile": "github://hkca09/SOFL-Maintainability-Experiment-Dataset/PUBLIC_TRANSPORT_TICKETING",
+    "module": "HKCA09.PUBLIC_TRANSPORT_TICKETING",
+    "name": "update_balance",
+    "signature": {
+      "inputs": [
+        {
+          "name": "user_ok",
+          "type": "int"
+        },
+        {
+          "name": "amount",
+          "type": "int"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "status",
+          "type": "int"
+        },
+        {
+          "name": "msg",
+          "type": "int"
+        }
+      ]
+    },
+    "fsfScenarios": [
+      {
+        "index": 1,
+        "kind": "scenario",
+        "test": "user_ok eq 0",
+        "def": "status eq 0 && msg eq 2"
+      },
+      {
+        "index": 2,
+        "kind": "scenario",
+        "test": "amount eq 0",
+        "def": "status eq 0 && msg eq 1"
+      },
+      {
+        "index": 3,
+        "kind": "scenario",
+        "test": "user_ok gt 0 && amount ne 0",
+        "def": "status eq 1 && msg eq 0"
+      },
+      {
+        "index": 4,
+        "kind": "others",
+        "test": "others",
+        "def": "status eq 0 && msg eq 0"
+      }
+    ],
+    "ext": [],
+    "promptSpec": "Process update_balance(user_ok, amount) -> (status, msg)\n\nFSF specification:\nif (user_ok eq 0) => status eq 0 && msg eq 2\nif (amount eq 0) => status eq 0 && msg eq 1\nif (user_ok gt 0 && amount ne 0) => status eq 1 && msg eq 0\nothers => status eq 0 && msg eq 0",
+    "sourceBasename": "hkca09/SOFL-Maintainability-Experiment-Dataset",
+    "externalProvenance": {
+      "source": "hkca09/SOFL-Maintainability-Experiment-Dataset",
+      "module": "PUBLIC_TRANSPORT_TICKETING",
+      "section": "Update_Balance: user found + nonzero delta",
+      "generator": "hkca09_sofl_fsf_reconstruction",
+      "corpus": "hkca09_github_sofl",
+      "honesty": "desensitized_int_fsf_from_public_sofl_decision_logic"
+    },
+    "referenceCode": "def update_balance(user_ok: int, amount: int) -> dict:\n    \"\"\"Reference implementation auto-generated from FSF.\"\"\"\n    if user_ok == 0:\n        return {\"status\": 0, \"msg\": 2}\n    elif amount == 0:\n        return {\"status\": 0, \"msg\": 1}\n    elif user_ok > 0  and  amount != 0:\n        return {\"status\": 1, \"msg\": 0}\n    else:\n        return {\"status\": 0, \"msg\": 0}\n",
+    "complexity": {
+      "scenario_count": 3,
+      "guard_complexity": "AND",
+      "overlap_rate": 0.833,
+      "has_external_vars": false,
+      "overlap_density_tier": "low"
+    }
+  },
+  {
+    "taskId": "HKCA09.Transit.Validate",
+    "kind": "process",
+    "sourceFile": "github://hkca09/SOFL-Maintainability-Experiment-Dataset/PUBLIC_TRANSPORT_TICKETING",
+    "module": "HKCA09.PUBLIC_TRANSPORT_TICKETING",
+    "name": "validate_ticket",
+    "signature": {
+      "inputs": [
+        {
+          "name": "found",
+          "type": "int"
+        },
+        {
+          "name": "valid",
+          "type": "int"
+        },
+        {
+          "name": "expired",
+          "type": "int"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "ok",
+          "type": "int"
+        },
+        {
+          "name": "msg",
+          "type": "int"
+        }
+      ]
+    },
+    "fsfScenarios": [
+      {
+        "index": 1,
+        "kind": "scenario",
+        "test": "found eq 0",
+        "def": "ok eq 0 && msg eq 3"
+      },
+      {
+        "index": 2,
+        "kind": "scenario",
+        "test": "expired gt 0",
+        "def": "ok eq 0 && msg eq 2"
+      },
+      {
+        "index": 3,
+        "kind": "scenario",
+        "test": "valid eq 0",
+        "def": "ok eq 0 && msg eq 1"
+      },
+      {
+        "index": 4,
+        "kind": "scenario",
+        "test": "found gt 0 && valid gt 0 && expired eq 0",
+        "def": "ok eq 1 && msg eq 0"
+      },
+      {
+        "index": 5,
+        "kind": "others",
+        "test": "others",
+        "def": "ok eq 0 && msg eq 0"
+      }
+    ],
+    "ext": [],
+    "promptSpec": "Process validate_ticket(found, valid, expired) -> (ok, msg)\n\nFSF specification:\nif (found eq 0) => ok eq 0 && msg eq 3\nif (expired gt 0) => ok eq 0 && msg eq 2\nif (valid eq 0) => ok eq 0 && msg eq 1\nif (found gt 0 && valid gt 0 && expired eq 0) => ok eq 1 && msg eq 0\nothers => ok eq 0 && msg eq 0",
+    "sourceBasename": "hkca09/SOFL-Maintainability-Experiment-Dataset",
+    "externalProvenance": {
+      "source": "hkca09/SOFL-Maintainability-Experiment-Dataset",
+      "module": "PUBLIC_TRANSPORT_TICKETING",
+      "section": "Validate_Ticket: found/valid/expired order",
+      "generator": "hkca09_sofl_fsf_reconstruction",
+      "corpus": "hkca09_github_sofl",
+      "honesty": "desensitized_int_fsf_from_public_sofl_decision_logic"
+    },
+    "referenceCode": "def validate_ticket(found: int, valid: int, expired: int) -> dict:\n    \"\"\"Reference implementation auto-generated from FSF.\"\"\"\n    if found == 0:\n        return {\"ok\": 0, \"msg\": 3}\n    elif expired > 0:\n        return {\"ok\": 0, \"msg\": 2}\n    elif valid == 0:\n        return {\"ok\": 0, \"msg\": 1}\n    elif found > 0  and  valid > 0  and  expired == 0:\n        return {\"ok\": 1, \"msg\": 0}\n    else:\n        return {\"ok\": 0, \"msg\": 0}\n",
+    "complexity": {
+      "scenario_count": 4,
+      "guard_complexity": "Nested",
+      "overlap_rate": 0.933,
+      "has_external_vars": false,
+      "overlap_density_tier": "low"
+    }
+  },
+  {
+    "taskId": "HKCA09.Transit.MakePayment",
+    "kind": "process",
+    "sourceFile": "github://hkca09/SOFL-Maintainability-Experiment-Dataset/PUBLIC_TRANSPORT_TICKETING",
+    "module": "HKCA09.PUBLIC_TRANSPORT_TICKETING",
+    "name": "make_payment",
+    "signature": {
+      "inputs": [
+        {
+          "name": "user_ok",
+          "type": "int"
+        },
+        {
+          "name": "amount",
+          "type": "int"
+        },
+        {
+          "name": "balance",
+          "type": "int"
+        },
+        {
+          "name": "method",
+          "type": "int"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "paid",
+          "type": "int"
+        },
+        {
+          "name": "code",
+          "type": "int"
+        }
+      ]
+    },
+    "fsfScenarios": [
+      {
+        "index": 1,
+        "kind": "scenario",
+        "test": "user_ok eq 0",
+        "def": "paid eq 0 && code eq 4"
+      },
+      {
+        "index": 2,
+        "kind": "scenario",
+        "test": "method le 0",
+        "def": "paid eq 0 && code eq 1"
+      },
+      {
+        "index": 3,
+        "kind": "scenario",
+        "test": "amount le 0",
+        "def": "paid eq 0 && code eq 1"
+      },
+      {
+        "index": 4,
+        "kind": "scenario",
+        "test": "amount gt balance",
+        "def": "paid eq 0 && code eq 2"
+      },
+      {
+        "index": 5,
+        "kind": "scenario",
+        "test": "user_ok gt 0 && method gt 0 && amount gt 0 && amount le balance",
+        "def": "paid eq 1 && code eq 0"
+      },
+      {
+        "index": 6,
+        "kind": "others",
+        "test": "others",
+        "def": "paid eq 0 && code eq 0"
+      }
+    ],
+    "ext": [],
+    "promptSpec": "Process make_payment(user_ok, amount, balance, method) -> (paid, code)\n\nFSF specification:\nif (user_ok eq 0) => paid eq 0 && code eq 4\nif (method le 0) => paid eq 0 && code eq 1\nif (amount le 0) => paid eq 0 && code eq 1\nif (amount gt balance) => paid eq 0 && code eq 2\nif (user_ok gt 0 && method gt 0 && amount gt 0 && amount le balance) => paid eq 1 && code eq 0\nothers => paid eq 0 && code eq 0",
+    "sourceBasename": "hkca09/SOFL-Maintainability-Experiment-Dataset",
+    "externalProvenance": {
+      "source": "hkca09/SOFL-Maintainability-Experiment-Dataset",
+      "module": "PUBLIC_TRANSPORT_TICKETING",
+      "section": "Make_Payment: method + solvency",
+      "generator": "hkca09_sofl_fsf_reconstruction",
+      "corpus": "hkca09_github_sofl",
+      "honesty": "desensitized_int_fsf_from_public_sofl_decision_logic"
+    },
+    "referenceCode": "def make_payment(user_ok: int, amount: int, balance: int, method: int) -> dict:\n    \"\"\"Reference implementation auto-generated from FSF.\"\"\"\n    if user_ok == 0:\n        return {\"paid\": 0, \"code\": 4}\n    elif method <= 0:\n        return {\"paid\": 0, \"code\": 1}\n    elif amount <= 0:\n        return {\"paid\": 0, \"code\": 1}\n    elif amount > balance:\n        return {\"paid\": 0, \"code\": 2}\n    elif user_ok > 0  and  method > 0  and  amount > 0  and  amount <= balance:\n        return {\"paid\": 1, \"code\": 0}\n    else:\n        return {\"paid\": 0, \"code\": 0}\n",
+    "complexity": {
+      "scenario_count": 5,
+      "guard_complexity": "Nested",
+      "overlap_rate": 1.333,
+      "has_external_vars": false,
+      "overlap_density_tier": "high"
+    }
+  },
+  {
+    "taskId": "HKCA09.Transit.UpdateRoute",
+    "kind": "process",
+    "sourceFile": "github://hkca09/SOFL-Maintainability-Experiment-Dataset/PUBLIC_TRANSPORT_TICKETING",
+    "module": "HKCA09.PUBLIC_TRANSPORT_TICKETING",
+    "name": "update_route",
+    "signature": {
+      "inputs": [
+        {
+          "name": "exists",
+          "type": "int"
+        },
+        {
+          "name": "n_stations",
+          "type": "int"
+        },
+        {
+          "name": "dist",
+          "type": "int"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "status",
+          "type": "int"
+        },
+        {
+          "name": "msg",
+          "type": "int"
+        }
+      ]
+    },
+    "fsfScenarios": [
+      {
+        "index": 1,
+        "kind": "scenario",
+        "test": "n_stations lt 2",
+        "def": "status eq 0 && msg eq 1"
+      },
+      {
+        "index": 2,
+        "kind": "scenario",
+        "test": "dist le 0",
+        "def": "status eq 0 && msg eq 1"
+      },
+      {
+        "index": 3,
+        "kind": "scenario",
+        "test": "exists gt 0",
+        "def": "status eq 0 && msg eq 2"
+      },
+      {
+        "index": 4,
+        "kind": "scenario",
+        "test": "exists eq 0 && n_stations ge 2 && dist gt 0",
+        "def": "status eq 1 && msg eq 0"
+      },
+      {
+        "index": 5,
+        "kind": "others",
+        "test": "others",
+        "def": "status eq 0 && msg eq 0"
+      }
+    ],
+    "ext": [],
+    "promptSpec": "Process update_route(exists, n_stations, dist) -> (status, msg)\n\nFSF specification:\nif (n_stations lt 2) => status eq 0 && msg eq 1\nif (dist le 0) => status eq 0 && msg eq 1\nif (exists gt 0) => status eq 0 && msg eq 2\nif (exists eq 0 && n_stations ge 2 && dist gt 0) => status eq 1 && msg eq 0\nothers => status eq 0 && msg eq 0",
+    "sourceBasename": "hkca09/SOFL-Maintainability-Experiment-Dataset",
+    "externalProvenance": {
+      "source": "hkca09/SOFL-Maintainability-Experiment-Dataset",
+      "module": "PUBLIC_TRANSPORT_TICKETING",
+      "section": "Update_Route: add-only; reject duplicates",
+      "generator": "hkca09_sofl_fsf_reconstruction",
+      "corpus": "hkca09_github_sofl",
+      "honesty": "desensitized_int_fsf_from_public_sofl_decision_logic"
+    },
+    "referenceCode": "def update_route(exists: int, n_stations: int, dist: int) -> dict:\n    \"\"\"Reference implementation auto-generated from FSF.\"\"\"\n    if n_stations < 2:\n        return {\"status\": 0, \"msg\": 1}\n    elif dist <= 0:\n        return {\"status\": 0, \"msg\": 1}\n    elif exists > 0:\n        return {\"status\": 0, \"msg\": 2}\n    elif exists == 0  and  n_stations >= 2  and  dist > 0:\n        return {\"status\": 1, \"msg\": 0}\n    else:\n        return {\"status\": 0, \"msg\": 0}\n",
+    "complexity": {
+      "scenario_count": 4,
+      "guard_complexity": "Nested",
+      "overlap_rate": 1.0,
+      "has_external_vars": false,
+      "overlap_density_tier": "low"
+    }
+  },
+  {
+    "taskId": "HKCA09.Atm.WithdrawStrict",
+    "kind": "process",
+    "sourceFile": "github://hkca09/SOFL-Maintainability-Experiment-Dataset/ATM_SYSTEM",
+    "module": "HKCA09.ATM_SYSTEM",
+    "name": "current_withdraw_strict",
+    "signature": {
+      "inputs": [
+        {
+          "name": "auth",
+          "type": "int"
+        },
+        {
+          "name": "amount",
+          "type": "int"
+        },
+        {
+          "name": "balance",
+          "type": "int"
+        },
+        {
+          "name": "max_once",
+          "type": "int"
+        },
+        {
+          "name": "app_lim",
+          "type": "int"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "cash",
+          "type": "int"
+        },
+        {
+          "name": "warn",
+          "type": "int"
+        }
+      ]
+    },
+    "fsfScenarios": [
+      {
+        "index": 1,
+        "kind": "scenario",
+        "test": "auth eq 0",
+        "def": "cash eq 0 && warn eq 5"
+      },
+      {
+        "index": 2,
+        "kind": "scenario",
+        "test": "amount le 0",
+        "def": "cash eq 0 && warn eq 1"
+      },
+      {
+        "index": 3,
+        "kind": "scenario",
+        "test": "amount gt max_once",
+        "def": "cash eq 0 && warn eq 2"
+      },
+      {
+        "index": 4,
+        "kind": "scenario",
+        "test": "amount gt app_lim",
+        "def": "cash eq 0 && warn eq 2"
+      },
+      {
+        "index": 5,
+        "kind": "scenario",
+        "test": "amount gt balance",
+        "def": "cash eq 0 && warn eq 3"
+      },
+      {
+        "index": 6,
+        "kind": "scenario",
+        "test": "auth gt 0 && amount gt 0 && amount le max_once && amount le app_lim && amount le balance",
+        "def": "cash eq 1 && warn eq 0"
+      },
+      {
+        "index": 7,
+        "kind": "others",
+        "test": "others",
+        "def": "cash eq 0 && warn eq 0"
+      }
+    ],
+    "ext": [],
+    "promptSpec": "Process current_withdraw_strict(auth, amount, balance, max_once, app_lim) -> (cash, warn)\n\nFSF specification:\nif (auth eq 0) => cash eq 0 && warn eq 5\nif (amount le 0) => cash eq 0 && warn eq 1\nif (amount gt max_once) => cash eq 0 && warn eq 2\nif (amount gt app_lim) => cash eq 0 && warn eq 2\nif (amount gt balance) => cash eq 0 && warn eq 3\nif (auth gt 0 && amount gt 0 && amount le max_once && amount le app_lim && amount le balance) => cash eq 1 && warn eq 0\nothers => cash eq 0 && warn eq 0",
+    "sourceBasename": "hkca09/SOFL-Maintainability-Experiment-Dataset",
+    "externalProvenance": {
+      "source": "hkca09/SOFL-Maintainability-Experiment-Dataset",
+      "module": "ATM_SYSTEM",
+      "section": "Current_Withdraw strict: once + application + balance overlaps",
+      "generator": "hkca09_sofl_fsf_reconstruction",
+      "corpus": "hkca09_github_sofl",
+      "honesty": "desensitized_int_fsf_from_public_sofl_decision_logic"
+    },
+    "referenceCode": "def current_withdraw_strict(auth: int, amount: int, balance: int, max_once: int, app_lim: int) -> dict:\n    \"\"\"Reference implementation auto-generated from FSF.\"\"\"\n    if auth == 0:\n        return {\"cash\": 0, \"warn\": 5}\n    elif amount <= 0:\n        return {\"cash\": 0, \"warn\": 1}\n    elif amount > max_once:\n        return {\"cash\": 0, \"warn\": 2}\n    elif amount > app_lim:\n        return {\"cash\": 0, \"warn\": 2}\n    elif amount > balance:\n        return {\"cash\": 0, \"warn\": 3}\n    elif auth > 0  and  amount > 0  and  amount <= max_once  and  amount <= app_lim  and  amount <= balance:\n        return {\"cash\": 1, \"warn\": 0}\n    else:\n        return {\"cash\": 0, \"warn\": 0}\n",
+    "complexity": {
+      "scenario_count": 6,
+      "guard_complexity": "Nested",
+      "overlap_rate": 1.429,
+      "has_external_vars": false,
+      "overlap_density_tier": "high"
+    }
+  },
+  {
+    "taskId": "HKCA09.Vend.SelectItemStrict",
+    "kind": "process",
+    "sourceFile": "github://hkca09/SOFL-Maintainability-Experiment-Dataset/VENDING_MACHINE",
+    "module": "HKCA09.VENDING_MACHINE",
+    "name": "select_item_strict",
+    "signature": {
+      "inputs": [
+        {
+          "name": "found",
+          "type": "int"
+        },
+        {
+          "name": "qty",
+          "type": "int"
+        },
+        {
+          "name": "stock",
+          "type": "int"
+        },
+        {
+          "name": "cost",
+          "type": "int"
+        },
+        {
+          "name": "balance",
+          "type": "int"
+        },
+        {
+          "name": "remain",
+          "type": "int"
+        },
+        {
+          "name": "warn_thr",
+          "type": "int"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "vend",
+          "type": "int"
+        },
+        {
+          "name": "code",
+          "type": "int"
+        }
+      ]
+    },
+    "fsfScenarios": [
+      {
+        "index": 1,
+        "kind": "scenario",
+        "test": "found eq 0",
+        "def": "vend eq 0 && code eq 5"
+      },
+      {
+        "index": 2,
+        "kind": "scenario",
+        "test": "qty le 0",
+        "def": "vend eq 0 && code eq 1"
+      },
+      {
+        "index": 3,
+        "kind": "scenario",
+        "test": "qty gt stock",
+        "def": "vend eq 0 && code eq 2"
+      },
+      {
+        "index": 4,
+        "kind": "scenario",
+        "test": "cost gt balance",
+        "def": "vend eq 0 && code eq 3"
+      },
+      {
+        "index": 5,
+        "kind": "scenario",
+        "test": "remain lt warn_thr",
+        "def": "vend eq 0 && code eq 4"
+      },
+      {
+        "index": 6,
+        "kind": "scenario",
+        "test": "found gt 0 && qty gt 0 && qty le stock && cost le balance && remain ge warn_thr",
+        "def": "vend eq 1 && code eq 0"
+      },
+      {
+        "index": 7,
+        "kind": "others",
+        "test": "others",
+        "def": "vend eq 0 && code eq 0"
+      }
+    ],
+    "ext": [],
+    "promptSpec": "Process select_item_strict(found, qty, stock, cost, balance, remain, warn_thr) -> (vend, code)\n\nFSF specification:\nif (found eq 0) => vend eq 0 && code eq 5\nif (qty le 0) => vend eq 0 && code eq 1\nif (qty gt stock) => vend eq 0 && code eq 2\nif (cost gt balance) => vend eq 0 && code eq 3\nif (remain lt warn_thr) => vend eq 0 && code eq 4\nif (found gt 0 && qty gt 0 && qty le stock && cost le balance && remain ge warn_thr) => vend eq 1 && code eq 0\nothers => vend eq 0 && code eq 0",
+    "sourceBasename": "hkca09/SOFL-Maintainability-Experiment-Dataset",
+    "externalProvenance": {
+      "source": "hkca09/SOFL-Maintainability-Experiment-Dataset",
+      "module": "VENDING_MACHINE",
+      "section": "Select_Item + post-vend min_balance_warning",
+      "generator": "hkca09_sofl_fsf_reconstruction",
+      "corpus": "hkca09_github_sofl",
+      "honesty": "desensitized_int_fsf_from_public_sofl_decision_logic"
+    },
+    "referenceCode": "def select_item_strict(found: int, qty: int, stock: int, cost: int, balance: int, remain: int, warn_thr: int) -> dict:\n    \"\"\"Reference implementation auto-generated from FSF.\"\"\"\n    if found == 0:\n        return {\"vend\": 0, \"code\": 5}\n    elif qty <= 0:\n        return {\"vend\": 0, \"code\": 1}\n    elif qty > stock:\n        return {\"vend\": 0, \"code\": 2}\n    elif cost > balance:\n        return {\"vend\": 0, \"code\": 3}\n    elif remain < warn_thr:\n        return {\"vend\": 0, \"code\": 4}\n    elif found > 0  and  qty > 0  and  qty <= stock  and  cost <= balance  and  remain >= warn_thr:\n        return {\"vend\": 1, \"code\": 0}\n    else:\n        return {\"vend\": 0, \"code\": 0}\n",
+    "complexity": {
+      "scenario_count": 6,
+      "guard_complexity": "Nested",
+      "overlap_rate": 1.0,
+      "has_external_vars": false,
+      "overlap_density_tier": "low"
+    }
+  },
+  {
+    "taskId": "HKCA09.Hosp.PerformRegStrict",
+    "kind": "process",
+    "sourceFile": "github://hkca09/SOFL-Maintainability-Experiment-Dataset/HOSPITAL_REGISTRATION",
+    "module": "HKCA09.HOSPITAL_REGISTRATION",
+    "name": "perform_registration_strict",
+    "signature": {
+      "inputs": [
+        {
+          "name": "patient_ok",
+          "type": "int"
+        },
+        {
+          "name": "doctor_ok",
+          "type": "int"
+        },
+        {
+          "name": "slot_free",
+          "type": "int"
+        },
+        {
+          "name": "doc_load",
+          "type": "int"
+        },
+        {
+          "name": "max_load",
+          "type": "int"
+        },
+        {
+          "name": "dept_ok",
+          "type": "int"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "reg_ok",
+          "type": "int"
+        },
+        {
+          "name": "code",
+          "type": "int"
+        }
+      ]
+    },
+    "fsfScenarios": [
+      {
+        "index": 1,
+        "kind": "scenario",
+        "test": "patient_ok eq 0",
+        "def": "reg_ok eq 0 && code eq 5"
+      },
+      {
+        "index": 2,
+        "kind": "scenario",
+        "test": "dept_ok eq 0",
+        "def": "reg_ok eq 0 && code eq 4"
+      },
+      {
+        "index": 3,
+        "kind": "scenario",
+        "test": "doctor_ok eq 0",
+        "def": "reg_ok eq 0 && code eq 3"
+      },
+      {
+        "index": 4,
+        "kind": "scenario",
+        "test": "slot_free eq 0",
+        "def": "reg_ok eq 0 && code eq 2"
+      },
+      {
+        "index": 5,
+        "kind": "scenario",
+        "test": "doc_load ge max_load",
+        "def": "reg_ok eq 0 && code eq 1"
+      },
+      {
+        "index": 6,
+        "kind": "scenario",
+        "test": "patient_ok gt 0 && dept_ok gt 0 && doctor_ok gt 0 && slot_free gt 0 && doc_load lt max_load",
+        "def": "reg_ok eq 1 && code eq 0"
+      },
+      {
+        "index": 7,
+        "kind": "others",
+        "test": "others",
+        "def": "reg_ok eq 0 && code eq 0"
+      }
+    ],
+    "ext": [],
+    "promptSpec": "Process perform_registration_strict(patient_ok, doctor_ok, slot_free, doc_load, max_load, dept_ok) -> (reg_ok, code)\n\nFSF specification:\nif (patient_ok eq 0) => reg_ok eq 0 && code eq 5\nif (dept_ok eq 0) => reg_ok eq 0 && code eq 4\nif (doctor_ok eq 0) => reg_ok eq 0 && code eq 3\nif (slot_free eq 0) => reg_ok eq 0 && code eq 2\nif (doc_load ge max_load) => reg_ok eq 0 && code eq 1\nif (patient_ok gt 0 && dept_ok gt 0 && doctor_ok gt 0 && slot_free gt 0 && doc_load lt max_load) => reg_ok eq 1 && code eq 0\nothers => reg_ok eq 0 && code eq 0",
+    "sourceBasename": "hkca09/SOFL-Maintainability-Experiment-Dataset",
+    "externalProvenance": {
+      "source": "hkca09/SOFL-Maintainability-Experiment-Dataset",
+      "module": "HOSPITAL_REGISTRATION",
+      "section": "Perform_Registration + department validity",
+      "generator": "hkca09_sofl_fsf_reconstruction",
+      "corpus": "hkca09_github_sofl",
+      "honesty": "desensitized_int_fsf_from_public_sofl_decision_logic"
+    },
+    "referenceCode": "def perform_registration_strict(patient_ok: int, doctor_ok: int, slot_free: int, doc_load: int, max_load: int, dept_ok: int) -> dict:\n    \"\"\"Reference implementation auto-generated from FSF.\"\"\"\n    if patient_ok == 0:\n        return {\"reg_ok\": 0, \"code\": 5}\n    elif dept_ok == 0:\n        return {\"reg_ok\": 0, \"code\": 4}\n    elif doctor_ok == 0:\n        return {\"reg_ok\": 0, \"code\": 3}\n    elif slot_free == 0:\n        return {\"reg_ok\": 0, \"code\": 2}\n    elif doc_load >= max_load:\n        return {\"reg_ok\": 0, \"code\": 1}\n    elif patient_ok > 0  and  dept_ok > 0  and  doctor_ok > 0  and  slot_free > 0  and  doc_load < max_load:\n        return {\"reg_ok\": 1, \"code\": 0}\n    else:\n        return {\"reg_ok\": 0, \"code\": 0}\n",
+    "complexity": {
+      "scenario_count": 6,
+      "guard_complexity": "Nested",
+      "overlap_rate": 1.714,
+      "has_external_vars": false,
+      "overlap_density_tier": "high"
+    }
+  },
+  {
+    "taskId": "HKCA09.Course.RegisterStrict",
+    "kind": "process",
+    "sourceFile": "github://hkca09/SOFL-Maintainability-Experiment-Dataset/COURSE_REGISTRATION",
+    "module": "HKCA09.COURSE_REGISTRATION",
+    "name": "register_course_strict",
+    "signature": {
+      "inputs": [
+        {
+          "name": "catalog_ok",
+          "type": "int"
+        },
+        {
+          "name": "enrolled",
+          "type": "int"
+        },
+        {
+          "name": "already",
+          "type": "int"
+        },
+        {
+          "name": "credits",
+          "type": "int"
+        },
+        {
+          "name": "max_lim",
+          "type": "int"
+        },
+        {
+          "name": "prereq",
+          "type": "int"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "success",
+          "type": "int"
+        },
+        {
+          "name": "msg",
+          "type": "int"
+        }
+      ]
+    },
+    "fsfScenarios": [
+      {
+        "index": 1,
+        "kind": "scenario",
+        "test": "catalog_ok eq 0",
+        "def": "success eq 0 && msg eq 4"
+      },
+      {
+        "index": 2,
+        "kind": "scenario",
+        "test": "prereq eq 0",
+        "def": "success eq 0 && msg eq 3"
+      },
+      {
+        "index": 3,
+        "kind": "scenario",
+        "test": "already gt 0",
+        "def": "success eq 0 && msg eq 2"
+      },
+      {
+        "index": 4,
+        "kind": "scenario",
+        "test": "enrolled ge max_lim",
+        "def": "success eq 0 && msg eq 1"
+      },
+      {
+        "index": 5,
+        "kind": "scenario",
+        "test": "credits le 0",
+        "def": "success eq 0 && msg eq 4"
+      },
+      {
+        "index": 6,
+        "kind": "scenario",
+        "test": "catalog_ok gt 0 && prereq gt 0 && already eq 0 && enrolled lt max_lim && credits gt 0",
+        "def": "success eq 1 && msg eq 0"
+      },
+      {
+        "index": 7,
+        "kind": "others",
+        "test": "others",
+        "def": "success eq 0 && msg eq 0"
+      }
+    ],
+    "ext": [],
+    "promptSpec": "Process register_course_strict(catalog_ok, enrolled, already, credits, max_lim, prereq) -> (success, msg)\n\nFSF specification:\nif (catalog_ok eq 0) => success eq 0 && msg eq 4\nif (prereq eq 0) => success eq 0 && msg eq 3\nif (already gt 0) => success eq 0 && msg eq 2\nif (enrolled ge max_lim) => success eq 0 && msg eq 1\nif (credits le 0) => success eq 0 && msg eq 4\nif (catalog_ok gt 0 && prereq gt 0 && already eq 0 && enrolled lt max_lim && credits gt 0) => success eq 1 && msg eq 0\nothers => success eq 0 && msg eq 0",
+    "sourceBasename": "hkca09/SOFL-Maintainability-Experiment-Dataset",
+    "externalProvenance": {
+      "source": "hkca09/SOFL-Maintainability-Experiment-Dataset",
+      "module": "COURSE_REGISTRATION",
+      "section": "Register_Course + prerequisite gate",
+      "generator": "hkca09_sofl_fsf_reconstruction",
+      "corpus": "hkca09_github_sofl",
+      "honesty": "desensitized_int_fsf_from_public_sofl_decision_logic"
+    },
+    "referenceCode": "def register_course_strict(catalog_ok: int, enrolled: int, already: int, credits: int, max_lim: int, prereq: int) -> dict:\n    \"\"\"Reference implementation auto-generated from FSF.\"\"\"\n    if catalog_ok == 0:\n        return {\"success\": 0, \"msg\": 4}\n    elif prereq == 0:\n        return {\"success\": 0, \"msg\": 3}\n    elif already > 0:\n        return {\"success\": 0, \"msg\": 2}\n    elif enrolled >= max_lim:\n        return {\"success\": 0, \"msg\": 1}\n    elif credits <= 0:\n        return {\"success\": 0, \"msg\": 4}\n    elif catalog_ok > 0  and  prereq > 0  and  already == 0  and  enrolled < max_lim  and  credits > 0:\n        return {\"success\": 1, \"msg\": 0}\n    else:\n        return {\"success\": 0, \"msg\": 0}\n",
+    "complexity": {
+      "scenario_count": 6,
+      "guard_complexity": "Nested",
+      "overlap_rate": 1.905,
+      "has_external_vars": false,
+      "overlap_density_tier": "high"
+    }
+  },
+  {
+    "taskId": "HKCA09.Stock.PlaceOrderStrict",
+    "kind": "process",
+    "sourceFile": "github://hkca09/SOFL-Maintainability-Experiment-Dataset/STOCK_TRADING",
+    "module": "HKCA09.STOCK_TRADING",
+    "name": "place_order_strict",
+    "signature": {
+      "inputs": [
+        {
+          "name": "user_ok",
+          "type": "int"
+        },
+        {
+          "name": "side",
+          "type": "int"
+        },
+        {
+          "name": "qty",
+          "type": "int"
+        },
+        {
+          "name": "cost",
+          "type": "int"
+        },
+        {
+          "name": "balance",
+          "type": "int"
+        },
+        {
+          "name": "holding",
+          "type": "int"
+        },
+        {
+          "name": "n_hold",
+          "type": "int"
+        },
+        {
+          "name": "max_hold",
+          "type": "int"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "accepted",
+          "type": "int"
+        },
+        {
+          "name": "code",
+          "type": "int"
+        }
+      ]
+    },
+    "fsfScenarios": [
+      {
+        "index": 1,
+        "kind": "scenario",
+        "test": "user_ok eq 0",
+        "def": "accepted eq 0 && code eq 5"
+      },
+      {
+        "index": 2,
+        "kind": "scenario",
+        "test": "qty le 0",
+        "def": "accepted eq 0 && code eq 1"
+      },
+      {
+        "index": 3,
+        "kind": "scenario",
+        "test": "cost le 0",
+        "def": "accepted eq 0 && code eq 1"
+      },
+      {
+        "index": 4,
+        "kind": "scenario",
+        "test": "side gt 0 && n_hold ge max_hold",
+        "def": "accepted eq 0 && code eq 4"
+      },
+      {
+        "index": 5,
+        "kind": "scenario",
+        "test": "side gt 0 && cost gt balance",
+        "def": "accepted eq 0 && code eq 2"
+      },
+      {
+        "index": 6,
+        "kind": "scenario",
+        "test": "side eq 0 && qty gt holding",
+        "def": "accepted eq 0 && code eq 3"
+      },
+      {
+        "index": 7,
+        "kind": "scenario",
+        "test": "side gt 0 && n_hold lt max_hold && cost le balance",
+        "def": "accepted eq 1 && code eq 0"
+      },
+      {
+        "index": 8,
+        "kind": "scenario",
+        "test": "side eq 0 && qty le holding",
+        "def": "accepted eq 1 && code eq 0"
+      },
+      {
+        "index": 9,
+        "kind": "others",
+        "test": "others",
+        "def": "accepted eq 0 && code eq 0"
+      }
+    ],
+    "ext": [],
+    "promptSpec": "Process place_order_strict(user_ok, side, qty, cost, balance, holding, n_hold, max_hold) -> (accepted, code)\n\nFSF specification:\nif (user_ok eq 0) => accepted eq 0 && code eq 5\nif (qty le 0) => accepted eq 0 && code eq 1\nif (cost le 0) => accepted eq 0 && code eq 1\nif (side gt 0 && n_hold ge max_hold) => accepted eq 0 && code eq 4\nif (side gt 0 && cost gt balance) => accepted eq 0 && code eq 2\nif (side eq 0 && qty gt holding) => accepted eq 0 && code eq 3\nif (side gt 0 && n_hold lt max_hold && cost le balance) => accepted eq 1 && code eq 0\nif (side eq 0 && qty le holding) => accepted eq 1 && code eq 0\nothers => accepted eq 0 && code eq 0",
+    "sourceBasename": "hkca09/SOFL-Maintainability-Experiment-Dataset",
+    "externalProvenance": {
+      "source": "hkca09/SOFL-Maintainability-Experiment-Dataset",
+      "module": "STOCK_TRADING",
+      "section": "Place_Order + max holdings risk gate",
+      "generator": "hkca09_sofl_fsf_reconstruction",
+      "corpus": "hkca09_github_sofl",
+      "honesty": "desensitized_int_fsf_from_public_sofl_decision_logic"
+    },
+    "referenceCode": "def place_order_strict(user_ok: int, side: int, qty: int, cost: int, balance: int, holding: int, n_hold: int, max_hold: int) -> dict:\n    \"\"\"Reference implementation auto-generated from FSF.\"\"\"\n    if user_ok == 0:\n        return {\"accepted\": 0, \"code\": 5}\n    elif qty <= 0:\n        return {\"accepted\": 0, \"code\": 1}\n    elif cost <= 0:\n        return {\"accepted\": 0, \"code\": 1}\n    elif side > 0  and  n_hold >= max_hold:\n        return {\"accepted\": 0, \"code\": 4}\n    elif side > 0  and  cost > balance:\n        return {\"accepted\": 0, \"code\": 2}\n    elif side == 0  and  qty > holding:\n        return {\"accepted\": 0, \"code\": 3}\n    elif side > 0  and  n_hold < max_hold  and  cost <= balance:\n        return {\"accepted\": 1, \"code\": 0}\n    elif side == 0  and  qty <= holding:\n        return {\"accepted\": 1, \"code\": 0}\n    else:\n        return {\"accepted\": 0, \"code\": 0}\n",
+    "complexity": {
+      "scenario_count": 8,
+      "guard_complexity": "Nested",
+      "overlap_rate": 1.481,
+      "has_external_vars": false,
+      "overlap_density_tier": "high"
+    }
+  },
+  {
+    "taskId": "IndustrialSOFL.LoanUnderwrite",
+    "kind": "process",
+    "sourceFile": "industrial://industrial_pattern:banking_loan",
+    "module": "IndustrialSOFL",
+    "name": "underwrite_loan",
+    "signature": {
+      "inputs": [
+        {
+          "name": "credit_band",
+          "type": "int"
+        },
+        {
+          "name": "income_k",
+          "type": "int"
+        },
+        {
+          "name": "dti",
+          "type": "int"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "decision",
+          "type": "int"
+        },
+        {
+          "name": "limit_k",
+          "type": "int"
+        }
+      ]
+    },
+    "fsfScenarios": [
+      {
+        "index": 1,
+        "kind": "scenario",
+        "test": "credit_band lt 3",
+        "def": "decision eq 0 && limit_k eq 0"
+      },
+      {
+        "index": 2,
+        "kind": "scenario",
+        "test": "credit_band ge 8 && income_k ge 8 && dti le 3",
+        "def": "decision eq 1 && limit_k eq 15"
+      },
+      {
+        "index": 3,
+        "kind": "scenario",
+        "test": "credit_band ge 6 && income_k ge 5",
+        "def": "decision eq 1 && limit_k eq 8"
+      },
+      {
+        "index": 4,
+        "kind": "scenario",
+        "test": "credit_band ge 3 && dti le 5",
+        "def": "decision eq 2 && limit_k eq 3"
+      },
+      {
+        "index": 5,
+        "kind": "others",
+        "test": "others",
+        "def": "decision eq 0 && limit_k eq 0"
+      }
+    ],
+    "ext": [],
+    "promptSpec": "Process underwrite_loan(credit_band, income_k, dti) -> (decision, limit_k)\n\nFSF specification:\nif (credit_band lt 3) => decision eq 0 && limit_k eq 0\nif (credit_band ge 8 && income_k ge 8 && dti le 3) => decision eq 1 && limit_k eq 15\nif (credit_band ge 6 && income_k ge 5) => decision eq 1 && limit_k eq 8\nif (credit_band ge 3 && dti le 5) => decision eq 2 && limit_k eq 3\nothers => decision eq 0 && limit_k eq 0",
+    "sourceBasename": "industrial_pattern:banking_loan",
+    "externalProvenance": {
+      "source": "industrial_pattern:banking_loan",
+      "section": "Retail loan underwriting decision table (ordered risk bands)",
+      "generator": "manual_industrial_curation",
+      "corpus": "industrial_sofl"
+    },
+    "referenceCode": "def underwrite_loan(credit_band: int, income_k: int, dti: int) -> dict:\n    \"\"\"Reference implementation auto-generated from FSF.\"\"\"\n    if credit_band < 3:\n        return {\"decision\": 0, \"limit_k\": 0}\n    elif credit_band >= 8  and  income_k >= 8  and  dti <= 3:\n        return {\"decision\": 1, \"limit_k\": 15}\n    elif credit_band >= 6  and  income_k >= 5:\n        return {\"decision\": 1, \"limit_k\": 8}\n    elif credit_band >= 3  and  dti <= 5:\n        return {\"decision\": 2, \"limit_k\": 3}\n    else:\n        return {\"decision\": 0, \"limit_k\": 0}\n",
+    "complexity": {
+      "scenario_count": 4,
+      "guard_complexity": "Nested",
+      "overlap_rate": 1.4,
+      "has_external_vars": false,
+      "overlap_density_tier": "high"
+    }
+  },
+  {
+    "taskId": "IndustrialSOFL.CallRoute",
+    "kind": "process",
+    "sourceFile": "industrial://li2023iet_faultprevention",
+    "module": "IndustrialSOFL",
+    "name": "route_call",
+    "signature": {
+      "inputs": [
+        {
+          "name": "qos",
+          "type": "int"
+        },
+        {
+          "name": "trunk_load",
+          "type": "int"
+        },
+        {
+          "name": "vip",
+          "type": "int"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "route",
+          "type": "int"
+        },
+        {
+          "name": "preempt",
+          "type": "int"
+        }
+      ]
+    },
+    "fsfScenarios": [
+      {
+        "index": 1,
+        "kind": "scenario",
+        "test": "vip eq 1 && qos ge 2",
+        "def": "route eq 1 && preempt eq 1"
+      },
+      {
+        "index": 2,
+        "kind": "scenario",
+        "test": "trunk_load ge 9",
+        "def": "route eq 0 && preempt eq 0"
+      },
+      {
+        "index": 3,
+        "kind": "scenario",
+        "test": "qos ge 4 && trunk_load le 6",
+        "def": "route eq 2 && preempt eq 0"
+      },
+      {
+        "index": 4,
+        "kind": "scenario",
+        "test": "qos ge 2",
+        "def": "route eq 3 && preempt eq 0"
+      },
+      {
+        "index": 5,
+        "kind": "others",
+        "test": "others",
+        "def": "route eq 0 && preempt eq 0"
+      }
+    ],
+    "ext": [],
+    "promptSpec": "Process route_call(qos, trunk_load, vip) -> (route, preempt)\n\nFSF specification:\nif (vip eq 1 && qos ge 2) => route eq 1 && preempt eq 1\nif (trunk_load ge 9) => route eq 0 && preempt eq 0\nif (qos ge 4 && trunk_load le 6) => route eq 2 && preempt eq 0\nif (qos ge 2) => route eq 3 && preempt eq 0\nothers => route eq 0 && preempt eq 0",
+    "sourceBasename": "li2023iet_faultprevention",
+    "externalProvenance": {
+      "source": "li2023iet_faultprevention",
+      "section": "RF pattern: telecom call routing / overload policy",
+      "generator": "manual_industrial_curation",
+      "corpus": "industrial_sofl"
+    },
+    "referenceCode": "def route_call(qos: int, trunk_load: int, vip: int) -> dict:\n    \"\"\"Reference implementation auto-generated from FSF.\"\"\"\n    if vip == 1  and  qos >= 2:\n        return {\"route\": 1, \"preempt\": 1}\n    elif trunk_load >= 9:\n        return {\"route\": 0, \"preempt\": 0}\n    elif qos >= 4  and  trunk_load <= 6:\n        return {\"route\": 2, \"preempt\": 0}\n    elif qos >= 2:\n        return {\"route\": 3, \"preempt\": 0}\n    else:\n        return {\"route\": 0, \"preempt\": 0}\n",
+    "complexity": {
+      "scenario_count": 4,
+      "guard_complexity": "AND",
+      "overlap_rate": 1.2,
+      "has_external_vars": false,
+      "overlap_density_tier": "medium"
+    }
+  },
+  {
+    "taskId": "IndustrialSOFL.LabCritical",
+    "kind": "process",
+    "sourceFile": "industrial://industrial_pattern:medical_dosage",
+    "module": "IndustrialSOFL",
+    "name": "flag_lab_critical",
+    "signature": {
+      "inputs": [
+        {
+          "name": "value",
+          "type": "int"
+        },
+        {
+          "name": "low",
+          "type": "int"
+        },
+        {
+          "name": "high",
+          "type": "int"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "flag",
+          "type": "int"
+        },
+        {
+          "name": "page",
+          "type": "int"
+        }
+      ]
+    },
+    "fsfScenarios": [
+      {
+        "index": 1,
+        "kind": "scenario",
+        "test": "value lt low && value le 0",
+        "def": "flag eq 3 && page eq 1"
+      },
+      {
+        "index": 2,
+        "kind": "scenario",
+        "test": "value lt low",
+        "def": "flag eq 2 && page eq 1"
+      },
+      {
+        "index": 3,
+        "kind": "scenario",
+        "test": "value gt high",
+        "def": "flag eq 2 && page eq 1"
+      },
+      {
+        "index": 4,
+        "kind": "scenario",
+        "test": "value ge low && value le high",
+        "def": "flag eq 0 && page eq 0"
+      },
+      {
+        "index": 5,
+        "kind": "others",
+        "test": "others",
+        "def": "flag eq 0 && page eq 0"
+      }
+    ],
+    "ext": [],
+    "promptSpec": "Process flag_lab_critical(value, low, high) -> (flag, page)\n\nFSF specification:\nif (value lt low && value le 0) => flag eq 3 && page eq 1\nif (value lt low) => flag eq 2 && page eq 1\nif (value gt high) => flag eq 2 && page eq 1\nif (value ge low && value le high) => flag eq 0 && page eq 0\nothers => flag eq 0 && page eq 0",
+    "sourceBasename": "industrial_pattern:medical_dosage",
+    "externalProvenance": {
+      "source": "industrial_pattern:medical_dosage",
+      "section": "Lab critical-value paging with overlapping low bands",
+      "generator": "manual_industrial_curation",
+      "corpus": "industrial_sofl"
+    },
+    "referenceCode": "def flag_lab_critical(value: int, low: int, high: int) -> dict:\n    \"\"\"Reference implementation auto-generated from FSF.\"\"\"\n    if value < low  and  value <= 0:\n        return {\"flag\": 3, \"page\": 1}\n    elif value < low:\n        return {\"flag\": 2, \"page\": 1}\n    elif value > high:\n        return {\"flag\": 2, \"page\": 1}\n    elif value >= low  and  value <= high:\n        return {\"flag\": 0, \"page\": 0}\n    else:\n        return {\"flag\": 0, \"page\": 0}\n",
+    "complexity": {
+      "scenario_count": 4,
+      "guard_complexity": "AND",
+      "overlap_rate": 1.5,
+      "has_external_vars": false,
+      "overlap_density_tier": "high"
+    }
+  },
+  {
+    "taskId": "IndustrialSOFL.PickPriority",
+    "kind": "process",
+    "sourceFile": "industrial://industrial_pattern:inventory_warehouse",
+    "module": "IndustrialSOFL",
+    "name": "prioritize_pick",
+    "signature": {
+      "inputs": [
+        {
+          "name": "sla_h",
+          "type": "int"
+        },
+        {
+          "name": "qty",
+          "type": "int"
+        },
+        {
+          "name": "hazmat",
+          "type": "int"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "wave",
+          "type": "int"
+        },
+        {
+          "name": "special",
+          "type": "int"
+        }
+      ]
+    },
+    "fsfScenarios": [
+      {
+        "index": 1,
+        "kind": "scenario",
+        "test": "hazmat eq 1",
+        "def": "wave eq 0 && special eq 1"
+      },
+      {
+        "index": 2,
+        "kind": "scenario",
+        "test": "sla_h le 2 && qty ge 5",
+        "def": "wave eq 1 && special eq 0"
+      },
+      {
+        "index": 3,
+        "kind": "scenario",
+        "test": "sla_h le 4",
+        "def": "wave eq 2 && special eq 0"
+      },
+      {
+        "index": 4,
+        "kind": "scenario",
+        "test": "qty ge 10",
+        "def": "wave eq 3 && special eq 0"
+      },
+      {
+        "index": 5,
+        "kind": "others",
+        "test": "others",
+        "def": "wave eq 0 && special eq 0"
+      }
+    ],
+    "ext": [],
+    "promptSpec": "Process prioritize_pick(sla_h, qty, hazmat) -> (wave, special)\n\nFSF specification:\nif (hazmat eq 1) => wave eq 0 && special eq 1\nif (sla_h le 2 && qty ge 5) => wave eq 1 && special eq 0\nif (sla_h le 4) => wave eq 2 && special eq 0\nif (qty ge 10) => wave eq 3 && special eq 0\nothers => wave eq 0 && special eq 0",
+    "sourceBasename": "industrial_pattern:inventory_warehouse",
+    "externalProvenance": {
+      "source": "industrial_pattern:inventory_warehouse",
+      "section": "Warehouse pick-wave prioritization (SLA vs hazmat)",
+      "generator": "manual_industrial_curation",
+      "corpus": "industrial_sofl"
+    },
+    "referenceCode": "def prioritize_pick(sla_h: int, qty: int, hazmat: int) -> dict:\n    \"\"\"Reference implementation auto-generated from FSF.\"\"\"\n    if hazmat == 1:\n        return {\"wave\": 0, \"special\": 1}\n    elif sla_h <= 2  and  qty >= 5:\n        return {\"wave\": 1, \"special\": 0}\n    elif sla_h <= 4:\n        return {\"wave\": 2, \"special\": 0}\n    elif qty >= 10:\n        return {\"wave\": 3, \"special\": 0}\n    else:\n        return {\"wave\": 0, \"special\": 0}\n",
+    "complexity": {
+      "scenario_count": 4,
+      "guard_complexity": "AND",
+      "overlap_rate": 1.2,
+      "has_external_vars": false,
+      "overlap_density_tier": "medium"
+    }
+  },
+  {
+    "taskId": "IndustrialSOFL.ScadaTrip",
+    "kind": "process",
+    "sourceFile": "industrial://industrial_pattern:power_scada",
+    "module": "IndustrialSOFL",
+    "name": "scada_trip",
+    "signature": {
+      "inputs": [
+        {
+          "name": "amps",
+          "type": "int"
+        },
+        {
+          "name": "temp_c",
+          "type": "int"
+        },
+        {
+          "name": "relay",
+          "type": "int"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "trip",
+          "type": "int"
+        },
+        {
+          "name": "alarm",
+          "type": "int"
+        }
+      ]
+    },
+    "fsfScenarios": [
+      {
+        "index": 1,
+        "kind": "scenario",
+        "test": "relay eq 1",
+        "def": "trip eq 1 && alarm eq 2"
+      },
+      {
+        "index": 2,
+        "kind": "scenario",
+        "test": "amps ge 15 && temp_c ge 12",
+        "def": "trip eq 1 && alarm eq 2"
+      },
+      {
+        "index": 3,
+        "kind": "scenario",
+        "test": "amps ge 12 || temp_c ge 14",
+        "def": "trip eq 0 && alarm eq 1"
+      },
+      {
+        "index": 4,
+        "kind": "scenario",
+        "test": "amps ge 8",
+        "def": "trip eq 0 && alarm eq 1"
+      },
+      {
+        "index": 5,
+        "kind": "others",
+        "test": "others",
+        "def": "trip eq 0 && alarm eq 0"
+      }
+    ],
+    "ext": [],
+    "promptSpec": "Process scada_trip(amps, temp_c, relay) -> (trip, alarm)\n\nFSF specification:\nif (relay eq 1) => trip eq 1 && alarm eq 2\nif (amps ge 15 && temp_c ge 12) => trip eq 1 && alarm eq 2\nif (amps ge 12 || temp_c ge 14) => trip eq 0 && alarm eq 1\nif (amps ge 8) => trip eq 0 && alarm eq 1\nothers => trip eq 0 && alarm eq 0",
+    "sourceBasename": "industrial_pattern:power_scada",
+    "externalProvenance": {
+      "source": "industrial_pattern:power_scada",
+      "section": "Feeder overcurrent / temperature trip ladder (ordered)",
+      "generator": "manual_industrial_curation",
+      "corpus": "industrial_sofl"
+    },
+    "referenceCode": "def scada_trip(amps: int, temp_c: int, relay: int) -> dict:\n    \"\"\"Reference implementation auto-generated from FSF.\"\"\"\n    if relay == 1:\n        return {\"trip\": 1, \"alarm\": 2}\n    elif amps >= 15  and  temp_c >= 12:\n        return {\"trip\": 1, \"alarm\": 2}\n    elif amps >= 12  or  temp_c >= 14:\n        return {\"trip\": 0, \"alarm\": 1}\n    elif amps >= 8:\n        return {\"trip\": 0, \"alarm\": 1}\n    else:\n        return {\"trip\": 0, \"alarm\": 0}\n",
+    "complexity": {
+      "scenario_count": 4,
+      "guard_complexity": "AND",
+      "overlap_rate": 1.4,
+      "has_external_vars": false,
+      "overlap_density_tier": "high"
+    }
+  },
+  {
+    "taskId": "IndustrialSOFL.SeatUpgrade",
+    "kind": "process",
+    "sourceFile": "industrial://industrial_pattern:airline_ticket",
+    "module": "IndustrialSOFL",
+    "name": "upgrade_seat",
+    "signature": {
+      "inputs": [
+        {
+          "name": "tier",
+          "type": "int"
+        },
+        {
+          "name": "overbook",
+          "type": "int"
+        },
+        {
+          "name": "hours_to_dep",
+          "type": "int"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "cabin",
+          "type": "int"
+        },
+        {
+          "name": "voucher",
+          "type": "int"
+        }
+      ]
+    },
+    "fsfScenarios": [
+      {
+        "index": 1,
+        "kind": "scenario",
+        "test": "overbook ge 3 && hours_to_dep le 2",
+        "def": "cabin eq 0 && voucher eq 2"
+      },
+      {
+        "index": 2,
+        "kind": "scenario",
+        "test": "tier ge 4 && hours_to_dep le 6",
+        "def": "cabin eq 2 && voucher eq 0"
+      },
+      {
+        "index": 3,
+        "kind": "scenario",
+        "test": "tier ge 2 && overbook le 1",
+        "def": "cabin eq 1 && voucher eq 0"
+      },
+      {
+        "index": 4,
+        "kind": "scenario",
+        "test": "tier ge 1",
+        "def": "cabin eq 0 && voucher eq 1"
+      },
+      {
+        "index": 5,
+        "kind": "others",
+        "test": "others",
+        "def": "cabin eq 0 && voucher eq 0"
+      }
+    ],
+    "ext": [],
+    "promptSpec": "Process upgrade_seat(tier, overbook, hours_to_dep) -> (cabin, voucher)\n\nFSF specification:\nif (overbook ge 3 && hours_to_dep le 2) => cabin eq 0 && voucher eq 2\nif (tier ge 4 && hours_to_dep le 6) => cabin eq 2 && voucher eq 0\nif (tier ge 2 && overbook le 1) => cabin eq 1 && voucher eq 0\nif (tier ge 1) => cabin eq 0 && voucher eq 1\nothers => cabin eq 0 && voucher eq 0",
+    "sourceBasename": "industrial_pattern:airline_ticket",
+    "externalProvenance": {
+      "source": "industrial_pattern:airline_ticket",
+      "section": "Airline involuntary / elite upgrade decision table",
+      "generator": "manual_industrial_curation",
+      "corpus": "industrial_sofl"
+    },
+    "referenceCode": "def upgrade_seat(tier: int, overbook: int, hours_to_dep: int) -> dict:\n    \"\"\"Reference implementation auto-generated from FSF.\"\"\"\n    if overbook >= 3  and  hours_to_dep <= 2:\n        return {\"cabin\": 0, \"voucher\": 2}\n    elif tier >= 4  and  hours_to_dep <= 6:\n        return {\"cabin\": 2, \"voucher\": 0}\n    elif tier >= 2  and  overbook <= 1:\n        return {\"cabin\": 1, \"voucher\": 0}\n    elif tier >= 1:\n        return {\"cabin\": 0, \"voucher\": 1}\n    else:\n        return {\"cabin\": 0, \"voucher\": 0}\n",
+    "complexity": {
+      "scenario_count": 4,
+      "guard_complexity": "AND",
+      "overlap_rate": 1.4,
+      "has_external_vars": false,
+      "overlap_density_tier": "high"
+    }
+  },
+  {
+    "taskId": "IndustrialSOFL.AutoPremium",
+    "kind": "process",
+    "sourceFile": "industrial://industrial_pattern:insurance_premium",
+    "module": "IndustrialSOFL",
+    "name": "quote_auto_premium",
+    "signature": {
+      "inputs": [
+        {
+          "name": "age",
+          "type": "int"
+        },
+        {
+          "name": "claims",
+          "type": "int"
+        },
+        {
+          "name": "risk",
+          "type": "int"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "premium",
+          "type": "int"
+        },
+        {
+          "name": "decline",
+          "type": "int"
+        }
+      ]
+    },
+    "fsfScenarios": [
+      {
+        "index": 1,
+        "kind": "scenario",
+        "test": "claims ge 4",
+        "def": "premium eq 0 && decline eq 1"
+      },
+      {
+        "index": 2,
+        "kind": "scenario",
+        "test": "age lt 4 && risk ge 3",
+        "def": "premium eq 12 && decline eq 0"
+      },
+      {
+        "index": 3,
+        "kind": "scenario",
+        "test": "age ge 12 && risk ge 2",
+        "def": "premium eq 9 && decline eq 0"
+      },
+      {
+        "index": 4,
+        "kind": "scenario",
+        "test": "risk ge 2",
+        "def": "premium eq 6 && decline eq 0"
+      },
+      {
+        "index": 5,
+        "kind": "others",
+        "test": "others",
+        "def": "premium eq 0 && decline eq 0"
+      }
+    ],
+    "ext": [],
+    "promptSpec": "Process quote_auto_premium(age, claims, risk) -> (premium, decline)\n\nFSF specification:\nif (claims ge 4) => premium eq 0 && decline eq 1\nif (age lt 4 && risk ge 3) => premium eq 12 && decline eq 0\nif (age ge 12 && risk ge 2) => premium eq 9 && decline eq 0\nif (risk ge 2) => premium eq 6 && decline eq 0\nothers => premium eq 0 && decline eq 0",
+    "sourceBasename": "industrial_pattern:insurance_premium",
+    "externalProvenance": {
+      "source": "industrial_pattern:insurance_premium",
+      "section": "Auto insurance quote bands (age scaled; claims hard decline)",
+      "generator": "manual_industrial_curation",
+      "corpus": "industrial_sofl"
+    },
+    "referenceCode": "def quote_auto_premium(age: int, claims: int, risk: int) -> dict:\n    \"\"\"Reference implementation auto-generated from FSF.\"\"\"\n    if claims >= 4:\n        return {\"premium\": 0, \"decline\": 1}\n    elif age < 4  and  risk >= 3:\n        return {\"premium\": 12, \"decline\": 0}\n    elif age >= 12  and  risk >= 2:\n        return {\"premium\": 9, \"decline\": 0}\n    elif risk >= 2:\n        return {\"premium\": 6, \"decline\": 0}\n    else:\n        return {\"premium\": 0, \"decline\": 0}\n",
+    "complexity": {
+      "scenario_count": 4,
+      "guard_complexity": "AND",
+      "overlap_rate": 1.2,
+      "has_external_vars": false,
+      "overlap_density_tier": "medium"
+    }
+  },
+  {
+    "taskId": "IndustrialSOFL.ClaimTriage",
+    "kind": "process",
+    "sourceFile": "industrial://li2023iet_faultprevention",
+    "module": "IndustrialSOFL",
+    "name": "triage_claim",
+    "signature": {
+      "inputs": [
+        {
+          "name": "amount",
+          "type": "int"
+        },
+        {
+          "name": "fraud_score",
+          "type": "int"
+        },
+        {
+          "name": "injury",
+          "type": "int"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "queue",
+          "type": "int"
+        },
+        {
+          "name": "siu",
+          "type": "int"
+        }
+      ]
+    },
+    "fsfScenarios": [
+      {
+        "index": 1,
+        "kind": "scenario",
+        "test": "fraud_score ge 7",
+        "def": "queue eq 0 && siu eq 1"
+      },
+      {
+        "index": 2,
+        "kind": "scenario",
+        "test": "injury eq 1 && amount ge 8",
+        "def": "queue eq 1 && siu eq 0"
+      },
+      {
+        "index": 3,
+        "kind": "scenario",
+        "test": "amount ge 10",
+        "def": "queue eq 2 && siu eq 0"
+      },
+      {
+        "index": 4,
+        "kind": "scenario",
+        "test": "amount ge 3",
+        "def": "queue eq 3 && siu eq 0"
+      },
+      {
+        "index": 5,
+        "kind": "others",
+        "test": "others",
+        "def": "queue eq 0 && siu eq 0"
+      }
+    ],
+    "ext": [],
+    "promptSpec": "Process triage_claim(amount, fraud_score, injury) -> (queue, siu)\n\nFSF specification:\nif (fraud_score ge 7) => queue eq 0 && siu eq 1\nif (injury eq 1 && amount ge 8) => queue eq 1 && siu eq 0\nif (amount ge 10) => queue eq 2 && siu eq 0\nif (amount ge 3) => queue eq 3 && siu eq 0\nothers => queue eq 0 && siu eq 0",
+    "sourceBasename": "li2023iet_faultprevention",
+    "externalProvenance": {
+      "source": "li2023iet_faultprevention",
+      "section": "RF pattern: boundary screening applied to claims triage",
+      "generator": "manual_industrial_curation",
+      "corpus": "industrial_sofl"
+    },
+    "referenceCode": "def triage_claim(amount: int, fraud_score: int, injury: int) -> dict:\n    \"\"\"Reference implementation auto-generated from FSF.\"\"\"\n    if fraud_score >= 7:\n        return {\"queue\": 0, \"siu\": 1}\n    elif injury == 1  and  amount >= 8:\n        return {\"queue\": 1, \"siu\": 0}\n    elif amount >= 10:\n        return {\"queue\": 2, \"siu\": 0}\n    elif amount >= 3:\n        return {\"queue\": 3, \"siu\": 0}\n    else:\n        return {\"queue\": 0, \"siu\": 0}\n",
+    "complexity": {
+      "scenario_count": 4,
+      "guard_complexity": "AND",
+      "overlap_rate": 1.2,
+      "has_external_vars": false,
+      "overlap_density_tier": "medium"
+    }
+  },
+  {
+    "taskId": "IndustrialSOFL.IntersectionPhase",
+    "kind": "process",
+    "sourceFile": "industrial://industrial_pattern:traffic_signal",
+    "module": "IndustrialSOFL",
+    "name": "select_phase",
+    "signature": {
+      "inputs": [
+        {
+          "name": "queue_ns",
+          "type": "int"
+        },
+        {
+          "name": "queue_ew",
+          "type": "int"
+        },
+        {
+          "name": "ped",
+          "type": "int"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "phase",
+          "type": "int"
+        },
+        {
+          "name": "extend",
+          "type": "int"
+        }
+      ]
+    },
+    "fsfScenarios": [
+      {
+        "index": 1,
+        "kind": "scenario",
+        "test": "ped eq 1 && queue_ns le 2",
+        "def": "phase eq 4 && extend eq 0"
+      },
+      {
+        "index": 2,
+        "kind": "scenario",
+        "test": "queue_ns ge 8",
+        "def": "phase eq 1 && extend eq 1"
+      },
+      {
+        "index": 3,
+        "kind": "scenario",
+        "test": "queue_ew ge 8",
+        "def": "phase eq 2 && extend eq 1"
+      },
+      {
+        "index": 4,
+        "kind": "scenario",
+        "test": "queue_ns ge queue_ew",
+        "def": "phase eq 1 && extend eq 0"
+      },
+      {
+        "index": 5,
+        "kind": "others",
+        "test": "others",
+        "def": "phase eq 0 && extend eq 0"
+      }
+    ],
+    "ext": [],
+    "promptSpec": "Process select_phase(queue_ns, queue_ew, ped) -> (phase, extend)\n\nFSF specification:\nif (ped eq 1 && queue_ns le 2) => phase eq 4 && extend eq 0\nif (queue_ns ge 8) => phase eq 1 && extend eq 1\nif (queue_ew ge 8) => phase eq 2 && extend eq 1\nif (queue_ns ge queue_ew) => phase eq 1 && extend eq 0\nothers => phase eq 0 && extend eq 0",
+    "sourceBasename": "industrial_pattern:traffic_signal",
+    "externalProvenance": {
+      "source": "industrial_pattern:traffic_signal",
+      "section": "Actuated intersection phase selection (pedestrian priority)",
+      "generator": "manual_industrial_curation",
+      "corpus": "industrial_sofl"
+    },
+    "referenceCode": "def select_phase(queue_ns: int, queue_ew: int, ped: int) -> dict:\n    \"\"\"Reference implementation auto-generated from FSF.\"\"\"\n    if ped == 1  and  queue_ns <= 2:\n        return {\"phase\": 4, \"extend\": 0}\n    elif queue_ns >= 8:\n        return {\"phase\": 1, \"extend\": 1}\n    elif queue_ew >= 8:\n        return {\"phase\": 2, \"extend\": 1}\n    elif queue_ns >= queue_ew:\n        return {\"phase\": 1, \"extend\": 0}\n    else:\n        return {\"phase\": 0, \"extend\": 0}\n",
+    "complexity": {
+      "scenario_count": 4,
+      "guard_complexity": "AND",
+      "overlap_rate": 1.2,
+      "has_external_vars": false,
+      "overlap_density_tier": "medium"
+    }
+  },
+  {
+    "taskId": "IndustrialSOFL.RampMeter",
+    "kind": "process",
+    "sourceFile": "industrial://industrial_pattern:traffic_signal",
+    "module": "IndustrialSOFL",
+    "name": "meter_ramp",
+    "signature": {
+      "inputs": [
+        {
+          "name": "mainline",
+          "type": "int"
+        },
+        {
+          "name": "ramp_q",
+          "type": "int"
+        },
+        {
+          "name": "incident",
+          "type": "int"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "rate",
+          "type": "int"
+        },
+        {
+          "name": "close",
+          "type": "int"
+        }
+      ]
+    },
+    "fsfScenarios": [
+      {
+        "index": 1,
+        "kind": "scenario",
+        "test": "incident eq 1",
+        "def": "rate eq 0 && close eq 1"
+      },
+      {
+        "index": 2,
+        "kind": "scenario",
+        "test": "mainline ge 14 && ramp_q ge 5",
+        "def": "rate eq 1 && close eq 0"
+      },
+      {
+        "index": 3,
+        "kind": "scenario",
+        "test": "mainline ge 10",
+        "def": "rate eq 2 && close eq 0"
+      },
+      {
+        "index": 4,
+        "kind": "scenario",
+        "test": "ramp_q ge 3",
+        "def": "rate eq 3 && close eq 0"
+      },
+      {
+        "index": 5,
+        "kind": "others",
+        "test": "others",
+        "def": "rate eq 0 && close eq 0"
+      }
+    ],
+    "ext": [],
+    "promptSpec": "Process meter_ramp(mainline, ramp_q, incident) -> (rate, close)\n\nFSF specification:\nif (incident eq 1) => rate eq 0 && close eq 1\nif (mainline ge 14 && ramp_q ge 5) => rate eq 1 && close eq 0\nif (mainline ge 10) => rate eq 2 && close eq 0\nif (ramp_q ge 3) => rate eq 3 && close eq 0\nothers => rate eq 0 && close eq 0",
+    "sourceBasename": "industrial_pattern:traffic_signal",
+    "externalProvenance": {
+      "source": "industrial_pattern:traffic_signal",
+      "section": "Freeway ramp metering with incident override",
+      "generator": "manual_industrial_curation",
+      "corpus": "industrial_sofl"
+    },
+    "referenceCode": "def meter_ramp(mainline: int, ramp_q: int, incident: int) -> dict:\n    \"\"\"Reference implementation auto-generated from FSF.\"\"\"\n    if incident == 1:\n        return {\"rate\": 0, \"close\": 1}\n    elif mainline >= 14  and  ramp_q >= 5:\n        return {\"rate\": 1, \"close\": 0}\n    elif mainline >= 10:\n        return {\"rate\": 2, \"close\": 0}\n    elif ramp_q >= 3:\n        return {\"rate\": 3, \"close\": 0}\n    else:\n        return {\"rate\": 0, \"close\": 0}\n",
+    "complexity": {
+      "scenario_count": 4,
+      "guard_complexity": "AND",
+      "overlap_rate": 1.2,
+      "has_external_vars": false,
+      "overlap_density_tier": "medium"
+    }
+  },
+  {
+    "taskId": "IndustrialSOFL.ApiRateLimit",
+    "kind": "process",
+    "sourceFile": "industrial://industrial_pattern:cache_rate_limit",
+    "module": "IndustrialSOFL",
+    "name": "limit_api_rate",
+    "signature": {
+      "inputs": [
+        {
+          "name": "rps",
+          "type": "int"
+        },
+        {
+          "name": "burst",
+          "type": "int"
+        },
+        {
+          "name": "plan",
+          "type": "int"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "allow",
+          "type": "int"
+        },
+        {
+          "name": "retry_after",
+          "type": "int"
+        }
+      ]
+    },
+    "fsfScenarios": [
+      {
+        "index": 1,
+        "kind": "scenario",
+        "test": "plan ge 3",
+        "def": "allow eq 1 && retry_after eq 0"
+      },
+      {
+        "index": 2,
+        "kind": "scenario",
+        "test": "rps gt 15 && burst gt 8",
+        "def": "allow eq 0 && retry_after eq 10"
+      },
+      {
+        "index": 3,
+        "kind": "scenario",
+        "test": "rps gt 10 && plan ge 2",
+        "def": "allow eq 1 && retry_after eq 2"
+      },
+      {
+        "index": 4,
+        "kind": "scenario",
+        "test": "rps gt 10",
+        "def": "allow eq 0 && retry_after eq 5"
+      },
+      {
+        "index": 5,
+        "kind": "others",
+        "test": "others",
+        "def": "allow eq 0 && retry_after eq 0"
+      }
+    ],
+    "ext": [],
+    "promptSpec": "Process limit_api_rate(rps, burst, plan) -> (allow, retry_after)\n\nFSF specification:\nif (plan ge 3) => allow eq 1 && retry_after eq 0\nif (rps gt 15 && burst gt 8) => allow eq 0 && retry_after eq 10\nif (rps gt 10 && plan ge 2) => allow eq 1 && retry_after eq 2\nif (rps gt 10) => allow eq 0 && retry_after eq 5\nothers => allow eq 0 && retry_after eq 0",
+    "sourceBasename": "industrial_pattern:cache_rate_limit",
+    "externalProvenance": {
+      "source": "industrial_pattern:cache_rate_limit",
+      "section": "API gateway rate limit with plan override",
+      "generator": "manual_industrial_curation",
+      "corpus": "industrial_sofl"
+    },
+    "referenceCode": "def limit_api_rate(rps: int, burst: int, plan: int) -> dict:\n    \"\"\"Reference implementation auto-generated from FSF.\"\"\"\n    if plan >= 3:\n        return {\"allow\": 1, \"retry_after\": 0}\n    elif rps > 15  and  burst > 8:\n        return {\"allow\": 0, \"retry_after\": 10}\n    elif rps > 10  and  plan >= 2:\n        return {\"allow\": 1, \"retry_after\": 2}\n    elif rps > 10:\n        return {\"allow\": 0, \"retry_after\": 5}\n    else:\n        return {\"allow\": 0, \"retry_after\": 0}\n",
+    "complexity": {
+      "scenario_count": 4,
+      "guard_complexity": "AND",
+      "overlap_rate": 1.2,
+      "has_external_vars": false,
+      "overlap_density_tier": "medium"
+    }
+  },
+  {
+    "taskId": "IndustrialSOFL.CardFraud",
+    "kind": "process",
+    "sourceFile": "industrial://li2023iet_faultprevention",
+    "module": "IndustrialSOFL",
+    "name": "screen_card_fraud",
+    "signature": {
+      "inputs": [
+        {
+          "name": "amount",
+          "type": "int"
+        },
+        {
+          "name": "velocity",
+          "type": "int"
+        },
+        {
+          "name": "geo_risk",
+          "type": "int"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "block",
+          "type": "int"
+        },
+        {
+          "name": "challenge",
+          "type": "int"
+        }
+      ]
+    },
+    "fsfScenarios": [
+      {
+        "index": 1,
+        "kind": "scenario",
+        "test": "geo_risk ge 4",
+        "def": "block eq 1 && challenge eq 0"
+      },
+      {
+        "index": 2,
+        "kind": "scenario",
+        "test": "amount ge 12 && velocity ge 6",
+        "def": "block eq 1 && challenge eq 0"
+      },
+      {
+        "index": 3,
+        "kind": "scenario",
+        "test": "amount ge 6 && velocity ge 3",
+        "def": "block eq 0 && challenge eq 1"
+      },
+      {
+        "index": 4,
+        "kind": "scenario",
+        "test": "amount le 5",
+        "def": "block eq 0 && challenge eq 0"
+      },
+      {
+        "index": 5,
+        "kind": "others",
+        "test": "others",
+        "def": "block eq 0 && challenge eq 0"
+      }
+    ],
+    "ext": [],
+    "promptSpec": "Process screen_card_fraud(amount, velocity, geo_risk) -> (block, challenge)\n\nFSF specification:\nif (geo_risk ge 4) => block eq 1 && challenge eq 0\nif (amount ge 12 && velocity ge 6) => block eq 1 && challenge eq 0\nif (amount ge 6 && velocity ge 3) => block eq 0 && challenge eq 1\nif (amount le 5) => block eq 0 && challenge eq 0\nothers => block eq 0 && challenge eq 0",
+    "sourceBasename": "li2023iet_faultprevention",
+    "externalProvenance": {
+      "source": "li2023iet_faultprevention",
+      "section": "RF pattern: payment fraud boundary screening",
+      "generator": "manual_industrial_curation",
+      "corpus": "industrial_sofl"
+    },
+    "referenceCode": "def screen_card_fraud(amount: int, velocity: int, geo_risk: int) -> dict:\n    \"\"\"Reference implementation auto-generated from FSF.\"\"\"\n    if geo_risk >= 4:\n        return {\"block\": 1, \"challenge\": 0}\n    elif amount >= 12  and  velocity >= 6:\n        return {\"block\": 1, \"challenge\": 0}\n    elif amount >= 6  and  velocity >= 3:\n        return {\"block\": 0, \"challenge\": 1}\n    elif amount <= 5:\n        return {\"block\": 0, \"challenge\": 0}\n    else:\n        return {\"block\": 0, \"challenge\": 0}\n",
+    "complexity": {
+      "scenario_count": 4,
+      "guard_complexity": "AND",
+      "overlap_rate": 1.2,
+      "has_external_vars": false,
+      "overlap_density_tier": "medium"
+    }
+  },
+  {
+    "taskId": "IndustrialSOFL.LoginAnomaly",
+    "kind": "process",
+    "sourceFile": "industrial://industrial_pattern:fraud_screen",
+    "module": "IndustrialSOFL",
+    "name": "score_login_anomaly",
+    "signature": {
+      "inputs": [
+        {
+          "name": "fail_count",
+          "type": "int"
+        },
+        {
+          "name": "new_device",
+          "type": "int"
+        },
+        {
+          "name": "geo_shift",
+          "type": "int"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "lock",
+          "type": "int"
+        },
+        {
+          "name": "mfa",
+          "type": "int"
+        }
+      ]
+    },
+    "fsfScenarios": [
+      {
+        "index": 1,
+        "kind": "scenario",
+        "test": "fail_count ge 5",
+        "def": "lock eq 1 && mfa eq 0"
+      },
+      {
+        "index": 2,
+        "kind": "scenario",
+        "test": "new_device eq 1 && geo_shift eq 1",
+        "def": "lock eq 0 && mfa eq 1"
+      },
+      {
+        "index": 3,
+        "kind": "scenario",
+        "test": "fail_count ge 3 || geo_shift eq 1",
+        "def": "lock eq 0 && mfa eq 1"
+      },
+      {
+        "index": 4,
+        "kind": "scenario",
+        "test": "new_device eq 1",
+        "def": "lock eq 0 && mfa eq 1"
+      },
+      {
+        "index": 5,
+        "kind": "others",
+        "test": "others",
+        "def": "lock eq 0 && mfa eq 0"
+      }
+    ],
+    "ext": [],
+    "promptSpec": "Process score_login_anomaly(fail_count, new_device, geo_shift) -> (lock, mfa)\n\nFSF specification:\nif (fail_count ge 5) => lock eq 1 && mfa eq 0\nif (new_device eq 1 && geo_shift eq 1) => lock eq 0 && mfa eq 1\nif (fail_count ge 3 || geo_shift eq 1) => lock eq 0 && mfa eq 1\nif (new_device eq 1) => lock eq 0 && mfa eq 1\nothers => lock eq 0 && mfa eq 0",
+    "sourceBasename": "industrial_pattern:fraud_screen",
+    "externalProvenance": {
+      "source": "industrial_pattern:fraud_screen",
+      "section": "Identity login anomaly / step-up authentication",
+      "generator": "manual_industrial_curation",
+      "corpus": "industrial_sofl"
+    },
+    "referenceCode": "def score_login_anomaly(fail_count: int, new_device: int, geo_shift: int) -> dict:\n    \"\"\"Reference implementation auto-generated from FSF.\"\"\"\n    if fail_count >= 5:\n        return {\"lock\": 1, \"mfa\": 0}\n    elif new_device == 1  and  geo_shift == 1:\n        return {\"lock\": 0, \"mfa\": 1}\n    elif fail_count >= 3  or  geo_shift == 1:\n        return {\"lock\": 0, \"mfa\": 1}\n    elif new_device == 1:\n        return {\"lock\": 0, \"mfa\": 1}\n    else:\n        return {\"lock\": 0, \"mfa\": 0}\n",
+    "complexity": {
+      "scenario_count": 4,
+      "guard_complexity": "AND",
+      "overlap_rate": 1.4,
+      "has_external_vars": false,
+      "overlap_density_tier": "high"
+    }
+  },
+  {
+    "taskId": "IndustrialSOFL.CourseEnroll",
+    "kind": "process",
+    "sourceFile": "industrial://liu2004soflbook",
+    "module": "IndustrialSOFL",
+    "name": "enroll_course",
+    "signature": {
+      "inputs": [
+        {
+          "name": "credits",
+          "type": "int"
+        },
+        {
+          "name": "prereq",
+          "type": "int"
+        },
+        {
+          "name": "seats",
+          "type": "int"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "enrolled",
+          "type": "int"
+        },
+        {
+          "name": "waitlist",
+          "type": "int"
+        }
+      ]
+    },
+    "fsfScenarios": [
+      {
+        "index": 1,
+        "kind": "scenario",
+        "test": "prereq eq 0",
+        "def": "enrolled eq 0 && waitlist eq 0"
+      },
+      {
+        "index": 2,
+        "kind": "scenario",
+        "test": "seats le 0 && credits le 15",
+        "def": "enrolled eq 0 && waitlist eq 1"
+      },
+      {
+        "index": 3,
+        "kind": "scenario",
+        "test": "credits ge 12 && seats ge 1",
+        "def": "enrolled eq 1 && waitlist eq 0"
+      },
+      {
+        "index": 4,
+        "kind": "scenario",
+        "test": "seats ge 1",
+        "def": "enrolled eq 1 && waitlist eq 0"
+      },
+      {
+        "index": 5,
+        "kind": "others",
+        "test": "others",
+        "def": "enrolled eq 0 && waitlist eq 0"
+      }
+    ],
+    "ext": [],
+    "promptSpec": "Process enroll_course(credits, prereq, seats) -> (enrolled, waitlist)\n\nFSF specification:\nif (prereq eq 0) => enrolled eq 0 && waitlist eq 0\nif (seats le 0 && credits le 15) => enrolled eq 0 && waitlist eq 1\nif (credits ge 12 && seats ge 1) => enrolled eq 1 && waitlist eq 0\nif (seats ge 1) => enrolled eq 1 && waitlist eq 0\nothers => enrolled eq 0 && waitlist eq 0",
+    "sourceBasename": "liu2004soflbook",
+    "externalProvenance": {
+      "source": "liu2004soflbook",
+      "section": "Academic enrollment / registration workflow",
+      "generator": "manual_industrial_curation",
+      "corpus": "industrial_sofl"
+    },
+    "referenceCode": "def enroll_course(credits: int, prereq: int, seats: int) -> dict:\n    \"\"\"Reference implementation auto-generated from FSF.\"\"\"\n    if prereq == 0:\n        return {\"enrolled\": 0, \"waitlist\": 0}\n    elif seats <= 0  and  credits <= 15:\n        return {\"enrolled\": 0, \"waitlist\": 1}\n    elif credits >= 12  and  seats >= 1:\n        return {\"enrolled\": 1, \"waitlist\": 0}\n    elif seats >= 1:\n        return {\"enrolled\": 1, \"waitlist\": 0}\n    else:\n        return {\"enrolled\": 0, \"waitlist\": 0}\n",
+    "complexity": {
+      "scenario_count": 4,
+      "guard_complexity": "AND",
+      "overlap_rate": 1.2,
+      "has_external_vars": false,
+      "overlap_density_tier": "medium"
+    }
+  },
+  {
+    "taskId": "PubIndPilot.CrossingClear",
+    "kind": "process",
+    "sourceFile": "industrial://liu1998railwaycrossing",
+    "module": "IndustrialSOFL",
+    "name": "crossing_clear_check",
+    "signature": {
+      "inputs": [
+        {
+          "name": "occupancy",
+          "type": "int"
+        },
+        {
+          "name": "gate_pos",
+          "type": "int"
+        },
+        {
+          "name": "timer",
+          "type": "int"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "permit",
+          "type": "int"
+        },
+        {
+          "name": "status",
+          "type": "int"
+        }
+      ]
+    },
+    "fsfScenarios": [
+      {
+        "index": 1,
+        "kind": "scenario",
+        "test": "occupancy gt 0",
+        "def": "permit eq 0 && status eq 2"
+      },
+      {
+        "index": 2,
+        "kind": "scenario",
+        "test": "gate_pos gt 0",
+        "def": "permit eq 0 && status eq 1"
+      },
+      {
+        "index": 3,
+        "kind": "scenario",
+        "test": "timer lt 2",
+        "def": "permit eq 0 && status eq 1"
+      },
+      {
+        "index": 4,
+        "kind": "scenario",
+        "test": "occupancy eq 0 && gate_pos eq 0 && timer ge 2",
+        "def": "permit eq 1 && status eq 0"
+      },
+      {
+        "index": 5,
+        "kind": "others",
+        "test": "others",
+        "def": "permit eq 0 && status eq 0"
+      }
+    ],
+    "ext": [],
+    "promptSpec": "Process crossing_clear_check(occupancy, gate_pos, timer) -> (permit, status)\n\nFSF specification:\nif (occupancy gt 0) => permit eq 0 && status eq 2\nif (gate_pos gt 0) => permit eq 0 && status eq 1\nif (timer lt 2) => permit eq 0 && status eq 1\nif (occupancy eq 0 && gate_pos eq 0 && timer ge 2) => permit eq 1 && status eq 0\nothers => permit eq 0 && status eq 0",
+    "sourceBasename": "liu1998railwaycrossing",
+    "externalProvenance": {
+      "source": "liu1998railwaycrossing",
+      "section": "Clearance permit under occupancy/gate/timer constraints",
+      "generator": "manual_industrial_curation",
+      "corpus": "industrial_sofl"
+    },
+    "referenceCode": "def crossing_clear_check(occupancy: int, gate_pos: int, timer: int) -> dict:\n    \"\"\"Reference implementation auto-generated from FSF.\"\"\"\n    if occupancy > 0:\n        return {\"permit\": 0, \"status\": 2}\n    elif gate_pos > 0:\n        return {\"permit\": 0, \"status\": 1}\n    elif timer < 2:\n        return {\"permit\": 0, \"status\": 1}\n    elif occupancy == 0  and  gate_pos == 0  and  timer >= 2:\n        return {\"permit\": 1, \"status\": 0}\n    else:\n        return {\"permit\": 0, \"status\": 0}\n",
+    "complexity": {
+      "scenario_count": 4,
+      "guard_complexity": "Nested",
+      "overlap_rate": 1.2,
+      "has_external_vars": false,
+      "overlap_density_tier": "medium"
+    }
+  },
+  {
+    "taskId": "PubIndPilot.HotelBook",
+    "kind": "process",
+    "sourceFile": "industrial://liu_sofl_hotel",
+    "module": "IndustrialSOFL",
+    "name": "hotel_book",
+    "signature": {
+      "inputs": [
+        {
+          "name": "rooms",
+          "type": "int"
+        },
+        {
+          "name": "nights",
+          "type": "int"
+        },
+        {
+          "name": "vip",
+          "type": "int"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "booked",
+          "type": "int"
+        },
+        {
+          "name": "rate",
+          "type": "int"
+        }
+      ]
+    },
+    "fsfScenarios": [
+      {
+        "index": 1,
+        "kind": "scenario",
+        "test": "rooms le 0",
+        "def": "booked eq 0 && rate eq 0"
+      },
+      {
+        "index": 2,
+        "kind": "scenario",
+        "test": "nights le 0",
+        "def": "booked eq 0 && rate eq 0"
+      },
+      {
+        "index": 3,
+        "kind": "scenario",
+        "test": "vip gt 0 && rooms gt 0 && nights gt 0",
+        "def": "booked eq 1 && rate eq 1"
+      },
+      {
+        "index": 4,
+        "kind": "scenario",
+        "test": "rooms gt 0 && nights gt 0",
+        "def": "booked eq 1 && rate eq 2"
+      },
+      {
+        "index": 5,
+        "kind": "others",
+        "test": "others",
+        "def": "booked eq 0 && rate eq 0"
+      }
+    ],
+    "ext": [],
+    "promptSpec": "Process hotel_book(rooms, nights, vip) -> (booked, rate)\n\nFSF specification:\nif (rooms le 0) => booked eq 0 && rate eq 0\nif (nights le 0) => booked eq 0 && rate eq 0\nif (vip gt 0 && rooms gt 0 && nights gt 0) => booked eq 1 && rate eq 1\nif (rooms gt 0 && nights gt 0) => booked eq 1 && rate eq 2\nothers => booked eq 0 && rate eq 0",
+    "sourceBasename": "liu_sofl_hotel",
+    "externalProvenance": {
+      "source": "liu_sofl_hotel",
+      "section": "Hotel reservation SOFL application (Liu research applications list)",
+      "generator": "manual_industrial_curation",
+      "corpus": "industrial_sofl"
+    },
+    "referenceCode": "def hotel_book(rooms: int, nights: int, vip: int) -> dict:\n    \"\"\"Reference implementation auto-generated from FSF.\"\"\"\n    if rooms <= 0:\n        return {\"booked\": 0, \"rate\": 0}\n    elif nights <= 0:\n        return {\"booked\": 0, \"rate\": 0}\n    elif vip > 0  and  rooms > 0  and  nights > 0:\n        return {\"booked\": 1, \"rate\": 1}\n    elif rooms > 0  and  nights > 0:\n        return {\"booked\": 1, \"rate\": 2}\n    else:\n        return {\"booked\": 0, \"rate\": 0}\n",
+    "complexity": {
+      "scenario_count": 4,
+      "guard_complexity": "Nested",
+      "overlap_rate": 1.5,
+      "has_external_vars": false,
+      "overlap_density_tier": "high"
+    }
+  },
+  {
+    "taskId": "PubIndPilot.TransferGuard",
+    "kind": "process",
+    "sourceFile": "industrial://liu_sofl_online_banking",
+    "module": "IndustrialSOFL",
+    "name": "transfer_guard",
+    "signature": {
+      "inputs": [
+        {
+          "name": "balance",
+          "type": "int"
+        },
+        {
+          "name": "amount",
+          "type": "int"
+        },
+        {
+          "name": "daily_left",
+          "type": "int"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "ok",
+          "type": "int"
+        },
+        {
+          "name": "reason",
+          "type": "int"
+        }
+      ]
+    },
+    "fsfScenarios": [
+      {
+        "index": 1,
+        "kind": "scenario",
+        "test": "amount le 0",
+        "def": "ok eq 0 && reason eq 1"
+      },
+      {
+        "index": 2,
+        "kind": "scenario",
+        "test": "amount gt balance",
+        "def": "ok eq 0 && reason eq 2"
+      },
+      {
+        "index": 3,
+        "kind": "scenario",
+        "test": "amount gt daily_left",
+        "def": "ok eq 0 && reason eq 3"
+      },
+      {
+        "index": 4,
+        "kind": "scenario",
+        "test": "amount gt 0 && amount le balance && amount le daily_left",
+        "def": "ok eq 1 && reason eq 0"
+      },
+      {
+        "index": 5,
+        "kind": "others",
+        "test": "others",
+        "def": "ok eq 0 && reason eq 0"
+      }
+    ],
+    "ext": [],
+    "promptSpec": "Process transfer_guard(balance, amount, daily_left) -> (ok, reason)\n\nFSF specification:\nif (amount le 0) => ok eq 0 && reason eq 1\nif (amount gt balance) => ok eq 0 && reason eq 2\nif (amount gt daily_left) => ok eq 0 && reason eq 3\nif (amount gt 0 && amount le balance && amount le daily_left) => ok eq 1 && reason eq 0\nothers => ok eq 0 && reason eq 0",
+    "sourceBasename": "liu_sofl_online_banking",
+    "externalProvenance": {
+      "source": "liu_sofl_online_banking",
+      "section": "Online banking transfer guards (published SOFL modelling case)",
+      "generator": "manual_industrial_curation",
+      "corpus": "industrial_sofl"
+    },
+    "referenceCode": "def transfer_guard(balance: int, amount: int, daily_left: int) -> dict:\n    \"\"\"Reference implementation auto-generated from FSF.\"\"\"\n    if amount <= 0:\n        return {\"ok\": 0, \"reason\": 1}\n    elif amount > balance:\n        return {\"ok\": 0, \"reason\": 2}\n    elif amount > daily_left:\n        return {\"ok\": 0, \"reason\": 3}\n    elif amount > 0  and  amount <= balance  and  amount <= daily_left:\n        return {\"ok\": 1, \"reason\": 0}\n    else:\n        return {\"ok\": 0, \"reason\": 0}\n",
+    "complexity": {
+      "scenario_count": 4,
+      "guard_complexity": "Nested",
+      "overlap_rate": 1.25,
+      "has_external_vars": false,
+      "overlap_density_tier": "high"
+    }
+  },
+  {
+    "taskId": "PubIndPilot.LibraryBorrow",
+    "kind": "process",
+    "sourceFile": "industrial://liu2004soflbook",
+    "module": "IndustrialSOFL",
+    "name": "library_borrow",
+    "signature": {
+      "inputs": [
+        {
+          "name": "member_ok",
+          "type": "int"
+        },
+        {
+          "name": "copies",
+          "type": "int"
+        },
+        {
+          "name": "overdue",
+          "type": "int"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "loan",
+          "type": "int"
+        },
+        {
+          "name": "deny",
+          "type": "int"
+        }
+      ]
+    },
+    "fsfScenarios": [
+      {
+        "index": 1,
+        "kind": "scenario",
+        "test": "member_ok eq 0",
+        "def": "loan eq 0 && deny eq 2"
+      },
+      {
+        "index": 2,
+        "kind": "scenario",
+        "test": "overdue gt 0",
+        "def": "loan eq 0 && deny eq 1"
+      },
+      {
+        "index": 3,
+        "kind": "scenario",
+        "test": "copies le 0",
+        "def": "loan eq 0 && deny eq 1"
+      },
+      {
+        "index": 4,
+        "kind": "scenario",
+        "test": "member_ok gt 0 && overdue eq 0 && copies gt 0",
+        "def": "loan eq 1 && deny eq 0"
+      },
+      {
+        "index": 5,
+        "kind": "others",
+        "test": "others",
+        "def": "loan eq 0 && deny eq 0"
+      }
+    ],
+    "ext": [],
+    "promptSpec": "Process library_borrow(member_ok, copies, overdue) -> (loan, deny)\n\nFSF specification:\nif (member_ok eq 0) => loan eq 0 && deny eq 2\nif (overdue gt 0) => loan eq 0 && deny eq 1\nif (copies le 0) => loan eq 0 && deny eq 1\nif (member_ok gt 0 && overdue eq 0 && copies gt 0) => loan eq 1 && deny eq 0\nothers => loan eq 0 && deny eq 0",
+    "sourceBasename": "liu2004soflbook",
+    "externalProvenance": {
+      "source": "liu2004soflbook",
+      "section": "Library borrow process (SOFL book industrial teaching case)",
+      "generator": "manual_industrial_curation",
+      "corpus": "industrial_sofl"
+    },
+    "referenceCode": "def library_borrow(member_ok: int, copies: int, overdue: int) -> dict:\n    \"\"\"Reference implementation auto-generated from FSF.\"\"\"\n    if member_ok == 0:\n        return {\"loan\": 0, \"deny\": 2}\n    elif overdue > 0:\n        return {\"loan\": 0, \"deny\": 1}\n    elif copies <= 0:\n        return {\"loan\": 0, \"deny\": 1}\n    elif member_ok > 0  and  overdue == 0  and  copies > 0:\n        return {\"loan\": 1, \"deny\": 0}\n    else:\n        return {\"loan\": 0, \"deny\": 0}\n",
+    "complexity": {
+      "scenario_count": 4,
+      "guard_complexity": "Nested",
+      "overlap_rate": 1.2,
+      "has_external_vars": false,
+      "overlap_density_tier": "medium"
+    }
+  },
+  {
+    "taskId": "PubIndPilot.WaterTank",
+    "kind": "process",
+    "sourceFile": "industrial://liu2004soflbook",
+    "module": "IndustrialSOFL",
+    "name": "water_tank_control",
+    "signature": {
+      "inputs": [
+        {
+          "name": "level",
+          "type": "int"
+        },
+        {
+          "name": "inflow",
+          "type": "int"
+        },
+        {
+          "name": "alarm",
+          "type": "int"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "valve",
+          "type": "int"
+        },
+        {
+          "name": "pump",
+          "type": "int"
+        }
+      ]
+    },
+    "fsfScenarios": [
+      {
+        "index": 1,
+        "kind": "scenario",
+        "test": "alarm gt 0",
+        "def": "valve eq 0 && pump eq 0"
+      },
+      {
+        "index": 2,
+        "kind": "scenario",
+        "test": "level ge 9",
+        "def": "valve eq 0 && pump eq 0"
+      },
+      {
+        "index": 3,
+        "kind": "scenario",
+        "test": "level le 2",
+        "def": "valve eq 1 && pump eq 1"
+      },
+      {
+        "index": 4,
+        "kind": "scenario",
+        "test": "level gt 2 && level lt 9",
+        "def": "valve eq 1 && pump eq 0"
+      },
+      {
+        "index": 5,
+        "kind": "others",
+        "test": "others",
+        "def": "valve eq 0 && pump eq 0"
+      }
+    ],
+    "ext": [],
+    "promptSpec": "Process water_tank_control(level, inflow, alarm) -> (valve, pump)\n\nFSF specification:\nif (alarm gt 0) => valve eq 0 && pump eq 0\nif (level ge 9) => valve eq 0 && pump eq 0\nif (level le 2) => valve eq 1 && pump eq 1\nif (level gt 2 && level lt 9) => valve eq 1 && pump eq 0\nothers => valve eq 0 && pump eq 0",
+    "sourceBasename": "liu2004soflbook",
+    "externalProvenance": {
+      "source": "liu2004soflbook",
+      "section": "Water-tank / process-control SOFL example (alarm preempts)",
+      "generator": "manual_industrial_curation",
+      "corpus": "industrial_sofl"
+    },
+    "referenceCode": "def water_tank_control(level: int, inflow: int, alarm: int) -> dict:\n    \"\"\"Reference implementation auto-generated from FSF.\"\"\"\n    if alarm > 0:\n        return {\"valve\": 0, \"pump\": 0}\n    elif level >= 9:\n        return {\"valve\": 0, \"pump\": 0}\n    elif level <= 2:\n        return {\"valve\": 1, \"pump\": 1}\n    elif level > 2  and  level < 9:\n        return {\"valve\": 1, \"pump\": 0}\n    else:\n        return {\"valve\": 0, \"pump\": 0}\n",
+    "complexity": {
+      "scenario_count": 4,
+      "guard_complexity": "AND",
+      "overlap_rate": 1.25,
+      "has_external_vars": false,
+      "overlap_density_tier": "high"
+    }
+  },
+  {
+    "taskId": "PubIndPilot.PowerTrip",
+    "kind": "process",
+    "sourceFile": "industrial://li2023iet_faultprevention",
+    "module": "IndustrialSOFL",
+    "name": "power_trip_protect",
+    "signature": {
+      "inputs": [
+        {
+          "name": "current",
+          "type": "int"
+        },
+        {
+          "name": "temp",
+          "type": "int"
+        },
+        {
+          "name": "manual",
+          "type": "int"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "trip",
+          "type": "int"
+        },
+        {
+          "name": "warn",
+          "type": "int"
+        }
+      ]
+    },
+    "fsfScenarios": [
+      {
+        "index": 1,
+        "kind": "scenario",
+        "test": "manual gt 0",
+        "def": "trip eq 1 && warn eq 2"
+      },
+      {
+        "index": 2,
+        "kind": "scenario",
+        "test": "current ge 9",
+        "def": "trip eq 1 && warn eq 2"
+      },
+      {
+        "index": 3,
+        "kind": "scenario",
+        "test": "temp ge 8",
+        "def": "trip eq 1 && warn eq 1"
+      },
+      {
+        "index": 4,
+        "kind": "scenario",
+        "test": "current lt 9 && temp lt 8",
+        "def": "trip eq 0 && warn eq 0"
+      },
+      {
+        "index": 5,
+        "kind": "others",
+        "test": "others",
+        "def": "trip eq 0 && warn eq 0"
+      }
+    ],
+    "ext": [],
+    "promptSpec": "Process power_trip_protect(current, temp, manual) -> (trip, warn)\n\nFSF specification:\nif (manual gt 0) => trip eq 1 && warn eq 2\nif (current ge 9) => trip eq 1 && warn eq 2\nif (temp ge 8) => trip eq 1 && warn eq 1\nif (current lt 9 && temp lt 8) => trip eq 0 && warn eq 0\nothers => trip eq 0 && warn eq 0",
+    "sourceBasename": "li2023iet_faultprevention",
+    "externalProvenance": {
+      "source": "li2023iet_faultprevention",
+      "section": "Power protection trip priority (industrial control FSF)",
+      "generator": "manual_industrial_curation",
+      "corpus": "industrial_sofl"
+    },
+    "referenceCode": "def power_trip_protect(current: int, temp: int, manual: int) -> dict:\n    \"\"\"Reference implementation auto-generated from FSF.\"\"\"\n    if manual > 0:\n        return {\"trip\": 1, \"warn\": 2}\n    elif current >= 9:\n        return {\"trip\": 1, \"warn\": 2}\n    elif temp >= 8:\n        return {\"trip\": 1, \"warn\": 1}\n    elif current < 9  and  temp < 8:\n        return {\"trip\": 0, \"warn\": 0}\n    else:\n        return {\"trip\": 0, \"warn\": 0}\n",
+    "complexity": {
+      "scenario_count": 4,
+      "guard_complexity": "AND",
+      "overlap_rate": 1.25,
+      "has_external_vars": false,
+      "overlap_density_tier": "high"
+    }
+  },
+  {
+    "taskId": "PubIndPilot.InventoryReorder",
+    "kind": "process",
+    "sourceFile": "industrial://liu2004soflbook",
+    "module": "IndustrialSOFL",
+    "name": "inventory_reorder",
+    "signature": {
+      "inputs": [
+        {
+          "name": "stock",
+          "type": "int"
+        },
+        {
+          "name": "reorder_pt",
+          "type": "int"
+        },
+        {
+          "name": "on_order",
+          "type": "int"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "order",
+          "type": "int"
+        },
+        {
+          "name": "qty",
+          "type": "int"
+        }
+      ]
+    },
+    "fsfScenarios": [
+      {
+        "index": 1,
+        "kind": "scenario",
+        "test": "on_order gt 0",
+        "def": "order eq 0 && qty eq 0"
+      },
+      {
+        "index": 2,
+        "kind": "scenario",
+        "test": "stock le reorder_pt",
+        "def": "order eq 1 && qty eq 2"
+      },
+      {
+        "index": 3,
+        "kind": "scenario",
+        "test": "stock gt reorder_pt",
+        "def": "order eq 0 && qty eq 0"
+      },
+      {
+        "index": 4,
+        "kind": "others",
+        "test": "others",
+        "def": "order eq 0 && qty eq 0"
+      }
+    ],
+    "ext": [],
+    "promptSpec": "Process inventory_reorder(stock, reorder_pt, on_order) -> (order, qty)\n\nFSF specification:\nif (on_order gt 0) => order eq 0 && qty eq 0\nif (stock le reorder_pt) => order eq 1 && qty eq 2\nif (stock gt reorder_pt) => order eq 0 && qty eq 0\nothers => order eq 0 && qty eq 0",
+    "sourceBasename": "liu2004soflbook",
+    "externalProvenance": {
+      "source": "liu2004soflbook",
+      "section": "Inventory reorder decision (SOFL book / teaching industrial case)",
+      "generator": "manual_industrial_curation",
+      "corpus": "industrial_sofl"
+    },
+    "referenceCode": "def inventory_reorder(stock: int, reorder_pt: int, on_order: int) -> dict:\n    \"\"\"Reference implementation auto-generated from FSF.\"\"\"\n    if on_order > 0:\n        return {\"order\": 0, \"qty\": 0}\n    elif stock <= reorder_pt:\n        return {\"order\": 1, \"qty\": 2}\n    elif stock > reorder_pt:\n        return {\"order\": 0, \"qty\": 0}\n    else:\n        return {\"order\": 0, \"qty\": 0}\n",
+    "complexity": {
+      "scenario_count": 3,
+      "guard_complexity": "AND",
+      "overlap_rate": 1.333,
+      "has_external_vars": false,
+      "overlap_density_tier": "high"
+    }
+  }
+]

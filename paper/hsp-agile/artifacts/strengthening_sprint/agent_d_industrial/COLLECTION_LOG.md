@@ -3,7 +3,7 @@
 ## Harvested into RealSpec
 
 - industrial_pattern: 31
-- published_case: 10
+- published_case: 28
 
 ## Not claimed
 

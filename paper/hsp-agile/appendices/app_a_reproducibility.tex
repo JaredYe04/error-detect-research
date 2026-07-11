@@ -63,6 +63,29 @@ number from the manuscript back through processed metrics to the underlying
 raw log entry without ambiguity.
 
 % ---------------------------------------------------------------------------
+\section{Smoke Reproduction (No LLM API)}
+\label{sec:repro:smoke}
+% ---------------------------------------------------------------------------
+
+A minimal offline check validates schemas, unit tests for Feedback IR
+ablation renderers, and re-derivation of E6/E2 summary tables from frozen
+artefacts---without spending API budget:
+
+\begin{verbatim}
+# From repository root (Python 3.12+)
+python -m pytest tests/test_feedback_ir_ablation.py tests/test_schema_validate.py -q
+python paper/hsp-agile/scripts/e6_paired_analysis.py \
+  --run-dir artifacts/run_feedback_v2
+python paper/hsp-agile/scripts/summarize_equal_k.py \
+  --run-dir artifacts/run_e1_equal_k_v1
+\end{verbatim}
+
+Authoritative numbers must match
+\texttt{paper/hsp-agile/artifacts/AUTHORITATIVE\_NUMBERS.md} and
+Table~\ref{tab:authoritative-numbers}.
+Full LLM re-runs are optional; prefer artefact re-aggregation for review.
+
+% ---------------------------------------------------------------------------
 \section{Running the Experiments}
 \label{sec:repro:running}
 % ---------------------------------------------------------------------------

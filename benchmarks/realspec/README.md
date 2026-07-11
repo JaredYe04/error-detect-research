@@ -3,8 +3,8 @@
 Non-synthetic / external-provenance ordered-guard tasks for HSP-Agile external validity.
 
 - **File:** `realspec_v1.json`
-- **Count:** 103
-- **Types:** industrial_pattern=31, published_case=10, real_derived=40, textbook=22
+- **Count:** 203
+- **Types:** github_harvest=47, github_sofl=35, industrial_pattern=31, published_case=28, real_derived=40, textbook=22
 
 Each task carries `realspec.source_type` and `realspec.provenance`.
 

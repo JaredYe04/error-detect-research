@@ -10,17 +10,17 @@ In the formal specification setting, these defects are qualitatively different f
 typical correctness failures: they violate a precisely-stated behavioural contract at
 boundary regions that the specification was designed to characterise.
 Prior SOFL-oriented studies showed that early fault prevention reduces downstream
-correction costs~\cite{li2022qrs,li2023iet}, but they assume human-written
+correction costs~\cite{li2022qrs_companion,li2023iet_faultprevention}, but they assume human-written
 implementations; the integration with LLM-based synthesis creates new failure modes that
 neither human-process prevention nor LLM post-processing alone addresses.
 
 \subsection{Verifier-in-the-Loop and CEGIS}
 
-Counterexample-guided inductive synthesis (CEGIS)~\cite{solar2006sketch} established the
+Counterexample-guided inductive synthesis (CEGIS)~\cite{solarlezama2008sketching} established the
 canonical template for iterative correction: a verifier supplies counterexamples and a
 synthesiser refines its candidate until no counterexample remains.
 Verifier-guided LLM synthesis has shown encouraging results in Dafny and related
-settings~\cite{lynn2024tosem,dafnybench2024}.
+settings~\cite{sun2024clover,loughridge2024dafnybench}.
 Table~\ref{tab:related-positioning} positions our framework against these approaches on
 the dimensions that matter for specification-conformance defect prevention.
 
@@ -36,11 +36,11 @@ the dimensions that matter for specification-conformance defect prevention.
     Approach & witnesses & feedback IR & protocol & framework \\
     \midrule
     CEGIS (Solar-Lezama)          & ---  & --- & ---  & \checkmark \\
-    DafnyBench~\cite{dafnybench2024}     & \checkmark & --- & --- & --- \\
+    DafnyBench~\cite{loughridge2024dafnybench}     & \checkmark & --- & --- & --- \\
     Self-Refine~\cite{madaan2023selfrefine}   & --- & --- & --- & \checkmark \\
-    Self-Debug~\cite{chen2023selfdebug}    & --- & --- & --- & \checkmark \\
+    Self-Debug~\cite{chen2024selfdebug}    & --- & --- & --- & \checkmark \\
     Reflexion~\cite{shinn2023reflexion}    & --- & --- & --- & \checkmark \\
-    CodeT~\cite{chen2022codet}           & --- & --- & --- & --- \\
+    CodeT~\cite{chen2023codet}           & --- & --- & --- & --- \\
     \textsc{SgDP} (this paper)    & \checkmark & \checkmark & \checkmark & \checkmark \\
     \bottomrule
   \end{tabular}
@@ -56,9 +56,9 @@ guard precedence chain as SMT constraints~\cite{barrett2018smt}.
 \subsection{Structured Feedback for LLM Repair}
 
 Recent work on LLM repair has explored increasingly rich feedback forms: test
-failures~\cite{chen2023selfdebug}, natural-language critique~\cite{madaan2023selfrefine},
+failures~\cite{chen2024selfdebug}, natural-language critique~\cite{madaan2023selfrefine},
 execution traces~\cite{shinn2023reflexion}, and compiler diagnostics.
-\citet{lynn2024verifierloop} document that test-feedback loops with underspecified
+\citet{sun2024clover} document that test-feedback loops with underspecified
 diagnostics converge significantly more slowly on violations requiring structural code
 changes.  Our Semantic Feedback IR addresses this by surfacing specification-level
 structure — violated scenario identity, guard predicate text, violation type —
@@ -69,7 +69,7 @@ contribution of additional feedback volume.
 \subsection{Specification Mutation and Prevention Evaluation}
 
 Specification mutation is a long-established method for evaluating fault sensitivity of
-testing and analysis processes~\cite{okun2007nist,circus2017mutation,li2023iet}.
+testing and analysis processes~\cite{okun2013sate4,jia2011mutation,li2023iet_faultprevention}.
 Prior prevention evaluation typically conflates specification-confusion and
 implementation-screening failure modes.
 Our prevention evaluation protocol separates these into two mutant layers (Section~\ref{sec:method})
@@ -90,7 +90,7 @@ mutant population (E7).
 
 \subsection{Formal Methods in Agile Development}
 
-The tension between formal rigour and agile delivery pace is well-studied~\cite{agile2001manifesto}.
+The tension between formal rigour and agile delivery pace is well-studied~\cite{beck2004xp}.
 Lightweight formal methods — model checking, property-based testing, runtime verification
 — have been proposed as practical compromises~\cite{clarke1999modelchecking}.
 \textsc{SgDP} contributes to this tradition by demonstrating that specification-grounded
@@ -101,7 +101,7 @@ verification~\cite{leino2010dafny}.
 \subsection{Gap Summary}
 
 Existing approaches either guarantee correctness but require proof annotations that LLMs
-systematically fail to produce~\cite{loughman2024dafnybench}, or they repair code without
+systematically fail to produce~\cite{loughridge2024dafnybench}, or they repair code without
 grounding feedback in specification semantics.  \textsc{SgDP} occupies the practical
 middle ground: specification-semantic awareness without proof obligation, with an
 evaluation protocol that measures prevention rather than generation accuracy.

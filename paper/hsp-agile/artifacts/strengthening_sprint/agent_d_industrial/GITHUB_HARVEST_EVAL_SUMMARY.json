@@ -1,0 +1,14 @@
+{
+  "run_id": "run_github_harvest_v1",
+  "model": "ecnu-plus",
+  "benchmark": "benchmarks/github_harvest_v1.json",
+  "n_tasks": 48,
+  "protocol": "B1/B2/M_eq, K=3, repeats=1, seed=42",
+  "source": "GitHub live harvest Wave-3: targeted repos + ASFL FSF lite parser (JaredYe04/agile-sofl-toolchain examples; HKCA09/ICARUS discovered)",
+  "mean_conf_pct": {"B1": 85.8, "B2": 89.9, "M_eq": 89.9},
+  "strict_pct": {"B1": 75.0, "B2": 79.2, "M_eq": 79.2},
+  "paired_M_eq_vs_B2": {"wins": 1, "losses": 1, "ties": 46},
+  "paired_B2_vs_B1": {"wins": 3, "losses": 1, "ties": 44},
+  "realspec_total": 168,
+  "interpretation": "On public GitHub ASFL-derived FSF, B2 ties M_eq at 89.9% and both beat B1 (85.8%). Supports C4 default B2; M not required for mean Conf on this public harvest."
+}

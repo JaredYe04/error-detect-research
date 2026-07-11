@@ -806,5 +806,1453 @@
       "has_external_vars": false,
       "overlap_density_tier": "medium"
     }
+  },
+  {
+    "taskId": "PubIndPilot.AtmDeposit",
+    "kind": "process",
+    "sourceFile": "industrial://li2022qrs_companion",
+    "module": "IndustrialSOFL",
+    "name": "atm_deposit",
+    "signature": {
+      "inputs": [
+        {
+          "name": "auth",
+          "type": "int"
+        },
+        {
+          "name": "amount",
+          "type": "int"
+        },
+        {
+          "name": "cap",
+          "type": "int"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "ok",
+          "type": "int"
+        },
+        {
+          "name": "status",
+          "type": "int"
+        }
+      ]
+    },
+    "fsfScenarios": [
+      {
+        "index": 1,
+        "kind": "scenario",
+        "test": "auth eq 0",
+        "def": "ok eq 0 && status eq 2"
+      },
+      {
+        "index": 2,
+        "kind": "scenario",
+        "test": "amount le 0",
+        "def": "ok eq 0 && status eq 1"
+      },
+      {
+        "index": 3,
+        "kind": "scenario",
+        "test": "amount gt cap",
+        "def": "ok eq 0 && status eq 1"
+      },
+      {
+        "index": 4,
+        "kind": "scenario",
+        "test": "auth gt 0 && amount gt 0 && amount le cap",
+        "def": "ok eq 1 && status eq 0"
+      },
+      {
+        "index": 5,
+        "kind": "others",
+        "test": "others",
+        "def": "ok eq 0 && status eq 0"
+      }
+    ],
+    "ext": [],
+    "promptSpec": "Process atm_deposit(auth, amount, cap) -> (ok, status)\n\nFSF specification:\nif (auth eq 0) => ok eq 0 && status eq 2\nif (amount le 0) => ok eq 0 && status eq 1\nif (amount gt cap) => ok eq 0 && status eq 1\nif (auth gt 0 && amount gt 0 && amount le cap) => ok eq 1 && status eq 0\nothers => ok eq 0 && status eq 0",
+    "sourceBasename": "li2022qrs_companion",
+    "externalProvenance": {
+      "source": "li2022qrs_companion",
+      "section": "Agile-SOFL ATM deposit constraints (public teaching/industrial example; amount cap mirrors published JPY limits scaled to ints)",
+      "generator": "manual_industrial_curation",
+      "corpus": "industrial_sofl"
+    },
+    "referenceCode": "def atm_deposit(auth: int, amount: int, cap: int) -> dict:\n    \"\"\"Reference implementation auto-generated from FSF.\"\"\"\n    if auth == 0:\n        return {\"ok\": 0, \"status\": 2}\n    elif amount <= 0:\n        return {\"ok\": 0, \"status\": 1}\n    elif amount > cap:\n        return {\"ok\": 0, \"status\": 1}\n    elif auth > 0  and  amount > 0  and  amount <= cap:\n        return {\"ok\": 1, \"status\": 0}\n    else:\n        return {\"ok\": 0, \"status\": 0}\n",
+    "complexity": {
+      "scenario_count": 4,
+      "guard_complexity": "Nested",
+      "overlap_rate": 1.0,
+      "has_external_vars": false,
+      "overlap_density_tier": "medium"
+    }
+  },
+  {
+    "taskId": "PubIndPilot.AtmTransfer",
+    "kind": "process",
+    "sourceFile": "industrial://li2022qrs_companion",
+    "module": "IndustrialSOFL",
+    "name": "atm_transfer",
+    "signature": {
+      "inputs": [
+        {
+          "name": "auth",
+          "type": "int"
+        },
+        {
+          "name": "balance",
+          "type": "int"
+        },
+        {
+          "name": "amount",
+          "type": "int"
+        },
+        {
+          "name": "xfer_cap",
+          "type": "int"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "ok",
+          "type": "int"
+        },
+        {
+          "name": "reason",
+          "type": "int"
+        }
+      ]
+    },
+    "fsfScenarios": [
+      {
+        "index": 1,
+        "kind": "scenario",
+        "test": "auth eq 0",
+        "def": "ok eq 0 && reason eq 4"
+      },
+      {
+        "index": 2,
+        "kind": "scenario",
+        "test": "amount le 0",
+        "def": "ok eq 0 && reason eq 1"
+      },
+      {
+        "index": 3,
+        "kind": "scenario",
+        "test": "amount gt balance",
+        "def": "ok eq 0 && reason eq 2"
+      },
+      {
+        "index": 4,
+        "kind": "scenario",
+        "test": "amount gt xfer_cap",
+        "def": "ok eq 0 && reason eq 3"
+      },
+      {
+        "index": 5,
+        "kind": "scenario",
+        "test": "auth gt 0 && amount gt 0 && amount le balance && amount le xfer_cap",
+        "def": "ok eq 1 && reason eq 0"
+      },
+      {
+        "index": 6,
+        "kind": "others",
+        "test": "others",
+        "def": "ok eq 0 && reason eq 0"
+      }
+    ],
+    "ext": [],
+    "promptSpec": "Process atm_transfer(auth, balance, amount, xfer_cap) -> (ok, reason)\n\nFSF specification:\nif (auth eq 0) => ok eq 0 && reason eq 4\nif (amount le 0) => ok eq 0 && reason eq 1\nif (amount gt balance) => ok eq 0 && reason eq 2\nif (amount gt xfer_cap) => ok eq 0 && reason eq 3\nif (auth gt 0 && amount gt 0 && amount le balance && amount le xfer_cap) => ok eq 1 && reason eq 0\nothers => ok eq 0 && reason eq 0",
+    "sourceBasename": "li2022qrs_companion",
+    "externalProvenance": {
+      "source": "li2022qrs_companion",
+      "section": "ATM/online transfer under auth/balance/cap (Agile-SOFL ATM transfer function; desensitized)",
+      "generator": "manual_industrial_curation",
+      "corpus": "industrial_sofl"
+    },
+    "referenceCode": "def atm_transfer(auth: int, balance: int, amount: int, xfer_cap: int) -> dict:\n    \"\"\"Reference implementation auto-generated from FSF.\"\"\"\n    if auth == 0:\n        return {\"ok\": 0, \"reason\": 4}\n    elif amount <= 0:\n        return {\"ok\": 0, \"reason\": 1}\n    elif amount > balance:\n        return {\"ok\": 0, \"reason\": 2}\n    elif amount > xfer_cap:\n        return {\"ok\": 0, \"reason\": 3}\n    elif auth > 0  and  amount > 0  and  amount <= balance  and  amount <= xfer_cap:\n        return {\"ok\": 1, \"reason\": 0}\n    else:\n        return {\"ok\": 0, \"reason\": 0}\n",
+    "complexity": {
+      "scenario_count": 5,
+      "guard_complexity": "Nested",
+      "overlap_rate": 1.167,
+      "has_external_vars": false,
+      "overlap_density_tier": "high"
+    }
+  },
+  {
+    "taskId": "PubIndPilot.AtmInquire",
+    "kind": "process",
+    "sourceFile": "industrial://li2022qrs_companion",
+    "module": "IndustrialSOFL",
+    "name": "atm_inquire",
+    "signature": {
+      "inputs": [
+        {
+          "name": "auth",
+          "type": "int"
+        },
+        {
+          "name": "account_ok",
+          "type": "int"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "show",
+          "type": "int"
+        },
+        {
+          "name": "deny",
+          "type": "int"
+        }
+      ]
+    },
+    "fsfScenarios": [
+      {
+        "index": 1,
+        "kind": "scenario",
+        "test": "auth eq 0",
+        "def": "show eq 0 && deny eq 1"
+      },
+      {
+        "index": 2,
+        "kind": "scenario",
+        "test": "account_ok eq 0",
+        "def": "show eq 0 && deny eq 1"
+      },
+      {
+        "index": 3,
+        "kind": "scenario",
+        "test": "auth gt 0 && account_ok gt 0",
+        "def": "show eq 1 && deny eq 0"
+      },
+      {
+        "index": 4,
+        "kind": "others",
+        "test": "others",
+        "def": "show eq 0 && deny eq 0"
+      }
+    ],
+    "ext": [],
+    "promptSpec": "Process atm_inquire(auth, account_ok) -> (show, deny)\n\nFSF specification:\nif (auth eq 0) => show eq 0 && deny eq 1\nif (account_ok eq 0) => show eq 0 && deny eq 1\nif (auth gt 0 && account_ok gt 0) => show eq 1 && deny eq 0\nothers => show eq 0 && deny eq 0",
+    "sourceBasename": "li2022qrs_companion",
+    "externalProvenance": {
+      "source": "li2022qrs_companion",
+      "section": "ATM balance inquire; auth and account validity first",
+      "generator": "manual_industrial_curation",
+      "corpus": "industrial_sofl"
+    },
+    "referenceCode": "def atm_inquire(auth: int, account_ok: int) -> dict:\n    \"\"\"Reference implementation auto-generated from FSF.\"\"\"\n    if auth == 0:\n        return {\"show\": 0, \"deny\": 1}\n    elif account_ok == 0:\n        return {\"show\": 0, \"deny\": 1}\n    elif auth > 0  and  account_ok > 0:\n        return {\"show\": 1, \"deny\": 0}\n    else:\n        return {\"show\": 0, \"deny\": 0}\n",
+    "complexity": {
+      "scenario_count": 3,
+      "guard_complexity": "AND",
+      "overlap_rate": 0.833,
+      "has_external_vars": false,
+      "overlap_density_tier": "low"
+    }
+  },
+  {
+    "taskId": "PubIndPilot.DailyWithdrawCap",
+    "kind": "process",
+    "sourceFile": "industrial://li2022qrs_companion",
+    "module": "IndustrialSOFL",
+    "name": "daily_withdraw_cap",
+    "signature": {
+      "inputs": [
+        {
+          "name": "auth",
+          "type": "int"
+        },
+        {
+          "name": "amount",
+          "type": "int"
+        },
+        {
+          "name": "remaining",
+          "type": "int"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "cash",
+          "type": "int"
+        },
+        {
+          "name": "status",
+          "type": "int"
+        }
+      ]
+    },
+    "fsfScenarios": [
+      {
+        "index": 1,
+        "kind": "scenario",
+        "test": "auth eq 0",
+        "def": "cash eq 0 && status eq 2"
+      },
+      {
+        "index": 2,
+        "kind": "scenario",
+        "test": "amount le 0",
+        "def": "cash eq 0 && status eq 1"
+      },
+      {
+        "index": 3,
+        "kind": "scenario",
+        "test": "amount gt remaining",
+        "def": "cash eq 0 && status eq 3"
+      },
+      {
+        "index": 4,
+        "kind": "scenario",
+        "test": "auth gt 0 && amount gt 0 && amount le remaining",
+        "def": "cash eq 1 && status eq 0"
+      },
+      {
+        "index": 5,
+        "kind": "others",
+        "test": "others",
+        "def": "cash eq 0 && status eq 0"
+      }
+    ],
+    "ext": [],
+    "promptSpec": "Process daily_withdraw_cap(auth, amount, remaining) -> (cash, status)\n\nFSF specification:\nif (auth eq 0) => cash eq 0 && status eq 2\nif (amount le 0) => cash eq 0 && status eq 1\nif (amount gt remaining) => cash eq 0 && status eq 3\nif (auth gt 0 && amount gt 0 && amount le remaining) => cash eq 1 && status eq 0\nothers => cash eq 0 && status eq 0",
+    "sourceBasename": "li2022qrs_companion",
+    "externalProvenance": {
+      "source": "li2022qrs_companion",
+      "section": "Daily withdrawal remaining-cap check (Agile-SOFL constraint 3.1 family; remaining = cap - used, desensitized)",
+      "generator": "manual_industrial_curation",
+      "corpus": "industrial_sofl"
+    },
+    "referenceCode": "def daily_withdraw_cap(auth: int, amount: int, remaining: int) -> dict:\n    \"\"\"Reference implementation auto-generated from FSF.\"\"\"\n    if auth == 0:\n        return {\"cash\": 0, \"status\": 2}\n    elif amount <= 0:\n        return {\"cash\": 0, \"status\": 1}\n    elif amount > remaining:\n        return {\"cash\": 0, \"status\": 3}\n    elif auth > 0  and  amount > 0  and  amount <= remaining:\n        return {\"cash\": 1, \"status\": 0}\n    else:\n        return {\"cash\": 0, \"status\": 0}\n",
+    "complexity": {
+      "scenario_count": 4,
+      "guard_complexity": "Nested",
+      "overlap_rate": 1.0,
+      "has_external_vars": false,
+      "overlap_density_tier": "medium"
+    }
+  },
+  {
+    "taskId": "PubIndPilot.RouteConflict",
+    "kind": "process",
+    "sourceFile": "industrial://luo2017railway",
+    "module": "IndustrialSOFL",
+    "name": "route_conflict_check",
+    "signature": {
+      "inputs": [
+        {
+          "name": "req_a",
+          "type": "int"
+        },
+        {
+          "name": "req_b",
+          "type": "int"
+        },
+        {
+          "name": "share_plat",
+          "type": "int"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "conflict",
+          "type": "int"
+        },
+        {
+          "name": "allow",
+          "type": "int"
+        }
+      ]
+    },
+    "fsfScenarios": [
+      {
+        "index": 1,
+        "kind": "scenario",
+        "test": "req_a gt 0 && req_b gt 0 && share_plat gt 0",
+        "def": "conflict eq 1 && allow eq 0"
+      },
+      {
+        "index": 2,
+        "kind": "scenario",
+        "test": "req_a gt 0 && req_b eq 0",
+        "def": "conflict eq 0 && allow eq 1"
+      },
+      {
+        "index": 3,
+        "kind": "scenario",
+        "test": "req_b gt 0 && req_a eq 0",
+        "def": "conflict eq 0 && allow eq 1"
+      },
+      {
+        "index": 4,
+        "kind": "others",
+        "test": "others",
+        "def": "conflict eq 0 && allow eq 0"
+      }
+    ],
+    "ext": [],
+    "promptSpec": "Process route_conflict_check(req_a, req_b, share_plat) -> (conflict, allow)\n\nFSF specification:\nif (req_a gt 0 && req_b gt 0 && share_plat gt 0) => conflict eq 1 && allow eq 0\nif (req_a gt 0 && req_b eq 0) => conflict eq 0 && allow eq 1\nif (req_b gt 0 && req_a eq 0) => conflict eq 0 && allow eq 1\nothers => conflict eq 0 && allow eq 0",
+    "sourceBasename": "luo2017railway",
+    "externalProvenance": {
+      "source": "luo2017railway",
+      "section": "Conflicting routes sharing platform (industrial interlocking pattern; cf. published compositional interlocking examples)",
+      "generator": "manual_industrial_curation",
+      "corpus": "industrial_sofl"
+    },
+    "referenceCode": "def route_conflict_check(req_a: int, req_b: int, share_plat: int) -> dict:\n    \"\"\"Reference implementation auto-generated from FSF.\"\"\"\n    if req_a > 0  and  req_b > 0  and  share_plat > 0:\n        return {\"conflict\": 1, \"allow\": 0}\n    elif req_a > 0  and  req_b == 0:\n        return {\"conflict\": 0, \"allow\": 1}\n    elif req_b > 0  and  req_a == 0:\n        return {\"conflict\": 0, \"allow\": 1}\n    else:\n        return {\"conflict\": 0, \"allow\": 0}\n",
+    "complexity": {
+      "scenario_count": 3,
+      "guard_complexity": "Nested",
+      "overlap_rate": 0.75,
+      "has_external_vars": false,
+      "overlap_density_tier": "low"
+    }
+  },
+  {
+    "taskId": "PubIndPilot.FlankProtect",
+    "kind": "process",
+    "sourceFile": "industrial://luo2017railway",
+    "module": "IndustrialSOFL",
+    "name": "flank_protect",
+    "signature": {
+      "inputs": [
+        {
+          "name": "route_set",
+          "type": "int"
+        },
+        {
+          "name": "flank_clear",
+          "type": "int"
+        },
+        {
+          "name": "override",
+          "type": "int"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "proceed",
+          "type": "int"
+        },
+        {
+          "name": "block",
+          "type": "int"
+        }
+      ]
+    },
+    "fsfScenarios": [
+      {
+        "index": 1,
+        "kind": "scenario",
+        "test": "override gt 0",
+        "def": "proceed eq 0 && block eq 2"
+      },
+      {
+        "index": 2,
+        "kind": "scenario",
+        "test": "route_set eq 0",
+        "def": "proceed eq 0 && block eq 1"
+      },
+      {
+        "index": 3,
+        "kind": "scenario",
+        "test": "flank_clear eq 0",
+        "def": "proceed eq 0 && block eq 1"
+      },
+      {
+        "index": 4,
+        "kind": "scenario",
+        "test": "route_set gt 0 && flank_clear gt 0 && override eq 0",
+        "def": "proceed eq 1 && block eq 0"
+      },
+      {
+        "index": 5,
+        "kind": "others",
+        "test": "others",
+        "def": "proceed eq 0 && block eq 0"
+      }
+    ],
+    "ext": [],
+    "promptSpec": "Process flank_protect(route_set, flank_clear, override) -> (proceed, block)\n\nFSF specification:\nif (override gt 0) => proceed eq 0 && block eq 2\nif (route_set eq 0) => proceed eq 0 && block eq 1\nif (flank_clear eq 0) => proceed eq 0 && block eq 1\nif (route_set gt 0 && flank_clear gt 0 && override eq 0) => proceed eq 1 && block eq 0\nothers => proceed eq 0 && block eq 0",
+    "sourceBasename": "luo2017railway",
+    "externalProvenance": {
+      "source": "luo2017railway",
+      "section": "Flank protection gate before proceed (desensitized from public interlocking-table literature; SOFL-shaped FSF)",
+      "generator": "manual_industrial_curation",
+      "corpus": "industrial_sofl"
+    },
+    "referenceCode": "def flank_protect(route_set: int, flank_clear: int, override: int) -> dict:\n    \"\"\"Reference implementation auto-generated from FSF.\"\"\"\n    if override > 0:\n        return {\"proceed\": 0, \"block\": 2}\n    elif route_set == 0:\n        return {\"proceed\": 0, \"block\": 1}\n    elif flank_clear == 0:\n        return {\"proceed\": 0, \"block\": 1}\n    elif route_set > 0  and  flank_clear > 0  and  override == 0:\n        return {\"proceed\": 1, \"block\": 0}\n    else:\n        return {\"proceed\": 0, \"block\": 0}\n",
+    "complexity": {
+      "scenario_count": 4,
+      "guard_complexity": "Nested",
+      "overlap_rate": 1.0,
+      "has_external_vars": false,
+      "overlap_density_tier": "medium"
+    }
+  },
+  {
+    "taskId": "PubIndPilot.ApproachLock",
+    "kind": "process",
+    "sourceFile": "industrial://liu1998railwaycrossing",
+    "module": "IndustrialSOFL",
+    "name": "approach_lock",
+    "signature": {
+      "inputs": [
+        {
+          "name": "train_app",
+          "type": "int"
+        },
+        {
+          "name": "signal_clear",
+          "type": "int"
+        },
+        {
+          "name": "timer",
+          "type": "int"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "locked",
+          "type": "int"
+        },
+        {
+          "name": "release",
+          "type": "int"
+        }
+      ]
+    },
+    "fsfScenarios": [
+      {
+        "index": 1,
+        "kind": "scenario",
+        "test": "train_app gt 0 && signal_clear gt 0",
+        "def": "locked eq 1 && release eq 0"
+      },
+      {
+        "index": 2,
+        "kind": "scenario",
+        "test": "train_app gt 0 && timer lt 3",
+        "def": "locked eq 1 && release eq 0"
+      },
+      {
+        "index": 3,
+        "kind": "scenario",
+        "test": "train_app eq 0 && timer ge 3",
+        "def": "locked eq 0 && release eq 1"
+      },
+      {
+        "index": 4,
+        "kind": "others",
+        "test": "others",
+        "def": "locked eq 0 && release eq 0"
+      }
+    ],
+    "ext": [],
+    "promptSpec": "Process approach_lock(train_app, signal_clear, timer) -> (locked, release)\n\nFSF specification:\nif (train_app gt 0 && signal_clear gt 0) => locked eq 1 && release eq 0\nif (train_app gt 0 && timer lt 3) => locked eq 1 && release eq 0\nif (train_app eq 0 && timer ge 3) => locked eq 0 && release eq 1\nothers => locked eq 0 && release eq 0",
+    "sourceBasename": "liu1998railwaycrossing",
+    "externalProvenance": {
+      "source": "liu1998railwaycrossing",
+      "section": "Approach locking / timed release (railway crossing + interlocking public patterns)",
+      "generator": "manual_industrial_curation",
+      "corpus": "industrial_sofl"
+    },
+    "referenceCode": "def approach_lock(train_app: int, signal_clear: int, timer: int) -> dict:\n    \"\"\"Reference implementation auto-generated from FSF.\"\"\"\n    if train_app > 0  and  signal_clear > 0:\n        return {\"locked\": 1, \"release\": 0}\n    elif train_app > 0  and  timer < 3:\n        return {\"locked\": 1, \"release\": 0}\n    elif train_app == 0  and  timer >= 3:\n        return {\"locked\": 0, \"release\": 1}\n    else:\n        return {\"locked\": 0, \"release\": 0}\n",
+    "complexity": {
+      "scenario_count": 3,
+      "guard_complexity": "AND",
+      "overlap_rate": 1.0,
+      "has_external_vars": false,
+      "overlap_density_tier": "medium"
+    }
+  },
+  {
+    "taskId": "PubIndPilot.SignalClear",
+    "kind": "process",
+    "sourceFile": "industrial://luo2017railway",
+    "module": "IndustrialSOFL",
+    "name": "signal_clear_permit",
+    "signature": {
+      "inputs": [
+        {
+          "name": "route_ok",
+          "type": "int"
+        },
+        {
+          "name": "track_clear",
+          "type": "int"
+        },
+        {
+          "name": "fault",
+          "type": "int"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "clear",
+          "type": "int"
+        },
+        {
+          "name": "restrict",
+          "type": "int"
+        }
+      ]
+    },
+    "fsfScenarios": [
+      {
+        "index": 1,
+        "kind": "scenario",
+        "test": "fault gt 0",
+        "def": "clear eq 0 && restrict eq 2"
+      },
+      {
+        "index": 2,
+        "kind": "scenario",
+        "test": "route_ok eq 0",
+        "def": "clear eq 0 && restrict eq 1"
+      },
+      {
+        "index": 3,
+        "kind": "scenario",
+        "test": "track_clear eq 0",
+        "def": "clear eq 0 && restrict eq 1"
+      },
+      {
+        "index": 4,
+        "kind": "scenario",
+        "test": "route_ok gt 0 && track_clear gt 0 && fault eq 0",
+        "def": "clear eq 1 && restrict eq 0"
+      },
+      {
+        "index": 5,
+        "kind": "others",
+        "test": "others",
+        "def": "clear eq 0 && restrict eq 0"
+      }
+    ],
+    "ext": [],
+    "promptSpec": "Process signal_clear_permit(route_ok, track_clear, fault) -> (clear, restrict)\n\nFSF specification:\nif (fault gt 0) => clear eq 0 && restrict eq 2\nif (route_ok eq 0) => clear eq 0 && restrict eq 1\nif (track_clear eq 0) => clear eq 0 && restrict eq 1\nif (route_ok gt 0 && track_clear gt 0 && fault eq 0) => clear eq 1 && restrict eq 0\nothers => clear eq 0 && restrict eq 0",
+    "sourceBasename": "luo2017railway",
+    "externalProvenance": {
+      "source": "luo2017railway",
+      "section": "Signal clear only when route+track OK and no fault",
+      "generator": "manual_industrial_curation",
+      "corpus": "industrial_sofl"
+    },
+    "referenceCode": "def signal_clear_permit(route_ok: int, track_clear: int, fault: int) -> dict:\n    \"\"\"Reference implementation auto-generated from FSF.\"\"\"\n    if fault > 0:\n        return {\"clear\": 0, \"restrict\": 2}\n    elif route_ok == 0:\n        return {\"clear\": 0, \"restrict\": 1}\n    elif track_clear == 0:\n        return {\"clear\": 0, \"restrict\": 1}\n    elif route_ok > 0  and  track_clear > 0  and  fault == 0:\n        return {\"clear\": 1, \"restrict\": 0}\n    else:\n        return {\"clear\": 0, \"restrict\": 0}\n",
+    "complexity": {
+      "scenario_count": 4,
+      "guard_complexity": "Nested",
+      "overlap_rate": 1.0,
+      "has_external_vars": false,
+      "overlap_density_tier": "medium"
+    }
+  },
+  {
+    "taskId": "PubIndPilot.LibraryBorrow",
+    "kind": "process",
+    "sourceFile": "industrial://liu2004soflbook",
+    "module": "IndustrialSOFL",
+    "name": "library_borrow",
+    "signature": {
+      "inputs": [
+        {
+          "name": "member_ok",
+          "type": "int"
+        },
+        {
+          "name": "copies",
+          "type": "int"
+        },
+        {
+          "name": "overdue",
+          "type": "int"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "loan",
+          "type": "int"
+        },
+        {
+          "name": "deny",
+          "type": "int"
+        }
+      ]
+    },
+    "fsfScenarios": [
+      {
+        "index": 1,
+        "kind": "scenario",
+        "test": "member_ok eq 0",
+        "def": "loan eq 0 && deny eq 2"
+      },
+      {
+        "index": 2,
+        "kind": "scenario",
+        "test": "overdue gt 0",
+        "def": "loan eq 0 && deny eq 1"
+      },
+      {
+        "index": 3,
+        "kind": "scenario",
+        "test": "copies le 0",
+        "def": "loan eq 0 && deny eq 1"
+      },
+      {
+        "index": 4,
+        "kind": "scenario",
+        "test": "member_ok gt 0 && overdue eq 0 && copies gt 0",
+        "def": "loan eq 1 && deny eq 0"
+      },
+      {
+        "index": 5,
+        "kind": "others",
+        "test": "others",
+        "def": "loan eq 0 && deny eq 0"
+      }
+    ],
+    "ext": [],
+    "promptSpec": "Process library_borrow(member_ok, copies, overdue) -> (loan, deny)\n\nFSF specification:\nif (member_ok eq 0) => loan eq 0 && deny eq 2\nif (overdue gt 0) => loan eq 0 && deny eq 1\nif (copies le 0) => loan eq 0 && deny eq 1\nif (member_ok gt 0 && overdue eq 0 && copies gt 0) => loan eq 1 && deny eq 0\nothers => loan eq 0 && deny eq 0",
+    "sourceBasename": "liu2004soflbook",
+    "externalProvenance": {
+      "source": "liu2004soflbook",
+      "section": "Library borrow process (SOFL book industrial teaching case)",
+      "generator": "manual_industrial_curation",
+      "corpus": "industrial_sofl"
+    },
+    "referenceCode": "def library_borrow(member_ok: int, copies: int, overdue: int) -> dict:\n    \"\"\"Reference implementation auto-generated from FSF.\"\"\"\n    if member_ok == 0:\n        return {\"loan\": 0, \"deny\": 2}\n    elif overdue > 0:\n        return {\"loan\": 0, \"deny\": 1}\n    elif copies <= 0:\n        return {\"loan\": 0, \"deny\": 1}\n    elif member_ok > 0  and  overdue == 0  and  copies > 0:\n        return {\"loan\": 1, \"deny\": 0}\n    else:\n        return {\"loan\": 0, \"deny\": 0}\n",
+    "complexity": {
+      "scenario_count": 4,
+      "guard_complexity": "Nested",
+      "overlap_rate": 1.2,
+      "has_external_vars": false,
+      "overlap_density_tier": "high"
+    }
+  },
+  {
+    "taskId": "PubIndPilot.LibraryReturn",
+    "kind": "process",
+    "sourceFile": "industrial://liu2004soflbook",
+    "module": "IndustrialSOFL",
+    "name": "library_return",
+    "signature": {
+      "inputs": [
+        {
+          "name": "loan_active",
+          "type": "int"
+        },
+        {
+          "name": "days_late",
+          "type": "int"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "closed",
+          "type": "int"
+        },
+        {
+          "name": "fine",
+          "type": "int"
+        }
+      ]
+    },
+    "fsfScenarios": [
+      {
+        "index": 1,
+        "kind": "scenario",
+        "test": "loan_active eq 0",
+        "def": "closed eq 0 && fine eq 0"
+      },
+      {
+        "index": 2,
+        "kind": "scenario",
+        "test": "days_late gt 0",
+        "def": "closed eq 1 && fine eq 1"
+      },
+      {
+        "index": 3,
+        "kind": "scenario",
+        "test": "loan_active gt 0 && days_late eq 0",
+        "def": "closed eq 1 && fine eq 0"
+      },
+      {
+        "index": 4,
+        "kind": "others",
+        "test": "others",
+        "def": "closed eq 0 && fine eq 0"
+      }
+    ],
+    "ext": [],
+    "promptSpec": "Process library_return(loan_active, days_late) -> (closed, fine)\n\nFSF specification:\nif (loan_active eq 0) => closed eq 0 && fine eq 0\nif (days_late gt 0) => closed eq 1 && fine eq 1\nif (loan_active gt 0 && days_late eq 0) => closed eq 1 && fine eq 0\nothers => closed eq 0 && fine eq 0",
+    "sourceBasename": "liu2004soflbook",
+    "externalProvenance": {
+      "source": "liu2004soflbook",
+      "section": "Library return with late fine priority",
+      "generator": "manual_industrial_curation",
+      "corpus": "industrial_sofl"
+    },
+    "referenceCode": "def library_return(loan_active: int, days_late: int) -> dict:\n    \"\"\"Reference implementation auto-generated from FSF.\"\"\"\n    if loan_active == 0:\n        return {\"closed\": 0, \"fine\": 0}\n    elif days_late > 0:\n        return {\"closed\": 1, \"fine\": 1}\n    elif loan_active > 0  and  days_late == 0:\n        return {\"closed\": 1, \"fine\": 0}\n    else:\n        return {\"closed\": 0, \"fine\": 0}\n",
+    "complexity": {
+      "scenario_count": 3,
+      "guard_complexity": "AND",
+      "overlap_rate": 0.75,
+      "has_external_vars": false,
+      "overlap_density_tier": "low"
+    }
+  },
+  {
+    "taskId": "PubIndPilot.WaterTank",
+    "kind": "process",
+    "sourceFile": "industrial://liu2004soflbook",
+    "module": "IndustrialSOFL",
+    "name": "water_tank_control",
+    "signature": {
+      "inputs": [
+        {
+          "name": "level",
+          "type": "int"
+        },
+        {
+          "name": "inflow",
+          "type": "int"
+        },
+        {
+          "name": "alarm",
+          "type": "int"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "valve",
+          "type": "int"
+        },
+        {
+          "name": "pump",
+          "type": "int"
+        }
+      ]
+    },
+    "fsfScenarios": [
+      {
+        "index": 1,
+        "kind": "scenario",
+        "test": "alarm gt 0",
+        "def": "valve eq 0 && pump eq 0"
+      },
+      {
+        "index": 2,
+        "kind": "scenario",
+        "test": "level ge 9",
+        "def": "valve eq 0 && pump eq 0"
+      },
+      {
+        "index": 3,
+        "kind": "scenario",
+        "test": "level le 2",
+        "def": "valve eq 1 && pump eq 1"
+      },
+      {
+        "index": 4,
+        "kind": "scenario",
+        "test": "level gt 2 && level lt 9",
+        "def": "valve eq 1 && pump eq 0"
+      },
+      {
+        "index": 5,
+        "kind": "others",
+        "test": "others",
+        "def": "valve eq 0 && pump eq 0"
+      }
+    ],
+    "ext": [],
+    "promptSpec": "Process water_tank_control(level, inflow, alarm) -> (valve, pump)\n\nFSF specification:\nif (alarm gt 0) => valve eq 0 && pump eq 0\nif (level ge 9) => valve eq 0 && pump eq 0\nif (level le 2) => valve eq 1 && pump eq 1\nif (level gt 2 && level lt 9) => valve eq 1 && pump eq 0\nothers => valve eq 0 && pump eq 0",
+    "sourceBasename": "liu2004soflbook",
+    "externalProvenance": {
+      "source": "liu2004soflbook",
+      "section": "Water-tank / process-control SOFL example (alarm preempts)",
+      "generator": "manual_industrial_curation",
+      "corpus": "industrial_sofl"
+    },
+    "referenceCode": "def water_tank_control(level: int, inflow: int, alarm: int) -> dict:\n    \"\"\"Reference implementation auto-generated from FSF.\"\"\"\n    if alarm > 0:\n        return {\"valve\": 0, \"pump\": 0}\n    elif level >= 9:\n        return {\"valve\": 0, \"pump\": 0}\n    elif level <= 2:\n        return {\"valve\": 1, \"pump\": 1}\n    elif level > 2  and  level < 9:\n        return {\"valve\": 1, \"pump\": 0}\n    else:\n        return {\"valve\": 0, \"pump\": 0}\n",
+    "complexity": {
+      "scenario_count": 4,
+      "guard_complexity": "AND",
+      "overlap_rate": 1.25,
+      "has_external_vars": false,
+      "overlap_density_tier": "high"
+    }
+  },
+  {
+    "taskId": "PubIndPilot.HotelCheckout",
+    "kind": "process",
+    "sourceFile": "industrial://liu_sofl_hotel",
+    "module": "IndustrialSOFL",
+    "name": "hotel_checkout",
+    "signature": {
+      "inputs": [
+        {
+          "name": "occupied",
+          "type": "int"
+        },
+        {
+          "name": "paid",
+          "type": "int"
+        },
+        {
+          "name": "damage",
+          "type": "int"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "release",
+          "type": "int"
+        },
+        {
+          "name": "bill",
+          "type": "int"
+        }
+      ]
+    },
+    "fsfScenarios": [
+      {
+        "index": 1,
+        "kind": "scenario",
+        "test": "occupied eq 0",
+        "def": "release eq 0 && bill eq 0"
+      },
+      {
+        "index": 2,
+        "kind": "scenario",
+        "test": "paid eq 0",
+        "def": "release eq 0 && bill eq 2"
+      },
+      {
+        "index": 3,
+        "kind": "scenario",
+        "test": "damage gt 0",
+        "def": "release eq 0 && bill eq 1"
+      },
+      {
+        "index": 4,
+        "kind": "scenario",
+        "test": "occupied gt 0 && paid gt 0 && damage eq 0",
+        "def": "release eq 1 && bill eq 0"
+      },
+      {
+        "index": 5,
+        "kind": "others",
+        "test": "others",
+        "def": "release eq 0 && bill eq 0"
+      }
+    ],
+    "ext": [],
+    "promptSpec": "Process hotel_checkout(occupied, paid, damage) -> (release, bill)\n\nFSF specification:\nif (occupied eq 0) => release eq 0 && bill eq 0\nif (paid eq 0) => release eq 0 && bill eq 2\nif (damage gt 0) => release eq 0 && bill eq 1\nif (occupied gt 0 && paid gt 0 && damage eq 0) => release eq 1 && bill eq 0\nothers => release eq 0 && bill eq 0",
+    "sourceBasename": "liu_sofl_hotel",
+    "externalProvenance": {
+      "source": "liu_sofl_hotel",
+      "section": "Hotel checkout release under payment/damage guards",
+      "generator": "manual_industrial_curation",
+      "corpus": "industrial_sofl"
+    },
+    "referenceCode": "def hotel_checkout(occupied: int, paid: int, damage: int) -> dict:\n    \"\"\"Reference implementation auto-generated from FSF.\"\"\"\n    if occupied == 0:\n        return {\"release\": 0, \"bill\": 0}\n    elif paid == 0:\n        return {\"release\": 0, \"bill\": 2}\n    elif damage > 0:\n        return {\"release\": 0, \"bill\": 1}\n    elif occupied > 0  and  paid > 0  and  damage == 0:\n        return {\"release\": 1, \"bill\": 0}\n    else:\n        return {\"release\": 0, \"bill\": 0}\n",
+    "complexity": {
+      "scenario_count": 4,
+      "guard_complexity": "Nested",
+      "overlap_rate": 0.867,
+      "has_external_vars": false,
+      "overlap_density_tier": "low"
+    }
+  },
+  {
+    "taskId": "PubIndPilot.AccessBadge",
+    "kind": "process",
+    "sourceFile": "industrial://li2023iet_faultprevention",
+    "module": "IndustrialSOFL",
+    "name": "access_badge",
+    "signature": {
+      "inputs": [
+        {
+          "name": "badge_ok",
+          "type": "int"
+        },
+        {
+          "name": "zone",
+          "type": "int"
+        },
+        {
+          "name": "time_ok",
+          "type": "int"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "open",
+          "type": "int"
+        },
+        {
+          "name": "alarm",
+          "type": "int"
+        }
+      ]
+    },
+    "fsfScenarios": [
+      {
+        "index": 1,
+        "kind": "scenario",
+        "test": "badge_ok eq 0",
+        "def": "open eq 0 && alarm eq 2"
+      },
+      {
+        "index": 2,
+        "kind": "scenario",
+        "test": "time_ok eq 0",
+        "def": "open eq 0 && alarm eq 1"
+      },
+      {
+        "index": 3,
+        "kind": "scenario",
+        "test": "zone ge 3 && badge_ok gt 0",
+        "def": "open eq 0 && alarm eq 1"
+      },
+      {
+        "index": 4,
+        "kind": "scenario",
+        "test": "badge_ok gt 0 && time_ok gt 0 && zone lt 3",
+        "def": "open eq 1 && alarm eq 0"
+      },
+      {
+        "index": 5,
+        "kind": "others",
+        "test": "others",
+        "def": "open eq 0 && alarm eq 0"
+      }
+    ],
+    "ext": [],
+    "promptSpec": "Process access_badge(badge_ok, zone, time_ok) -> (open, alarm)\n\nFSF specification:\nif (badge_ok eq 0) => open eq 0 && alarm eq 2\nif (time_ok eq 0) => open eq 0 && alarm eq 1\nif (zone ge 3 && badge_ok gt 0) => open eq 0 && alarm eq 1\nif (badge_ok gt 0 && time_ok gt 0 && zone lt 3) => open eq 1 && alarm eq 0\nothers => open eq 0 && alarm eq 0",
+    "sourceBasename": "li2023iet_faultprevention",
+    "externalProvenance": {
+      "source": "li2023iet_faultprevention",
+      "section": "Physical access control ordered guards (IET SOFL fault-prevention industrial modelling style)",
+      "generator": "manual_industrial_curation",
+      "corpus": "industrial_sofl"
+    },
+    "referenceCode": "def access_badge(badge_ok: int, zone: int, time_ok: int) -> dict:\n    \"\"\"Reference implementation auto-generated from FSF.\"\"\"\n    if badge_ok == 0:\n        return {\"open\": 0, \"alarm\": 2}\n    elif time_ok == 0:\n        return {\"open\": 0, \"alarm\": 1}\n    elif zone >= 3  and  badge_ok > 0:\n        return {\"open\": 0, \"alarm\": 1}\n    elif badge_ok > 0  and  time_ok > 0  and  zone < 3:\n        return {\"open\": 1, \"alarm\": 0}\n    else:\n        return {\"open\": 0, \"alarm\": 0}\n",
+    "complexity": {
+      "scenario_count": 4,
+      "guard_complexity": "Nested",
+      "overlap_rate": 0.867,
+      "has_external_vars": false,
+      "overlap_density_tier": "low"
+    }
+  },
+  {
+    "taskId": "PubIndPilot.MedDose",
+    "kind": "process",
+    "sourceFile": "industrial://li2023iet_faultprevention",
+    "module": "IndustrialSOFL",
+    "name": "med_dose_check",
+    "signature": {
+      "inputs": [
+        {
+          "name": "weight",
+          "type": "int"
+        },
+        {
+          "name": "dose",
+          "type": "int"
+        },
+        {
+          "name": "allergy",
+          "type": "int"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "approve",
+          "type": "int"
+        },
+        {
+          "name": "flag",
+          "type": "int"
+        }
+      ]
+    },
+    "fsfScenarios": [
+      {
+        "index": 1,
+        "kind": "scenario",
+        "test": "allergy gt 0",
+        "def": "approve eq 0 && flag eq 2"
+      },
+      {
+        "index": 2,
+        "kind": "scenario",
+        "test": "dose le 0",
+        "def": "approve eq 0 && flag eq 1"
+      },
+      {
+        "index": 3,
+        "kind": "scenario",
+        "test": "dose gt weight",
+        "def": "approve eq 0 && flag eq 1"
+      },
+      {
+        "index": 4,
+        "kind": "scenario",
+        "test": "allergy eq 0 && dose gt 0 && dose le weight",
+        "def": "approve eq 1 && flag eq 0"
+      },
+      {
+        "index": 5,
+        "kind": "others",
+        "test": "others",
+        "def": "approve eq 0 && flag eq 0"
+      }
+    ],
+    "ext": [],
+    "promptSpec": "Process med_dose_check(weight, dose, allergy) -> (approve, flag)\n\nFSF specification:\nif (allergy gt 0) => approve eq 0 && flag eq 2\nif (dose le 0) => approve eq 0 && flag eq 1\nif (dose gt weight) => approve eq 0 && flag eq 1\nif (allergy eq 0 && dose gt 0 && dose le weight) => approve eq 1 && flag eq 0\nothers => approve eq 0 && flag eq 0",
+    "sourceBasename": "li2023iet_faultprevention",
+    "externalProvenance": {
+      "source": "li2023iet_faultprevention",
+      "section": "Medication dose safety checks (published SOFL healthcare modelling pattern; desensitized units)",
+      "generator": "manual_industrial_curation",
+      "corpus": "industrial_sofl"
+    },
+    "referenceCode": "def med_dose_check(weight: int, dose: int, allergy: int) -> dict:\n    \"\"\"Reference implementation auto-generated from FSF.\"\"\"\n    if allergy > 0:\n        return {\"approve\": 0, \"flag\": 2}\n    elif dose <= 0:\n        return {\"approve\": 0, \"flag\": 1}\n    elif dose > weight:\n        return {\"approve\": 0, \"flag\": 1}\n    elif allergy == 0  and  dose > 0  and  dose <= weight:\n        return {\"approve\": 1, \"flag\": 0}\n    else:\n        return {\"approve\": 0, \"flag\": 0}\n",
+    "complexity": {
+      "scenario_count": 4,
+      "guard_complexity": "Nested",
+      "overlap_rate": 1.0,
+      "has_external_vars": false,
+      "overlap_density_tier": "medium"
+    }
+  },
+  {
+    "taskId": "PubIndPilot.PowerTrip",
+    "kind": "process",
+    "sourceFile": "industrial://li2023iet_faultprevention",
+    "module": "IndustrialSOFL",
+    "name": "power_trip_protect",
+    "signature": {
+      "inputs": [
+        {
+          "name": "current",
+          "type": "int"
+        },
+        {
+          "name": "temp",
+          "type": "int"
+        },
+        {
+          "name": "manual",
+          "type": "int"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "trip",
+          "type": "int"
+        },
+        {
+          "name": "warn",
+          "type": "int"
+        }
+      ]
+    },
+    "fsfScenarios": [
+      {
+        "index": 1,
+        "kind": "scenario",
+        "test": "manual gt 0",
+        "def": "trip eq 1 && warn eq 2"
+      },
+      {
+        "index": 2,
+        "kind": "scenario",
+        "test": "current ge 9",
+        "def": "trip eq 1 && warn eq 2"
+      },
+      {
+        "index": 3,
+        "kind": "scenario",
+        "test": "temp ge 8",
+        "def": "trip eq 1 && warn eq 1"
+      },
+      {
+        "index": 4,
+        "kind": "scenario",
+        "test": "current lt 9 && temp lt 8",
+        "def": "trip eq 0 && warn eq 0"
+      },
+      {
+        "index": 5,
+        "kind": "others",
+        "test": "others",
+        "def": "trip eq 0 && warn eq 0"
+      }
+    ],
+    "ext": [],
+    "promptSpec": "Process power_trip_protect(current, temp, manual) -> (trip, warn)\n\nFSF specification:\nif (manual gt 0) => trip eq 1 && warn eq 2\nif (current ge 9) => trip eq 1 && warn eq 2\nif (temp ge 8) => trip eq 1 && warn eq 1\nif (current lt 9 && temp lt 8) => trip eq 0 && warn eq 0\nothers => trip eq 0 && warn eq 0",
+    "sourceBasename": "li2023iet_faultprevention",
+    "externalProvenance": {
+      "source": "li2023iet_faultprevention",
+      "section": "Power protection trip priority (industrial control FSF)",
+      "generator": "manual_industrial_curation",
+      "corpus": "industrial_sofl"
+    },
+    "referenceCode": "def power_trip_protect(current: int, temp: int, manual: int) -> dict:\n    \"\"\"Reference implementation auto-generated from FSF.\"\"\"\n    if manual > 0:\n        return {\"trip\": 1, \"warn\": 2}\n    elif current >= 9:\n        return {\"trip\": 1, \"warn\": 2}\n    elif temp >= 8:\n        return {\"trip\": 1, \"warn\": 1}\n    elif current < 9  and  temp < 8:\n        return {\"trip\": 0, \"warn\": 0}\n    else:\n        return {\"trip\": 0, \"warn\": 0}\n",
+    "complexity": {
+      "scenario_count": 4,
+      "guard_complexity": "AND",
+      "overlap_rate": 1.25,
+      "has_external_vars": false,
+      "overlap_density_tier": "high"
+    }
+  },
+  {
+    "taskId": "PubIndPilot.TrafficPriority",
+    "kind": "process",
+    "sourceFile": "industrial://liu2004soflbook",
+    "module": "IndustrialSOFL",
+    "name": "traffic_signal_priority",
+    "signature": {
+      "inputs": [
+        {
+          "name": "emergency",
+          "type": "int"
+        },
+        {
+          "name": "ped",
+          "type": "int"
+        },
+        {
+          "name": "phase",
+          "type": "int"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "light",
+          "type": "int"
+        },
+        {
+          "name": "hold",
+          "type": "int"
+        }
+      ]
+    },
+    "fsfScenarios": [
+      {
+        "index": 1,
+        "kind": "scenario",
+        "test": "emergency gt 0",
+        "def": "light eq 0 && hold eq 2"
+      },
+      {
+        "index": 2,
+        "kind": "scenario",
+        "test": "ped gt 0 && phase eq 1",
+        "def": "light eq 1 && hold eq 1"
+      },
+      {
+        "index": 3,
+        "kind": "scenario",
+        "test": "phase eq 2",
+        "def": "light eq 2 && hold eq 0"
+      },
+      {
+        "index": 4,
+        "kind": "scenario",
+        "test": "phase eq 0",
+        "def": "light eq 0 && hold eq 0"
+      },
+      {
+        "index": 5,
+        "kind": "others",
+        "test": "others",
+        "def": "light eq 0 && hold eq 0"
+      }
+    ],
+    "ext": [],
+    "promptSpec": "Process traffic_signal_priority(emergency, ped, phase) -> (light, hold)\n\nFSF specification:\nif (emergency gt 0) => light eq 0 && hold eq 2\nif (ped gt 0 && phase eq 1) => light eq 1 && hold eq 1\nif (phase eq 2) => light eq 2 && hold eq 0\nif (phase eq 0) => light eq 0 && hold eq 0\nothers => light eq 0 && hold eq 0",
+    "sourceBasename": "liu2004soflbook",
+    "externalProvenance": {
+      "source": "liu2004soflbook",
+      "section": "Traffic signal priority with emergency preempt (SOFL-style ordered scenarios)",
+      "generator": "manual_industrial_curation",
+      "corpus": "industrial_sofl"
+    },
+    "referenceCode": "def traffic_signal_priority(emergency: int, ped: int, phase: int) -> dict:\n    \"\"\"Reference implementation auto-generated from FSF.\"\"\"\n    if emergency > 0:\n        return {\"light\": 0, \"hold\": 2}\n    elif ped > 0  and  phase == 1:\n        return {\"light\": 1, \"hold\": 1}\n    elif phase == 2:\n        return {\"light\": 2, \"hold\": 0}\n    elif phase == 0:\n        return {\"light\": 0, \"hold\": 0}\n    else:\n        return {\"light\": 0, \"hold\": 0}\n",
+    "complexity": {
+      "scenario_count": 4,
+      "guard_complexity": "AND",
+      "overlap_rate": 0.867,
+      "has_external_vars": false,
+      "overlap_density_tier": "low"
+    }
+  },
+  {
+    "taskId": "PubIndPilot.InsuranceClaim",
+    "kind": "process",
+    "sourceFile": "industrial://li2023iet_faultprevention",
+    "module": "IndustrialSOFL",
+    "name": "insurance_claim_triage",
+    "signature": {
+      "inputs": [
+        {
+          "name": "fraud_score",
+          "type": "int"
+        },
+        {
+          "name": "amount",
+          "type": "int"
+        },
+        {
+          "name": "docs_ok",
+          "type": "int"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "pay",
+          "type": "int"
+        },
+        {
+          "name": "review",
+          "type": "int"
+        }
+      ]
+    },
+    "fsfScenarios": [
+      {
+        "index": 1,
+        "kind": "scenario",
+        "test": "fraud_score ge 8",
+        "def": "pay eq 0 && review eq 2"
+      },
+      {
+        "index": 2,
+        "kind": "scenario",
+        "test": "docs_ok eq 0",
+        "def": "pay eq 0 && review eq 1"
+      },
+      {
+        "index": 3,
+        "kind": "scenario",
+        "test": "amount ge 9",
+        "def": "pay eq 0 && review eq 1"
+      },
+      {
+        "index": 4,
+        "kind": "scenario",
+        "test": "fraud_score lt 8 && docs_ok gt 0 && amount lt 9",
+        "def": "pay eq 1 && review eq 0"
+      },
+      {
+        "index": 5,
+        "kind": "others",
+        "test": "others",
+        "def": "pay eq 0 && review eq 0"
+      }
+    ],
+    "ext": [],
+    "promptSpec": "Process insurance_claim_triage(fraud_score, amount, docs_ok) -> (pay, review)\n\nFSF specification:\nif (fraud_score ge 8) => pay eq 0 && review eq 2\nif (docs_ok eq 0) => pay eq 0 && review eq 1\nif (amount ge 9) => pay eq 0 && review eq 1\nif (fraud_score lt 8 && docs_ok gt 0 && amount lt 9) => pay eq 1 && review eq 0\nothers => pay eq 0 && review eq 0",
+    "sourceBasename": "li2023iet_faultprevention",
+    "externalProvenance": {
+      "source": "li2023iet_faultprevention",
+      "section": "Insurance claim triage with fraud preempt (IET-style requirements fault-prevention modelling)",
+      "generator": "manual_industrial_curation",
+      "corpus": "industrial_sofl"
+    },
+    "referenceCode": "def insurance_claim_triage(fraud_score: int, amount: int, docs_ok: int) -> dict:\n    \"\"\"Reference implementation auto-generated from FSF.\"\"\"\n    if fraud_score >= 8:\n        return {\"pay\": 0, \"review\": 2}\n    elif docs_ok == 0:\n        return {\"pay\": 0, \"review\": 1}\n    elif amount >= 9:\n        return {\"pay\": 0, \"review\": 1}\n    elif fraud_score < 8  and  docs_ok > 0  and  amount < 9:\n        return {\"pay\": 1, \"review\": 0}\n    else:\n        return {\"pay\": 0, \"review\": 0}\n",
+    "complexity": {
+      "scenario_count": 4,
+      "guard_complexity": "Nested",
+      "overlap_rate": 0.867,
+      "has_external_vars": false,
+      "overlap_density_tier": "low"
+    }
+  },
+  {
+    "taskId": "PubIndPilot.InventoryReorder",
+    "kind": "process",
+    "sourceFile": "industrial://liu2004soflbook",
+    "module": "IndustrialSOFL",
+    "name": "inventory_reorder",
+    "signature": {
+      "inputs": [
+        {
+          "name": "stock",
+          "type": "int"
+        },
+        {
+          "name": "reorder_pt",
+          "type": "int"
+        },
+        {
+          "name": "on_order",
+          "type": "int"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "order",
+          "type": "int"
+        },
+        {
+          "name": "qty",
+          "type": "int"
+        }
+      ]
+    },
+    "fsfScenarios": [
+      {
+        "index": 1,
+        "kind": "scenario",
+        "test": "on_order gt 0",
+        "def": "order eq 0 && qty eq 0"
+      },
+      {
+        "index": 2,
+        "kind": "scenario",
+        "test": "stock le reorder_pt",
+        "def": "order eq 1 && qty eq 2"
+      },
+      {
+        "index": 3,
+        "kind": "scenario",
+        "test": "stock gt reorder_pt",
+        "def": "order eq 0 && qty eq 0"
+      },
+      {
+        "index": 4,
+        "kind": "others",
+        "test": "others",
+        "def": "order eq 0 && qty eq 0"
+      }
+    ],
+    "ext": [],
+    "promptSpec": "Process inventory_reorder(stock, reorder_pt, on_order) -> (order, qty)\n\nFSF specification:\nif (on_order gt 0) => order eq 0 && qty eq 0\nif (stock le reorder_pt) => order eq 1 && qty eq 2\nif (stock gt reorder_pt) => order eq 0 && qty eq 0\nothers => order eq 0 && qty eq 0",
+    "sourceBasename": "liu2004soflbook",
+    "externalProvenance": {
+      "source": "liu2004soflbook",
+      "section": "Inventory reorder decision (SOFL book / teaching industrial case)",
+      "generator": "manual_industrial_curation",
+      "corpus": "industrial_sofl"
+    },
+    "referenceCode": "def inventory_reorder(stock: int, reorder_pt: int, on_order: int) -> dict:\n    \"\"\"Reference implementation auto-generated from FSF.\"\"\"\n    if on_order > 0:\n        return {\"order\": 0, \"qty\": 0}\n    elif stock <= reorder_pt:\n        return {\"order\": 1, \"qty\": 2}\n    elif stock > reorder_pt:\n        return {\"order\": 0, \"qty\": 0}\n    else:\n        return {\"order\": 0, \"qty\": 0}\n",
+    "complexity": {
+      "scenario_count": 3,
+      "guard_complexity": "AND",
+      "overlap_rate": 1.333,
+      "has_external_vars": false,
+      "overlap_density_tier": "high"
+    }
   }
 ]
