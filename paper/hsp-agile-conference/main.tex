@@ -52,33 +52,43 @@ Shanghai, China}
 
 \begin{abstract}
 Large language models synthesise code that often looks correct under everyday
-unit tests yet still mishandles thin specification regions---especially
+unit tests yet still mishandles thin specification regions, especially
 catch-all residuals and ordered overlaps.
 Consider a tier classifier whose \texttt{OTHERWISE} branch must return
 \texttt{Review}: an LLM candidate can pass every Reject/Pass sample while
 silently promoting the mid-band to \texttt{Pass}.
 A release dashboard that tracks mean pass rate alone will ship that defect.
 
-We study a bounded \textbf{acceptance check}: release only when every
-specification-derived witness matches \emph{and} a structural screen clears
+We study \textbf{headroom-conditioned catch-all repair} under a SpecIR
+first-match oracle, together with a conditional dual-gate release check
 ($\mathrm{Accept}\Leftrightarrow\mathrm{Conf}{=}1\wedge\mathrm{Screen}{=}\mathit{pass}$).
-HSP-Agile implements this dual-gate check on SOFL/FSF with first-match SMT
-witnesses, structured scenario-aware repair feedback, and a configurable
-static safety screen.
-Here \emph{FAR} is the fraction of faulty mutants that a mode incorrectly
-releases; \emph{PDR} is the complementary rejection rate.
+HSP-Agile implements the check on SOFL/FSF with Priority-Encoded Witness
+Generation, Scenario-Indexed Feedback Rendering, and a configurable static
+screen.
+\emph{FAR} (False Accept Rate) is the fraction of faulty mutants that a mode
+incorrectly releases; \emph{PDR} is the complementary rejection rate.
 
-When repair still has headroom, scenario-aware feedback improves mean
-conformance over test-only feedback by ${+}7.7$\,pp (95\% CI
-$[2.3,\,13.6]$); all 14 wins repair catch-all residuals.
-On the constructed first-order mutant population, the dual-gate check reduces
-FAR from 8.8\% to 5.0\% (PDR 91.2\% to 95.0\%).
-At matched budget~$K{=}3$, equal-$K$ Conf.\ places \texttt{M\_eq} at 100.0\%
-vs.\ B2 97.5\% (${+}2.5$\,pp; $3/0/117$).
-Gemini hard-seed runs support the feedback effect, while GPT-4o/Claude and
-public-corpus results reveal frequent saturation.  Test-feedback is therefore
-the default; the additional gate is justified when its bounded witness and
-mutant criteria match the release context.
+When test-only Conf.\ is already~$0$ ($n{=}13$), Semantic IR rescues all tasks
+(${+}90.7$\,pp); on the headroom set (Conf.${<}1$, $n{=}114$) the paired mean
+is ${+}8.2$\,pp (CI excludes~0).
+Among 18 decisive tasks, Semantic IR wins 14/18 (77.8\%).
+The all-task ${+}7.7$\,pp figure is only a supporting aggregate.
+On industrial-style mutants ($n{=}132$), Screen cuts FAR from 56.8\% to
+32.6\%---the primary prevention claim; over the full mutant pool ($n{=}852$)
+that lift appears as FAR 8.8\% to 5.0\%, but HardSynthetic mutants are already
+saturated and do not exercise Screen.
+Under a frozen external hard-seed protocol (test-only Conf.${<}1$),
+\texttt{wrong\_relop} transfers at ${+}20.6$\,pp ($n{=}79$; CI $[12.7,\,28.6]$);
+HKCA09 alone contributes ${+}18.8$\,pp ($n{=}17$; CI excludes~0).
+On GitHub harvest reference mutants, Screen cuts FAR from 60.4\% to 11.5\%
+(94 B2-accept/M-reject cases); published-industrial screening saturates
+(0 Screen-hits)---a boundary, not a null of industrial-132.
+The controlled SIFR estimate remains E6 on BENCH-120; external rows are
+protocol-transfer diagnostics, not a second headline.
+Test-only B2 remains the default.
+Escalate when Accept is required or a contractual FAR budget exists \emph{and}
+repair headroom remains; Screen helps on industrial-pattern mutants but does
+not attain FAR${\le}5\%$ on that slice.
 \end{abstract}
 
 \begin{IEEEkeywords}
@@ -91,26 +101,26 @@ ordered guards, LLM synthesis, SOFL, SMT, false accept rate
 %======================================================================
 A release dashboard can look healthy while a residual specification region is
 already broken.
-LLMs synthesise code that passes busy unit tests yet mishandles catch-all
-\texttt{OTHERWISE} bands and ordered overlaps that everyday suites never
-sample~\cite{chen2021codex,dakhel2023copilot,zhu1997specification}.
+Large language models synthesise code that passes busy unit tests yet still
+mishandles catch-all \texttt{OTHERWISE} bands and ordered overlaps that everyday
+suites never sample~\cite{chen2021codex,dakhel2023copilot,zhu1997specification}.
 SOFL/FSF makes those regions explicit as first-match
 scenarios~\cite{liu1998sofl,liu2004soflbook,li2022qrs_companion}.
-We ask whether a team can \emph{refuse} to ship under an acceptance-safety bar
-that uses the specification itself as evidence---without full deductive
-verification.
+We ask whether a team can \emph{refuse} to ship under a specification-backed
+acceptance-safety bar, without full deductive verification.
 
 \runin{Acceptance criterion.}
-Release requires every specification-derived witness to match \emph{and} a
-structural screen to clear:
+Release is safe only when every specification-derived witness matches
+\emph{and} a structural screen clears:
 $\mathrm{Accept}\Leftrightarrow\mathrm{Conf}{=}1\wedge\mathrm{Screen}{=}\mathit{pass}$.
-We refer to this directly as a \textbf{dual-gate acceptance check}.  It is a
-bounded operational criterion over the generated witnesses and configured
-screen, not a proof of program safety.
+We refer to this directly as a \textbf{dual-gate acceptance check}.
+It is a bounded operational criterion evaluated over generated witnesses and a
+configured screen, not a proof of program safety.
 HSP-Agile realises it on SOFL/FSF with SpecIR witnesses, structured
-scenario-aware feedback under headroom, and a configurable static screen.
-$\mathrm{FAR}$ (False Accept Rate) is the fraction of faulty mutants that a
-mode incorrectly releases; $\mathrm{PDR}$ is the complementary rejection rate.
+scenario-aware feedback when repair headroom remains, and a configurable static
+screen.
+$\mathrm{FAR}$ is the fraction of faulty mutants that a mode incorrectly
+releases; $\mathrm{PDR}$ is the complementary rejection rate.
 
 \runin{Primary vignette (catch-all).}
 A tier classifier rejects negative scores and passes scores at or above a
@@ -118,10 +128,10 @@ floor; everything else falls into \texttt{OTHERWISE} and must return
 \texttt{Review}.
 An LLM candidate collapses that residual to \texttt{Pass}.
 Busy Reject/Pass tests succeed; the mid-band never reaches a human.
-Typed IR names the residual scenario (\texttt{others})---the same regime as
+Typed IR names the residual scenario (\texttt{others}), the same regime as
 all 14 E6 Conf.\ wins over test-only feedback (0/14 ordering repairs).
-The intro uses a three-scenario skeleton with residual~$S_3$; BENCH-120 hard
-tasks scale the same first-match shape to eight scenarios, so coded wins
+The introduction uses a three-scenario skeleton with residual~$S_3$; BENCH-120
+hard tasks scale the same first-match shape to eight scenarios, so coded wins
 refer to residual index~$S_8$.
 
 \runin{Secondary vignette (ordering).}
@@ -129,21 +139,39 @@ Ordered tax/sensor overlaps motivate first-match witnesses $\Phi_i$ and
 prevention mutants that reorder or drop preemption; they are not the E6 win
 set.
 A public API ACL reconstruction (\texttt{enforce\_api\_acl}) fail-opens on
-\texttt{OTHERWISE} while guest/admin tests pass---Accept stays red.
+\texttt{OTHERWISE} while guest/admin tests pass, so Accept stays red.
 
 \runin{Contributions.}
+The contribution is a SpecIR interface plus a headroom-conditioned evaluation
+protocol for ordered-guard acceptance checking---not a new SMT decision
+procedure and not a proof system.
 \begin{itemize}
-  \item A first-match witness construction that exposes residual and
-    precedence regions missed by ordinary test suites.
-  \item A controlled comparison showing that scenario-aware repair feedback
-    improves mean conformance by ${+}7.7$\,pp over test-only feedback at
-    matched $K{=}3$; all 14 wins repair catch-all residuals.
-  \item A dual-gate prevention evaluation in which FAR falls from 8.8\% to
-    5.0\%, together with cross-model and public-corpus evidence that identifies
-    when the additional checking is worth its cost.
+  \item \textbf{Priority-Encoded Witness Generation (PEWG):} a first-match
+    SpecIR witness interface for residual and precedence regions, with the
+    catch-all and ACL examples illustrating the $\Phi_i$ formula, with disclosed
+    measurement corrections for fair evaluation.
+  \item \textbf{Scenario-Indexed Feedback Rendering (SIFR):} a structured
+    repair record that carries scenario identity, witness inputs, and
+    expected/observed outputs into repair under headroom (collapsed
+    catch-all residuals), not as a universal APR lift.
+  \item \textbf{Dual-Gate Acceptance (DGA):} a release predicate and prevention
+    \emph{evaluation protocol} that separate witness conformance from a
+    conditional structural screen under PDR/FAR (industrial-pattern mutants).
 \end{itemize}
-The evidence therefore separates mechanism (E6), prevention (E2), and
-deployment under model or corpus saturation.
+For deployment we keep test-only B2 as the default and escalate to the full
+loop only when Accept is required or a contractual FAR budget exists
+\emph{and} repair headroom remains; the pre-hoc escalation tree is a checklist
+policy, not a validated predictor.
+Screen is a conditional second gate: it cuts FAR on industrial-style mutants
+(56.8\% to 32.6\%) but does not attain FAR${\le}5\%$ on that slice.
+We evaluate mechanism (E6), prevention (E2), and saturation boundaries under
+stronger models or public corpora as separate evidence tracks.
+The controlled causal estimate for SIFR is E6 on BENCH-120; Gemini hard-seed
+runs, headroom-filtered external hard seeds
+(\texttt{run\_ext\_hardseed\_e6\_v1}), and public-corpus ranking runs bound
+saturation and transfer, not a second ${+}7.7$\,pp headline.
+As a formal-engineering method, the dual-gate check is a bounded operational
+criterion under a faithful SpecIR encoding, not a theorem of program safety.
 
 %======================================================================
 \section{Related Work}
@@ -157,15 +185,17 @@ DafnyBench and Clover target proof
 discharge~\cite{loughridge2024dafnybench,sun2024clover}; success is a theorem,
 not first-match region coverage.
 Our Conf.\ metric is witness agreement under SpecIR, not a proof certificate.
-CEGIS-style SMT loops are closer in spirit, but typically synthesise programs
-or invariants from logical specs rather than ordered-guard FSF with typed
-repair records.
+CEGIS-style SMT loops, boundary-value suites, and concolic testing can emit
+satisfying inputs, but they do not by themselves encode first-match
+preemption ($g_i\land\bigwedge_{j<i}\neg g_j$) together with an \texttt{others}
+residual as a typed repair contract for LLM synthesis.
+PEWG is that SpecIR witness interface, not a new SMT decision procedure.
 
 \runin{Verbal and agentic repair.}
 Self-Refine, Self-Debug, and Reflexion raise generation success via critique or
 verbal memory~\cite{madaan2023selfrefine,chen2024selfdebug,shinn2023reflexion}.
 That channel is LLM-as-judge style: useful, but not bound to an executable
-first-match oracle---the judge may omit the catch-all scenario index.
+first-match oracle, so the judge can omit the catch-all scenario index.
 CodeT and coding agents optimise repository tasks without an FSF
 oracle~\cite{chen2023codet,wang2024opendevin,yang2024sweagent,xia2025agentless,jimenez2024swebench}.
 LLM-based APR patches failing tests~\cite{xia2024chatrepair,jiang2023impact,legoues2019apr,bouzenia2024repairagent,fan2023llmrepair};
@@ -186,10 +216,13 @@ defects~\cite{li2023iet_faultprevention}; we target LLM repair under an
 executable SpecIR oracle.
 HSP-Agile combines first-match SMT witnesses, scenario-aware repair feedback,
 and a dual-gate release check evaluated with PDR/FAR.
+The novelty claim is therefore the ordered-guard SpecIR interface plus
+headroom-conditioned typed feedback and prevention metrics, not a new decision
+procedure for SMT or a replacement for proof-oriented oracles.
 
 \begin{table}[t]
 \centering
-\caption{Positioning (tick = design goal).}
+\caption{Positioning against prior approaches (tick = design goal).}
 \label{tab:rw}
 \footnotesize
 \begin{tabular}{@{}lcccc@{}}
@@ -209,12 +242,14 @@ B6 VerifierLoop-FSF & \checkmark & --- & --- & cex \\
 %======================================================================
 \section{Approach}
 %======================================================================
-\subsection{SpecIR and first-match witnesses}
+\subsection{A1: PEWG for First-Match Witnesses}
 For task $t$ with ordered scenarios $\langle s_1,\ldots,s_n\rangle$, SpecIR
 exposes first-match regions as a shared hinge across notations (SOFL/FSF,
 Mini-Z, Mini-StateMachine adapters).
 Each scenario $s_i=(G_i,P_i)$ pairs a guard with a postcondition; FSF selects
 the least $i$ with $G_i(\mathbf{x})$ and requires $P_i(\mathbf{x},\mathbf{y})$.
+A witness for $s_i$ must satisfy $s_i$ only after higher-priority guards have
+been ruled out.
 For scenario $s_i$, the witness generator solves
 \begin{equation}
   \Phi_i \;\triangleq\; \hat{g}_i(\mathbf{x})
@@ -223,16 +258,16 @@ For scenario $s_i$, the witness generator solves
 with Z3~\cite{demoura2008z3,barrett2018smt}, yielding suite $\mathcal{D}(t)$.
 Without the negated higher guards, a model of $g_i$ alone may still belong to
 $s_j$ for $j{<}i$.
-An \emph{others} witness uses $\bigwedge_i\lnot\hat{g}_i$ when nonempty; a
-prior others-witness bug (others encoded without $\neg$ prior guards)
-inflated false failures and is disclosed as a measurement correction---we cite
+An \emph{others} witness uses $\bigwedge_i\lnot\hat{g}_i$ when nonempty.
+A prior others-witness bug (others encoded without $\neg$ prior guards)
+inflated false failures; we disclose it as a measurement correction and cite
 fixed-oracle runs as primary.
 Soundness is conditional on a faithful SMT encoding of SpecIR guards
 (integer/boolean fragments in our corpora).
 Ordinary random suites can undersample thin $\Phi_i$ regions, allowing residual
 or ordering bugs to survive green CI~\cite{zhu1997specification,ammann2016testing}.
 
-\subsection{Catch-all repair step}
+\subsection{A2: SIFR for Catch-All Repair}
 Return to the tier classifier: on a mid-band input the buggy candidate returns
 \texttt{Pass} where the oracle requires \texttt{Review}.
 The structured scenario-aware feedback record (implemented as a Semantic
@@ -250,7 +285,7 @@ surfaces under identical~$K$.
 \texttt{violation\_type}:\texttt{ordering}; that trail motivates $\Phi_i$ and
 E2 mutants, not the E6 win profile.)
 
-\subsection{Scenario-aware feedback and acceptance}
+\subsection{A3: DGA for Release}
 The record carries: \texttt{violation\_type} (ordering,
 postcondition, others), \texttt{scenario\_index}, \texttt{constraint\_text},
 concrete \texttt{inputs}, \texttt{expected}/\texttt{observed} outputs, and an
@@ -264,7 +299,7 @@ Conformance and release:
   \mathrm{Accept}(c,t)
   &\iff \mathrm{Conf}(c,t)=1 \,\land\, P^H(c)=0.
 \end{align}
-Mode~B2 uses unstructured test pass/fail only---no scenario index, no
+Mode~B2 uses unstructured test pass/fail only, with no scenario index and no
 constraint text.
 Controlled E6 isolates feedback content under full~M at matched $K{=}3$:
 variant~A is test-only; B adds expected outputs; C is the full Semantic IR.
@@ -274,9 +309,9 @@ Strengthened E1 ($K{=}5$, \texttt{execution\_trace\_matched}, advisory gate)
 is a multi-factor bundle used as a near-ceiling ranking check.
 E14 further shows that length-matched execution traces can outperform
 \texttt{semantic\_ir} on mean Conf.\ (85.4\% vs.\ 75.1\%); the E6 claim is
-therefore relative to unstructured test feedback.
+relative to unstructured test feedback.
 
-\subsection{Pipeline}
+\subsection{Pipeline and A4 Deployment Boundary}
 Algorithm~\ref{alg:sgdp} summarises one task.
 Synthesise from FSF text $\to$ check on $\mathcal{D}(t)$ $\to$
 if not Accept, render Feedback IR and repair, up to budget~$K$; on exhaustion
@@ -285,16 +320,22 @@ Prevention evaluation injects specification-confusion and
 implementation-screening mutants and scores PDR/FAR on the faulty set.
 The second gate is instantiated by 14 AST-level safety smells derived from
 SOFL fault-prevention patterns, including inverted priority, missing
-preemption, and unconditional success.  This catalogue is a reproducible
-screen instance rather than a completeness claim: any severity-tagged static
-analyser can replace it without changing the witness check.  We therefore
-attribute conformance changes to witnesses and repair.  E2 observes the screen
-only within the bundled dual gate, while the reported ablation measures
-conformance rather than a screen-only prevention effect.
+preemption, and unconditional success.
+We treat this catalogue as one reproducible screen, not a completeness claim;
+any severity-tagged static analyser can replace it without changing the
+witness check.
+We attribute conformance changes to witnesses and repair feedback.
+E2 observes the screen only within the bundled dual gate, while the reported
+ablation measures conformance rather than a screen-only prevention effect in
+isolation.
 Overlap density is an engineering hinge for witness generation: E3/E10
 tertiles are non-monotone, so overlap alone is not a deployment trigger.
 The deployable levers are feedback typing (E6) and the Accept/prevention gate
 (E2).
+
+For deployment, keep B2 when mean conformance and latency are the release bar.
+Escalate to M when the sprint requires $\mathrm{Accept}{=}1$ or a FAR target
+and repair headroom remains.
 
 \begin{algorithm}[t]
 \caption{Witness-guided repair with dual-gate acceptance}
@@ -349,10 +390,13 @@ per task in strengthened runs.
 The operators model recurring guard-generation errors: swapping or negating a
 scenario, reversing an output, dropping a condition, shifting a boundary,
 flipping a branch condition, reordering returns, dropping a branch, or
-reversing a dependency.  Each operator makes one first-order change to a
+reversing a dependency.
+Each operator makes one first-order change to a
 known-correct specification or implementation; uncompilable mutants are
-discarded.  These faults exercise first-match semantics and postconditions,
-not just the 14 screen patterns.  The implementation track contains
+discarded.
+These faults exercise first-match semantics and postconditions,
+not just the 14 screen patterns.
+The implementation track contains
 $n{=}852$ mutants; pooling it with specification-confusion gives $n{=}1704$.
 PDR is the fraction of faulty candidates rejected; FAR is the fraction of
 faulty mutants incorrectly released under the release predicate.
@@ -360,10 +404,14 @@ faulty mutants incorrectly released under the release predicate.
 \runin{Protocol.}
 E6 isolates feedback content; E2 evaluates prevention; \texttt{M\_eq} gives
 the equal-$K$ ranking; strengthened E1 supplies near-ceiling context.
+Table~\ref{tab:master-protocol} is the single protocol map for interpreting
+reported numbers.
+
+\input{../hsp-agile/tables/master_protocol}
 
 \begin{table}[t]
 \centering
-\caption{Evaluation corpora and their roles.}
+\caption{Evaluation corpora and their roles in each experiment family.}
 \label{tab:corpus}
 \footnotesize
 \begin{tabular}{@{}llp{0.42\linewidth}@{}}
@@ -386,22 +434,48 @@ HKCA09$\rightarrow$FSF & 35 & Public SOFL modules; B2${=}$\texttt{M\_eq} \\
 \subsection{RQ1: Scenario-aware repair feedback (E6)}
 Figure~\ref{fig:e6} and Table~\ref{tab:e6} hold $K$ and tasks fixed under
 full~M ($K{=}3$, $n{=}120$).
-Variant~C (full Semantic IR) reaches 86.9\% mean Conf.---\textbf{+7.7\,pp}
+Variant~C (full Semantic IR) reaches 86.9\% mean Conf., \textbf{+7.7\,pp}
 over test-only (A, 79.1\%) and ${+}8.0$\,pp over test+expected (B, 78.9\%).
 Paired: \textbf{14/4/102}; 95\% CI $[2.3,\,13.6]$\,pp; Wilcoxon $p{=}0.018$.
-Most tasks tie near ceiling; the 14 wins are a rescue regime: 13/14 have
-test-only Conf${=}0$, and IR records name catch-all scenario~\texttt{others}
-with arithmetic/output mismatches (Table~\ref{tab:defect-map}).
+Most tasks tie near ceiling; the 14 wins form a rescue regime in which 13/14
+have test-only Conf${=}0$.
+IR records name catch-all scenario~\texttt{others} with arithmetic/output
+mismatches (Table~\ref{tab:defect-map}).
 The four losses are mixed output/arithmetic residuals.
 Ordering/preemption defects still motivate $\Phi_i$ witnesses and E2 mutants.
 E14: \texttt{semantic\_ir} 75.1\% vs.\ \texttt{execution\_trace\_matched}
-85.4\% (5/19/96)---E6 is relative to unstructured feedback.
+85.4\% (5/19/96), so E6 is relative to unstructured feedback.
 Hard combo seeds on \texttt{gemini-2.5-flash} (pooled $n{=}80$): FULL vs.\
 test-only ${+}26.5$\,pp (CI excl.~0).
 Field ablation (Table~\ref{tab:field-conf}): FULL beats NL-only dumps of the
 same facts (${+}28.0$\,pp; CI excl.~0), while dropping any single IR field
-yields CIs that include~0---structure vs.\ unstructured text, not one-field
-necessity.
+yields CIs that include~0, which points to structured feedback over
+unstructured text rather than dependence on any single field.
+Table~\ref{tab:e6-headroom} is the primary reading: headroom tasks with
+test-only Conf.${<}1$ ($n{=}114$) gain ${+}8.2$\,pp; the Conf.${=}0$ rescue
+subset ($n{=}13$) is ${+}90.7$\,pp with 13/13 wins; the partial-failure band
+($0{<}$Conf${<}1$, $n{=}101$) does not favour Semantic IR (${-}2.5$\,pp).
+In this band, failures are often multi-scenario or arithmetic partial
+mismatches where typed scenario hints can mis-steer repair; the win profile
+(13/14 zero-A, all catch-all/arithmetic) shows that SIFR targets collapsed
+residuals, not every partial witness failure.
+Deployment rule: when test-only Conf.\ is already partial (${>}0$ and ${<}1$),
+keep B2 rather than forcing Semantic IR.
+Among the 18 decisive (non-tie) tasks, Semantic IR wins 14/18 (77.8\%;
+Wilson 95\% CI $[54.8,\,91.0]$), so the sparse absolute win count coexists
+with a high decisive-task win rate.
+The all-task ${+}7.7$\,pp mean is a supporting aggregate, not a claim of
+universal repair lift.
+
+\runin{Catch-all mini case.}
+On \texttt{HardSynthetic.HardCase004}, test-only Conf.\ is~$0$ while Semantic IR
+reaches $0.958$ after naming residual scenario~$S_8$ (\texttt{others}) with an
+arithmetic mismatch (\texttt{expected}$\neq$\texttt{observed}).
+The same Conf.${=}0\!\to\!{\approx}0.88$--$0.96$ rescue pattern appears on several
+ranked catch-all candidates (e.g., HardCase010, HardCase005); IR fields point
+repair at the residual band that busy Reject/Pass tests never sample.
+
+\input{../hsp-agile/tables/e6_headroom_summary}
 
 \begin{table}[t]
 \centering
@@ -425,13 +499,13 @@ FULL $-$ $X$ & $\Delta$ (pp) & W/L/T & Excl.~0 \\
   \centering
   \includegraphics[width=0.95\textwidth]{../hsp-agile/figures/feedback_variant_bar.pdf}
   \caption{E6 feedback variants under full~M ($K{=}3$, $n{=}120$). Variant~C
-    (full Semantic IR) +7.7\,pp vs.\ A; CI excludes~0.}
+    (full Semantic IR) gains +7.7\,pp vs.\ A; the 95\% CI excludes~0.}
   \label{fig:e6}
 \end{figure*}
 
 \begin{table}[t]
 \centering
-\caption{E6 paired stats, win profile, and equal-$K$ Conf.\ ranking.}
+\caption{E6 paired statistics, win profile, and equal-$K$ Conf.\ ranking.}
 \label{tab:e6}
 \footnotesize
 \begin{tabular}{lccc}
@@ -449,7 +523,7 @@ Equal-$K$ \texttt{M\_eq} & 120 & \textbf{100.0\%} (${+}2.5$) & 3/0/117 \\
 
 \begin{table}[t]
 \centering
-\caption{Defect-class $\leftrightarrow$ evidence map.}
+\caption{Defect class and supporting evidence map.}
 \label{tab:defect-map}
 \footnotesize
 \begin{tabular}{@{}lll@{}}
@@ -464,26 +538,52 @@ Saturated easy tasks & pilots ($n{\ge}28$) & default B2 \\
 \end{table}
 
 \subsection{RQ2: Prevention under the dual gate (E2)}
-On implementation-screening mutants ($n{=}852$), M reaches PDR 95.0\% / FAR
-5.0\% vs.\ B2 91.2\% / 8.8\%; paired bootstrap 95\% CIs on the gaps exclude
-zero (Fig.~\ref{fig:prev}).
-The absolute PDR lift is ${+}3.8$\,pp on this mutant population.
-Fixed-oracle Conf.\ ablations vs.\ strengthened M: removing repair $-$25.8\,pp;
-removing formal checker $-$17.5\,pp; removing pattern guard $0.0$\,pp on Conf.\
-under an advisory gate.  These ablations isolate conformance effects, whereas
-E2 evaluates the bundled dual gate; they do not separately identify the
-screen's causal contribution to prevention.
+Prevention under the dual gate varies by corpus slice.
+Table~\ref{tab:e2-decomp-availability} leads with mechanism: the
+HardSynthetic slice ($n{=}720$) saturates at PDR 100\% / FAR 0\% under B2, A2,
+and M, while the industrial slice ($n{=}132$) moves from FAR 56.8\% (B2/A2) to
+32.6\% (M) (bootstrap 95\% CI on the FAR drop:
+$[-31.8,\,-17.4]$\,pp; excludes~0).
+All 32 mutants that B2 accepts and M rejects are industrial, and in every
+case Conf.${=}1$ under B2, A2, and M: the second gate alone separates them
+(Table~\ref{tab:e2-screen-vignette}).
+Typical operators are DRO (remove else/catch-all), MBO (off-by-one guard
+comparison), and WRO (wrong relational/output constant).
+Readers should treat the pooled 3.8\,pp FAR reduction as a Screen effect on
+industrial-style mutants; HardSynthetic mutants do not exercise the second
+gate, and pooled FAR 5.0\% is \emph{not} the release claim.
+On the pooled set ($n{=}852$), that Screen contribution yields M at PDR
+95.0\% / FAR 5.0\% vs.\ B2 91.2\% / 8.8\% (Fig.~\ref{fig:prev}).
+A2 (formal witnesses, no Screen) matches B2 at 91.2\% / 8.8\%, so the pooled
+${-}3.8$\,pp FAR lift is not a larger witness budget alone.
+B6 and M\_lite are formal-only modes like A2; by design their prevention
+equals B2 when Screen is off.
+Table~\ref{tab:e2-decomp-availability} records B6${=}$B2/A2 on the
+HardSynthetic slice (FAR~$0\%$) and marks industrial B6 as unavailable in
+\texttt{prevention\_full\_v1}; we do not invent those FAR rows.
+Their role remains the Conf.\ / verifier-loop contrast already reported on
+BENCH-120.
+Fixed-oracle Conf.\ ablations vs.\ strengthened M still isolate conformance
+(no repair $-$25.8\,pp; no formal $-$17.5\,pp; no pattern guard $0.0$\,pp on
+Conf.), while E2 isolates prevention.
+On clean reference implementations, advisory Screen matches are common
+(120/120), but high/critical rejection is 0/120, so the gate is low-false-kill
+once Conf.${=}1$.
+
+\input{../hsp-agile/tables/e2_decomp_availability}
+\input{../hsp-agile/tables/e2_screen_vignette}
+\input{../hsp-agile/tables/screen_false_positive}
 
 \begin{figure*}[t]
   \centering
   \begin{minipage}{0.48\textwidth}
     \includegraphics[width=\linewidth]{../hsp-agile/figures/prevention_bar.pdf}
-    \caption{E2 aggregate PDR by mode.}
+    \caption{E2 aggregate PDR by mode on the pooled mutant set.}
     \label{fig:prev}
   \end{minipage}\hfill
   \begin{minipage}{0.48\textwidth}
     \includegraphics[width=\linewidth]{../hsp-agile/figures/performance_vs_overlap.pdf}
-    \caption{E10 Conf.\ vs.\ overlap tertile (non-monotone).}
+    \caption{E10 mean Conf.\ vs.\ overlap tertile (non-monotone).}
     \label{fig:overlap}
   \end{minipage}
 \end{figure*}
@@ -493,11 +593,27 @@ The catch-all failure is not specific to one model family, but the benefit of
 additional feedback depends on remaining repair headroom.
 On \texttt{gemini-2.5-flash}, frozen hard seeds yield ${+}26.5$\,pp for
 scenario-aware feedback over test-only feedback (pooled $n{=}80$, CI excludes
-zero).  On industrial-pattern tasks, GPT-4o and Claude both reach 100.0\%
+zero).
+Applying the same headroom filter to archived HKCA09/GitHub/RealSpec/industrial
+hard seeds (\texttt{run\_ext\_hardseed\_e6\_v2}) yields a transferring
+\texttt{wrong\_relop} contrast: ${+}20.6$\,pp on $n{=}79$ pairs (22/1/56;
+CI $[12.7,\,28.6]$), with pooled headroom $n{=}186$ at ${+}18.3$\,pp
+(CI $[13.2,\,23.8]$).
+HKCA09 gemini alone: ${+}18.8$\,pp ($n{=}17$; CI excludes~0).
+External impl-screening shows GitHub Screen transfer
+(FAR 60.4\%$\rightarrow$11.5\%) beside published-industrial saturation.
+Unfiltered public ranking runs still often saturate; Table~\ref{tab:e6-ext-multi-status}
+keeps those rows as ceiling diagnostics.
+On industrial-pattern tasks, GPT-4o and Claude both reach 100.0\%
 with B2 while the fuller mode reaches 95.5\%; DeepSeek retains more headroom
-(80.7\% for B2 and 72.5\% for M).  These results show that stronger models can
-saturate under ordinary test feedback; they support conditional deployment,
-not a universal gain from the full pipeline.
+(80.7\% for B2 and 72.5\% for M).
+Regression guard: when B2 already achieves Accept${=}1$ (or 100\% mean Conf.\ on
+the release suite), do not escalate to M; the fuller loop can regress under
+strong models.
+Stronger models often saturate under ordinary test feedback. That pattern
+motivates conditional deployment rather than always running the full pipeline.
+
+\input{../hsp-agile/tables/e6_ext_multi_status}
 
 \begin{table}[t]
 \centering
@@ -516,8 +632,10 @@ DeepSeek & 52.7 & \textbf{80.7} & 72.5 \\
 \end{table}
 
 Equal-$K$ Conf.\ ranking (Table~\ref{tab:e6}): \texttt{M\_eq} 100.0\% vs.\ B2
-97.5\% (${+}2.5$\,pp; 3/0/117)---matched budget, not a substitute for E6.
-Unified external equal-$K$: GitHub B2${=}$\texttt{M\_eq} 89.9\%; HKCA09 both
+97.5\% (${+}2.5$\,pp; $3/0/117$), a matched-budget check rather than a
+substitute for E6.
+Unified external equal-$K$ (Table~\ref{tab:ext}): GitHub B2${=}$\texttt{M\_eq}
+92.0\% vs.\ B1 83.7\% (0/0/48; Accept$\neq$mean Conf.); HKCA09 both
 100\%; desensitized both 100\%.
 Strengthened E1 ($K{=}5$ bundle, Table~\ref{tab:e1}) sits near ceiling.
 E12: B2 reaches 100\% on every seed; M mean 99.7\% across seeds.
@@ -544,6 +662,10 @@ on Accept/FAR and headroom, not on overlap density alone
 (Table~\ref{tab:deploy}).
 On fixed-oracle E1, mean LLM calls for B2 ($\sim$1.18) and strengthened M
 ($\sim$1.16) are comparable; wall-clock means are 9.6\,s (B2) vs.\ 10.5\,s (M).
+The pre-hoc HTE diagnostic is deliberately weak: the best inspected tree over
+hard-task metadata reaches precision 0.167 and recall 0.786 against a 0.117
+base positive rate.
+We treat HTE as a checklist policy, not as a validated predictor.
 
 \begin{table}[t]
 \centering
@@ -556,8 +678,11 @@ Signal & Prefer B2 & Prefer M \\
 \midrule
 Default & Mean Conf./latency & --- \\
 Release & Mean Conf.\ OK & Accept${=}1$ \\
-Prevention & --- & FAR${\le}5\%$ \\
+Prevention & No FAR contract & Contractual FAR budget \\
 Headroom & Saturated endpoint & Collapsed test-only Conf.\ (E6) \\
+Partial Conf. & $0{<}$test-only Conf.${<}1$ & Do not force SIFR \\
+Strong-model Accept & B2 already Accept${=}1$ & Do not escalate \\
+E14 structured alt. & Prefer lighter channel & Do not claim SIFR-optimal \\
 Overlap tertile & Non-monotone & Not a trigger \\
 \bottomrule
 \end{tabular}
@@ -566,13 +691,18 @@ Overlap tertile & Non-monotone & Not a trigger \\
 \subsubsection{Public and published corpora}
 \label{sec:ext}
 Desensitized published pilot ($n{=}28$): B1/B2/\texttt{M\_eq} all 100.0\%.
-GitHub harvest ($n{=}48$): B2/\texttt{M\_eq} 89.9\% vs.\ B1 85.8\%.
+GitHub harvest ($n{=}48$; \texttt{run\_github\_harvest\_v2}): B2/\texttt{M\_eq}
+92.0\% vs.\ B1 83.7\% (paired 0/0/48)---B1 headroom, then B2 ties
+\texttt{M\_eq}, so mean Conf.\ must not replace Accept.
 HKCA09$\rightarrow$FSF ($n{=}35$): B1 74.3\% / B2${=}$\texttt{M\_eq} 100\%.
-These ranking ties support B2 as the default for mean Conf.
-Where one-shot saturates, HKCA09 hard-seed repair (wrong\_relop:
-\texttt{semantic\_ir} 82.0\% vs.\ test\_only 69.3\%, ${+}12.7$\,pp; CI may
-include~0) is scoped external support.
-Provenance: reconstructions / public harvest---not proprietary dumps.
+Headroom-filtered HKCA09 hard-seed (\texttt{wrong\_relop}, gemini):
+${+}18.8$\,pp ($n{=}17$; CI $[3.9,\,37.5]$).
+External Screen on reference mutants
+(Table~\ref{tab:e2-ext-screen}): GitHub FAR 60.4\%$\rightarrow$11.5\%;
+HKCA09 near-null; published-industrial saturated---industrial-132 remains
+primary Screen evidence.
+Provenance: reconstructions / public harvest; vendor NDA pending
+(\texttt{VENDOR\_INTAKE\_CHECKLIST}).
 
 \begin{table}[t]
 \centering
@@ -585,64 +715,98 @@ Corpus & B1 & B2 & M / \texttt{M\_eq} \\
 \midrule
 Industrial-pattern ($n{=}31$, gpt-4o) & 95.5 & \textbf{100.0} & 95.5 \\
 Desens.\ published ($n{=}28$) & 100.0 & \textbf{100.0} & \textbf{100.0} \\
-GitHub harvest ($n{=}48$) & 85.8 & \textbf{89.9} & \textbf{89.9} \\
+GitHub harvest ($n{=}48$) & 83.7 & \textbf{92.0} & \textbf{92.0} \\
 HKCA09 FSF ($n{=}35$) & 74.3 & \textbf{100.0} & \textbf{100.0} \\
 Equal-$K$ BENCH-120 & --- & 97.5 & \textbf{100.0} \\
 \bottomrule
 \end{tabular}
 \end{table}
 
+\input{../hsp-agile/tables/e2_ext_screen}
+
 \subsubsection{Public ACL interception case}
-The aggregate results are complemented by
-\texttt{enforce\_api\_acl}, an ordered API-access contract reconstructed from
-the public RealSpec/harvest family.  The contract denies guests, requires
+Beyond the aggregates, \texttt{enforce\_api\_acl} is an ordered API-access
+contract reconstructed from the public RealSpec/harvest family.
+The contract denies guests, requires
 step-up MFA for high scope, permits narrow admin/reader bands, and fails closed
-on \texttt{OTHERWISE}.  An LLM-shaped candidate passes the busy guest-deny and
+on \texttt{OTHERWISE}.
+An LLM-shaped candidate passes the busy guest-deny and
 admin-permit tests but contains two residual defects: high scope without MFA
-is permitted, and the catch-all branch fails open.  A first-match witness
+is permitted, and the catch-all branch fails open.
+A first-match witness
 $(\mathit{role}{=}2,\mathit{scope}{=}2,\mathit{mfa}{=}1)$ forces the residual
 branch; the candidate returns permit, so Conf${<}1$ and the dual-gate check
-refuses release.  This reproducible case illustrates the operational target
-of the method, while remaining smaller than a repository-scale industrial
+refuses release.
+This reproducible case illustrates the operational target of
+the acceptance check, while remaining smaller than a repository-scale industrial
 study.
 
 \subsubsection{Scope of transfer}
 The controlled causal estimate remains E6 on the primary endpoint; Gemini
-supports the repair mechanism on frozen hard seeds, while GPT-4o and Claude
-demonstrate saturation on industrial-pattern tasks.  Public and reconstructed
+and headroom-filtered external hard seeds support protocol transfer, while
+GPT-4o and Claude demonstrate saturation on industrial-pattern tasks.
+Public and reconstructed
 corpora support the deployment boundary, but they do not constitute
 repository-scale validation.
+
+\runin{Failure modes and escalation limits.}
+Four negative results bound when \emph{not} to escalate.
+First, in the partial-failure band ($0{<}$test-only Conf.${<}1$, $n{=}101$),
+Semantic IR is ${-}2.5$\,pp vs.\ test-only: do not force SIFR when B2 is
+already partially succeeding.
+Second, on industrial-pattern tasks GPT-4o and Claude reach 100.0\% with B2
+while fuller M falls to 95.5\%: do not escalate when B2 already Accept${=}1$.
+Third, E14 shows length-matched execution traces can beat the tested Semantic
+IR on mean Conf.\ (85.4\% vs.\ 75.1\%); SIFR is a light structured channel
+relative to unstructured test feedback, not the uniquely best structured
+renderer.
+Fourth, the pre-hoc HTE tree reaches precision only 0.167: treat it as a
+checklist reminder, not a predictor.
+Table~\ref{tab:deploy} records these limits beside the positive escalation
+triggers.
 
 %======================================================================
 \section{Discussion}
 %======================================================================
 \runin{Practice.}
 Match feedback depth to the release bar: B2 for mean Conf.\ / latency; M when
-dual-gate Accept or FAR${\le}5\%$ is required \emph{and} repair headroom
-remains (E6 rescue when test-only Conf.\ collapses).
-External pilots reinforce default B2 on mean Conf.
-A practical playbook: (i)~B2 inner loop; (ii)~pre-release M with Accept;
-(iii)~track FAR on a frozen mutant pack; (iv)~escalate if FAR drifts or Accept
-failures cluster.
+Accept is required or a contractual FAR budget exists \emph{and} repair
+headroom remains (E6 rescue when test-only Conf.\ collapses).
+Do not read the industrial Screen lift (FAR 56.8\% to 32.6\%) as attainment of
+FAR${\le}5\%$ on that mutant set.
+External pilots support keeping B2 as the default on mean Conf.
+In practice, run B2 in the inner loop, run M before release when Accept
+matters, track FAR on a frozen mutant pack, and escalate if FAR drifts or
+Accept failures cluster---subject to the failure-mode limits above.
 
 \runin{Limitations.}
 BENCH-120 is synthetic and overlap-filtered; E10 and public pilots probe, but
 do not bound, transfer.
-Finite witnesses approximate Conf.; the others-witness measurement correction
-previously inflated false failures.
+Finite witnesses approximate Conf.; Conf.${=}1$ is not a completeness claim
+over the full input space.
+Accept is sound only relative to a faithful SpecIR$\to$SMT encoding of the
+guards under evaluation; encoding bugs (such as the disclosed others-witness
+fault) change measured Conf.\ and must be treated as measurement corrections.
+The Screen catalogue is a configurable instance, not a completeness proof over
+defect classes.
 LLM non-determinism is mitigated by $T_\text{repair}{=}0$ and paired tests;
 the $K{=}5$ E1 bundle combines several mechanisms and is used only as
 near-ceiling context.
 Published reconstructions and harvests are not production dumps; vendor NDA
-\texttt{.asfl} pilots remain future work.  The screen catalogue and mutation
-operators are author-selected from SOFL fault patterns; E2 therefore estimates
-rejection on that constructed first-order distribution, not completeness or
+\texttt{.asfl} pilots remain future work.
+The screen catalogue and mutation
+operators are author-selected from SOFL fault patterns; E2 estimates rejection
+on that constructed first-order distribution, not completeness or
 repository-wide safety.
-Ceiling effects on stronger models shrink E6 deltas---report headroom when
+B6 (VerifierLoop-FSF) prevention equals B2/A2 by design when Screen is off;
+the BENCH-120 Conf.\ contrast (B6 81.1\% vs.\ M\_lite 79.0\%) is
+conformance-only---we do not report B6 FAR without \texttt{prevention\_full\_v1}
+rows.
+Ceiling effects on stronger models shrink E6 deltas; report headroom when
 transferring claims.
 E14 shows that length-matched execution traces can outperform the tested
-scenario-aware record on mean Conf.; E6 therefore establishes improvement
-over unstructured test feedback rather than superiority over every structured
+scenario-aware record on mean Conf.; E6 establishes improvement over
+unstructured test feedback rather than superiority over every structured
 feedback design.
 B2 leads every E12 seed (100\%); M mean is 99.7\% across seeds.
 
@@ -654,15 +818,20 @@ Primary claims cite those run directories rather than ad-hoc aggregates.
 %======================================================================
 \section{Conclusion}
 %======================================================================
-HSP-Agile pairs first-match witnesses, scenario-aware repair feedback, and a
-dual-gate acceptance check for ordered-guard specifications.
-The central result is a bounded acceptance check: release only under
+HSP-Agile offers headroom-conditioned catch-all repair under a SpecIR
+first-match oracle, plus a conditional dual-gate acceptance check for
+ordered-guard specifications:
 $\mathrm{Accept}\Leftrightarrow\mathrm{Conf}{=}1\wedge\mathrm{Screen}{=}\mathit{pass}$.
-Under headroom, E6 yields ${+}7.7$\,pp vs.\ test-only at $K{=}3$ (CI
-excludes~0; 14/14 catch-all rescues).
-E2 supports the gate on the evaluated mutant population at FAR 5.0\% vs.\
-8.8\%.
-Deploy B2 by default; escalate for Accept or FAR${\le}5\%$ with headroom.
+Under collapsed test-only Conf.\ ($n{=}13$), Semantic IR rescues all tasks;
+on the broader headroom set the paired mean is ${+}8.2$\,pp, with a supporting
+all-task aggregate of ${+}7.7$\,pp (CI excludes~0).
+SIFR is not claimed superior to every structured feedback channel (E14).
+Prevention evidence is industrial-first: Screen cuts FAR from 56.8\% to
+32.6\% on $n{=}132$ mutants; the pooled 8.8\% to 5.0\% reading is
+industrial-only and is not the release claim.
+Deploy B2 by default; escalate for Accept or a contractual FAR budget with
+headroom, knowing Screen helps but does not reach FAR${\le}5\%$ on the
+evaluated industrial slice.
 Future work includes NDA vendor \texttt{.asfl} pilots, adaptive~$K$, and
 SpecIR adapters beyond SOFL/FSF.
 

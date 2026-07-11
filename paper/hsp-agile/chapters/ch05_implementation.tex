@@ -1,4 +1,4 @@
-%% ch5_implementation.tex  —  Chapter 5: Implementation (rewrite staging)
+%% ch05_implementation.tex  —  Chapter 5: Implementation (Step 1 polish staging)
 %% HSP-Agile Thesis, East China Normal University, 2026
 %% Ye Xujun
 
@@ -9,7 +9,7 @@ This chapter realises SpecIR and the SgDP loop as a deployable system:
 which module owns which failure mode, what can be swapped for ablation, and
 where latency is spent.
 Algorithms and acceptance semantics remain in Chapter~\ref{ch:method};
-here the concern is software realisation---adapters, checker wiring,
+here the focus is software realisation---adapters, checker wiring,
 Semantic Feedback IR serialisation, and the conjunctive release gate.
 Notation follows~\eqref{eq:accept}:
 $t = (\mathcal{S}_t, \mathcal{X}_t, \mathcal{Y}_t)$, candidate~$c$,
@@ -30,7 +30,7 @@ path as a secondary regime.
 
 Stages~1--4 must be ablatable and auditable without rewriting the rest
 (Chapter~\ref{ch:experiments}), so ingestion, orchestration, and external
-services stay apart.
+services remain separate.
 Figure~\ref{fig:component-arch} shows the layout: pipeline core at the
 centre, LLM/SMT clients below, and experiment orchestration above---the
 software view of Figure~\ref{fig:sgdp-overview}.
@@ -96,7 +96,7 @@ with resume-safe logs.
 The checker never consumes raw SOFL, Mini-Z, or Mini-StateMachine text.
 Ingestion parses each surface notation into SpecIR
 (Chapter~\ref{ch:formalization}) and lowers it to the FSF-shaped
-\texttt{TaskSpec} consumed by Stages~2--4:
+\texttt{TaskSpec} consumed by Stages~2--4 through three steps:
 notation-specific parsing via a registered \texttt{SpecAdapter};
 canonicalisation into ordered \texttt{GuardedCase} records; and lowering via
 \texttt{FSFLowerer}.
@@ -123,7 +123,7 @@ pattern-guard metadata).
 \texttt{PipelineRunner.run()} accepts either a \texttt{TaskSpec} dict or a
 \texttt{SpecIR} instance (\path{src/pipeline/task_input.py}), normalising
 through the lowerer when needed.
-Oracle construction, witness generation, and repair feedback therefore stay
+Oracle construction, witness generation, and repair feedback stay
 notation-agnostic while remaining compatible with the 120-task FSF benchmark.
 
 \begin{figure}[t]
@@ -163,11 +163,12 @@ checked by RF10 when relevant.
 \label{sec:impl:llm}
 % ---------------------------------------------------------------------------
 
-Synthesis is the only non-deterministic stage; everything else must be
+Synthesis is the only non-deterministic stage; every other stage must be
 replayable.
 The LLM layer wraps an OpenAI-compatible gateway
 (\texttt{ECNUClient}, \path{src/llm/ecnu_client.py}) for auth, retry, timeout,
-token accounting, and audit logs---the name is historical, not a coupling.
+token accounting, and audit logs---the name is historical and does not imply
+institutional coupling.
 Production runs use Qwen2.5-27B-Instruct (\textsf{Qwen-27B}) with exponential
 backoff (up to three retries), a 90\,s request timeout, and optional JSON
 audit of message history and token counts~\citep{openai2023gpt4,chen2021codex}.
@@ -181,7 +182,7 @@ $T_\text{repair}{=}0.0$ thereafter ($\mathit{top\_p}{=}0.95$): explore once,
 then exploit under a deterministic checker.
 Responses are scanned for the last fenced Python block (or a conservative
 line heuristic); \texttt{compile()} failure yields a sentinel~$\bot$ that
-scores zero and triggers repair without crashing the pipeline.
+scores zero and triggers repair without aborting the pipeline.
 
 \subsection{Semantic Feedback IR and Two-Layer Repair Prompting}
 \label{sec:impl:repair-feedback}
@@ -209,7 +210,7 @@ natural-language rendering:
 Pattern violations append as a capped list of \texttt{pattern\_id:name}
 pairs under a \emph{``Previous attempt failed''} header.
 Ablation E6 varies only the renderer while holding IR construction fixed,
-so Semantic Feedback is a genuine intermediate representation rather than a
+so Semantic Feedback IR is a genuine intermediate representation rather than a
 prompt template alone.
 
 \paragraph{Example: catch-all failure.}
@@ -376,7 +377,7 @@ loop is Algorithm~\ref{alg:sgdp}.
 A candidate can match every witness in $\mathcal{D}(t)$ and still hard-code
 success, ignore ordered guards, or drop an output field that the finite case
 set never exercised.
-Stage~4 therefore implements the structural half of acceptance safety: an
+Stage~4 implements the structural half of acceptance safety: an
 oracle $\mathrm{Screen}(c,t)$ independent of the witness suite that can veto
 release even when $\mathrm{Conf}{=}1$
 (Section~\ref{sec:method:guard}; Figure~\ref{fig:accept-tree}).
@@ -441,8 +442,8 @@ $7 \times 120 = 840$ runs (B0--B2, M, A1--A3 under
 \code{run\_hard\_full\_parallel\_v1}); the \emph{extended} matrix is
 $10 \times 120 = 1{,}200$ when B3--B5 are included
 (\code{run\_ccf\_b\_extended\_v1}; B6 is reported separately where evaluated).
-Jobs run in a \emph{process pool} (one worker per core) because Z3's native
-global state is not thread-safe; each worker owns its own client, config, and
+Jobs run in a \emph{process pool} (one worker per core) because the native
+global state of Z3 is not thread-safe; each worker owns its own client, config, and
 pipeline, then appends a strict 64-case evaluation (and optional mutation
 score~\citep{demillo1978mutation,li2023iet_faultprevention}) to a shared JSONL log.
 Incremental persistence plus a \texttt{progress.json} sidecar make mid-batch
@@ -488,7 +489,7 @@ full mode~M (Chapter~\ref{ch:experiments}).
 \label{sec:impl:tradeoffs}
 % ---------------------------------------------------------------------------
 
-Three decisions dominate the rest~\citep{woodcock2009formalsurvey}.
+Three design decisions dominate the engineering trade-offs~\citep{woodcock2009formalsurvey}.
 
 \subsection{Z3 Over Random Testing}
 
@@ -510,11 +511,11 @@ screen) would maximise throughput but conflate distinct fault classes.
 Formal conformance certifies pointwise witness correctness; $\mathrm{Screen}$
 certifies that the candidate is not an obvious structural shortcut
 (Section~\ref{sec:impl:patterns}).
-Neither implies the other: hard-coded outputs can pass sparse witnesses while
+Neither criterion implies the other: hard-coded outputs can pass sparse witnesses while
 failing RF07, and a structurally clean candidate can still fail on a catch-all
 or overlap residual.
-The conjunctive $\mathrm{Accept}$ of~\eqref{eq:accept} is therefore
-conservative---fewer accepts, but each satisfies both criteria.
+The conjunctive $\mathrm{Accept}$ of~\eqref{eq:accept} is
+conservative: fewer accepts, but each satisfies both criteria.
 Which concrete $\mathrm{Screen}$ fills the slot does not change that design.
 
 \subsection{Latency vs.\ Quality Trade-off}

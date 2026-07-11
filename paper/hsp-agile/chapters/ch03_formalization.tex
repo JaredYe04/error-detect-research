@@ -276,7 +276,7 @@ acceptance if RF07 (\emph{unconditional success}) fires on a hard-coded
 \texttt{return "Pass"}.
 Conversely, clearing the pattern screen while failing the \texttt{others}
 witness also fails $\mathrm{Accept}$.
-Mean conformance can therefore be high while acceptance stays selective
+Mean conformance can be high while acceptance stays selective
 (Chapter~\ref{ch:results}).
 
 Those pieces assemble into the computational problem: find an acceptable
@@ -361,7 +361,7 @@ covering the entire precedence ordering $s_1 \succ s_2 \succ \cdots \succ s_n$.
 \begin{proof}
 By construction, each $x_i$ satisfies $g_i$ but not $g_1, \ldots, g_{i-1}$.
 Hence $i = \min\{j : g_j(x_i) = 1\}$, so the oracle evaluates
-$g_t(x_i) = \phi_i(x_i)$.  Each distinct scenario $s_i$ therefore
+$g_t(x_i) = \phi_i(x_i)$.  Each distinct scenario $s_i$
 contributes at least one case whose correct output is determined by
 $\phi_i$, and the precedence ordering is witnessed by all $n$ cases jointly.
 \end{proof}
@@ -404,7 +404,7 @@ The Constraint-guided Witness Generator produces one witness per strict
 scenario region via $\Phi_i$ (Equation~\eqref{eq:priority}); under a faithful
 SMT encoding, each such witness activates scenario~$i$ with probability~$1$
 (Proposition~\ref{thm:witness-soundness}).
-Random sampling therefore reaches precedence-critical or residual regions
+Random sampling reaches precedence-critical or residual regions
 with probability $\mathcal{O}(\rho)$, whereas SMT achieves targeted coverage
 of each $\Phi_i$ deterministically.
 \end{corollary}

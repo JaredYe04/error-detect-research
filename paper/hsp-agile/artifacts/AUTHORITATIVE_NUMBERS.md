@@ -7,6 +7,22 @@ Campaign script: `paper/hsp-agile/scripts/run_m_win_campaign.ps1`
 
 ---
 
+## Pre-expansion snapshot (External Evidence Sprint Phase 0)
+
+Frozen before `run_github_harvest_v2` / `run_ext_hardseed_e6_v2` / `run_prevention_external_v1` (2026-07-12). Do not overwrite; cite as baseline.
+
+| Corpus / claim | n / figure | Run / note |
+|----------------|------------|------------|
+| GitHub harvest ranking | n=48; B1 85.8% / B2 89.9% / M_eq 89.9% | `run_github_harvest_v1` |
+| HKCA09 SOFL→FSF ranking | n=35; B1 74.3% / B2 100% / M_eq 100% | `run_hkca09_b1b2m_v1` |
+| Published-industrial desensitized | n=28; B1/B2/M_eq 100% | `run_desens_real_sofl_v1` |
+| Ext hard-seed protocol (Conf.\<1) wrong_relop | n=76, Δ+20.7 pp | `run_ext_hardseed_e6_v1` |
+| Ext pooled headroom (Conf.\<1) | n=183, Δ+18.3 pp | same protocol artifact |
+
+Run-dir convention for this sprint: `artifacts/run_github_harvest_v2/`, `artifacts/run_ext_hardseed_e6_v2/`, `artifacts/run_prevention_external_v1/`.
+
+---
+
 ## Corpus / protocol card (cite from papers)
 
 Papers must distinguish three corpora. Do not mix numbers across rows.
@@ -21,18 +37,86 @@ Papers must distinguish three corpora. Do not mix numbers across rows.
 
 **Causal clarity (P1):** Fixed-oracle E1 M vs B2 is a **bundle** ($K{=}5$, advisory gate, `execution_trace_matched`, argmax)—**not** single-factor C2. E14 scopes uniqueness (`semantic_ir` 75.1% ≠ `execution_trace_matched` 85.4%; paired mean Conf. 5/19/96). See `artifacts/P1_CAUSAL_NOTES.md`.
 
+**CCF-B Accept revision protocol:** cite `tables/master_protocol.tex` as the single
+protocol map. Do not mix $K$, feedback renderer, gate mode, or corpus across
+claims.
+
+**E6 headroom strata (`data/processed/e6_headroom_summary.*`):**
+all tasks C--A $+7.7$ pp (14/4/102; CI $[2.3,13.6]$ in prose / paired table);
+test-only Conf. $<1$ subset $n=114$, $+8.2$ pp (14/4/96; CI $[2.3,14.4]$);
+collapsed test-only Conf. $=0$ subset $n=13$, $+90.7$ pp (13/0/0; CI
+$[88.8,93.3]$; paired sign delta $1.0$).
+Decisive (non-tie) tasks: $14/18$ wins ($77.8\%$; Wilson $[54.8,91.0]\%$).
+Partial band $0<$Conf$<1$ ($n=101$): $-2.5$ pp — do not force SIFR.
+The collapsed subset is the mechanism explanation, not an external-effect
+headline.
+
+**B6 prevention:** formal-only ⇒ equals B2/A2 when Screen is off.
+HardSynthetic slice of `prevention_full_v1`: B2/A2/M (and B6 by design) at
+PDR $100\%$ / FAR $0\%$ ($n=720$). Industrial B6 rows absent from
+`prevention_full_v1` (disclose n/a). See `tables/e2_decomp_availability.tex`.
+
+**Screen-hit industrial vignettes (`e2_screen_hit_vignettes.py`):**
+32 mutants with B2 accept and M reject; all industrial; Conf.=1 under B2/A2/M
+in every case (DRO 15, MBO 15, WRO 2). Table `e2_screen_vignette.tex`.
+
+**Industrial FAR bootstrap (`e2_pdr_far_bootstrap.json`):**
+industrial $n{=}132$, $\Delta$FAR M−B2 ${-}24.2$ pp, CI $[-31.8,\,-17.4]$ pp
+(excludes 0). Pooled $\Delta$FAR CI also excludes 0 but is not the release claim.
+on 120 clean reference implementations, any advisory pattern match occurs on
+120/120, but high-or-critical rejection is 0/120 and critical rejection is
+0/120. Cite as clean-reference reject rate, not as proof of complete screen
+precision.
+
+**E2 decomposition (`prevention_full_v1` slice analysis; table
+`tables/e2_decomp_availability.tex`):**
+- Pooled impl-screening $n{=}852$: B2=A2 PDR/FAR 91.2/8.8; M 95.0/5.0
+  ($\Delta_{\mathrm{screen}}{=}{-}3.8$\,pp FAR).
+- HardSynthetic slice $n{=}720$: B2=A2=M all PDR 100\% / FAR 0\% (no screen
+  headroom).
+- Industrial slice $n{=}132$: B2=A2 PDR/FAR 43.2/56.8; M 67.4/32.6
+  ($\Delta_{\mathrm{screen}}{=}{-}24.2$\,pp FAR; 32 B2-accept/M-reject cases,
+  all industrial).
+- B6/M_lite: no rows in `prevention_full_v1`. Because both are formal-only /
+  no-Screen modes (like A2), expected prevention equals B2/A2; do not invent
+  B6 FAR. BENCH-120 Conf. artifacts remain B6 81.1\% / M_lite 79.0\%.
+- Offline HardSynthetic-180 regenerates the hard IDs but does not restore the
+  missing 33 industrial task definitions; cite archived `prevention_full_v1`
+  for prevention claims.
+
 **Quick primary numbers (fixed oracle):** E1 B1 84.2% / B2 98.3% / M 100.0%; E10 B1 81% / B2 99% / M 100%; E12 B1 88.6% / B2 100% / M 99.7% (B2 first every seed).  
 **Real-priority micro (`run_real_priority_micro_v1`, n=30):** B1 **95.6%** / B2 **100%** / M_eq **100%** (0/0/30). Includes firewall/role/tax/billing adaptations + industrial/GitHub/HKCA09. Supports C4 + external validity. See `benchmarks/REAL_PRIORITY_MICRO_README.md`.
 
 **SMT scalability (`artifacts/smt_scalability_v1`):** LIA mean witness ~29–31 ms from `[-5,20]` through `[-1000,1000]`; Real `[-100,100]` ~19 ms. No latency cliff on this fragment; hybrid fuzzing fallback discussed in ch08.
 
-**GitHub live harvest (`run_github_harvest_v1`, n=48):** B1 85.8% / B2 **89.9%** / M_eq 89.9% (equal K=3, ecnu-plus; M_eq vs B2 1/1/46). Public `.asfl` FSF auto-extract (ecommerce/smart-city/hospital/library). Supports C4.
+**GitHub live harvest (`run_github_harvest_v2`, n=48; v1 frozen in Phase 0):** B1 **83.7%** / B2 **92.0%** / M_eq **92.0%** (equal K=3, ecnu-plus; M_eq vs B2 0/0/48; Accept B1 72.9% / B2=M_eq 81.2%). Public `.asfl` FSF auto-extract. Phase-1 targeted expansion did **not** grow validated $n$ past 48. Supports C4; Accept≠mean-Conf.
+
+**E6 external hard-seed protocol v2 (`artifacts/run_ext_hardseed_e6_v2/`):**
+pre-registered filter keeps pairs with test-only Conf. $<1$.
+Primary family `wrong_relop`: $n{=}79$, $\Delta{+}20.6$ pp, W/L/T 22/1/56,
+CI $[12.7,28.6]$ (excludes 0); decisive 22/23.
+Pooled headroom across seed families: $n{=}186$, $\Delta{+}18.3$ pp,
+CI $[13.2,23.8]$.
+New slices: GitHub harvest wrong_relop gemini $n{=}3$ (CI includes 0; rare
+injectable relops); HKCA09 wrong_relop gemini v2 headroom $n{=}17$,
+$\Delta{+}18.8$ pp, CI $[3.9,37.5]$ (excludes 0).
+Script: `paper/hsp-agile/scripts/run_ext_hardseed_protocol.py`.
+Cite as external transfer under headroom, not a replacement for BENCH-120 E6.
+(v1 snapshot frozen above in Phase 0: wrong_relop $n{=}76$, ${+}20.7$.)
+
+**External prevention / Screen (`artifacts/run_prevention_external_v1/`,
+`--impl-screening-only` on reference mutants):**
+GitHub harvest: Screen-hits **94**; FAR B2/A2 60.4% → M **11.5%**.
+HKCA09: Screen-hits 2; FAR 50.0% → 48.6% (near-null).
+Published-industrial: Screen-hits 0; FAR 50% all modes (saturation boundary).
+Industrial-132 remains primary Screen evidence; GitHub is reproducible extension.
+Tables: `e2_ext_screen.tex`, `e2_screen_vignette_external.tex`.
 
 **HKCA09 SOFL→FSF (`run_hkca09_b1b2m_v1`, n=35):** B1 **74.3%** / B2 **100%** / M_eq 100% (0/0/35). Overlap-rich reconstructions from public maintainability-experiment SOFL modules. Supports C4 (B1 headroom; B2 enough). RealSpec total **203** (`github_sofl=35`).
 
-**HKCA09 hard-seed C2 (`run_hkca09_hard_seed_e6_v1`):** one-shot E6 on real/headroom saturates (all variants Conf=1). Freeze seed → T=0 repair: **wrong_relop** semantic_ir 82.0% vs test_only 69.3% (**+12.7 pp**; W/L/T 9/5/12; CI includes 0). invert_order mixed. Cite as supporting external C2, not replacement for BENCH-120 E6. See `HKCA09_FSF_EXPANSION.md`.
+**HKCA09 hard-seed C2 (`run_hkca09_hard_seed_e6_v1`):** one-shot E6 on real/headroom saturates (all variants Conf=1). Freeze seed → T=0 repair: **wrong_relop** semantic_ir 82.0% vs test_only 69.3% (**+12.7 pp**; W/L/T 9/5/12; CI includes 0). invert_order mixed. Prefer filtered gemini v2 headroom row above for CI-excludes-0 external transfer. See `HKCA09_FSF_EXPANSION.md`.
 
-**Published-industrial desensitized pilot (`run_desens_real_sofl_v1`, n=28):** B1/B2/M_eq all **100.0%** Conf./Strict (equal K=3, ecnu-plus; paired M_eq vs B2 0/0/28). Supports C4 default B2. Corpus: `benchmarks/published_industrial_pilot.json`. Vendor `.asfl` import: `vendor/README.md`. Provenance: `benchmarks/DESENSITIZED_REAL_SOFL_PILOT.md`.
+**Published-industrial desensitized pilot (`run_desens_real_sofl_v1`, n=28):** B1/B2/M_eq all **100.0%** Conf./Strict (equal K=3, ecnu-plus; paired M_eq vs B2 0/0/28). Supports C4 default B2. Corpus: `benchmarks/published_industrial_pilot.json`. Vendor `.asfl` import: `vendor/README.md` / `artifacts/VENDOR_INTAKE_CHECKLIST.md` (NDA pending; interim = published reconstruction). Provenance: `benchmarks/DESENSITIZED_REAL_SOFL_PILOT.md`.
 
 ---
 

@@ -1,0 +1,50 @@
+% Master protocol table for the CCF-B Accept revision.
+% Keep this as the single protocol map for conference and full versions.
+\begin{table}[t]
+  \centering
+  \caption{Master protocol table.
+    Each headline number must trace to one row; this prevents mixing $K$,
+    feedback renderers, gates, and corpora across claims.
+    B6 is a Conf.-only VerifierLoop baseline on BENCH-120; prevention equals
+    B2/A2 by design when Screen is off, so the DGA prevention row compares
+    B2 / A2 / M.}
+  \label{tab:master-protocol}
+  \footnotesize
+  \renewcommand{\arraystretch}{1.08}
+  \begin{tabular}{@{}p{0.12\linewidth}p{0.19\linewidth}p{0.06\linewidth}p{0.19\linewidth}p{0.18\linewidth}p{0.18\linewidth}@{}}
+    \toprule
+    Claim & Comparison & $K$ & Feedback / gate & Corpus & Primary metric \\
+    \midrule
+    DGA / Decomp
+      & B2 / A2 / M
+      & 3--5
+      & Mode defaults; gate reported explicitly
+      & E2 faulty mutants
+      & PDR / FAR by eval type \\
+    SIFR
+      & A / B / C under full M
+      & 3
+      & test-only / expected / Semantic IR
+      & BENCH-120 and headroom strata
+      & $\Delta$Conf., W/L/T, CI \\
+    External scope
+      & A / B / C or B2 / M\_eq
+      & 3
+      & Same as source run
+      & RealSpec / HKCA09 / GitHub / desensitized
+      & Conf. and saturation boundary \\
+    HTE
+      & B2 default vs. M escalation
+      & 3--5
+      & Pre-hoc rule, no attempt-history features
+      & Pooled public + synthetic metadata
+      & Escalation precision / recall \\
+    Stress only
+      & B1 / B2 / strengthened M
+      & 3 / 5
+      & M uses trace-matched feedback + advisory gate
+      & Fixed-oracle BENCH-120
+      & Near-ceiling Conf. context \\
+    \bottomrule
+  \end{tabular}
+\end{table}

@@ -1,0 +1,6 @@
+mode,eval_type,n,detection_rate,false_accept_rate,strict_conformance
+B2,impl_screening,720,0.5,0.5,0.7185929232804232
+B6,impl_screening,720,0.5,0.5,0.7185929232804232
+M_lite,impl_screening,720,0.5,0.5,0.7185929232804232
+A2,impl_screening,720,0.5,0.5,0.7185929232804232
+M,impl_screening,720,0.5,0.5,0.7185929232804232

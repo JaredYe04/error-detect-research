@@ -1,5 +1,6 @@
 %% Industrial decision vignette — included from ch08_discussion.
-%% Staging: _rewrite/ch08_industrial_case.tex (promote with ch08_discussion.tex)
+%% Step 1 polish staging: _pipeline/step1_polish/ch08_industrial_case.tex
+
 \section{Industrial Decision Vignette}
 \label{sec:disc:industrial-case}
 
@@ -11,8 +12,8 @@ encodes overlapping severity guards in which ``link down'' must preempt
 Chapter~\ref{ch:intro} (\code{classify\_signal} / tax), now with industrial
 wording.
 Catch-all residual mismatch remains the primary Conf.\ mechanism on
-BENCH-120 (E6); this vignette stresses preemption witnesses and deployment
-choice under saturation.
+BENCH-120 (E6 headroom strata); this vignette stresses preemption witnesses
+and deployment choice under saturation.
 
 On the $n{=}31$ industrial-pattern corpus, commercial endpoints already
 saturate mean Conf.\ under test-feedback: B2 reaches 100\% under gpt-4o and
@@ -27,7 +28,8 @@ The practical rule follows Table~\ref{tab:deployment-boundary}.
 When mean Conf.\ before merge is the release bar, B2 is the correct default.
 Escalate to~M only when the sprint requires conjunctive
 $\mathrm{Accept}{=}1$ (every SpecIR witness and a clear critical pattern
-screen) or a prevention target FAR${\le}5\%$ on mutant screening (E2).
+screen) or a prevention target FAR${\le}5\%$ on mutant screening (E2,
+industrial slice first).
 Overlap density is not the trigger: E3 tertiles on BENCH-120 are
 non-monotone, and both industrial slices already favour B2 on Conf.
 
@@ -35,7 +37,7 @@ non-monotone, and both industrial slices already favour B2 on Conf.
 Table~\ref{tab:defect-evidence-map} clarifies the complementary roles.
 E6's typed-IR gain is a scenario-indexed rescue under repair headroom on
 BENCH-120; ordering and preemption defects still motivate $\Phi_i$ witnesses
-and E2 mutants.
+and E2 mutants on the industrial slice.
 Saturated industrial Conf.\ supports the B2 default for mean quality;
 Accept and PDR/FAR remain the reasons to escalate when release bars demand
 them.

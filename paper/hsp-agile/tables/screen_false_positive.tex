@@ -1,0 +1,19 @@
+% Generated from data/processed/screen_false_positive_summary.json.
+\begin{table}[t]
+  \centering
+  \caption{\textbf{Clean-reference screen false positives on BENCH-120.}
+    The PoC screen emits advisory matches on reference code, but no
+    high/critical hit would reject a clean reference implementation.}
+  \label{tab:screen-fp}
+  \footnotesize
+  \begin{tabular}{@{}lrr@{}}
+    \toprule
+    Measure & Count / $n$ & Rate \\
+    \midrule
+    Clean reference implementations & 120/120 & 100.0\% \\
+    Any pattern match & 120/120 & 100.0\% \\
+    High or critical reject & 0/120 & 0.0\% \\
+    Critical reject & 0/120 & 0.0\% \\
+    \bottomrule
+  \end{tabular}
+\end{table}

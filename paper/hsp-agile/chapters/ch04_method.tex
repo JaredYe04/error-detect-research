@@ -1,4 +1,4 @@
-%% ch04_method.tex  —  Chapter 4: The SgDP Framework and HSP-Agile Instantiation
+%% ch04_method.tex  —  Chapter 4: The SgDP Framework and HSP-Agile Instantiation (Step 1 polish staging)
 %% HSP-Agile Thesis, East China Normal University, 2026
 %% Staging rewrite: paper/hsp-agile/_rewrite/ch04_method.tex
 
@@ -7,18 +7,18 @@
 
 This chapter realises the two mechanisms introduced in
 Chapter~\ref{ch:intro}: structured scenario-aware repair feedback~(C2) and
-dual-gate acceptance~(C3), on top of the SpecIR engineering hinge.
-Chapter~\ref{ch:formalization} fixed the objects; here they become a loop an
-LLM can participate in.
+dual-gate acceptance~(C3), built on the SpecIR engineering hinge.
+Chapter~\ref{ch:formalization} fixed the formal objects; here they become a
+loop that an LLM can participate in.
 Adapters and FSF lowering are necessary engineering for the HSP-Agile
-instantiation, not claimed contributions.
+instantiation and are not claimed as contributions.
 
 The walkthrough opens with the \emph{primary} vignette from
 Chapter~\ref{ch:intro}---the catch-all / \texttt{OTHERWISE} tier classifier---so
-the four stages are seen as artefact transforms before the interfaces are
+readers see the four stages as artefact transforms before the interfaces are
 named.
-Ordered-overlap examples (\code{classify\_signal}, \code{compute\_tax}) appear
-as a \emph{secondary} thread for witness priority formulas $\Phi_i$.
+Ordered-overlap examples (\code{classify\_signal}, \code{compute\_tax}) serve as
+a \emph{secondary} thread for witness priority formulas $\Phi_i$.
 Notation is inherited:
 $t = (\mathcal{S}_t, \mathcal{X}_t, \mathcal{Y}_t)$, oracle $g_t$, and
 first-match semantics over $\mathcal{S}_t = \langle s_1,\ldots,s_n\rangle$.
@@ -26,11 +26,11 @@ first-match semantics over $\mathcal{S}_t = \langle s_1,\ldots,s_n\rangle$.
 \section{Pipeline Intuition}
 \label{sec:method:intuition}
 
-Synthesise from FSF text, check on first-match SMT witnesses, repair from a
-typed failure record, and release only when every witness matches \emph{and} no
-high-severity structural pattern remains.
-Figure~\ref{fig:sgdp-overview} (Chapter~\ref{ch:intro}) is that loop; the
-dashed orange arc is budget~$K=3$.
+The pipeline synthesises from FSF text, checks on first-match SMT witnesses,
+repairs from a typed failure record, and releases only when every witness
+matches \emph{and} no high-severity structural pattern remains.
+Figure~\ref{fig:sgdp-overview} (Chapter~\ref{ch:intro}) depicts that loop; the
+dashed orange arc marks budget~$K=3$.
 
 \section{Worked Example: Catch-All Rescue End to End}
 \label{sec:method:worked}
@@ -40,7 +40,7 @@ Listings~\ref{lst:others-fsf}--\ref{lst:others-bug} define a three-scenario
 tier classifier: Reject on negative scores, Pass at or above a floor, and
 \texttt{OTHERWISE} must return \texttt{Review}.
 The buggy candidate collapses the residual into \texttt{Pass}.
-Busy Reject/Pass tests all succeed; the mid-band never reaches a human.
+Busy Reject/Pass tests all succeed, so the mid-band never reaches a human.
 
 The walkthrough below shows how each stage transforms that failure into a
 repairable record and, after one iteration, into $\mathrm{Accept}=1$.
@@ -81,7 +81,7 @@ catch-all residual after Reject and Pass.''}
 After repair restores the correct catch-all constant, every witness matches and
 the pattern screen is clear, so $\mathrm{Accept}(c_2,t)=1$.
 Figure~\ref{fig:accept-tree} makes the conjunctive decision explicit:
-conformance alone never releases a candidate.
+conformance alone does not release a candidate.
 
 \begin{figure}[t]
   \centering
@@ -135,7 +135,7 @@ The walkthrough above already used four ideas that are not FSF-specific:
 an oracle derived from the specification, witnesses that hit first-match
 regions, a structured failure record for repair, and a conjunctive release
 gate.
-Those ideas are the language-independent core of \textsc{SgDP}.
+Together they form the language-independent core of \textsc{SgDP}.
 
 \begin{enumerate}
   \item \textbf{Specification Oracle} ($\mathcal{G}$).
@@ -191,10 +191,9 @@ The FSF oracle requires no reference implementation:
 
 Random tests rarely land in thin first-match regions---neither catch-all
 residuals nor multi-conjunct overlaps.
-What is needed is one input per scenario that activates that scenario
-\emph{and no higher-priority one}.
-For scenario $s_i$, the witness generator therefore solves the
-\emph{priority formula}
+The witness generator needs one input per scenario that activates
+that scenario \emph{and no higher-priority one}.
+For scenario $s_i$, it solves the \emph{priority formula}
 \begin{equation}
   \label{eq:priority}
   \Phi_i \;\triangleq\; \hat{g}_i(\mathbf{x}) \;\land\; \bigwedge_{j=1}^{i-1} \lnot\hat{g}_j(\mathbf{x}),
@@ -226,8 +225,8 @@ $g_t(\mathbf{x}^*)=\phi_i(\mathbf{x}^*)$.
 Raw failing tests omit the information the repair model needs:
 \emph{which} scenario failed, \emph{why} the region matters (catch-all residual
 or ordering precedence), and \emph{what} the oracle expected.
-That information is organised into a structured semantic record before any
-natural-language prompt is rendered---the Semantic Feedback IR.
+That information is organised into a structured semantic record---Semantic
+Feedback IR---before any natural-language prompt is rendered.
 
 The IR is designed so that scenario identity, guard text, observed/expected
 outputs, and a typed violation reason travel together into the repair prompt,
@@ -295,7 +294,7 @@ Figure~\ref{fig:accept-tree}---witnesses \emph{and} a structural screen?
 \end{equation}
 Let $\mathrm{Screen}(c,t)$ be the Stage~4 structural oracle
 (Section~\ref{sec:method:screen}).
-In this report's PoC, $\mathrm{Screen}$ fails iff any smell in the
+In the PoC reported here, $\mathrm{Screen}$ fails iff any smell in the
 high-severity set $\mathcal{P}^H$ fires (Table~\ref{tab:patterns}); the
 interface itself is not tied to that catalogue.
 Release then requires both full witness agreement and a clear screen:
@@ -368,13 +367,13 @@ by plain test-pass/fail feedback.
 \noindent
 Chapter~\ref{ch:results} tests this hypothesis empirically
 (Figures~\ref{fig:convergence} and~\ref{fig:feedback-variant}); a fully formal
-stochastic model of LLM repair is beyond current theory.
+stochastic model of LLM repair lies beyond current theory.
 
 \subsection{Empirical FAR Envelope}
 \label{subsec:far-validation}
 
-With $\varepsilon = 0.08$ and illustrative $n = 9$ (not the pipeline's
-$N_{\max}{=}16$ or strict-eval 64), Proposition~\ref{thm:far-bound} gives
+With $\varepsilon = 0.08$ and illustrative $n = 9$ (not the per-repair cap
+$N_{\max}{=}16$ or the strict-eval 64-case budget), Proposition~\ref{thm:far-bound} gives
 $\mathrm{FAR} \leq (0.92)^9 \approx 0.473$ ($\approx 47\%$).
 Chapter~\ref{ch:results} reports the operational E2 impl-screening rates
 (mode~M FAR $5.0\%$, B2 $8.8\%$; PDR $95.0\%$ / $91.2\%$;
@@ -457,7 +456,7 @@ E3--E4 confirm sub-linear cost relative to conformance gain
 
 On budget exhaustion the implementation returns the best-effort candidate
 $\arg\max_{k\le K}\mathrm{Conf}(c_k,t)$ among attempts (ties broken by formal
-pass and fewer blocking pattern hits), not necessarily $c_K$.
+pass and fewer blocking pattern hits), not necessarily the last attempt $c_K$.
 Each iteration also logs
 $\langle k, \mathrm{Conf}(c_k,t), |\text{failures}_k|, |\text{patterns}_k|\rangle$
 to \texttt{attempt\_history} for repair-dynamics analyses in
@@ -506,8 +505,8 @@ Figure~\ref{fig:pipeline-seq} is the message-level sequence of one run.
 \section{Stage 1: LLM-Based Candidate Synthesis}
 \label{sec:method:synthesis}
 
-Stage~1 maps $(t, \mathit{feedback}_{k-1})$ to candidate $c_k$ (the only
-non-deterministic stage).
+Stage~1 maps $(t, \mathit{feedback}_{k-1})$ to candidate $c_k$; it is the only
+non-deterministic stage.
 
 \subsection{Prompt Structure}
 \label{subsec:method:prompt}
@@ -569,7 +568,7 @@ the Z3 encoding for one scenario.
 
 Random sampling rarely hits multi-conjunct first-match regions or catch-all
 residuals~\citep{claessen2000quickcheck, zhu1997specification}.
-$\Phi_i$ places each witness in scenario~$i$'s exclusive region
+$\Phi_i$ places each witness in the exclusive region of scenario~$i$
 (Proposition~\ref{thm:witness-soundness}), so oracle labels are unambiguous.
 
 \section{Stage 3: Counterexample-Guided Repair}
@@ -604,9 +603,9 @@ Finite SMT witnesses answer a \emph{pointwise} question: does the candidate
 match the oracle on forced first-match regions?
 They do not answer a \emph{structural} question: did the model cheat the suite?
 A degenerate candidate that always returns a constant success flag can survive
-a thin suite that never exercises an overlap or a catch-all residual---the LLM
-``shortcut'' failure mode~\cite{dakhel2023copilot,hovemeyer2004findbugs}.
-Acceptance safety therefore needs a second conjunct after Conf.
+a thin suite that never exercises an overlap or a catch-all residual---the
+LLM ``shortcut'' failure mode~\cite{dakhel2023copilot,hovemeyer2004findbugs}.
+Acceptance safety requires a second conjunct after Conf.
 
 Stage~4 is any oracle
 \begin{equation}
@@ -634,11 +633,12 @@ Table~\ref{tab:patterns} lists the fourteen smells; nine high-severity ones
 form the blocking set $\mathcal{P}^H$ in Equation~\eqref{eq:accept}, with RF07
 (\emph{unconditional success}) as the canonical critical shortcut on
 fail-closed contracts.
-The catalogue is a reproducible screen instance, not an exhaustive defect
-model.  Its operators are grounded in prior SOFL fault-prevention patterns,
-whereas E2 also includes first-match and postcondition mutants that do not map
-one-to-one onto these smells.  This separation prevents the prevention result
-from reducing to a detector tested only on its own templates.
+We treat this catalogue as one reproducible screen, not a completeness claim;
+its operators draw on prior SOFL fault-prevention patterns, whereas
+E2 also includes first-match and postcondition mutants that do not map
+one-to-one onto these smells.
+This separation prevents the prevention result from reducing to a detector
+tested only on its own templates.
 
 \begin{table}[H]
   \caption{PoC structural smell catalogue ($|\mathcal{P}| = 14$).

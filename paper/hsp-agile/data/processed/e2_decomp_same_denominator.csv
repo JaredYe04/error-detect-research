@@ -1,0 +1,11 @@
+scope,mode,denominator_n,pdr,far,strict_success_rate,strict_conformance,mutation_kill_rate,latency_ms,source,comparability_note
+prevention_impl_screening,B2,852,0.9119718309859155,0.0880281690140845,,0.10543818466353677,,,artifacts/prevention_eval/prevention_full_v1/prevention_summary.json,same impl_screening denominator when present; B6/M_lite absent in prevention_full_v1
+prevention_impl_screening,B6,,,,,,,,artifacts/prevention_eval/prevention_full_v1/prevention_summary.json,same impl_screening denominator when present; B6/M_lite absent in prevention_full_v1
+prevention_impl_screening,M_lite,,,,,,,,artifacts/prevention_eval/prevention_full_v1/prevention_summary.json,same impl_screening denominator when present; B6/M_lite absent in prevention_full_v1
+prevention_impl_screening,A2,852,0.9119718309859155,0.0880281690140845,,0.10387323943661972,,,artifacts/prevention_eval/prevention_full_v1/prevention_summary.json,same impl_screening denominator when present; B6/M_lite absent in prevention_full_v1
+prevention_impl_screening,M,852,0.9495305164319249,0.05046948356807512,,0.10446009389671361,,,artifacts/prevention_eval/prevention_full_v1/prevention_summary.json,same impl_screening denominator when present; B6/M_lite absent in prevention_full_v1
+bench120_common_task_conformance,B2,120,,,0.05,0.8771825396825397,0.48854166666666665,13863.507735832902,paper/hsp-agile/data/raw/results_raw.csv,same task_id denominator; modes come from existing local campaigns
+bench120_common_task_conformance,B6,120,,,0.05,0.8108630952380953,0.50625,21439.974750000332,artifacts/run_b6_full_v2/results.jsonl,same task_id denominator; modes come from existing local campaigns
+bench120_common_task_conformance,M_lite,120,,,0.05,0.7896825396825397,0.51875,37219.18127499921,artifacts/run_m_lite_v1/results.jsonl,same task_id denominator; modes come from existing local campaigns
+bench120_common_task_conformance,A2,120,,,0.05,0.8028769841269842,0.509375,39935.04716916662,paper/hsp-agile/data/raw/results_raw.csv,same task_id denominator; modes come from existing local campaigns
+bench120_common_task_conformance,M,120,,,0.05,0.8625992063492064,0.4979166666666667,46161.48890000016,paper/hsp-agile/data/raw/results_raw.csv,same task_id denominator; modes come from existing local campaigns

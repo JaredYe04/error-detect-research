@@ -48,20 +48,54 @@ def _accept_candidate_code(mode: str, code: str, task: dict[str, Any]) -> tuple[
 def evaluate_prevention(
     tasks: list[dict[str, Any]],
     modes: list[str],
-    llm: ECNUClient,
+    llm: ECNUClient | None,
     *,
     seed: int = 42,
     done_keys: set[str] | None = None,
+    impl_screening_only: bool = False,
 ) -> list[PreventionRecord]:
-    """Measure both spec-confusion and candidate-defect prevention performance."""
+    """Measure both spec-confusion and candidate-defect prevention performance.
+
+    When ``impl_screening_only`` is True, skip LLM generation and evaluate
+    reference-code mutants under each mode's formal/pattern gate only
+    (external Screen/FAR path).
+    """
     records: list[PreventionRecord] = []
     done_keys = done_keys or set()
     for task in tasks:
         ref = task.get("referenceCode", "")
-        mutants = generate_mutants(task, ref, seed=seed, impl_ops=True, spec_ops=True)
+        mutants = generate_mutants(task, ref, seed=seed, impl_ops=True, spec_ops=not impl_screening_only)
         for mode in modes:
             if mode == "B0":
                 continue
+            if impl_screening_only:
+                for mut in mutants:
+                    if mut.layer == "spec":
+                        continue
+                    eval_type = "impl_screening"
+                    key = f"{mode}|{mut.mutant_id}|{eval_type}"
+                    if key in done_keys:
+                        continue
+                    candidate = mut.payload["code"]
+                    accepted, strict_conf = _accept_candidate_code(mode, candidate, task)
+                    detected = not accepted
+                    records.append(
+                        PreventionRecord(
+                            task_id=task["taskId"],
+                            mode=mode,
+                            mutant_id=mut.mutant_id,
+                            operator=mut.operator,
+                            layer=mut.layer,
+                            accepted=accepted,
+                            detected=detected,
+                            strict_conformance=strict_conf,
+                            description=mut.description,
+                            eval_type=eval_type,
+                        )
+                    )
+                    done_keys.add(key)
+                continue
+
             pending: list[tuple[Any, str]] = []
             for mut in mutants:
                 eval_type = "spec_confusion" if mut.layer == "spec" else "impl_screening"
@@ -70,6 +104,8 @@ def evaluate_prevention(
                     pending.append((mut, eval_type))
             if not pending:
                 continue
+            if llm is None:
+                raise ValueError("llm client required unless impl_screening_only=True")
             cfg = config_for_mode(mode)
             pipeline = ErrorPreventionPipeline(config=cfg, llm=llm)
             # Generate one baseline candidate per (task, mode), then evaluate against mutants.

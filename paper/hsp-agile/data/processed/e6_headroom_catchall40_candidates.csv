@@ -1,0 +1,41 @@
+rank,task_id,conf_test_only,conf_semantic_ir,delta,relation,is_current_semantic_ir_win,is_current_test_only_win,is_conf0_rescue_regime,has_catchall_signal,violation_type,scenario_index,constraint_text,rationale
+1,HardSynthetic.HardCase004,0.0,0.9583333333333334,0.9583333333333334,win,True,False,True,True,arithmetic,8,others,E6 C>A win with qualitative catch-all/others evidence
+2,HardSynthetic.HardCase010,0.0,0.9583333333333334,0.9583333333333334,win,True,False,True,True,arithmetic,8,others,E6 C>A win with qualitative catch-all/others evidence
+3,HardSynthetic.HardCase047,0.0,0.9583333333333334,0.9583333333333334,win,True,False,True,True,arithmetic,8,others,E6 C>A win with qualitative catch-all/others evidence
+4,HardSynthetic.HardCase118,0.0,0.9583333333333334,0.9583333333333334,win,True,False,True,True,arithmetic,8,others,E6 C>A win with qualitative catch-all/others evidence
+5,HardSynthetic.HardCase122,0.0,0.9583333333333334,0.9583333333333334,win,True,False,True,True,arithmetic,8,others,E6 C>A win with qualitative catch-all/others evidence
+6,HardSynthetic.HardCase005,0.0,0.875,0.875,win,True,False,True,True,arithmetic,8,others,E6 C>A win with qualitative catch-all/others evidence
+7,HardSynthetic.HardCase012,0.0,0.875,0.875,win,True,False,True,True,arithmetic,8,others,E6 C>A win with qualitative catch-all/others evidence
+8,HardSynthetic.HardCase028,0.0,0.875,0.875,win,True,False,True,True,arithmetic,8,others,E6 C>A win with qualitative catch-all/others evidence
+9,HardSynthetic.HardCase065,0.0,0.875,0.875,win,True,False,True,True,arithmetic,8,others,E6 C>A win with qualitative catch-all/others evidence
+10,HardSynthetic.HardCase097,0.0,0.875,0.875,win,True,False,True,True,arithmetic,8,others,E6 C>A win with qualitative catch-all/others evidence
+11,HardSynthetic.HardCase104,0.0,0.875,0.875,win,True,False,True,True,arithmetic,8,others,E6 C>A win with qualitative catch-all/others evidence
+12,HardSynthetic.HardCase116,0.0,0.875,0.875,win,True,False,True,True,arithmetic,8,others,E6 C>A win with qualitative catch-all/others evidence
+13,HardSynthetic.HardCase124,0.0,0.875,0.875,win,True,False,True,True,arithmetic,8,others,E6 C>A win with qualitative catch-all/others evidence
+14,HardSynthetic.HardCase037,0.625,0.9583333333333334,0.33333333333333337,win,True,False,False,True,arithmetic,8,others,E6 C>A win with qualitative catch-all/others evidence
+15,HardSynthetic.HardCase001,0.875,0.875,0.0,tie,False,False,False,True,arithmetic,8,others,Headroom task with catch-all/others feedback signal
+16,HardSynthetic.HardCase002,0.875,0.875,0.0,tie,False,False,False,True,arithmetic,8,others,Headroom task with catch-all/others feedback signal
+17,HardSynthetic.HardCase003,0.875,0.875,0.0,tie,False,False,False,True,arithmetic,8,others,Headroom task with catch-all/others feedback signal
+18,HardSynthetic.HardCase006,0.875,0.875,0.0,tie,False,False,False,True,arithmetic,8,others,Headroom task with catch-all/others feedback signal
+19,HardSynthetic.HardCase007,0.875,0.875,0.0,tie,False,False,False,True,arithmetic,8,others,Headroom task with catch-all/others feedback signal
+20,HardSynthetic.HardCase008,0.875,0.875,0.0,tie,False,False,False,True,arithmetic,8,others,Headroom task with catch-all/others feedback signal
+21,HardSynthetic.HardCase009,0.875,0.875,0.0,tie,False,False,False,True,arithmetic,8,others,Headroom task with catch-all/others feedback signal
+22,HardSynthetic.HardCase011,0.875,0.875,0.0,tie,False,False,False,True,arithmetic,8,others,Headroom task with catch-all/others feedback signal
+23,HardSynthetic.HardCase013,0.9583333333333334,0.9583333333333334,0.0,tie,False,False,False,True,arithmetic,8,others,Headroom task with catch-all/others feedback signal
+24,HardSynthetic.HardCase014,0.875,0.875,0.0,tie,False,False,False,True,arithmetic,8,others,Headroom task with catch-all/others feedback signal
+25,HardSynthetic.HardCase015,0.875,0.875,0.0,tie,False,False,False,True,arithmetic,8,others,Headroom task with catch-all/others feedback signal
+26,HardSynthetic.HardCase016,0.875,0.875,0.0,tie,False,False,False,True,arithmetic,8,others,Headroom task with catch-all/others feedback signal
+27,HardSynthetic.HardCase017,0.875,0.875,0.0,tie,False,False,False,True,arithmetic,8,others,Headroom task with catch-all/others feedback signal
+28,HardSynthetic.HardCase018,0.875,0.875,0.0,tie,False,False,False,True,arithmetic,8,others,Headroom task with catch-all/others feedback signal
+29,HardSynthetic.HardCase019,0.875,0.875,0.0,tie,False,False,False,True,arithmetic,8,others,Headroom task with catch-all/others feedback signal
+30,HardSynthetic.HardCase020,0.875,0.875,0.0,tie,False,False,False,True,arithmetic,8,others,Headroom task with catch-all/others feedback signal
+31,HardSynthetic.HardCase021,0.875,0.875,0.0,tie,False,False,False,True,arithmetic,8,others,Headroom task with catch-all/others feedback signal
+32,HardSynthetic.HardCase022,0.875,0.875,0.0,tie,False,False,False,True,arithmetic,8,others,Headroom task with catch-all/others feedback signal
+33,HardSynthetic.HardCase023,0.875,0.875,0.0,tie,False,False,False,True,arithmetic,8,others,Headroom task with catch-all/others feedback signal
+34,HardSynthetic.HardCase024,0.875,0.875,0.0,tie,False,False,False,True,arithmetic,8,others,Headroom task with catch-all/others feedback signal
+35,HardSynthetic.HardCase025,0.9583333333333334,0.9583333333333334,0.0,tie,False,False,False,True,arithmetic,8,others,Headroom task with catch-all/others feedback signal
+36,HardSynthetic.HardCase026,0.875,0.875,0.0,tie,False,False,False,True,arithmetic,8,others,Headroom task with catch-all/others feedback signal
+37,HardSynthetic.HardCase027,0.875,0.875,0.0,tie,False,False,False,True,arithmetic,8,others,Headroom task with catch-all/others feedback signal
+38,HardSynthetic.HardCase030,0.875,0.875,0.0,tie,False,False,False,True,arithmetic,8,others,Headroom task with catch-all/others feedback signal
+39,HardSynthetic.HardCase032,0.9583333333333334,0.9583333333333334,0.0,tie,False,False,False,True,arithmetic,8,others,Headroom task with catch-all/others feedback signal
+40,HardSynthetic.HardCase033,0.875,0.875,0.0,tie,False,False,False,True,arithmetic,8,others,Headroom task with catch-all/others feedback signal

@@ -12,26 +12,38 @@ exercise.
 Release requires every specification-derived witness to match \emph{and} a
 structural screen to clear:
 $\mathrm{Accept}\Leftrightarrow\mathrm{Conf}{=}1\wedge\mathrm{Screen}{=}\mathit{pass}$.
+We refer to this directly as a \textbf{dual-gate acceptance check}.
 A candidate that ``looks right'' on busy inputs, yet mishandles a catch-all or
 overlap region, must not sail through on mean pass rate alone.
-We use a direct \textbf{dual-gate acceptance rule}: release requires both
-complete witness conformance and a clear static safety screen.
-HSP-Agile makes the rule executable for SOFL/FSF through SpecIR regions,
+HSP-Agile realises the check on SOFL/FSF through SpecIR regions,
 structured scenario-aware repair feedback, and a configurable
 $\mathrm{Screen}$.
-The rule is a bounded operational check over generated witnesses and the
-configured screen; it is not a proof of whole-program safety.
+The check is a bounded operational criterion evaluated over generated witnesses
+and the configured screen; it is not a proof of whole-program safety or a new
+SMT decision procedure.
 
+The contribution is headroom-conditioned catch-all repair under a SpecIR
+first-match oracle, plus a conditional dual-gate acceptance check.
 Conjunctive Accept cuts escaped defects at comparable mean conformance (E2);
 structured feedback rescues catch-all failures when repair still has headroom
 (E6); prefer test-feedback (B2) by default and escalate to full mode~M when
-release requires $\mathrm{Accept}{=}1$ or FAR${\le}5\%$ and headroom remains.
+release requires $\mathrm{Accept}{=}1$ or a contractual FAR budget exists
+\emph{and} repair headroom remains.
+Screen is a conditional second gate: it cuts FAR on industrial-style mutants
+(56.8\% to 32.6\%) but does not attain FAR${\le}5\%$ on that slice.
+The controlled causal estimate for SIFR is E6 on BENCH-120; Gemini hard-seed
+and public-corpus runs bound saturation and transfer, not a second
+${+}7.7$\,pp headline.
+When test-only Conf.\ is already partial ($0{<}\mathrm{Conf}{<}1$), keep B2
+rather than forcing Semantic IR.
+When B2 already achieves Accept${=}1$ (or 100\% mean Conf.\ on the release
+suite), do not escalate to~M---the fuller loop can regress under strong models.
 
 
 \section{Primary Vignette: Catch-All That Ships}
 \label{sec:intro:running-example}
 
-Start from the failure mode that drives our strongest Conf.\ evidence.
+Start from the failure mode that drives the strongest Conf.\ evidence.
 
 Imagine a tier classifier for incoming support tickets
 (Listing~\ref{lst:others-fsf}).
@@ -220,13 +232,18 @@ pass-rate crowns.
 \section{Contributions}
 \label{sec:intro:contributions}
 
-This work contributes a \textbf{dual-gate acceptance rule} and evidence for
-when scenario-aware repair and static screening justify their cost
-(Figure~\ref{fig:contribution-map}; Table~\ref{tab:evidence-ladder}).
-The headline is acceptance safety (C3): the gate that refuses to ship a
-lucky-pass residual when mean Conf.\ against test-feedback looks fine.
+This work contributes an \textbf{operational acceptance-checking stack} for
+ordered guards---a SpecIR witness interface, headroom-conditioned catch-all
+repair, and a conditional dual-gate release metric---not a new SMT solver or a
+proof system (Figure~\ref{fig:contribution-map};
+Table~\ref{tab:evidence-ladder}).
+The headline is acceptance safety (C3): Screen is a conditional second gate
+that separates witness-conformant candidates only when industrial-pattern
+mutants exercise it.
 SpecIR adapters, SMT lowering, and the hard benchmark are engineering that
 makes the decision rule runnable.
+As a formal-engineering method, the dual-gate check is a bounded operational
+criterion under a faithful SpecIR encoding, not a theorem of program safety.
 
 \input{tables/evidence_ladder}
 
@@ -255,8 +272,15 @@ prescribe deploying M (a negative bound on C4).
     (Equation~\eqref{eq:acceptance}).
     Pass-rate alone is not enough---as the catch-all vignette shows, a
     candidate can look strong on busy tests and still ship a broken residual.
-    On E2 impl-screening ($n{=}852$), M reaches PDR 95.0\% / FAR 5.0\% vs.\
-    B2 91.2\% / 8.8\% (bootstrap CIs on the gaps exclude zero).
+    On industrial-style mutants ($n{=}132$), FAR falls from 56.8\% to
+    32.6\% under M---the primary prevention claim (bootstrap 95\% CI on the
+    FAR drop: $[-31.8,\,-17.4]$\,pp; excludes~0).
+    Pooled over $n{=}852$ that lift appears as M PDR 95.0\% / FAR 5.0\%
+    vs.\ B2 91.2\% / 8.8\%, but HardSynthetic mutants are already saturated
+    and do not exercise Screen; pooled FAR 5.0\% is \emph{not} the release
+    claim.
+    The HardSynthetic slice ($n{=}720$) already saturates at PDR 100\% /
+    FAR 0\%.
     Ordering and preemption mutants motivate the gate beyond E6 Conf.\ gains.
     Limitation: near-ceiling mean-Conf.\ ranking across corpora is secondary
     appendix material; C3 is scored by Accept/FAR, not by Conf.\ crowns.
@@ -267,6 +291,17 @@ prescribe deploying M (a negative bound on C4).
     E6 isolates feedback under full~M, equal $K{=}3$: semantic\_ir reaches
     86.9\% vs.\ test\_only 79.1\% (${+}7.7$\,pp; paired W/L/T $14/4/102$;
     95\% CI $[2.3,\,13.6]$\,pp; Wilcoxon $p{=}0.018$).
+    The primary reading is headroom-conditional: on tasks where test-only
+    Conf.\ is already~$0$ ($n{=}13$), semantic\_ir rescues all cases
+    (${+}90.7$\,pp; 13/0/0); on the broader headroom set (test-only
+    Conf.${<}1$, $n{=}114$), the paired mean is ${+}8.2$\,pp (95\% CI
+    excludes~0).
+    The all-task ${+}7.7$\,pp aggregate is a supporting summary, not a
+    universal repair claim.
+    Among the 18 decisive (non-tie) tasks, Semantic IR wins 14/18 (77.8\%;
+    Wilson 95\% CI $[54.8,\,91.0]$).
+    The partial-failure band ($0{<}$test-only Conf.${<}1$) does not favour
+    typed IR (${-}2.5$\,pp); keep B2 rather than forcing Semantic IR there.
     Qualitative coding of all 14 wins (Table~\ref{tab:e6-qual}):
     \textbf{14/14 catch-all (\texttt{others}) rescues};
     \textbf{0/14 ordering-precedence repairs}.
@@ -279,8 +314,10 @@ prescribe deploying M (a negative bound on C4).
   \item[\textbf{C4.}]
     Prefer test-feedback (B2) by default for mean conformance and latency;
     escalate to full HSP-Agile (M) when release requires
-    $\mathrm{Accept}{=}1$ or target FAR${\le}5\%$ \emph{and} repair headroom
-    remains (Table~\ref{tab:deployment-boundary}).
+    $\mathrm{Accept}{=}1$ or a contractual FAR budget exists \emph{and}
+    repair headroom remains (Table~\ref{tab:deployment-boundary}).
+    Screen helps on industrial-pattern mutants but does not attain
+    FAR${\le}5\%$ on that slice.
     When contracts are simple enough that baselines already saturate, B2 is
     enough---that is a deployment boundary, not a failure of the decision
     rule.
@@ -288,11 +325,16 @@ prescribe deploying M (a negative bound on C4).
     $3/0/117$); external pilots often tie on mean Conf.; a public ACL-style
     case (Section~\ref{sec:results:acl-case}) shows the gate intercepting a
     lucky-pass candidate.
+    A pre-hoc escalation checklist (HTE) is a deployment policy, not a
+    validated predictor or a fourth algorithmic contribution (precision
+    0.167 on hard-task metadata).
     Limitation: live vendor CI replication remains future work; present
     pilots support the deployment heuristic, not production KPIs.
 \end{enumerate}
 
 Primary evidence is E2, E6, equal-$K$ Conf.\ ranking, and the deployment table.
+We evaluate mechanism (E6), prevention (E2), and saturation boundaries under
+stronger models or public corpora as separate evidence tracks.
 Near-ceiling fixed-oracle ranking runs (E1/E10/E12) are appendix material:
 E1 places B1/B2/M at $84.2\%/98.3\%/100.0\%$ under a $K{=}5$ bundle for M;
 E12 shows B2 at $100\%$ every seed and M at $99.7\%$---M does not lead every

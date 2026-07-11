@@ -1,0 +1,858 @@
+{
+  "source": "artifacts/run_prevention_external_v1/github_harvest_screen_v1/prevention_eval.jsonl",
+  "n_screen_hits": 94,
+  "operator_counts": {
+    "MBO": 37,
+    "DRO": 37,
+    "ICO": 5,
+    "WRO": 15
+  },
+  "vignettes": [
+    {
+      "task_id": "GitHubHarvest.ASFL_AddToCart",
+      "mutant_id": "GitHubHarvest.ASFL_AddToCart_impl_MBO",
+      "operator": "MBO",
+      "description": "Off-by-one in comparison",
+      "b2_strict": 1.0,
+      "m_strict": 1.0,
+      "a2_accepted": true
+    },
+    {
+      "task_id": "GitHubHarvest.ASFL_AddToCart",
+      "mutant_id": "GitHubHarvest.ASFL_AddToCart_impl_DRO",
+      "operator": "DRO",
+      "description": "Remove else branch",
+      "b2_strict": 1.0,
+      "m_strict": 1.0,
+      "a2_accepted": true
+    },
+    {
+      "task_id": "GitHubHarvest.ASFL_Checkout",
+      "mutant_id": "GitHubHarvest.ASFL_Checkout_impl_ICO",
+      "operator": "ICO",
+      "description": "Invert if condition in implementation",
+      "b2_strict": 1.0,
+      "m_strict": 1.0,
+      "a2_accepted": true
+    },
+    {
+      "task_id": "GitHubHarvest.ASFL_Checkout",
+      "mutant_id": "GitHubHarvest.ASFL_Checkout_impl_MBO",
+      "operator": "MBO",
+      "description": "Off-by-one in comparison",
+      "b2_strict": 1.0,
+      "m_strict": 1.0,
+      "a2_accepted": true
+    },
+    {
+      "task_id": "GitHubHarvest.ASFL_Checkout",
+      "mutant_id": "GitHubHarvest.ASFL_Checkout_impl_DRO",
+      "operator": "DRO",
+      "description": "Remove else branch",
+      "b2_strict": 1.0,
+      "m_strict": 1.0,
+      "a2_accepted": true
+    },
+    {
+      "task_id": "GitHubHarvest.ASFL_ShipOrder",
+      "mutant_id": "GitHubHarvest.ASFL_ShipOrder_impl_MBO",
+      "operator": "MBO",
+      "description": "Off-by-one in comparison",
+      "b2_strict": 1.0,
+      "m_strict": 1.0,
+      "a2_accepted": true
+    },
+    {
+      "task_id": "GitHubHarvest.ASFL_ShipOrder",
+      "mutant_id": "GitHubHarvest.ASFL_ShipOrder_impl_DRO",
+      "operator": "DRO",
+      "description": "Remove else branch",
+      "b2_strict": 1.0,
+      "m_strict": 1.0,
+      "a2_accepted": true
+    },
+    {
+      "task_id": "GitHubHarvest.ASFL_DrainQueue",
+      "mutant_id": "GitHubHarvest.ASFL_DrainQueue_impl_WRO",
+      "operator": "WRO",
+      "description": "Return wrong constant for primary output",
+      "b2_strict": 1.0,
+      "m_strict": 1.0,
+      "a2_accepted": true
+    },
+    {
+      "task_id": "GitHubHarvest.ASFL_DrainQueue",
+      "mutant_id": "GitHubHarvest.ASFL_DrainQueue_impl_MBO",
+      "operator": "MBO",
+      "description": "Off-by-one in comparison",
+      "b2_strict": 1.0,
+      "m_strict": 1.0,
+      "a2_accepted": true
+    },
+    {
+      "task_id": "GitHubHarvest.ASFL_DrainQueue",
+      "mutant_id": "GitHubHarvest.ASFL_DrainQueue_impl_DRO",
+      "operator": "DRO",
+      "description": "Remove else branch",
+      "b2_strict": 1.0,
+      "m_strict": 1.0,
+      "a2_accepted": true
+    },
+    {
+      "task_id": "GitHubHarvest.ASFL_Capture",
+      "mutant_id": "GitHubHarvest.ASFL_Capture_impl_MBO",
+      "operator": "MBO",
+      "description": "Off-by-one in comparison",
+      "b2_strict": 1.0,
+      "m_strict": 1.0,
+      "a2_accepted": true
+    },
+    {
+      "task_id": "GitHubHarvest.ASFL_Capture",
+      "mutant_id": "GitHubHarvest.ASFL_Capture_impl_DRO",
+      "operator": "DRO",
+      "description": "Remove else branch",
+      "b2_strict": 1.0,
+      "m_strict": 1.0,
+      "a2_accepted": true
+    },
+    {
+      "task_id": "GitHubHarvest.ASFL_Promote",
+      "mutant_id": "GitHubHarvest.ASFL_Promote_impl_MBO",
+      "operator": "MBO",
+      "description": "Off-by-one in comparison",
+      "b2_strict": 1.0,
+      "m_strict": 1.0,
+      "a2_accepted": true
+    },
+    {
+      "task_id": "GitHubHarvest.ASFL_Promote",
+      "mutant_id": "GitHubHarvest.ASFL_Promote_impl_DRO",
+      "operator": "DRO",
+      "description": "Remove else branch",
+      "b2_strict": 1.0,
+      "m_strict": 1.0,
+      "a2_accepted": true
+    },
+    {
+      "task_id": "GitHubHarvest.ASFL_DispatchAlert",
+      "mutant_id": "GitHubHarvest.ASFL_DispatchAlert_impl_MBO",
+      "operator": "MBO",
+      "description": "Off-by-one in comparison",
+      "b2_strict": 1.0,
+      "m_strict": 1.0,
+      "a2_accepted": true
+    },
+    {
+      "task_id": "GitHubHarvest.ASFL_DispatchAlert",
+      "mutant_id": "GitHubHarvest.ASFL_DispatchAlert_impl_DRO",
+      "operator": "DRO",
+      "description": "Remove else branch",
+      "b2_strict": 1.0,
+      "m_strict": 1.0,
+      "a2_accepted": true
+    },
+    {
+      "task_id": "GitHubHarvest.ASFL_RegisterCitizen",
+      "mutant_id": "GitHubHarvest.ASFL_RegisterCitizen_impl_MBO",
+      "operator": "MBO",
+      "description": "Off-by-one in comparison",
+      "b2_strict": 1.0,
+      "m_strict": 1.0,
+      "a2_accepted": true
+    },
+    {
+      "task_id": "GitHubHarvest.ASFL_RegisterCitizen",
+      "mutant_id": "GitHubHarvest.ASFL_RegisterCitizen_impl_DRO",
+      "operator": "DRO",
+      "description": "Remove else branch",
+      "b2_strict": 1.0,
+      "m_strict": 1.0,
+      "a2_accepted": true
+    },
+    {
+      "task_id": "GitHubHarvest.ASFL_AggregateMetrics",
+      "mutant_id": "GitHubHarvest.ASFL_AggregateMetrics_impl_MBO",
+      "operator": "MBO",
+      "description": "Off-by-one in comparison",
+      "b2_strict": 1.0,
+      "m_strict": 1.0,
+      "a2_accepted": true
+    },
+    {
+      "task_id": "GitHubHarvest.ASFL_AggregateMetrics",
+      "mutant_id": "GitHubHarvest.ASFL_AggregateMetrics_impl_DRO",
+      "operator": "DRO",
+      "description": "Remove else branch",
+      "b2_strict": 1.0,
+      "m_strict": 1.0,
+      "a2_accepted": true
+    },
+    {
+      "task_id": "GitHubHarvest.ASFL_HandleAlert",
+      "mutant_id": "GitHubHarvest.ASFL_HandleAlert_impl_MBO",
+      "operator": "MBO",
+      "description": "Off-by-one in comparison",
+      "b2_strict": 1.0,
+      "m_strict": 1.0,
+      "a2_accepted": true
+    },
+    {
+      "task_id": "GitHubHarvest.ASFL_HandleAlert",
+      "mutant_id": "GitHubHarvest.ASFL_HandleAlert_impl_DRO",
+      "operator": "DRO",
+      "description": "Remove else branch",
+      "b2_strict": 1.0,
+      "m_strict": 1.0,
+      "a2_accepted": true
+    },
+    {
+      "task_id": "GitHubHarvest.ASFL_ReportCongestion",
+      "mutant_id": "GitHubHarvest.ASFL_ReportCongestion_impl_WRO",
+      "operator": "WRO",
+      "description": "Return wrong constant for primary output",
+      "b2_strict": 1.0,
+      "m_strict": 1.0,
+      "a2_accepted": true
+    },
+    {
+      "task_id": "GitHubHarvest.ASFL_ReportCongestion",
+      "mutant_id": "GitHubHarvest.ASFL_ReportCongestion_impl_MBO",
+      "operator": "MBO",
+      "description": "Off-by-one in comparison",
+      "b2_strict": 1.0,
+      "m_strict": 1.0,
+      "a2_accepted": true
+    },
+    {
+      "task_id": "GitHubHarvest.ASFL_ReportCongestion",
+      "mutant_id": "GitHubHarvest.ASFL_ReportCongestion_impl_DRO",
+      "operator": "DRO",
+      "description": "Remove else branch",
+      "b2_strict": 1.0,
+      "m_strict": 1.0,
+      "a2_accepted": true
+    },
+    {
+      "task_id": "GitHubHarvest.ASFL_ShedLoad",
+      "mutant_id": "GitHubHarvest.ASFL_ShedLoad_impl_MBO",
+      "operator": "MBO",
+      "description": "Off-by-one in comparison",
+      "b2_strict": 1.0,
+      "m_strict": 1.0,
+      "a2_accepted": true
+    },
+    {
+      "task_id": "GitHubHarvest.ASFL_ShedLoad",
+      "mutant_id": "GitHubHarvest.ASFL_ShedLoad_impl_DRO",
+      "operator": "DRO",
+      "description": "Remove else branch",
+      "b2_strict": 1.0,
+      "m_strict": 1.0,
+      "a2_accepted": true
+    },
+    {
+      "task_id": "GitHubHarvest.ASFL_BoostPressure",
+      "mutant_id": "GitHubHarvest.ASFL_BoostPressure_impl_MBO",
+      "operator": "MBO",
+      "description": "Off-by-one in comparison",
+      "b2_strict": 1.0,
+      "m_strict": 1.0,
+      "a2_accepted": true
+    },
+    {
+      "task_id": "GitHubHarvest.ASFL_BoostPressure",
+      "mutant_id": "GitHubHarvest.ASFL_BoostPressure_impl_DRO",
+      "operator": "DRO",
+      "description": "Remove else branch",
+      "b2_strict": 1.0,
+      "m_strict": 1.0,
+      "a2_accepted": true
+    },
+    {
+      "task_id": "GitHubHarvest.ASFL_ReadMeters",
+      "mutant_id": "GitHubHarvest.ASFL_ReadMeters_impl_WRO",
+      "operator": "WRO",
+      "description": "Return wrong constant for primary output",
+      "b2_strict": 1.0,
+      "m_strict": 1.0,
+      "a2_accepted": true
+    },
+    {
+      "task_id": "GitHubHarvest.ASFL_ReadMeters",
+      "mutant_id": "GitHubHarvest.ASFL_ReadMeters_impl_MBO",
+      "operator": "MBO",
+      "description": "Off-by-one in comparison",
+      "b2_strict": 1.0,
+      "m_strict": 1.0,
+      "a2_accepted": true
+    },
+    {
+      "task_id": "GitHubHarvest.ASFL_ReadMeters",
+      "mutant_id": "GitHubHarvest.ASFL_ReadMeters_impl_DRO",
+      "operator": "DRO",
+      "description": "Remove else branch",
+      "b2_strict": 1.0,
+      "m_strict": 1.0,
+      "a2_accepted": true
+    },
+    {
+      "task_id": "GitHubHarvest.ASFL_DispatchUnit",
+      "mutant_id": "GitHubHarvest.ASFL_DispatchUnit_impl_MBO",
+      "operator": "MBO",
+      "description": "Off-by-one in comparison",
+      "b2_strict": 1.0,
+      "m_strict": 1.0,
+      "a2_accepted": true
+    },
+    {
+      "task_id": "GitHubHarvest.ASFL_DispatchUnit",
+      "mutant_id": "GitHubHarvest.ASFL_DispatchUnit_impl_DRO",
+      "operator": "DRO",
+      "description": "Remove else branch",
+      "b2_strict": 1.0,
+      "m_strict": 1.0,
+      "a2_accepted": true
+    },
+    {
+      "task_id": "GitHubHarvest.ASFL_PageResponders",
+      "mutant_id": "GitHubHarvest.ASFL_PageResponders_impl_WRO",
+      "operator": "WRO",
+      "description": "Return wrong constant for primary output",
+      "b2_strict": 1.0,
+      "m_strict": 1.0,
+      "a2_accepted": true
+    },
+    {
+      "task_id": "GitHubHarvest.ASFL_PageResponders",
+      "mutant_id": "GitHubHarvest.ASFL_PageResponders_impl_MBO",
+      "operator": "MBO",
+      "description": "Off-by-one in comparison",
+      "b2_strict": 1.0,
+      "m_strict": 1.0,
+      "a2_accepted": true
+    },
+    {
+      "task_id": "GitHubHarvest.ASFL_PageResponders",
+      "mutant_id": "GitHubHarvest.ASFL_PageResponders_impl_DRO",
+      "operator": "DRO",
+      "description": "Remove else branch",
+      "b2_strict": 1.0,
+      "m_strict": 1.0,
+      "a2_accepted": true
+    },
+    {
+      "task_id": "GitHubHarvest.ASFL_Register",
+      "mutant_id": "GitHubHarvest.ASFL_Register_impl_MBO",
+      "operator": "MBO",
+      "description": "Off-by-one in comparison",
+      "b2_strict": 1.0,
+      "m_strict": 1.0,
+      "a2_accepted": true
+    },
+    {
+      "task_id": "GitHubHarvest.ASFL_Register",
+      "mutant_id": "GitHubHarvest.ASFL_Register_impl_DRO",
+      "operator": "DRO",
+      "description": "Remove else branch",
+      "b2_strict": 1.0,
+      "m_strict": 1.0,
+      "a2_accepted": true
+    },
+    {
+      "task_id": "GitHubHarvest.ASFL_Publish",
+      "mutant_id": "GitHubHarvest.ASFL_Publish_impl_MBO",
+      "operator": "MBO",
+      "description": "Off-by-one in comparison",
+      "b2_strict": 1.0,
+      "m_strict": 1.0,
+      "a2_accepted": true
+    },
+    {
+      "task_id": "GitHubHarvest.ASFL_Publish",
+      "mutant_id": "GitHubHarvest.ASFL_Publish_impl_DRO",
+      "operator": "DRO",
+      "description": "Remove else branch",
+      "b2_strict": 1.0,
+      "m_strict": 1.0,
+      "a2_accepted": true
+    },
+    {
+      "task_id": "GitHubHarvest.ASFL_DrainNotices",
+      "mutant_id": "GitHubHarvest.ASFL_DrainNotices_impl_WRO",
+      "operator": "WRO",
+      "description": "Return wrong constant for primary output",
+      "b2_strict": 1.0,
+      "m_strict": 1.0,
+      "a2_accepted": true
+    },
+    {
+      "task_id": "GitHubHarvest.ASFL_DrainNotices",
+      "mutant_id": "GitHubHarvest.ASFL_DrainNotices_impl_MBO",
+      "operator": "MBO",
+      "description": "Off-by-one in comparison",
+      "b2_strict": 1.0,
+      "m_strict": 1.0,
+      "a2_accepted": true
+    },
+    {
+      "task_id": "GitHubHarvest.ASFL_DrainNotices",
+      "mutant_id": "GitHubHarvest.ASFL_DrainNotices_impl_DRO",
+      "operator": "DRO",
+      "description": "Remove else branch",
+      "b2_strict": 1.0,
+      "m_strict": 1.0,
+      "a2_accepted": true
+    },
+    {
+      "task_id": "GitHubHarvest.ASFL_Ingest",
+      "mutant_id": "GitHubHarvest.ASFL_Ingest_impl_MBO",
+      "operator": "MBO",
+      "description": "Off-by-one in comparison",
+      "b2_strict": 1.0,
+      "m_strict": 1.0,
+      "a2_accepted": true
+    },
+    {
+      "task_id": "GitHubHarvest.ASFL_Ingest",
+      "mutant_id": "GitHubHarvest.ASFL_Ingest_impl_DRO",
+      "operator": "DRO",
+      "description": "Remove else branch",
+      "b2_strict": 1.0,
+      "m_strict": 1.0,
+      "a2_accepted": true
+    },
+    {
+      "task_id": "GitHubHarvest.ASFL_ExportDashboard",
+      "mutant_id": "GitHubHarvest.ASFL_ExportDashboard_impl_WRO",
+      "operator": "WRO",
+      "description": "Return wrong constant for primary output",
+      "b2_strict": 1.0,
+      "m_strict": 1.0,
+      "a2_accepted": true
+    },
+    {
+      "task_id": "GitHubHarvest.ASFL_ExportDashboard",
+      "mutant_id": "GitHubHarvest.ASFL_ExportDashboard_impl_MBO",
+      "operator": "MBO",
+      "description": "Off-by-one in comparison",
+      "b2_strict": 1.0,
+      "m_strict": 1.0,
+      "a2_accepted": true
+    },
+    {
+      "task_id": "GitHubHarvest.ASFL_ExportDashboard",
+      "mutant_id": "GitHubHarvest.ASFL_ExportDashboard_impl_DRO",
+      "operator": "DRO",
+      "description": "Remove else branch",
+      "b2_strict": 1.0,
+      "m_strict": 1.0,
+      "a2_accepted": true
+    },
+    {
+      "task_id": "GitHubHarvest.ASFL_WarmSensors",
+      "mutant_id": "GitHubHarvest.ASFL_WarmSensors_impl_ICO",
+      "operator": "ICO",
+      "description": "Invert if condition in implementation",
+      "b2_strict": 1.0,
+      "m_strict": 1.0,
+      "a2_accepted": true
+    },
+    {
+      "task_id": "GitHubHarvest.ASFL_WarmSensors",
+      "mutant_id": "GitHubHarvest.ASFL_WarmSensors_impl_WRO",
+      "operator": "WRO",
+      "description": "Return wrong constant for primary output",
+      "b2_strict": 1.0,
+      "m_strict": 1.0,
+      "a2_accepted": true
+    },
+    {
+      "task_id": "GitHubHarvest.ASFL_WarmSensors",
+      "mutant_id": "GitHubHarvest.ASFL_WarmSensors_impl_MBO",
+      "operator": "MBO",
+      "description": "Off-by-one in comparison",
+      "b2_strict": 1.0,
+      "m_strict": 1.0,
+      "a2_accepted": true
+    },
+    {
+      "task_id": "GitHubHarvest.ASFL_WarmSensors",
+      "mutant_id": "GitHubHarvest.ASFL_WarmSensors_impl_DRO",
+      "operator": "DRO",
+      "description": "Remove else branch",
+      "b2_strict": 1.0,
+      "m_strict": 1.0,
+      "a2_accepted": true
+    },
+    {
+      "task_id": "GitHubHarvest.ASFL_SeedZones",
+      "mutant_id": "GitHubHarvest.ASFL_SeedZones_impl_ICO",
+      "operator": "ICO",
+      "description": "Invert if condition in implementation",
+      "b2_strict": 1.0,
+      "m_strict": 1.0,
+      "a2_accepted": true
+    },
+    {
+      "task_id": "GitHubHarvest.ASFL_SeedZones",
+      "mutant_id": "GitHubHarvest.ASFL_SeedZones_impl_WRO",
+      "operator": "WRO",
+      "description": "Return wrong constant for primary output",
+      "b2_strict": 1.0,
+      "m_strict": 1.0,
+      "a2_accepted": true
+    },
+    {
+      "task_id": "GitHubHarvest.ASFL_SeedZones",
+      "mutant_id": "GitHubHarvest.ASFL_SeedZones_impl_MBO",
+      "operator": "MBO",
+      "description": "Off-by-one in comparison",
+      "b2_strict": 1.0,
+      "m_strict": 1.0,
+      "a2_accepted": true
+    },
+    {
+      "task_id": "GitHubHarvest.ASFL_SeedZones",
+      "mutant_id": "GitHubHarvest.ASFL_SeedZones_impl_DRO",
+      "operator": "DRO",
+      "description": "Remove else branch",
+      "b2_strict": 1.0,
+      "m_strict": 1.0,
+      "a2_accepted": true
+    },
+    {
+      "task_id": "GitHubHarvest.ASFL_AssignDoctor",
+      "mutant_id": "GitHubHarvest.ASFL_AssignDoctor_impl_MBO",
+      "operator": "MBO",
+      "description": "Off-by-one in comparison",
+      "b2_strict": 1.0,
+      "m_strict": 1.0,
+      "a2_accepted": true
+    },
+    {
+      "task_id": "GitHubHarvest.ASFL_AssignDoctor",
+      "mutant_id": "GitHubHarvest.ASFL_AssignDoctor_impl_DRO",
+      "operator": "DRO",
+      "description": "Remove else branch",
+      "b2_strict": 1.0,
+      "m_strict": 1.0,
+      "a2_accepted": true
+    },
+    {
+      "task_id": "GitHubHarvest.ASFL_Discharge",
+      "mutant_id": "GitHubHarvest.ASFL_Discharge_impl_MBO",
+      "operator": "MBO",
+      "description": "Off-by-one in comparison",
+      "b2_strict": 1.0,
+      "m_strict": 1.0,
+      "a2_accepted": true
+    },
+    {
+      "task_id": "GitHubHarvest.ASFL_Discharge",
+      "mutant_id": "GitHubHarvest.ASFL_Discharge_impl_DRO",
+      "operator": "DRO",
+      "description": "Remove else branch",
+      "b2_strict": 1.0,
+      "m_strict": 1.0,
+      "a2_accepted": true
+    },
+    {
+      "task_id": "GitHubHarvest.ASFL_AdmitUrgent",
+      "mutant_id": "GitHubHarvest.ASFL_AdmitUrgent_impl_MBO",
+      "operator": "MBO",
+      "description": "Off-by-one in comparison",
+      "b2_strict": 1.0,
+      "m_strict": 1.0,
+      "a2_accepted": true
+    },
+    {
+      "task_id": "GitHubHarvest.ASFL_AdmitUrgent",
+      "mutant_id": "GitHubHarvest.ASFL_AdmitUrgent_impl_DRO",
+      "operator": "DRO",
+      "description": "Remove else branch",
+      "b2_strict": 1.0,
+      "m_strict": 1.0,
+      "a2_accepted": true
+    },
+    {
+      "task_id": "GitHubHarvest.ASFL_ReleaseBed",
+      "mutant_id": "GitHubHarvest.ASFL_ReleaseBed_impl_WRO",
+      "operator": "WRO",
+      "description": "Return wrong constant for primary output",
+      "b2_strict": 1.0,
+      "m_strict": 1.0,
+      "a2_accepted": true
+    },
+    {
+      "task_id": "GitHubHarvest.ASFL_ReleaseBed",
+      "mutant_id": "GitHubHarvest.ASFL_ReleaseBed_impl_MBO",
+      "operator": "MBO",
+      "description": "Off-by-one in comparison",
+      "b2_strict": 1.0,
+      "m_strict": 1.0,
+      "a2_accepted": true
+    },
+    {
+      "task_id": "GitHubHarvest.ASFL_ReleaseBed",
+      "mutant_id": "GitHubHarvest.ASFL_ReleaseBed_impl_DRO",
+      "operator": "DRO",
+      "description": "Remove else branch",
+      "b2_strict": 1.0,
+      "m_strict": 1.0,
+      "a2_accepted": true
+    },
+    {
+      "task_id": "GitHubHarvest.ASFL_CollectFee",
+      "mutant_id": "GitHubHarvest.ASFL_CollectFee_impl_MBO",
+      "operator": "MBO",
+      "description": "Off-by-one in comparison",
+      "b2_strict": 1.0,
+      "m_strict": 1.0,
+      "a2_accepted": true
+    },
+    {
+      "task_id": "GitHubHarvest.ASFL_CollectFee",
+      "mutant_id": "GitHubHarvest.ASFL_CollectFee_impl_DRO",
+      "operator": "DRO",
+      "description": "Remove else branch",
+      "b2_strict": 1.0,
+      "m_strict": 1.0,
+      "a2_accepted": true
+    },
+    {
+      "task_id": "GitHubHarvest.ASFL_LookupVisits",
+      "mutant_id": "GitHubHarvest.ASFL_LookupVisits_impl_WRO",
+      "operator": "WRO",
+      "description": "Return wrong constant for primary output",
+      "b2_strict": 1.0,
+      "m_strict": 1.0,
+      "a2_accepted": true
+    },
+    {
+      "task_id": "GitHubHarvest.ASFL_LookupVisits",
+      "mutant_id": "GitHubHarvest.ASFL_LookupVisits_impl_MBO",
+      "operator": "MBO",
+      "description": "Off-by-one in comparison",
+      "b2_strict": 1.0,
+      "m_strict": 1.0,
+      "a2_accepted": true
+    },
+    {
+      "task_id": "GitHubHarvest.ASFL_LookupVisits",
+      "mutant_id": "GitHubHarvest.ASFL_LookupVisits_impl_DRO",
+      "operator": "DRO",
+      "description": "Remove else branch",
+      "b2_strict": 1.0,
+      "m_strict": 1.0,
+      "a2_accepted": true
+    },
+    {
+      "task_id": "GitHubHarvest.ASFL_Borrow",
+      "mutant_id": "GitHubHarvest.ASFL_Borrow_impl_MBO",
+      "operator": "MBO",
+      "description": "Off-by-one in comparison",
+      "b2_strict": 1.0,
+      "m_strict": 1.0,
+      "a2_accepted": true
+    },
+    {
+      "task_id": "GitHubHarvest.ASFL_Borrow",
+      "mutant_id": "GitHubHarvest.ASFL_Borrow_impl_DRO",
+      "operator": "DRO",
+      "description": "Remove else branch",
+      "b2_strict": 1.0,
+      "m_strict": 1.0,
+      "a2_accepted": true
+    },
+    {
+      "task_id": "GitHubHarvest.ASFL_Return",
+      "mutant_id": "GitHubHarvest.ASFL_Return_impl_MBO",
+      "operator": "MBO",
+      "description": "Off-by-one in comparison",
+      "b2_strict": 1.0,
+      "m_strict": 1.0,
+      "a2_accepted": true
+    },
+    {
+      "task_id": "GitHubHarvest.ASFL_Return",
+      "mutant_id": "GitHubHarvest.ASFL_Return_impl_DRO",
+      "operator": "DRO",
+      "description": "Remove else branch",
+      "b2_strict": 1.0,
+      "m_strict": 1.0,
+      "a2_accepted": true
+    },
+    {
+      "task_id": "GitHubHarvest.ASFL_Reserve",
+      "mutant_id": "GitHubHarvest.ASFL_Reserve_impl_MBO",
+      "operator": "MBO",
+      "description": "Off-by-one in comparison",
+      "b2_strict": 1.0,
+      "m_strict": 1.0,
+      "a2_accepted": true
+    },
+    {
+      "task_id": "GitHubHarvest.ASFL_Reserve",
+      "mutant_id": "GitHubHarvest.ASFL_Reserve_impl_DRO",
+      "operator": "DRO",
+      "description": "Remove else branch",
+      "b2_strict": 1.0,
+      "m_strict": 1.0,
+      "a2_accepted": true
+    },
+    {
+      "task_id": "GitHubHarvest.ASFL_ListCatalog",
+      "mutant_id": "GitHubHarvest.ASFL_ListCatalog_impl_WRO",
+      "operator": "WRO",
+      "description": "Return wrong constant for primary output",
+      "b2_strict": 1.0,
+      "m_strict": 1.0,
+      "a2_accepted": true
+    },
+    {
+      "task_id": "GitHubHarvest.ASFL_ListCatalog",
+      "mutant_id": "GitHubHarvest.ASFL_ListCatalog_impl_MBO",
+      "operator": "MBO",
+      "description": "Off-by-one in comparison",
+      "b2_strict": 1.0,
+      "m_strict": 1.0,
+      "a2_accepted": true
+    },
+    {
+      "task_id": "GitHubHarvest.ASFL_ListCatalog",
+      "mutant_id": "GitHubHarvest.ASFL_ListCatalog_impl_DRO",
+      "operator": "DRO",
+      "description": "Remove else branch",
+      "b2_strict": 1.0,
+      "m_strict": 1.0,
+      "a2_accepted": true
+    },
+    {
+      "task_id": "GitHubHarvest.ASFL_ClearPending",
+      "mutant_id": "GitHubHarvest.ASFL_ClearPending_impl_ICO",
+      "operator": "ICO",
+      "description": "Invert if condition in implementation",
+      "b2_strict": 1.0,
+      "m_strict": 1.0,
+      "a2_accepted": true
+    },
+    {
+      "task_id": "GitHubHarvest.ASFL_ClearPending",
+      "mutant_id": "GitHubHarvest.ASFL_ClearPending_impl_WRO",
+      "operator": "WRO",
+      "description": "Return wrong constant for primary output",
+      "b2_strict": 1.0,
+      "m_strict": 1.0,
+      "a2_accepted": true
+    },
+    {
+      "task_id": "GitHubHarvest.ASFL_ClearPending",
+      "mutant_id": "GitHubHarvest.ASFL_ClearPending_impl_MBO",
+      "operator": "MBO",
+      "description": "Off-by-one in comparison",
+      "b2_strict": 1.0,
+      "m_strict": 1.0,
+      "a2_accepted": true
+    },
+    {
+      "task_id": "GitHubHarvest.ASFL_ClearPending",
+      "mutant_id": "GitHubHarvest.ASFL_ClearPending_impl_DRO",
+      "operator": "DRO",
+      "description": "Remove else branch",
+      "b2_strict": 1.0,
+      "m_strict": 1.0,
+      "a2_accepted": true
+    },
+    {
+      "task_id": "GitHubHarvest.ASFL_SyncCatalog",
+      "mutant_id": "GitHubHarvest.ASFL_SyncCatalog_impl_WRO",
+      "operator": "WRO",
+      "description": "Return wrong constant for primary output",
+      "b2_strict": 1.0,
+      "m_strict": 1.0,
+      "a2_accepted": true
+    },
+    {
+      "task_id": "GitHubHarvest.ASFL_SyncCatalog",
+      "mutant_id": "GitHubHarvest.ASFL_SyncCatalog_impl_MBO",
+      "operator": "MBO",
+      "description": "Off-by-one in comparison",
+      "b2_strict": 1.0,
+      "m_strict": 1.0,
+      "a2_accepted": true
+    },
+    {
+      "task_id": "GitHubHarvest.ASFL_SyncCatalog",
+      "mutant_id": "GitHubHarvest.ASFL_SyncCatalog_impl_DRO",
+      "operator": "DRO",
+      "description": "Remove else branch",
+      "b2_strict": 1.0,
+      "m_strict": 1.0,
+      "a2_accepted": true
+    },
+    {
+      "task_id": "GitHubHarvest.ASFL_ResetFeatured",
+      "mutant_id": "GitHubHarvest.ASFL_ResetFeatured_impl_ICO",
+      "operator": "ICO",
+      "description": "Invert if condition in implementation",
+      "b2_strict": 1.0,
+      "m_strict": 1.0,
+      "a2_accepted": true
+    },
+    {
+      "task_id": "GitHubHarvest.ASFL_ResetFeatured",
+      "mutant_id": "GitHubHarvest.ASFL_ResetFeatured_impl_WRO",
+      "operator": "WRO",
+      "description": "Return wrong constant for primary output",
+      "b2_strict": 1.0,
+      "m_strict": 1.0,
+      "a2_accepted": true
+    },
+    {
+      "task_id": "GitHubHarvest.ASFL_ResetFeatured",
+      "mutant_id": "GitHubHarvest.ASFL_ResetFeatured_impl_MBO",
+      "operator": "MBO",
+      "description": "Off-by-one in comparison",
+      "b2_strict": 1.0,
+      "m_strict": 1.0,
+      "a2_accepted": true
+    },
+    {
+      "task_id": "GitHubHarvest.ASFL_ResetFeatured",
+      "mutant_id": "GitHubHarvest.ASFL_ResetFeatured_impl_DRO",
+      "operator": "DRO",
+      "description": "Remove else branch",
+      "b2_strict": 1.0,
+      "m_strict": 1.0,
+      "a2_accepted": true
+    },
+    {
+      "task_id": "GitHubHarvest.ASFL_GenerateReport",
+      "mutant_id": "GitHubHarvest.ASFL_GenerateReport_impl_WRO",
+      "operator": "WRO",
+      "description": "Return wrong constant for primary output",
+      "b2_strict": 1.0,
+      "m_strict": 1.0,
+      "a2_accepted": true
+    },
+    {
+      "task_id": "GitHubHarvest.ASFL_GenerateReport",
+      "mutant_id": "GitHubHarvest.ASFL_GenerateReport_impl_MBO",
+      "operator": "MBO",
+      "description": "Off-by-one in comparison",
+      "b2_strict": 1.0,
+      "m_strict": 1.0,
+      "a2_accepted": true
+    },
+    {
+      "task_id": "GitHubHarvest.ASFL_GenerateReport",
+      "mutant_id": "GitHubHarvest.ASFL_GenerateReport_impl_DRO",
+      "operator": "DRO",
+      "description": "Remove else branch",
+      "b2_strict": 1.0,
+      "m_strict": 1.0,
+      "a2_accepted": true
+    }
+  ]
+}

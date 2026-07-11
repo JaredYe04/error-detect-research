@@ -1,52 +1,24 @@
 {
-  "n_rows": 360,
+  "n_rows": 9,
   "mean_conf_by_seed_variant": {
-    "combo_invert_relop|semantic_ir": 0.2125,
-    "combo_invert_relop|test_expected": 0.0344,
-    "combo_invert_relop|test_only": 0.0156,
-    "combo_swap_relop|semantic_ir": 0.2375,
-    "combo_swap_relop|test_expected": 0.0187,
-    "combo_swap_relop|test_only": 0.0469,
-    "drop_first_guard|semantic_ir": 0.2406,
-    "drop_first_guard|test_expected": 0.0156,
-    "drop_first_guard|test_only": 0.0375
+    "wrong_relop|semantic_ir": 0.7778,
+    "wrong_relop|test_expected": 0.6111,
+    "wrong_relop|test_only": 0.6111
   },
   "paired_full_vs_ablation": {
-    "combo_swap_relop|FULL_vs_test_expected": {
-      "wins": 10,
-      "losses": 3,
-      "ties": 27
+    "wrong_relop|FULL_vs_test_only": {
+      "wins": 1,
+      "losses": 0,
+      "ties": 2
     },
-    "combo_swap_relop|FULL_vs_test_only": {
-      "wins": 10,
-      "losses": 5,
-      "ties": 25
-    },
-    "drop_first_guard|FULL_vs_test_expected": {
-      "wins": 11,
-      "losses": 4,
-      "ties": 25
-    },
-    "drop_first_guard|FULL_vs_test_only": {
-      "wins": 10,
-      "losses": 10,
-      "ties": 20
-    },
-    "combo_invert_relop|FULL_vs_test_expected": {
-      "wins": 11,
-      "losses": 3,
-      "ties": 26
-    },
-    "combo_invert_relop|FULL_vs_test_only": {
-      "wins": 11,
-      "losses": 4,
-      "ties": 25
+    "wrong_relop|FULL_vs_test_expected": {
+      "wins": 1,
+      "losses": 0,
+      "ties": 2
     }
   },
   "model": "gemini-2.5-flash",
   "seed_types": [
-    "combo_invert_relop",
-    "combo_swap_relop",
-    "drop_first_guard"
+    "wrong_relop"
   ]
 }

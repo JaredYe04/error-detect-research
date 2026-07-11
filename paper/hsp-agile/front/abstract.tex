@@ -10,29 +10,49 @@ Consider a tier classifier whose \texttt{OTHERWISE} branch must return
 silently promoting the mid-band to \texttt{Pass}.
 A release dashboard that tracks mean pass rate alone will ship that defect.
 
-We reframe the goal as \textbf{acceptance safety}: release only when every
-specification-derived witness matches \emph{and} a structural screen clears
+We study headroom-conditioned catch-all repair under a SpecIR first-match
+oracle, together with a conditional dual-gate release check
 ($\mathrm{Accept}\Leftrightarrow\mathrm{Conf}{=}1\wedge\mathrm{Screen}{=}\mathit{pass}$).
-The vehicle is a \textbf{conjunctive release decision framework} realised by
-HSP-Agile on SOFL/FSF: first-match SMT witnesses, a typed Semantic Feedback IR
-for repair under headroom, and a pluggable screen.
+HSP-Agile implements the check on SOFL/FSF with Priority-Encoded Witness
+Generation, Scenario-Indexed Feedback Rendering, and a configurable static
+screen.
+As a formal-engineering method, the check is a bounded operational criterion
+under a faithful SpecIR encoding, not a theorem of program safety or a new
+SMT decision procedure.
 Here \emph{FAR} (False Accept Rate) is the fraction of faulty mutants that a
 mode incorrectly releases; \emph{PDR} is the complementary rejection rate.
 
-At comparable mean conformance, conjunctive Accept cuts escaped defects
-(E2: M FAR 5.0\% vs.\ B2 8.8\%; PDR 95.0\% vs.\ 91.2\%; bootstrap CIs on the
-gaps exclude~0).
-When repair still has headroom, structured feedback rescues catch-all failures
-that unstructured dumps miss (E6: semantic\_ir 86.9\% vs.\ test\_only 79.1\%,
-${+}7.7$\,pp; W/L/T $14/4/102$; 95\% CI $[2.3,\,13.6]$\,pp; $p{=}0.018$;
-all 14 Conf.\ wins are \texttt{others} rescues, none are ordering repairs).
+When test-only Conf.\ is already~$0$ ($n{=}13$), Semantic IR rescues all tasks
+(${+}90.7$\,pp); on the headroom set (Conf.${<}1$, $n{=}114$) the paired mean
+is ${+}8.2$\,pp (CI excludes~0).
+Among 18 decisive tasks, Semantic IR wins 14/18 (77.8\%).
+The all-task ${+}7.7$\,pp figure is only a supporting aggregate.
+On industrial-style mutants ($n{=}132$), Screen cuts FAR from 56.8\% to
+32.6\%---the primary prevention claim; over the full mutant pool ($n{=}852$)
+that lift appears as FAR 8.8\% to 5.0\%, but HardSynthetic mutants are already
+saturated and do not exercise Screen.
+The all-task ${+}7.7$\,pp aggregate (semantic\_ir 86.9\% vs.\ test\_only 79.1\%;
+W/L/T $14/4/102$; 95\% CI $[2.3,\,13.6]$\,pp; $p{=}0.018$) is a supporting
+summary, not a universal repair claim, and all 14 Conf.\ wins are
+\texttt{others} rescues, none are ordering repairs.
+When test-only Conf.\ is already partial ($0{<}\mathrm{Conf}{<}1$), keep B2
+rather than forcing Semantic IR (${-}2.5$\,pp in the partial-failure band).
 At matched budget~$K{=}3$, equal-$K$ Conf.\ places \texttt{M\_eq} at 100.0\%
 vs.\ B2 97.5\% (${+}2.5$\,pp; $3/0/117$).
-Prefer test-feedback (B2) by default; escalate to full mode~M when release
-requires $\mathrm{Accept}{=}1$ or FAR${\le}5\%$ and headroom remains.
+Gemini hard-seed runs support the feedback mechanism on frozen injected bugs.
+Under a frozen external hard-seed protocol (test-only Conf.${<}1$),
+\texttt{wrong\_relop} transfers at ${+}20.6$\,pp ($n{=}79$; CI $[12.7,\,28.6]$).
+On GitHub harvest reference mutants, Screen cuts FAR from 60.4\% to 11.5\%
+(94 Screen-hits); published-industrial screening saturates (0 hits).
+The controlled SIFR estimate remains E6 on BENCH-120; external rows are
+protocol-transfer diagnostics, not a second headline.
+Test-only B2 remains the default.
+Escalate when Accept is required or a contractual FAR budget exists \emph{and}
+repair headroom remains; Screen helps on industrial-pattern mutants but does
+not attain FAR${\le}5\%$ on that slice.
 Table~\ref{tab:evidence-ladder} summarises the evidence ladder.
 Artifacts released.
 
 \paragraph{Keywords.}
-Acceptance safety; conjunctive release; specification-guided repair; false
+Acceptance checking; dual-gate release; specification-guided repair; false
 accept rate; LLM synthesis; SOFL; SMT witnesses; catch-all rescue.

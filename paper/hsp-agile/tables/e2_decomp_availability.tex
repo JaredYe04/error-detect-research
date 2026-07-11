@@ -1,0 +1,30 @@
+% Generated from prevention_full_v1 split analysis + B6 design note.
+\begin{table}[t]
+  \centering
+  \caption{E2 prevention decomposition.
+    How to read: $720/852$ HardSynthetic mutants saturate at PDR~$100\%$ /
+    FAR~$0\%$ under every formal gate, so they do not exercise Screen.
+    The primary prevention claim is the industrial slice ($n{=}132$): FAR
+    $56.8\%$ to $32.6\%$ (bootstrap $\Delta$FAR CI
+    $[-31.8,\,-17.4]$\,pp).
+    Pooled FAR $8.8\%$ to $5.0\%$ is an aggregate reading only, not the release
+    claim.
+    B6 is formal-only (no Screen): on HardSynthetic it matches B2/A2 by design;
+    industrial B6 rows are absent from \texttt{prevention\_full\_v1}.}
+  \label{tab:e2-decomp-availability}
+  \footnotesize
+  \renewcommand{\arraystretch}{1.08}
+  \begin{tabular}{@{}llrrr@{}}
+    \toprule
+    Slice & Mode & $n$ & PDR & FAR \\
+    \midrule
+    HardSynthetic & B2 / A2 / M & 720 & 100.0\% & 0.0\% \\
+    HardSynthetic & B6 (formal-only) & 720 & 100.0\% & 0.0\% \\
+    Industrial & B2 / A2 & 132 & 43.2\% & 56.8\% \\
+    Industrial & M (with Screen) & 132 & 67.4\% & 32.6\% \\
+    Industrial & B6 & --- & n/a & n/a \\
+    Pooled (authoritative) & B2 / A2 & 852 & 91.2\% & 8.8\% \\
+    Pooled (authoritative) & M & 852 & 95.0\% & 5.0\% \\
+    \bottomrule
+  \end{tabular}
+\end{table}

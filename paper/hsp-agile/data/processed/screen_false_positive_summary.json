@@ -1,0 +1,2131 @@
+{
+  "n_clean": 120,
+  "any_match_rate": 1.0,
+  "high_or_critical_reject_rate": 0.0,
+  "high_rate": 0.0,
+  "critical_rate": 0.0,
+  "pattern_counts": {
+    "RF06": 93,
+    "RF08": 120
+  },
+  "rows": [
+    {
+      "task_id": "HardSynthetic.HardCase001",
+      "n_matches": 2,
+      "n_high_critical": 0,
+      "matches": [
+        {
+          "pattern_id": "RF06",
+          "name": "no_guard_zero_input",
+          "severity": "medium",
+          "evidence": "FSF requires zero/None guard [('a', '==', '0'), ('b', '==', '0')] but code has no matching condition"
+        },
+        {
+          "pattern_id": "RF08",
+          "name": "missing_type_coercion",
+          "severity": "medium",
+          "evidence": "regex:return\\s+\\{[^}]*\\}"
+        }
+      ]
+    },
+    {
+      "task_id": "HardSynthetic.HardCase002",
+      "n_matches": 2,
+      "n_high_critical": 0,
+      "matches": [
+        {
+          "pattern_id": "RF06",
+          "name": "no_guard_zero_input",
+          "severity": "medium",
+          "evidence": "FSF requires zero/None guard [('a', '==', '0'), ('b', '==', '0')] but code has no matching condition"
+        },
+        {
+          "pattern_id": "RF08",
+          "name": "missing_type_coercion",
+          "severity": "medium",
+          "evidence": "regex:return\\s+\\{[^}]*\\}"
+        }
+      ]
+    },
+    {
+      "task_id": "HardSynthetic.HardCase003",
+      "n_matches": 2,
+      "n_high_critical": 0,
+      "matches": [
+        {
+          "pattern_id": "RF06",
+          "name": "no_guard_zero_input",
+          "severity": "medium",
+          "evidence": "FSF requires zero/None guard [('a', '==', '0'), ('b', '==', '0')] but code has no matching condition"
+        },
+        {
+          "pattern_id": "RF08",
+          "name": "missing_type_coercion",
+          "severity": "medium",
+          "evidence": "regex:return\\s+\\{[^}]*\\}"
+        }
+      ]
+    },
+    {
+      "task_id": "HardSynthetic.HardCase004",
+      "n_matches": 2,
+      "n_high_critical": 0,
+      "matches": [
+        {
+          "pattern_id": "RF06",
+          "name": "no_guard_zero_input",
+          "severity": "medium",
+          "evidence": "FSF requires zero/None guard [('a', '==', '0'), ('b', '==', '0')] but code has no matching condition"
+        },
+        {
+          "pattern_id": "RF08",
+          "name": "missing_type_coercion",
+          "severity": "medium",
+          "evidence": "regex:return\\s+\\{[^}]*\\}"
+        }
+      ]
+    },
+    {
+      "task_id": "HardSynthetic.HardCase005",
+      "n_matches": 2,
+      "n_high_critical": 0,
+      "matches": [
+        {
+          "pattern_id": "RF06",
+          "name": "no_guard_zero_input",
+          "severity": "medium",
+          "evidence": "FSF requires zero/None guard [('a', '==', '0'), ('b', '==', '0')] but code has no matching condition"
+        },
+        {
+          "pattern_id": "RF08",
+          "name": "missing_type_coercion",
+          "severity": "medium",
+          "evidence": "regex:return\\s+\\{[^}]*\\}"
+        }
+      ]
+    },
+    {
+      "task_id": "HardSynthetic.HardCase006",
+      "n_matches": 2,
+      "n_high_critical": 0,
+      "matches": [
+        {
+          "pattern_id": "RF06",
+          "name": "no_guard_zero_input",
+          "severity": "medium",
+          "evidence": "FSF requires zero/None guard [('a', '==', '0'), ('b', '==', '0')] but code has no matching condition"
+        },
+        {
+          "pattern_id": "RF08",
+          "name": "missing_type_coercion",
+          "severity": "medium",
+          "evidence": "regex:return\\s+\\{[^}]*\\}"
+        }
+      ]
+    },
+    {
+      "task_id": "HardSynthetic.HardCase007",
+      "n_matches": 2,
+      "n_high_critical": 0,
+      "matches": [
+        {
+          "pattern_id": "RF06",
+          "name": "no_guard_zero_input",
+          "severity": "medium",
+          "evidence": "FSF requires zero/None guard [('a', '==', '0'), ('b', '==', '0')] but code has no matching condition"
+        },
+        {
+          "pattern_id": "RF08",
+          "name": "missing_type_coercion",
+          "severity": "medium",
+          "evidence": "regex:return\\s+\\{[^}]*\\}"
+        }
+      ]
+    },
+    {
+      "task_id": "HardSynthetic.HardCase008",
+      "n_matches": 2,
+      "n_high_critical": 0,
+      "matches": [
+        {
+          "pattern_id": "RF06",
+          "name": "no_guard_zero_input",
+          "severity": "medium",
+          "evidence": "FSF requires zero/None guard [('a', '==', '0'), ('b', '==', '0')] but code has no matching condition"
+        },
+        {
+          "pattern_id": "RF08",
+          "name": "missing_type_coercion",
+          "severity": "medium",
+          "evidence": "regex:return\\s+\\{[^}]*\\}"
+        }
+      ]
+    },
+    {
+      "task_id": "HardSynthetic.HardCase009",
+      "n_matches": 2,
+      "n_high_critical": 0,
+      "matches": [
+        {
+          "pattern_id": "RF06",
+          "name": "no_guard_zero_input",
+          "severity": "medium",
+          "evidence": "FSF requires zero/None guard [('a', '==', '0'), ('b', '==', '0')] but code has no matching condition"
+        },
+        {
+          "pattern_id": "RF08",
+          "name": "missing_type_coercion",
+          "severity": "medium",
+          "evidence": "regex:return\\s+\\{[^}]*\\}"
+        }
+      ]
+    },
+    {
+      "task_id": "HardSynthetic.HardCase010",
+      "n_matches": 2,
+      "n_high_critical": 0,
+      "matches": [
+        {
+          "pattern_id": "RF06",
+          "name": "no_guard_zero_input",
+          "severity": "medium",
+          "evidence": "FSF requires zero/None guard [('a', '==', '0'), ('b', '==', '0')] but code has no matching condition"
+        },
+        {
+          "pattern_id": "RF08",
+          "name": "missing_type_coercion",
+          "severity": "medium",
+          "evidence": "regex:return\\s+\\{[^}]*\\}"
+        }
+      ]
+    },
+    {
+      "task_id": "HardSynthetic.HardCase011",
+      "n_matches": 2,
+      "n_high_critical": 0,
+      "matches": [
+        {
+          "pattern_id": "RF06",
+          "name": "no_guard_zero_input",
+          "severity": "medium",
+          "evidence": "FSF requires zero/None guard [('a', '==', '0'), ('b', '==', '0')] but code has no matching condition"
+        },
+        {
+          "pattern_id": "RF08",
+          "name": "missing_type_coercion",
+          "severity": "medium",
+          "evidence": "regex:return\\s+\\{[^}]*\\}"
+        }
+      ]
+    },
+    {
+      "task_id": "HardSynthetic.HardCase012",
+      "n_matches": 2,
+      "n_high_critical": 0,
+      "matches": [
+        {
+          "pattern_id": "RF06",
+          "name": "no_guard_zero_input",
+          "severity": "medium",
+          "evidence": "FSF requires zero/None guard [('a', '==', '0'), ('b', '==', '0')] but code has no matching condition"
+        },
+        {
+          "pattern_id": "RF08",
+          "name": "missing_type_coercion",
+          "severity": "medium",
+          "evidence": "regex:return\\s+\\{[^}]*\\}"
+        }
+      ]
+    },
+    {
+      "task_id": "HardSynthetic.HardCase013",
+      "n_matches": 2,
+      "n_high_critical": 0,
+      "matches": [
+        {
+          "pattern_id": "RF06",
+          "name": "no_guard_zero_input",
+          "severity": "medium",
+          "evidence": "FSF requires zero/None guard [('a', '==', '0'), ('b', '==', '0')] but code has no matching condition"
+        },
+        {
+          "pattern_id": "RF08",
+          "name": "missing_type_coercion",
+          "severity": "medium",
+          "evidence": "regex:return\\s+\\{[^}]*\\}"
+        }
+      ]
+    },
+    {
+      "task_id": "HardSynthetic.HardCase014",
+      "n_matches": 2,
+      "n_high_critical": 0,
+      "matches": [
+        {
+          "pattern_id": "RF06",
+          "name": "no_guard_zero_input",
+          "severity": "medium",
+          "evidence": "FSF requires zero/None guard [('a', '==', '0'), ('b', '==', '0')] but code has no matching condition"
+        },
+        {
+          "pattern_id": "RF08",
+          "name": "missing_type_coercion",
+          "severity": "medium",
+          "evidence": "regex:return\\s+\\{[^}]*\\}"
+        }
+      ]
+    },
+    {
+      "task_id": "HardSynthetic.HardCase015",
+      "n_matches": 2,
+      "n_high_critical": 0,
+      "matches": [
+        {
+          "pattern_id": "RF06",
+          "name": "no_guard_zero_input",
+          "severity": "medium",
+          "evidence": "FSF requires zero/None guard [('a', '==', '0'), ('b', '==', '0')] but code has no matching condition"
+        },
+        {
+          "pattern_id": "RF08",
+          "name": "missing_type_coercion",
+          "severity": "medium",
+          "evidence": "regex:return\\s+\\{[^}]*\\}"
+        }
+      ]
+    },
+    {
+      "task_id": "HardSynthetic.HardCase016",
+      "n_matches": 2,
+      "n_high_critical": 0,
+      "matches": [
+        {
+          "pattern_id": "RF06",
+          "name": "no_guard_zero_input",
+          "severity": "medium",
+          "evidence": "FSF requires zero/None guard [('a', '==', '0'), ('b', '==', '0')] but code has no matching condition"
+        },
+        {
+          "pattern_id": "RF08",
+          "name": "missing_type_coercion",
+          "severity": "medium",
+          "evidence": "regex:return\\s+\\{[^}]*\\}"
+        }
+      ]
+    },
+    {
+      "task_id": "HardSynthetic.HardCase017",
+      "n_matches": 1,
+      "n_high_critical": 0,
+      "matches": [
+        {
+          "pattern_id": "RF08",
+          "name": "missing_type_coercion",
+          "severity": "medium",
+          "evidence": "regex:return\\s+\\{[^}]*\\}"
+        }
+      ]
+    },
+    {
+      "task_id": "HardSynthetic.HardCase018",
+      "n_matches": 2,
+      "n_high_critical": 0,
+      "matches": [
+        {
+          "pattern_id": "RF06",
+          "name": "no_guard_zero_input",
+          "severity": "medium",
+          "evidence": "FSF requires zero/None guard [('a', '==', '0'), ('b', '==', '0')] but code has no matching condition"
+        },
+        {
+          "pattern_id": "RF08",
+          "name": "missing_type_coercion",
+          "severity": "medium",
+          "evidence": "regex:return\\s+\\{[^}]*\\}"
+        }
+      ]
+    },
+    {
+      "task_id": "HardSynthetic.HardCase019",
+      "n_matches": 2,
+      "n_high_critical": 0,
+      "matches": [
+        {
+          "pattern_id": "RF06",
+          "name": "no_guard_zero_input",
+          "severity": "medium",
+          "evidence": "FSF requires zero/None guard [('a', '==', '0'), ('b', '==', '0')] but code has no matching condition"
+        },
+        {
+          "pattern_id": "RF08",
+          "name": "missing_type_coercion",
+          "severity": "medium",
+          "evidence": "regex:return\\s+\\{[^}]*\\}"
+        }
+      ]
+    },
+    {
+      "task_id": "HardSynthetic.HardCase020",
+      "n_matches": 2,
+      "n_high_critical": 0,
+      "matches": [
+        {
+          "pattern_id": "RF06",
+          "name": "no_guard_zero_input",
+          "severity": "medium",
+          "evidence": "FSF requires zero/None guard [('a', '==', '0'), ('b', '==', '0')] but code has no matching condition"
+        },
+        {
+          "pattern_id": "RF08",
+          "name": "missing_type_coercion",
+          "severity": "medium",
+          "evidence": "regex:return\\s+\\{[^}]*\\}"
+        }
+      ]
+    },
+    {
+      "task_id": "HardSynthetic.HardCase021",
+      "n_matches": 2,
+      "n_high_critical": 0,
+      "matches": [
+        {
+          "pattern_id": "RF06",
+          "name": "no_guard_zero_input",
+          "severity": "medium",
+          "evidence": "FSF requires zero/None guard [('a', '==', '0'), ('b', '==', '0')] but code has no matching condition"
+        },
+        {
+          "pattern_id": "RF08",
+          "name": "missing_type_coercion",
+          "severity": "medium",
+          "evidence": "regex:return\\s+\\{[^}]*\\}"
+        }
+      ]
+    },
+    {
+      "task_id": "HardSynthetic.HardCase022",
+      "n_matches": 1,
+      "n_high_critical": 0,
+      "matches": [
+        {
+          "pattern_id": "RF08",
+          "name": "missing_type_coercion",
+          "severity": "medium",
+          "evidence": "regex:return\\s+\\{[^}]*\\}"
+        }
+      ]
+    },
+    {
+      "task_id": "HardSynthetic.HardCase023",
+      "n_matches": 1,
+      "n_high_critical": 0,
+      "matches": [
+        {
+          "pattern_id": "RF08",
+          "name": "missing_type_coercion",
+          "severity": "medium",
+          "evidence": "regex:return\\s+\\{[^}]*\\}"
+        }
+      ]
+    },
+    {
+      "task_id": "HardSynthetic.HardCase024",
+      "n_matches": 2,
+      "n_high_critical": 0,
+      "matches": [
+        {
+          "pattern_id": "RF06",
+          "name": "no_guard_zero_input",
+          "severity": "medium",
+          "evidence": "FSF requires zero/None guard [('a', '==', '0'), ('b', '==', '0')] but code has no matching condition"
+        },
+        {
+          "pattern_id": "RF08",
+          "name": "missing_type_coercion",
+          "severity": "medium",
+          "evidence": "regex:return\\s+\\{[^}]*\\}"
+        }
+      ]
+    },
+    {
+      "task_id": "HardSynthetic.HardCase025",
+      "n_matches": 2,
+      "n_high_critical": 0,
+      "matches": [
+        {
+          "pattern_id": "RF06",
+          "name": "no_guard_zero_input",
+          "severity": "medium",
+          "evidence": "FSF requires zero/None guard [('a', '==', '0'), ('b', '==', '0')] but code has no matching condition"
+        },
+        {
+          "pattern_id": "RF08",
+          "name": "missing_type_coercion",
+          "severity": "medium",
+          "evidence": "regex:return\\s+\\{[^}]*\\}"
+        }
+      ]
+    },
+    {
+      "task_id": "HardSynthetic.HardCase026",
+      "n_matches": 2,
+      "n_high_critical": 0,
+      "matches": [
+        {
+          "pattern_id": "RF06",
+          "name": "no_guard_zero_input",
+          "severity": "medium",
+          "evidence": "FSF requires zero/None guard [('a', '==', '0'), ('b', '==', '0')] but code has no matching condition"
+        },
+        {
+          "pattern_id": "RF08",
+          "name": "missing_type_coercion",
+          "severity": "medium",
+          "evidence": "regex:return\\s+\\{[^}]*\\}"
+        }
+      ]
+    },
+    {
+      "task_id": "HardSynthetic.HardCase027",
+      "n_matches": 2,
+      "n_high_critical": 0,
+      "matches": [
+        {
+          "pattern_id": "RF06",
+          "name": "no_guard_zero_input",
+          "severity": "medium",
+          "evidence": "FSF requires zero/None guard [('a', '==', '0'), ('b', '==', '0')] but code has no matching condition"
+        },
+        {
+          "pattern_id": "RF08",
+          "name": "missing_type_coercion",
+          "severity": "medium",
+          "evidence": "regex:return\\s+\\{[^}]*\\}"
+        }
+      ]
+    },
+    {
+      "task_id": "HardSynthetic.HardCase028",
+      "n_matches": 2,
+      "n_high_critical": 0,
+      "matches": [
+        {
+          "pattern_id": "RF06",
+          "name": "no_guard_zero_input",
+          "severity": "medium",
+          "evidence": "FSF requires zero/None guard [('a', '==', '0'), ('b', '==', '0')] but code has no matching condition"
+        },
+        {
+          "pattern_id": "RF08",
+          "name": "missing_type_coercion",
+          "severity": "medium",
+          "evidence": "regex:return\\s+\\{[^}]*\\}"
+        }
+      ]
+    },
+    {
+      "task_id": "HardSynthetic.HardCase029",
+      "n_matches": 1,
+      "n_high_critical": 0,
+      "matches": [
+        {
+          "pattern_id": "RF08",
+          "name": "missing_type_coercion",
+          "severity": "medium",
+          "evidence": "regex:return\\s+\\{[^}]*\\}"
+        }
+      ]
+    },
+    {
+      "task_id": "HardSynthetic.HardCase030",
+      "n_matches": 2,
+      "n_high_critical": 0,
+      "matches": [
+        {
+          "pattern_id": "RF06",
+          "name": "no_guard_zero_input",
+          "severity": "medium",
+          "evidence": "FSF requires zero/None guard [('a', '==', '0'), ('b', '==', '0')] but code has no matching condition"
+        },
+        {
+          "pattern_id": "RF08",
+          "name": "missing_type_coercion",
+          "severity": "medium",
+          "evidence": "regex:return\\s+\\{[^}]*\\}"
+        }
+      ]
+    },
+    {
+      "task_id": "HardSynthetic.HardCase032",
+      "n_matches": 2,
+      "n_high_critical": 0,
+      "matches": [
+        {
+          "pattern_id": "RF06",
+          "name": "no_guard_zero_input",
+          "severity": "medium",
+          "evidence": "FSF requires zero/None guard [('a', '==', '0'), ('b', '==', '0')] but code has no matching condition"
+        },
+        {
+          "pattern_id": "RF08",
+          "name": "missing_type_coercion",
+          "severity": "medium",
+          "evidence": "regex:return\\s+\\{[^}]*\\}"
+        }
+      ]
+    },
+    {
+      "task_id": "HardSynthetic.HardCase033",
+      "n_matches": 1,
+      "n_high_critical": 0,
+      "matches": [
+        {
+          "pattern_id": "RF08",
+          "name": "missing_type_coercion",
+          "severity": "medium",
+          "evidence": "regex:return\\s+\\{[^}]*\\}"
+        }
+      ]
+    },
+    {
+      "task_id": "HardSynthetic.HardCase034",
+      "n_matches": 2,
+      "n_high_critical": 0,
+      "matches": [
+        {
+          "pattern_id": "RF06",
+          "name": "no_guard_zero_input",
+          "severity": "medium",
+          "evidence": "FSF requires zero/None guard [('a', '==', '0'), ('b', '==', '0')] but code has no matching condition"
+        },
+        {
+          "pattern_id": "RF08",
+          "name": "missing_type_coercion",
+          "severity": "medium",
+          "evidence": "regex:return\\s+\\{[^}]*\\}"
+        }
+      ]
+    },
+    {
+      "task_id": "HardSynthetic.HardCase035",
+      "n_matches": 1,
+      "n_high_critical": 0,
+      "matches": [
+        {
+          "pattern_id": "RF08",
+          "name": "missing_type_coercion",
+          "severity": "medium",
+          "evidence": "regex:return\\s+\\{[^}]*\\}"
+        }
+      ]
+    },
+    {
+      "task_id": "HardSynthetic.HardCase036",
+      "n_matches": 1,
+      "n_high_critical": 0,
+      "matches": [
+        {
+          "pattern_id": "RF08",
+          "name": "missing_type_coercion",
+          "severity": "medium",
+          "evidence": "regex:return\\s+\\{[^}]*\\}"
+        }
+      ]
+    },
+    {
+      "task_id": "HardSynthetic.HardCase037",
+      "n_matches": 2,
+      "n_high_critical": 0,
+      "matches": [
+        {
+          "pattern_id": "RF06",
+          "name": "no_guard_zero_input",
+          "severity": "medium",
+          "evidence": "FSF requires zero/None guard [('a', '==', '0'), ('b', '==', '0')] but code has no matching condition"
+        },
+        {
+          "pattern_id": "RF08",
+          "name": "missing_type_coercion",
+          "severity": "medium",
+          "evidence": "regex:return\\s+\\{[^}]*\\}"
+        }
+      ]
+    },
+    {
+      "task_id": "HardSynthetic.HardCase038",
+      "n_matches": 2,
+      "n_high_critical": 0,
+      "matches": [
+        {
+          "pattern_id": "RF06",
+          "name": "no_guard_zero_input",
+          "severity": "medium",
+          "evidence": "FSF requires zero/None guard [('a', '==', '0'), ('b', '==', '0')] but code has no matching condition"
+        },
+        {
+          "pattern_id": "RF08",
+          "name": "missing_type_coercion",
+          "severity": "medium",
+          "evidence": "regex:return\\s+\\{[^}]*\\}"
+        }
+      ]
+    },
+    {
+      "task_id": "HardSynthetic.HardCase039",
+      "n_matches": 2,
+      "n_high_critical": 0,
+      "matches": [
+        {
+          "pattern_id": "RF06",
+          "name": "no_guard_zero_input",
+          "severity": "medium",
+          "evidence": "FSF requires zero/None guard [('a', '==', '0'), ('b', '==', '0')] but code has no matching condition"
+        },
+        {
+          "pattern_id": "RF08",
+          "name": "missing_type_coercion",
+          "severity": "medium",
+          "evidence": "regex:return\\s+\\{[^}]*\\}"
+        }
+      ]
+    },
+    {
+      "task_id": "HardSynthetic.HardCase040",
+      "n_matches": 2,
+      "n_high_critical": 0,
+      "matches": [
+        {
+          "pattern_id": "RF06",
+          "name": "no_guard_zero_input",
+          "severity": "medium",
+          "evidence": "FSF requires zero/None guard [('a', '==', '0'), ('b', '==', '0')] but code has no matching condition"
+        },
+        {
+          "pattern_id": "RF08",
+          "name": "missing_type_coercion",
+          "severity": "medium",
+          "evidence": "regex:return\\s+\\{[^}]*\\}"
+        }
+      ]
+    },
+    {
+      "task_id": "HardSynthetic.HardCase041",
+      "n_matches": 2,
+      "n_high_critical": 0,
+      "matches": [
+        {
+          "pattern_id": "RF06",
+          "name": "no_guard_zero_input",
+          "severity": "medium",
+          "evidence": "FSF requires zero/None guard [('a', '==', '0'), ('b', '==', '0')] but code has no matching condition"
+        },
+        {
+          "pattern_id": "RF08",
+          "name": "missing_type_coercion",
+          "severity": "medium",
+          "evidence": "regex:return\\s+\\{[^}]*\\}"
+        }
+      ]
+    },
+    {
+      "task_id": "HardSynthetic.HardCase042",
+      "n_matches": 2,
+      "n_high_critical": 0,
+      "matches": [
+        {
+          "pattern_id": "RF06",
+          "name": "no_guard_zero_input",
+          "severity": "medium",
+          "evidence": "FSF requires zero/None guard [('a', '==', '0'), ('b', '==', '0')] but code has no matching condition"
+        },
+        {
+          "pattern_id": "RF08",
+          "name": "missing_type_coercion",
+          "severity": "medium",
+          "evidence": "regex:return\\s+\\{[^}]*\\}"
+        }
+      ]
+    },
+    {
+      "task_id": "HardSynthetic.HardCase043",
+      "n_matches": 2,
+      "n_high_critical": 0,
+      "matches": [
+        {
+          "pattern_id": "RF06",
+          "name": "no_guard_zero_input",
+          "severity": "medium",
+          "evidence": "FSF requires zero/None guard [('a', '==', '0'), ('b', '==', '0')] but code has no matching condition"
+        },
+        {
+          "pattern_id": "RF08",
+          "name": "missing_type_coercion",
+          "severity": "medium",
+          "evidence": "regex:return\\s+\\{[^}]*\\}"
+        }
+      ]
+    },
+    {
+      "task_id": "HardSynthetic.HardCase044",
+      "n_matches": 1,
+      "n_high_critical": 0,
+      "matches": [
+        {
+          "pattern_id": "RF08",
+          "name": "missing_type_coercion",
+          "severity": "medium",
+          "evidence": "regex:return\\s+\\{[^}]*\\}"
+        }
+      ]
+    },
+    {
+      "task_id": "HardSynthetic.HardCase045",
+      "n_matches": 2,
+      "n_high_critical": 0,
+      "matches": [
+        {
+          "pattern_id": "RF06",
+          "name": "no_guard_zero_input",
+          "severity": "medium",
+          "evidence": "FSF requires zero/None guard [('a', '==', '0'), ('b', '==', '0')] but code has no matching condition"
+        },
+        {
+          "pattern_id": "RF08",
+          "name": "missing_type_coercion",
+          "severity": "medium",
+          "evidence": "regex:return\\s+\\{[^}]*\\}"
+        }
+      ]
+    },
+    {
+      "task_id": "HardSynthetic.HardCase046",
+      "n_matches": 1,
+      "n_high_critical": 0,
+      "matches": [
+        {
+          "pattern_id": "RF08",
+          "name": "missing_type_coercion",
+          "severity": "medium",
+          "evidence": "regex:return\\s+\\{[^}]*\\}"
+        }
+      ]
+    },
+    {
+      "task_id": "HardSynthetic.HardCase047",
+      "n_matches": 2,
+      "n_high_critical": 0,
+      "matches": [
+        {
+          "pattern_id": "RF06",
+          "name": "no_guard_zero_input",
+          "severity": "medium",
+          "evidence": "FSF requires zero/None guard [('a', '==', '0'), ('b', '==', '0')] but code has no matching condition"
+        },
+        {
+          "pattern_id": "RF08",
+          "name": "missing_type_coercion",
+          "severity": "medium",
+          "evidence": "regex:return\\s+\\{[^}]*\\}"
+        }
+      ]
+    },
+    {
+      "task_id": "HardSynthetic.HardCase048",
+      "n_matches": 2,
+      "n_high_critical": 0,
+      "matches": [
+        {
+          "pattern_id": "RF06",
+          "name": "no_guard_zero_input",
+          "severity": "medium",
+          "evidence": "FSF requires zero/None guard [('a', '==', '0'), ('b', '==', '0')] but code has no matching condition"
+        },
+        {
+          "pattern_id": "RF08",
+          "name": "missing_type_coercion",
+          "severity": "medium",
+          "evidence": "regex:return\\s+\\{[^}]*\\}"
+        }
+      ]
+    },
+    {
+      "task_id": "HardSynthetic.HardCase049",
+      "n_matches": 1,
+      "n_high_critical": 0,
+      "matches": [
+        {
+          "pattern_id": "RF08",
+          "name": "missing_type_coercion",
+          "severity": "medium",
+          "evidence": "regex:return\\s+\\{[^}]*\\}"
+        }
+      ]
+    },
+    {
+      "task_id": "HardSynthetic.HardCase050",
+      "n_matches": 2,
+      "n_high_critical": 0,
+      "matches": [
+        {
+          "pattern_id": "RF06",
+          "name": "no_guard_zero_input",
+          "severity": "medium",
+          "evidence": "FSF requires zero/None guard [('a', '==', '0'), ('b', '==', '0')] but code has no matching condition"
+        },
+        {
+          "pattern_id": "RF08",
+          "name": "missing_type_coercion",
+          "severity": "medium",
+          "evidence": "regex:return\\s+\\{[^}]*\\}"
+        }
+      ]
+    },
+    {
+      "task_id": "HardSynthetic.HardCase051",
+      "n_matches": 1,
+      "n_high_critical": 0,
+      "matches": [
+        {
+          "pattern_id": "RF08",
+          "name": "missing_type_coercion",
+          "severity": "medium",
+          "evidence": "regex:return\\s+\\{[^}]*\\}"
+        }
+      ]
+    },
+    {
+      "task_id": "HardSynthetic.HardCase052",
+      "n_matches": 2,
+      "n_high_critical": 0,
+      "matches": [
+        {
+          "pattern_id": "RF06",
+          "name": "no_guard_zero_input",
+          "severity": "medium",
+          "evidence": "FSF requires zero/None guard [('a', '==', '0'), ('b', '==', '0')] but code has no matching condition"
+        },
+        {
+          "pattern_id": "RF08",
+          "name": "missing_type_coercion",
+          "severity": "medium",
+          "evidence": "regex:return\\s+\\{[^}]*\\}"
+        }
+      ]
+    },
+    {
+      "task_id": "HardSynthetic.HardCase053",
+      "n_matches": 2,
+      "n_high_critical": 0,
+      "matches": [
+        {
+          "pattern_id": "RF06",
+          "name": "no_guard_zero_input",
+          "severity": "medium",
+          "evidence": "FSF requires zero/None guard [('a', '==', '0'), ('b', '==', '0')] but code has no matching condition"
+        },
+        {
+          "pattern_id": "RF08",
+          "name": "missing_type_coercion",
+          "severity": "medium",
+          "evidence": "regex:return\\s+\\{[^}]*\\}"
+        }
+      ]
+    },
+    {
+      "task_id": "HardSynthetic.HardCase054",
+      "n_matches": 2,
+      "n_high_critical": 0,
+      "matches": [
+        {
+          "pattern_id": "RF06",
+          "name": "no_guard_zero_input",
+          "severity": "medium",
+          "evidence": "FSF requires zero/None guard [('a', '==', '0'), ('b', '==', '0')] but code has no matching condition"
+        },
+        {
+          "pattern_id": "RF08",
+          "name": "missing_type_coercion",
+          "severity": "medium",
+          "evidence": "regex:return\\s+\\{[^}]*\\}"
+        }
+      ]
+    },
+    {
+      "task_id": "HardSynthetic.HardCase055",
+      "n_matches": 2,
+      "n_high_critical": 0,
+      "matches": [
+        {
+          "pattern_id": "RF06",
+          "name": "no_guard_zero_input",
+          "severity": "medium",
+          "evidence": "FSF requires zero/None guard [('a', '==', '0'), ('b', '==', '0')] but code has no matching condition"
+        },
+        {
+          "pattern_id": "RF08",
+          "name": "missing_type_coercion",
+          "severity": "medium",
+          "evidence": "regex:return\\s+\\{[^}]*\\}"
+        }
+      ]
+    },
+    {
+      "task_id": "HardSynthetic.HardCase056",
+      "n_matches": 2,
+      "n_high_critical": 0,
+      "matches": [
+        {
+          "pattern_id": "RF06",
+          "name": "no_guard_zero_input",
+          "severity": "medium",
+          "evidence": "FSF requires zero/None guard [('a', '==', '0'), ('b', '==', '0')] but code has no matching condition"
+        },
+        {
+          "pattern_id": "RF08",
+          "name": "missing_type_coercion",
+          "severity": "medium",
+          "evidence": "regex:return\\s+\\{[^}]*\\}"
+        }
+      ]
+    },
+    {
+      "task_id": "HardSynthetic.HardCase057",
+      "n_matches": 2,
+      "n_high_critical": 0,
+      "matches": [
+        {
+          "pattern_id": "RF06",
+          "name": "no_guard_zero_input",
+          "severity": "medium",
+          "evidence": "FSF requires zero/None guard [('a', '==', '0'), ('b', '==', '0')] but code has no matching condition"
+        },
+        {
+          "pattern_id": "RF08",
+          "name": "missing_type_coercion",
+          "severity": "medium",
+          "evidence": "regex:return\\s+\\{[^}]*\\}"
+        }
+      ]
+    },
+    {
+      "task_id": "HardSynthetic.HardCase058",
+      "n_matches": 2,
+      "n_high_critical": 0,
+      "matches": [
+        {
+          "pattern_id": "RF06",
+          "name": "no_guard_zero_input",
+          "severity": "medium",
+          "evidence": "FSF requires zero/None guard [('a', '==', '0'), ('b', '==', '0')] but code has no matching condition"
+        },
+        {
+          "pattern_id": "RF08",
+          "name": "missing_type_coercion",
+          "severity": "medium",
+          "evidence": "regex:return\\s+\\{[^}]*\\}"
+        }
+      ]
+    },
+    {
+      "task_id": "HardSynthetic.HardCase059",
+      "n_matches": 2,
+      "n_high_critical": 0,
+      "matches": [
+        {
+          "pattern_id": "RF06",
+          "name": "no_guard_zero_input",
+          "severity": "medium",
+          "evidence": "FSF requires zero/None guard [('a', '==', '0'), ('b', '==', '0')] but code has no matching condition"
+        },
+        {
+          "pattern_id": "RF08",
+          "name": "missing_type_coercion",
+          "severity": "medium",
+          "evidence": "regex:return\\s+\\{[^}]*\\}"
+        }
+      ]
+    },
+    {
+      "task_id": "HardSynthetic.HardCase060",
+      "n_matches": 1,
+      "n_high_critical": 0,
+      "matches": [
+        {
+          "pattern_id": "RF08",
+          "name": "missing_type_coercion",
+          "severity": "medium",
+          "evidence": "regex:return\\s+\\{[^}]*\\}"
+        }
+      ]
+    },
+    {
+      "task_id": "HardSynthetic.HardCase061",
+      "n_matches": 2,
+      "n_high_critical": 0,
+      "matches": [
+        {
+          "pattern_id": "RF06",
+          "name": "no_guard_zero_input",
+          "severity": "medium",
+          "evidence": "FSF requires zero/None guard [('a', '==', '0'), ('b', '==', '0')] but code has no matching condition"
+        },
+        {
+          "pattern_id": "RF08",
+          "name": "missing_type_coercion",
+          "severity": "medium",
+          "evidence": "regex:return\\s+\\{[^}]*\\}"
+        }
+      ]
+    },
+    {
+      "task_id": "HardSynthetic.HardCase062",
+      "n_matches": 2,
+      "n_high_critical": 0,
+      "matches": [
+        {
+          "pattern_id": "RF06",
+          "name": "no_guard_zero_input",
+          "severity": "medium",
+          "evidence": "FSF requires zero/None guard [('a', '==', '0'), ('b', '==', '0')] but code has no matching condition"
+        },
+        {
+          "pattern_id": "RF08",
+          "name": "missing_type_coercion",
+          "severity": "medium",
+          "evidence": "regex:return\\s+\\{[^}]*\\}"
+        }
+      ]
+    },
+    {
+      "task_id": "HardSynthetic.HardCase063",
+      "n_matches": 2,
+      "n_high_critical": 0,
+      "matches": [
+        {
+          "pattern_id": "RF06",
+          "name": "no_guard_zero_input",
+          "severity": "medium",
+          "evidence": "FSF requires zero/None guard [('a', '==', '0'), ('b', '==', '0')] but code has no matching condition"
+        },
+        {
+          "pattern_id": "RF08",
+          "name": "missing_type_coercion",
+          "severity": "medium",
+          "evidence": "regex:return\\s+\\{[^}]*\\}"
+        }
+      ]
+    },
+    {
+      "task_id": "HardSynthetic.HardCase064",
+      "n_matches": 2,
+      "n_high_critical": 0,
+      "matches": [
+        {
+          "pattern_id": "RF06",
+          "name": "no_guard_zero_input",
+          "severity": "medium",
+          "evidence": "FSF requires zero/None guard [('a', '==', '0'), ('b', '==', '0')] but code has no matching condition"
+        },
+        {
+          "pattern_id": "RF08",
+          "name": "missing_type_coercion",
+          "severity": "medium",
+          "evidence": "regex:return\\s+\\{[^}]*\\}"
+        }
+      ]
+    },
+    {
+      "task_id": "HardSynthetic.HardCase065",
+      "n_matches": 2,
+      "n_high_critical": 0,
+      "matches": [
+        {
+          "pattern_id": "RF06",
+          "name": "no_guard_zero_input",
+          "severity": "medium",
+          "evidence": "FSF requires zero/None guard [('a', '==', '0'), ('b', '==', '0')] but code has no matching condition"
+        },
+        {
+          "pattern_id": "RF08",
+          "name": "missing_type_coercion",
+          "severity": "medium",
+          "evidence": "regex:return\\s+\\{[^}]*\\}"
+        }
+      ]
+    },
+    {
+      "task_id": "HardSynthetic.HardCase066",
+      "n_matches": 2,
+      "n_high_critical": 0,
+      "matches": [
+        {
+          "pattern_id": "RF06",
+          "name": "no_guard_zero_input",
+          "severity": "medium",
+          "evidence": "FSF requires zero/None guard [('a', '==', '0'), ('b', '==', '0')] but code has no matching condition"
+        },
+        {
+          "pattern_id": "RF08",
+          "name": "missing_type_coercion",
+          "severity": "medium",
+          "evidence": "regex:return\\s+\\{[^}]*\\}"
+        }
+      ]
+    },
+    {
+      "task_id": "HardSynthetic.HardCase067",
+      "n_matches": 1,
+      "n_high_critical": 0,
+      "matches": [
+        {
+          "pattern_id": "RF08",
+          "name": "missing_type_coercion",
+          "severity": "medium",
+          "evidence": "regex:return\\s+\\{[^}]*\\}"
+        }
+      ]
+    },
+    {
+      "task_id": "HardSynthetic.HardCase068",
+      "n_matches": 1,
+      "n_high_critical": 0,
+      "matches": [
+        {
+          "pattern_id": "RF08",
+          "name": "missing_type_coercion",
+          "severity": "medium",
+          "evidence": "regex:return\\s+\\{[^}]*\\}"
+        }
+      ]
+    },
+    {
+      "task_id": "HardSynthetic.HardCase069",
+      "n_matches": 2,
+      "n_high_critical": 0,
+      "matches": [
+        {
+          "pattern_id": "RF06",
+          "name": "no_guard_zero_input",
+          "severity": "medium",
+          "evidence": "FSF requires zero/None guard [('a', '==', '0'), ('b', '==', '0')] but code has no matching condition"
+        },
+        {
+          "pattern_id": "RF08",
+          "name": "missing_type_coercion",
+          "severity": "medium",
+          "evidence": "regex:return\\s+\\{[^}]*\\}"
+        }
+      ]
+    },
+    {
+      "task_id": "HardSynthetic.HardCase070",
+      "n_matches": 2,
+      "n_high_critical": 0,
+      "matches": [
+        {
+          "pattern_id": "RF06",
+          "name": "no_guard_zero_input",
+          "severity": "medium",
+          "evidence": "FSF requires zero/None guard [('a', '==', '0'), ('b', '==', '0')] but code has no matching condition"
+        },
+        {
+          "pattern_id": "RF08",
+          "name": "missing_type_coercion",
+          "severity": "medium",
+          "evidence": "regex:return\\s+\\{[^}]*\\}"
+        }
+      ]
+    },
+    {
+      "task_id": "HardSynthetic.HardCase071",
+      "n_matches": 1,
+      "n_high_critical": 0,
+      "matches": [
+        {
+          "pattern_id": "RF08",
+          "name": "missing_type_coercion",
+          "severity": "medium",
+          "evidence": "regex:return\\s+\\{[^}]*\\}"
+        }
+      ]
+    },
+    {
+      "task_id": "HardSynthetic.HardCase072",
+      "n_matches": 1,
+      "n_high_critical": 0,
+      "matches": [
+        {
+          "pattern_id": "RF08",
+          "name": "missing_type_coercion",
+          "severity": "medium",
+          "evidence": "regex:return\\s+\\{[^}]*\\}"
+        }
+      ]
+    },
+    {
+      "task_id": "HardSynthetic.HardCase073",
+      "n_matches": 1,
+      "n_high_critical": 0,
+      "matches": [
+        {
+          "pattern_id": "RF08",
+          "name": "missing_type_coercion",
+          "severity": "medium",
+          "evidence": "regex:return\\s+\\{[^}]*\\}"
+        }
+      ]
+    },
+    {
+      "task_id": "HardSynthetic.HardCase074",
+      "n_matches": 1,
+      "n_high_critical": 0,
+      "matches": [
+        {
+          "pattern_id": "RF08",
+          "name": "missing_type_coercion",
+          "severity": "medium",
+          "evidence": "regex:return\\s+\\{[^}]*\\}"
+        }
+      ]
+    },
+    {
+      "task_id": "HardSynthetic.HardCase075",
+      "n_matches": 2,
+      "n_high_critical": 0,
+      "matches": [
+        {
+          "pattern_id": "RF06",
+          "name": "no_guard_zero_input",
+          "severity": "medium",
+          "evidence": "FSF requires zero/None guard [('a', '==', '0'), ('b', '==', '0')] but code has no matching condition"
+        },
+        {
+          "pattern_id": "RF08",
+          "name": "missing_type_coercion",
+          "severity": "medium",
+          "evidence": "regex:return\\s+\\{[^}]*\\}"
+        }
+      ]
+    },
+    {
+      "task_id": "HardSynthetic.HardCase076",
+      "n_matches": 1,
+      "n_high_critical": 0,
+      "matches": [
+        {
+          "pattern_id": "RF08",
+          "name": "missing_type_coercion",
+          "severity": "medium",
+          "evidence": "regex:return\\s+\\{[^}]*\\}"
+        }
+      ]
+    },
+    {
+      "task_id": "HardSynthetic.HardCase077",
+      "n_matches": 2,
+      "n_high_critical": 0,
+      "matches": [
+        {
+          "pattern_id": "RF06",
+          "name": "no_guard_zero_input",
+          "severity": "medium",
+          "evidence": "FSF requires zero/None guard [('a', '==', '0'), ('b', '==', '0')] but code has no matching condition"
+        },
+        {
+          "pattern_id": "RF08",
+          "name": "missing_type_coercion",
+          "severity": "medium",
+          "evidence": "regex:return\\s+\\{[^}]*\\}"
+        }
+      ]
+    },
+    {
+      "task_id": "HardSynthetic.HardCase078",
+      "n_matches": 1,
+      "n_high_critical": 0,
+      "matches": [
+        {
+          "pattern_id": "RF08",
+          "name": "missing_type_coercion",
+          "severity": "medium",
+          "evidence": "regex:return\\s+\\{[^}]*\\}"
+        }
+      ]
+    },
+    {
+      "task_id": "HardSynthetic.HardCase079",
+      "n_matches": 2,
+      "n_high_critical": 0,
+      "matches": [
+        {
+          "pattern_id": "RF06",
+          "name": "no_guard_zero_input",
+          "severity": "medium",
+          "evidence": "FSF requires zero/None guard [('a', '==', '0'), ('b', '==', '0')] but code has no matching condition"
+        },
+        {
+          "pattern_id": "RF08",
+          "name": "missing_type_coercion",
+          "severity": "medium",
+          "evidence": "regex:return\\s+\\{[^}]*\\}"
+        }
+      ]
+    },
+    {
+      "task_id": "HardSynthetic.HardCase080",
+      "n_matches": 2,
+      "n_high_critical": 0,
+      "matches": [
+        {
+          "pattern_id": "RF06",
+          "name": "no_guard_zero_input",
+          "severity": "medium",
+          "evidence": "FSF requires zero/None guard [('a', '==', '0'), ('b', '==', '0')] but code has no matching condition"
+        },
+        {
+          "pattern_id": "RF08",
+          "name": "missing_type_coercion",
+          "severity": "medium",
+          "evidence": "regex:return\\s+\\{[^}]*\\}"
+        }
+      ]
+    },
+    {
+      "task_id": "HardSynthetic.HardCase081",
+      "n_matches": 2,
+      "n_high_critical": 0,
+      "matches": [
+        {
+          "pattern_id": "RF06",
+          "name": "no_guard_zero_input",
+          "severity": "medium",
+          "evidence": "FSF requires zero/None guard [('a', '==', '0'), ('b', '==', '0')] but code has no matching condition"
+        },
+        {
+          "pattern_id": "RF08",
+          "name": "missing_type_coercion",
+          "severity": "medium",
+          "evidence": "regex:return\\s+\\{[^}]*\\}"
+        }
+      ]
+    },
+    {
+      "task_id": "HardSynthetic.HardCase082",
+      "n_matches": 2,
+      "n_high_critical": 0,
+      "matches": [
+        {
+          "pattern_id": "RF06",
+          "name": "no_guard_zero_input",
+          "severity": "medium",
+          "evidence": "FSF requires zero/None guard [('a', '==', '0'), ('b', '==', '0')] but code has no matching condition"
+        },
+        {
+          "pattern_id": "RF08",
+          "name": "missing_type_coercion",
+          "severity": "medium",
+          "evidence": "regex:return\\s+\\{[^}]*\\}"
+        }
+      ]
+    },
+    {
+      "task_id": "HardSynthetic.HardCase083",
+      "n_matches": 2,
+      "n_high_critical": 0,
+      "matches": [
+        {
+          "pattern_id": "RF06",
+          "name": "no_guard_zero_input",
+          "severity": "medium",
+          "evidence": "FSF requires zero/None guard [('a', '==', '0'), ('b', '==', '0')] but code has no matching condition"
+        },
+        {
+          "pattern_id": "RF08",
+          "name": "missing_type_coercion",
+          "severity": "medium",
+          "evidence": "regex:return\\s+\\{[^}]*\\}"
+        }
+      ]
+    },
+    {
+      "task_id": "HardSynthetic.HardCase084",
+      "n_matches": 2,
+      "n_high_critical": 0,
+      "matches": [
+        {
+          "pattern_id": "RF06",
+          "name": "no_guard_zero_input",
+          "severity": "medium",
+          "evidence": "FSF requires zero/None guard [('a', '==', '0'), ('b', '==', '0')] but code has no matching condition"
+        },
+        {
+          "pattern_id": "RF08",
+          "name": "missing_type_coercion",
+          "severity": "medium",
+          "evidence": "regex:return\\s+\\{[^}]*\\}"
+        }
+      ]
+    },
+    {
+      "task_id": "HardSynthetic.HardCase085",
+      "n_matches": 1,
+      "n_high_critical": 0,
+      "matches": [
+        {
+          "pattern_id": "RF08",
+          "name": "missing_type_coercion",
+          "severity": "medium",
+          "evidence": "regex:return\\s+\\{[^}]*\\}"
+        }
+      ]
+    },
+    {
+      "task_id": "HardSynthetic.HardCase086",
+      "n_matches": 2,
+      "n_high_critical": 0,
+      "matches": [
+        {
+          "pattern_id": "RF06",
+          "name": "no_guard_zero_input",
+          "severity": "medium",
+          "evidence": "FSF requires zero/None guard [('a', '==', '0'), ('b', '==', '0')] but code has no matching condition"
+        },
+        {
+          "pattern_id": "RF08",
+          "name": "missing_type_coercion",
+          "severity": "medium",
+          "evidence": "regex:return\\s+\\{[^}]*\\}"
+        }
+      ]
+    },
+    {
+      "task_id": "HardSynthetic.HardCase087",
+      "n_matches": 1,
+      "n_high_critical": 0,
+      "matches": [
+        {
+          "pattern_id": "RF08",
+          "name": "missing_type_coercion",
+          "severity": "medium",
+          "evidence": "regex:return\\s+\\{[^}]*\\}"
+        }
+      ]
+    },
+    {
+      "task_id": "HardSynthetic.HardCase088",
+      "n_matches": 1,
+      "n_high_critical": 0,
+      "matches": [
+        {
+          "pattern_id": "RF08",
+          "name": "missing_type_coercion",
+          "severity": "medium",
+          "evidence": "regex:return\\s+\\{[^}]*\\}"
+        }
+      ]
+    },
+    {
+      "task_id": "HardSynthetic.HardCase089",
+      "n_matches": 2,
+      "n_high_critical": 0,
+      "matches": [
+        {
+          "pattern_id": "RF06",
+          "name": "no_guard_zero_input",
+          "severity": "medium",
+          "evidence": "FSF requires zero/None guard [('a', '==', '0'), ('b', '==', '0')] but code has no matching condition"
+        },
+        {
+          "pattern_id": "RF08",
+          "name": "missing_type_coercion",
+          "severity": "medium",
+          "evidence": "regex:return\\s+\\{[^}]*\\}"
+        }
+      ]
+    },
+    {
+      "task_id": "HardSynthetic.HardCase090",
+      "n_matches": 2,
+      "n_high_critical": 0,
+      "matches": [
+        {
+          "pattern_id": "RF06",
+          "name": "no_guard_zero_input",
+          "severity": "medium",
+          "evidence": "FSF requires zero/None guard [('a', '==', '0'), ('b', '==', '0')] but code has no matching condition"
+        },
+        {
+          "pattern_id": "RF08",
+          "name": "missing_type_coercion",
+          "severity": "medium",
+          "evidence": "regex:return\\s+\\{[^}]*\\}"
+        }
+      ]
+    },
+    {
+      "task_id": "HardSynthetic.HardCase091",
+      "n_matches": 2,
+      "n_high_critical": 0,
+      "matches": [
+        {
+          "pattern_id": "RF06",
+          "name": "no_guard_zero_input",
+          "severity": "medium",
+          "evidence": "FSF requires zero/None guard [('a', '==', '0'), ('b', '==', '0')] but code has no matching condition"
+        },
+        {
+          "pattern_id": "RF08",
+          "name": "missing_type_coercion",
+          "severity": "medium",
+          "evidence": "regex:return\\s+\\{[^}]*\\}"
+        }
+      ]
+    },
+    {
+      "task_id": "HardSynthetic.HardCase092",
+      "n_matches": 2,
+      "n_high_critical": 0,
+      "matches": [
+        {
+          "pattern_id": "RF06",
+          "name": "no_guard_zero_input",
+          "severity": "medium",
+          "evidence": "FSF requires zero/None guard [('a', '==', '0'), ('b', '==', '0')] but code has no matching condition"
+        },
+        {
+          "pattern_id": "RF08",
+          "name": "missing_type_coercion",
+          "severity": "medium",
+          "evidence": "regex:return\\s+\\{[^}]*\\}"
+        }
+      ]
+    },
+    {
+      "task_id": "HardSynthetic.HardCase094",
+      "n_matches": 2,
+      "n_high_critical": 0,
+      "matches": [
+        {
+          "pattern_id": "RF06",
+          "name": "no_guard_zero_input",
+          "severity": "medium",
+          "evidence": "FSF requires zero/None guard [('a', '==', '0'), ('b', '==', '0')] but code has no matching condition"
+        },
+        {
+          "pattern_id": "RF08",
+          "name": "missing_type_coercion",
+          "severity": "medium",
+          "evidence": "regex:return\\s+\\{[^}]*\\}"
+        }
+      ]
+    },
+    {
+      "task_id": "HardSynthetic.HardCase095",
+      "n_matches": 2,
+      "n_high_critical": 0,
+      "matches": [
+        {
+          "pattern_id": "RF06",
+          "name": "no_guard_zero_input",
+          "severity": "medium",
+          "evidence": "FSF requires zero/None guard [('a', '==', '0'), ('b', '==', '0')] but code has no matching condition"
+        },
+        {
+          "pattern_id": "RF08",
+          "name": "missing_type_coercion",
+          "severity": "medium",
+          "evidence": "regex:return\\s+\\{[^}]*\\}"
+        }
+      ]
+    },
+    {
+      "task_id": "HardSynthetic.HardCase096",
+      "n_matches": 1,
+      "n_high_critical": 0,
+      "matches": [
+        {
+          "pattern_id": "RF08",
+          "name": "missing_type_coercion",
+          "severity": "medium",
+          "evidence": "regex:return\\s+\\{[^}]*\\}"
+        }
+      ]
+    },
+    {
+      "task_id": "HardSynthetic.HardCase097",
+      "n_matches": 2,
+      "n_high_critical": 0,
+      "matches": [
+        {
+          "pattern_id": "RF06",
+          "name": "no_guard_zero_input",
+          "severity": "medium",
+          "evidence": "FSF requires zero/None guard [('a', '==', '0'), ('b', '==', '0')] but code has no matching condition"
+        },
+        {
+          "pattern_id": "RF08",
+          "name": "missing_type_coercion",
+          "severity": "medium",
+          "evidence": "regex:return\\s+\\{[^}]*\\}"
+        }
+      ]
+    },
+    {
+      "task_id": "HardSynthetic.HardCase098",
+      "n_matches": 2,
+      "n_high_critical": 0,
+      "matches": [
+        {
+          "pattern_id": "RF06",
+          "name": "no_guard_zero_input",
+          "severity": "medium",
+          "evidence": "FSF requires zero/None guard [('a', '==', '0'), ('b', '==', '0')] but code has no matching condition"
+        },
+        {
+          "pattern_id": "RF08",
+          "name": "missing_type_coercion",
+          "severity": "medium",
+          "evidence": "regex:return\\s+\\{[^}]*\\}"
+        }
+      ]
+    },
+    {
+      "task_id": "HardSynthetic.HardCase099",
+      "n_matches": 2,
+      "n_high_critical": 0,
+      "matches": [
+        {
+          "pattern_id": "RF06",
+          "name": "no_guard_zero_input",
+          "severity": "medium",
+          "evidence": "FSF requires zero/None guard [('a', '==', '0'), ('b', '==', '0')] but code has no matching condition"
+        },
+        {
+          "pattern_id": "RF08",
+          "name": "missing_type_coercion",
+          "severity": "medium",
+          "evidence": "regex:return\\s+\\{[^}]*\\}"
+        }
+      ]
+    },
+    {
+      "task_id": "HardSynthetic.HardCase100",
+      "n_matches": 2,
+      "n_high_critical": 0,
+      "matches": [
+        {
+          "pattern_id": "RF06",
+          "name": "no_guard_zero_input",
+          "severity": "medium",
+          "evidence": "FSF requires zero/None guard [('a', '==', '0'), ('b', '==', '0')] but code has no matching condition"
+        },
+        {
+          "pattern_id": "RF08",
+          "name": "missing_type_coercion",
+          "severity": "medium",
+          "evidence": "regex:return\\s+\\{[^}]*\\}"
+        }
+      ]
+    },
+    {
+      "task_id": "HardSynthetic.HardCase101",
+      "n_matches": 2,
+      "n_high_critical": 0,
+      "matches": [
+        {
+          "pattern_id": "RF06",
+          "name": "no_guard_zero_input",
+          "severity": "medium",
+          "evidence": "FSF requires zero/None guard [('a', '==', '0'), ('b', '==', '0')] but code has no matching condition"
+        },
+        {
+          "pattern_id": "RF08",
+          "name": "missing_type_coercion",
+          "severity": "medium",
+          "evidence": "regex:return\\s+\\{[^}]*\\}"
+        }
+      ]
+    },
+    {
+      "task_id": "HardSynthetic.HardCase103",
+      "n_matches": 2,
+      "n_high_critical": 0,
+      "matches": [
+        {
+          "pattern_id": "RF06",
+          "name": "no_guard_zero_input",
+          "severity": "medium",
+          "evidence": "FSF requires zero/None guard [('a', '==', '0'), ('b', '==', '0')] but code has no matching condition"
+        },
+        {
+          "pattern_id": "RF08",
+          "name": "missing_type_coercion",
+          "severity": "medium",
+          "evidence": "regex:return\\s+\\{[^}]*\\}"
+        }
+      ]
+    },
+    {
+      "task_id": "HardSynthetic.HardCase104",
+      "n_matches": 2,
+      "n_high_critical": 0,
+      "matches": [
+        {
+          "pattern_id": "RF06",
+          "name": "no_guard_zero_input",
+          "severity": "medium",
+          "evidence": "FSF requires zero/None guard [('a', '==', '0'), ('b', '==', '0')] but code has no matching condition"
+        },
+        {
+          "pattern_id": "RF08",
+          "name": "missing_type_coercion",
+          "severity": "medium",
+          "evidence": "regex:return\\s+\\{[^}]*\\}"
+        }
+      ]
+    },
+    {
+      "task_id": "HardSynthetic.HardCase105",
+      "n_matches": 2,
+      "n_high_critical": 0,
+      "matches": [
+        {
+          "pattern_id": "RF06",
+          "name": "no_guard_zero_input",
+          "severity": "medium",
+          "evidence": "FSF requires zero/None guard [('a', '==', '0'), ('b', '==', '0')] but code has no matching condition"
+        },
+        {
+          "pattern_id": "RF08",
+          "name": "missing_type_coercion",
+          "severity": "medium",
+          "evidence": "regex:return\\s+\\{[^}]*\\}"
+        }
+      ]
+    },
+    {
+      "task_id": "HardSynthetic.HardCase106",
+      "n_matches": 2,
+      "n_high_critical": 0,
+      "matches": [
+        {
+          "pattern_id": "RF06",
+          "name": "no_guard_zero_input",
+          "severity": "medium",
+          "evidence": "FSF requires zero/None guard [('a', '==', '0'), ('b', '==', '0')] but code has no matching condition"
+        },
+        {
+          "pattern_id": "RF08",
+          "name": "missing_type_coercion",
+          "severity": "medium",
+          "evidence": "regex:return\\s+\\{[^}]*\\}"
+        }
+      ]
+    },
+    {
+      "task_id": "HardSynthetic.HardCase107",
+      "n_matches": 1,
+      "n_high_critical": 0,
+      "matches": [
+        {
+          "pattern_id": "RF08",
+          "name": "missing_type_coercion",
+          "severity": "medium",
+          "evidence": "regex:return\\s+\\{[^}]*\\}"
+        }
+      ]
+    },
+    {
+      "task_id": "HardSynthetic.HardCase108",
+      "n_matches": 2,
+      "n_high_critical": 0,
+      "matches": [
+        {
+          "pattern_id": "RF06",
+          "name": "no_guard_zero_input",
+          "severity": "medium",
+          "evidence": "FSF requires zero/None guard [('a', '==', '0'), ('b', '==', '0')] but code has no matching condition"
+        },
+        {
+          "pattern_id": "RF08",
+          "name": "missing_type_coercion",
+          "severity": "medium",
+          "evidence": "regex:return\\s+\\{[^}]*\\}"
+        }
+      ]
+    },
+    {
+      "task_id": "HardSynthetic.HardCase109",
+      "n_matches": 2,
+      "n_high_critical": 0,
+      "matches": [
+        {
+          "pattern_id": "RF06",
+          "name": "no_guard_zero_input",
+          "severity": "medium",
+          "evidence": "FSF requires zero/None guard [('a', '==', '0'), ('b', '==', '0')] but code has no matching condition"
+        },
+        {
+          "pattern_id": "RF08",
+          "name": "missing_type_coercion",
+          "severity": "medium",
+          "evidence": "regex:return\\s+\\{[^}]*\\}"
+        }
+      ]
+    },
+    {
+      "task_id": "HardSynthetic.HardCase110",
+      "n_matches": 2,
+      "n_high_critical": 0,
+      "matches": [
+        {
+          "pattern_id": "RF06",
+          "name": "no_guard_zero_input",
+          "severity": "medium",
+          "evidence": "FSF requires zero/None guard [('a', '==', '0'), ('b', '==', '0')] but code has no matching condition"
+        },
+        {
+          "pattern_id": "RF08",
+          "name": "missing_type_coercion",
+          "severity": "medium",
+          "evidence": "regex:return\\s+\\{[^}]*\\}"
+        }
+      ]
+    },
+    {
+      "task_id": "HardSynthetic.HardCase111",
+      "n_matches": 2,
+      "n_high_critical": 0,
+      "matches": [
+        {
+          "pattern_id": "RF06",
+          "name": "no_guard_zero_input",
+          "severity": "medium",
+          "evidence": "FSF requires zero/None guard [('a', '==', '0'), ('b', '==', '0')] but code has no matching condition"
+        },
+        {
+          "pattern_id": "RF08",
+          "name": "missing_type_coercion",
+          "severity": "medium",
+          "evidence": "regex:return\\s+\\{[^}]*\\}"
+        }
+      ]
+    },
+    {
+      "task_id": "HardSynthetic.HardCase112",
+      "n_matches": 2,
+      "n_high_critical": 0,
+      "matches": [
+        {
+          "pattern_id": "RF06",
+          "name": "no_guard_zero_input",
+          "severity": "medium",
+          "evidence": "FSF requires zero/None guard [('a', '==', '0'), ('b', '==', '0')] but code has no matching condition"
+        },
+        {
+          "pattern_id": "RF08",
+          "name": "missing_type_coercion",
+          "severity": "medium",
+          "evidence": "regex:return\\s+\\{[^}]*\\}"
+        }
+      ]
+    },
+    {
+      "task_id": "HardSynthetic.HardCase113",
+      "n_matches": 2,
+      "n_high_critical": 0,
+      "matches": [
+        {
+          "pattern_id": "RF06",
+          "name": "no_guard_zero_input",
+          "severity": "medium",
+          "evidence": "FSF requires zero/None guard [('a', '==', '0'), ('b', '==', '0')] but code has no matching condition"
+        },
+        {
+          "pattern_id": "RF08",
+          "name": "missing_type_coercion",
+          "severity": "medium",
+          "evidence": "regex:return\\s+\\{[^}]*\\}"
+        }
+      ]
+    },
+    {
+      "task_id": "HardSynthetic.HardCase115",
+      "n_matches": 1,
+      "n_high_critical": 0,
+      "matches": [
+        {
+          "pattern_id": "RF08",
+          "name": "missing_type_coercion",
+          "severity": "medium",
+          "evidence": "regex:return\\s+\\{[^}]*\\}"
+        }
+      ]
+    },
+    {
+      "task_id": "HardSynthetic.HardCase116",
+      "n_matches": 2,
+      "n_high_critical": 0,
+      "matches": [
+        {
+          "pattern_id": "RF06",
+          "name": "no_guard_zero_input",
+          "severity": "medium",
+          "evidence": "FSF requires zero/None guard [('a', '==', '0'), ('b', '==', '0')] but code has no matching condition"
+        },
+        {
+          "pattern_id": "RF08",
+          "name": "missing_type_coercion",
+          "severity": "medium",
+          "evidence": "regex:return\\s+\\{[^}]*\\}"
+        }
+      ]
+    },
+    {
+      "task_id": "HardSynthetic.HardCase117",
+      "n_matches": 2,
+      "n_high_critical": 0,
+      "matches": [
+        {
+          "pattern_id": "RF06",
+          "name": "no_guard_zero_input",
+          "severity": "medium",
+          "evidence": "FSF requires zero/None guard [('a', '==', '0'), ('b', '==', '0')] but code has no matching condition"
+        },
+        {
+          "pattern_id": "RF08",
+          "name": "missing_type_coercion",
+          "severity": "medium",
+          "evidence": "regex:return\\s+\\{[^}]*\\}"
+        }
+      ]
+    },
+    {
+      "task_id": "HardSynthetic.HardCase118",
+      "n_matches": 2,
+      "n_high_critical": 0,
+      "matches": [
+        {
+          "pattern_id": "RF06",
+          "name": "no_guard_zero_input",
+          "severity": "medium",
+          "evidence": "FSF requires zero/None guard [('a', '==', '0'), ('b', '==', '0')] but code has no matching condition"
+        },
+        {
+          "pattern_id": "RF08",
+          "name": "missing_type_coercion",
+          "severity": "medium",
+          "evidence": "regex:return\\s+\\{[^}]*\\}"
+        }
+      ]
+    },
+    {
+      "task_id": "HardSynthetic.HardCase120",
+      "n_matches": 2,
+      "n_high_critical": 0,
+      "matches": [
+        {
+          "pattern_id": "RF06",
+          "name": "no_guard_zero_input",
+          "severity": "medium",
+          "evidence": "FSF requires zero/None guard [('a', '==', '0'), ('b', '==', '0')] but code has no matching condition"
+        },
+        {
+          "pattern_id": "RF08",
+          "name": "missing_type_coercion",
+          "severity": "medium",
+          "evidence": "regex:return\\s+\\{[^}]*\\}"
+        }
+      ]
+    },
+    {
+      "task_id": "HardSynthetic.HardCase121",
+      "n_matches": 2,
+      "n_high_critical": 0,
+      "matches": [
+        {
+          "pattern_id": "RF06",
+          "name": "no_guard_zero_input",
+          "severity": "medium",
+          "evidence": "FSF requires zero/None guard [('a', '==', '0'), ('b', '==', '0')] but code has no matching condition"
+        },
+        {
+          "pattern_id": "RF08",
+          "name": "missing_type_coercion",
+          "severity": "medium",
+          "evidence": "regex:return\\s+\\{[^}]*\\}"
+        }
+      ]
+    },
+    {
+      "task_id": "HardSynthetic.HardCase122",
+      "n_matches": 2,
+      "n_high_critical": 0,
+      "matches": [
+        {
+          "pattern_id": "RF06",
+          "name": "no_guard_zero_input",
+          "severity": "medium",
+          "evidence": "FSF requires zero/None guard [('a', '==', '0'), ('b', '==', '0')] but code has no matching condition"
+        },
+        {
+          "pattern_id": "RF08",
+          "name": "missing_type_coercion",
+          "severity": "medium",
+          "evidence": "regex:return\\s+\\{[^}]*\\}"
+        }
+      ]
+    },
+    {
+      "task_id": "HardSynthetic.HardCase123",
+      "n_matches": 1,
+      "n_high_critical": 0,
+      "matches": [
+        {
+          "pattern_id": "RF08",
+          "name": "missing_type_coercion",
+          "severity": "medium",
+          "evidence": "regex:return\\s+\\{[^}]*\\}"
+        }
+      ]
+    },
+    {
+      "task_id": "HardSynthetic.HardCase124",
+      "n_matches": 2,
+      "n_high_critical": 0,
+      "matches": [
+        {
+          "pattern_id": "RF06",
+          "name": "no_guard_zero_input",
+          "severity": "medium",
+          "evidence": "FSF requires zero/None guard [('a', '==', '0'), ('b', '==', '0')] but code has no matching condition"
+        },
+        {
+          "pattern_id": "RF08",
+          "name": "missing_type_coercion",
+          "severity": "medium",
+          "evidence": "regex:return\\s+\\{[^}]*\\}"
+        }
+      ]
+    },
+    {
+      "task_id": "HardSynthetic.HardCase125",
+      "n_matches": 2,
+      "n_high_critical": 0,
+      "matches": [
+        {
+          "pattern_id": "RF06",
+          "name": "no_guard_zero_input",
+          "severity": "medium",
+          "evidence": "FSF requires zero/None guard [('a', '==', '0'), ('b', '==', '0')] but code has no matching condition"
+        },
+        {
+          "pattern_id": "RF08",
+          "name": "missing_type_coercion",
+          "severity": "medium",
+          "evidence": "regex:return\\s+\\{[^}]*\\}"
+        }
+      ]
+    }
+  ]
+}

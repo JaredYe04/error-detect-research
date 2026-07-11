@@ -21,12 +21,26 @@ def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--modes", nargs="+", default=["B1", "B2", "M", "A1", "A2", "A3"])
     parser.add_argument("--task-limit", type=int, default=None)
+    parser.add_argument(
+        "--benchmark-path",
+        type=Path,
+        default=None,
+        help="Benchmark JSON (default: benchmarks/tasks.json via load_benchmark)",
+    )
     parser.add_argument("--output", type=Path, default=ROOT / "artifacts" / "prevention_eval")
     parser.add_argument("--run-name", type=str, default="prevention_full_v1")
     parser.add_argument("--seed", type=int, default=42)
+    parser.add_argument(
+        "--impl-screening-only",
+        action="store_true",
+        help="Skip LLM generation; screen reference-code mutants only (external Screen/FAR)",
+    )
     args = parser.parse_args()
 
-    tasks = load_benchmark()
+    if args.benchmark_path is not None:
+        tasks = load_benchmark(args.benchmark_path, include_hard=False)
+    else:
+        tasks = load_benchmark()
     if args.task_limit:
         tasks = tasks[: args.task_limit]
     out_dir = args.output / args.run_name
@@ -44,8 +58,15 @@ def main() -> None:
             existing.append(rec)
             done_keys.add(f"{rec.mode}|{rec.mutant_id}|{rec.eval_type}")
 
-    llm = ECNUClient(log_dir=out_dir / "llm_logs")
-    new_records = evaluate_prevention(tasks, args.modes, llm, seed=args.seed, done_keys=done_keys)
+    llm = None if args.impl_screening_only else ECNUClient(log_dir=out_dir / "llm_logs")
+    new_records = evaluate_prevention(
+        tasks,
+        args.modes,
+        llm,
+        seed=args.seed,
+        done_keys=done_keys,
+        impl_screening_only=args.impl_screening_only,
+    )
     all_records = existing + new_records
     path = save_prevention_report(all_records, out_dir)
     print(f"Prevention evaluation saved to {path}")

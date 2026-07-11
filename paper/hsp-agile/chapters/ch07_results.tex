@@ -1,4 +1,4 @@
-%% ch07_results.tex  —  Chapter 7: Experimental Results (rewrite staging)
+%% ch07_results.tex  —  Chapter 7: Experimental Results (Step 1 polish staging)
 %% HSP-Agile Thesis, East China Normal University, 2026
 
 \chapter{Experimental Results}
@@ -48,7 +48,8 @@ $\mathrm{Accept}\Leftrightarrow\mathrm{Conf}{=}1\wedge\mathrm{Screen}{=}\mathit{
 
 Does naming the failed specification region improve repair beyond unstructured
 test dumps?
-The primary answer is E6 under full mode~M at matched $K{=}3$.
+The primary answer is E6 under full mode~M at matched $K{=}3$, read first on
+headroom strata (Table~\ref{tab:e6-headroom}).
 Supporting runs (E5 budget shape, E14 structured-family scope, hard combo
 seeds, fixed-oracle component ablation, E17 advisory gate) refine that answer;
 they are not co-equal headlines.
@@ -61,9 +62,9 @@ are busy; the mid-band \texttt{OTHERWISE} must return \texttt{Review}; an LLM
 candidate collapses it to \texttt{Pass}.
 Busy unit tests stay green.
 When a rare residual witness finally fails, an unstructured dump says only
-that ``a test failed.''
+that a test failed.
 Typed Semantic Feedback IR names the residual \texttt{others} scenario, the
-guard, and the output mismatch---and that naming is what E6 isolates.
+guard, and the output mismatch, and that naming is what E6 isolates.
 (The intro vignette uses three scenarios with residual $S_3$; BENCH-120 hard
 tasks scale the same first-match skeleton to eight scenarios, so the residual
 is scenario index~8 / $S_8$ in the coded wins below.)
@@ -85,7 +86,7 @@ Variant~C (full Semantic Feedback IR) reaches mean Conf\,=\,86.9\%---a gain of
 +7.7\,pp over test-only feedback (A, 79.1\%) and +8.0\,pp over
 test-plus-expected (B, 78.9\%).
 Paired per-task statistics (Table~\ref{tab:e6-paired}): C vs.\ A
-wins/losses/ties 14/4/102; bootstrap 95\% CI on mean $\Delta$Conf.\
+wins/losses/ties 14/4/102; bootstrap 95\% CI on mean $\Delta$Conf.\ 
 $[2.3,\,13.6]$\,pp; Wilcoxon signed-rank $p{=}0.018$ (nonzero deltas).
 C vs.\ B: same W/L/T, ${+}8.0$\,pp, CI $[2.2,\,14.0]$, $p{=}0.027$.
 Both intervals exclude zero.
@@ -133,15 +134,47 @@ Conf.\ delta measures on this corpus.
   \end{tabular}
 \end{inlinetable}
 
+\input{tables/e6_headroom_summary}
+
+\paragraph{Headroom strata (primary E6 reading).}
+Table~\ref{tab:e6-headroom} is the primary mechanism reading, not the
+all-task ${+}7.7$\,pp mean alone.
+On the broad headroom set where test-only Conf.${<}1$ ($n{=}114$), Semantic
+Feedback IR gains ${+}8.2$\,pp (14/4/96; CI $[2.3,\,14.4]$).
+The collapsed subset with test-only Conf.${=}0$ ($n{=}13$) explains the
+rescue regime: all 13/13 wins, ${+}90.7$\,pp (CI $[88.8,\,93.3]$).
+That stratum is small and should not be headline evidence by itself.
+The partial-failure band where $0{<}$test-only Conf.${<}1$ ($n{=}101$) does
+not favour typed IR (${-}2.5$\,pp; CI $[-5.8,\,0.2]$).
+Failures there are often multi-scenario or arithmetic partial mismatches in
+which a single scenario label can mis-steer repair; the win profile
+(13/14 zero-A, all catch-all/arithmetic) shows that SIFR targets collapsed
+residuals, not every partial witness failure.
+Among the 18 decisive (non-tie) tasks, Semantic IR wins 14/18 (77.8\%;
+Wilson 95\% CI $[54.8,\,91.0]$), so the sparse absolute win count coexists
+with a high decisive-task win rate.
+Deployment rule: when test-only Conf.\ is already partial (${>}0$ and ${<}1$),
+keep B2 rather than forcing Semantic IR.
+The all-task ${+}7.7$\,pp aggregate is a supporting summary over the full
+$n{=}120$ panel.
+
+\paragraph{Catch-all mini case.}
+On \texttt{HardSynthetic.HardCase004}, test-only Conf.\ is~$0$ while Semantic IR
+reaches $0.958$ after naming residual scenario~$S_8$ (\texttt{others}) with an
+arithmetic mismatch (\texttt{expected}$\neq$\texttt{observed}).
+The same Conf.${=}0\!\to\!{\approx}0.88$--$0.96$ rescue pattern appears on several
+ranked catch-all candidates (e.g., HardCase010, HardCase005); IR fields point
+repair at the residual band that busy Reject/Pass tests never sample.
+
 \paragraph{Cross-model scope (\texttt{ecnu-max}).}
 Table~\ref{tab:feedback-e6-max} repeats the same A/B/C protocol on
 \texttt{ecnu-max} (DeepSeek-family endpoint; \texttt{run\_e6\_ecnu\_max\_v1},
 $n{=}120$, 0 errors).
 Mean Conf.\ collapses to ${\approx}89.2\%$ for all three variants
 (C$-$A ${=}{+}0.03$\,pp; C beats A on only $1/120$ tasks).
-The +7.7\,pp typed-IR gain is therefore primary-model evidence under headroom:
-a stronger endpoint already saturates aggregate Conf.\ on BENCH-120, so
-feedback content no longer moves the mean.
+The +7.7\,pp typed-IR gain is primary-endpoint evidence under
+headroom: a stronger endpoint already saturates aggregate Conf.\ on BENCH-120,
+so feedback content no longer moves the mean.
 Prefer typed IR when the base model still leaves repair headroom; prefer B2
 when the endpoint already saturates mean Conf.\ (consistent with E16 ties).
 
@@ -183,7 +216,7 @@ The $\mathrm{Conf}(k)$ trajectory, extracted from 258 backfilled M/B2
 \texttt{attempt\_history} records, rises from 78.3\% at $k{=}1$ to 84.5\% at
 $k{=}2$, then plateaus at 83.4\% at $k{=}3$.
 Most of the repair gain arrives within two iterations; E6's matched $K{=}3$
-protocol therefore sits at a natural budget sweet spot rather than an
+protocol sits at a natural budget sweet spot rather than an
 arbitrary truncation.
 
 \subsection{Structured-Surface Comparison (E14)}
@@ -200,7 +233,7 @@ Paired per-task mean Conf.\ (\texttt{e14\_paired\_summary}):
 \texttt{semantic\_ir} vs.\ \texttt{execution\_trace\_matched} wins 5 / losses
 19 / ties 96 (${-}10.3$\,pp); vs.\ \texttt{test\_only} wins 18 / losses 16 /
 ties 86 (${+}1.3$\,pp).
-E14 therefore compares length-matched structured surfaces; it does not
+E14 compares length-matched structured surfaces; it does not
 replace E6 as the primary single-factor lever against unstructured feedback.
 
 \paragraph{Design rule.}
@@ -212,7 +245,7 @@ Within the structured family, length-matched execution traces can beat bare
 Semantic Feedback IR on aggregate Conf.\ (E14), while scenario-indexed fields
 remain the right artefact when engineers need localisation, auditable repair
 prompts, or cross-notation rendering from SpecIR.
-Default strengthened mode~M may therefore render
+Default strengthened mode~M may render
 \texttt{execution\_trace\_matched} for Conf.; controlled E6 still isolates
 \texttt{semantic\_ir} vs.\ \texttt{test\_only} as the causal C2 lever.
 
@@ -259,7 +292,7 @@ FULL beats unstructured dumps \emph{and} an NL-only dump of the same facts
 Dropping any single field (\texttt{scenario\_id}, \texttt{expected},
 \texttt{constraint}, \texttt{reason}, \texttt{suggested\_fix}) yields CIs
 that include~0.
-C2 is therefore a structure-versus-unstructured claim under headroom.
+C2 is a structure-versus-unstructured claim under headroom.
 E14 further shows that length-matched structured traces can exceed bare
 Semantic Feedback IR on aggregate Conf.
 
@@ -270,8 +303,9 @@ gpt-4o-mini and deepseek-chat saturate on the same combo protocol
 to help when the base model already solves the seeded tasks.
 External public-SOFL ranking ties (HKCA09 / GitHub) support the deployment
 boundary
-(Table~\ref{tab:headroom-map}); HKCA09 \texttt{wrong\_relop} hard-seed is
-directional supporting evidence (${+}12.7$\,pp; CI includes~0).
+(Table~\ref{tab:headroom-map}); under the headroom-filtered external protocol,
+\texttt{wrong\_relop} transfers at ${+}20.6$\,pp ($n{=}79$; CI excludes~0;
+Table~\ref{tab:e6-ext-multi-status}).
 
 \subsection{Component Ablation under Fixed Oracle}
 \label{sec:results:ablation-fixed}
@@ -363,9 +397,14 @@ measure the guard.
 \paragraph{Answer to RQ1 / C2.}
 Under controlled isolation of feedback content (E6, full~M, $K{=}3$), typed
 Semantic Feedback IR is the largest single-factor repair lever vs.\
-unstructured test-only (+7.7\,pp; CI excludes~0).
+unstructured test-only on headroom tasks (+8.2\,pp on test-only Conf.${<}1$;
+the all-task +7.7\,pp mean is a supporting aggregate; CI excludes~0).
 The gain concentrates on catch-all rescue (14/14 wins; 13/14 with test-only
 Conf${=}0$; 0/14 ordering).
+Among decisive tasks, Semantic IR wins 14/18 (77.8\%; Wilson 95\% CI
+$[54.8,\,91.0]$).
+The partial-failure band ($0{<}$test-only Conf.${<}1$) does not favour typed
+IR (${-}2.5$\,pp); keep B2 rather than forcing Semantic IR there.
 E14 compares length-matched structured surfaces
 (\texttt{semantic\_ir} 75.1\% vs.\
 \texttt{execution\_trace\_matched} 85.4\%; paired 5/19/96).
@@ -445,6 +484,27 @@ inversion); B2 leads on boundary-shift operators.
 SMT witnesses sit on first-match boundaries and expose ordering faults, while
 B2's tests sometimes hit boundary inputs without naming the violated scenario.
 
+\input{tables/e2_decomp_availability}
+\input{tables/e2_screen_vignette}
+\input{tables/e2_ext_screen}
+\input{tables/screen_false_positive}
+
+\paragraph{Industrial slice first, then pooled aggregate.}
+Table~\ref{tab:e2-decomp-availability} is the primary prevention reading.
+On the industrial slice ($n{=}132$), formal-only modes B2 and A2 leave FAR at
+56.8\%; mode~M cuts FAR to 32.6\% (PDR 67.4\%; bootstrap 95\% CI on the FAR
+drop: $[-31.8,\,-17.4]$\,pp; excludes~0).
+All 32 mutants that B2 accepts and M rejects are industrial, and in every case
+Conf.${=}1$ under B2, A2, and M: the second gate alone separates them
+(Table~\ref{tab:e2-screen-vignette}).
+Typical operators are DRO (remove else/catch-all), MBO (off-by-one guard
+comparison), and WRO (wrong relational/output constant).
+The HardSynthetic slice ($n{=}720$) saturates at PDR 100\% / FAR 0\% under
+every formal gate, so the Screen effect does not appear there.
+Readers should treat the pooled 3.8\,pp FAR reduction as a Screen effect on
+industrial-style mutants; HardSynthetic mutants do not exercise the second
+gate, and pooled FAR 5.0\% is \emph{not} the release claim.
+
 \begin{table}[H]
   \caption{Implementation-screening prevention (E2 full evaluation,
     \texttt{prevention\_full\_v1}, $n{=}852$ mutant evaluations per mode).
@@ -467,12 +527,17 @@ B2's tests sometimes hit boundary inputs without naming the violated scenario.
   }
 \end{table}
 
-Table~\ref{tab:prevention} summarises the implementation-screening track only
-($n{=}852$ mutants per mode), not the pooled E2 corpus ($n{=}1{,}704$ when
-spec-confusion and implementation-screening are combined; see
+Table~\ref{tab:prevention} summarises the pooled implementation-screening
+track ($n{=}852$ mutants per mode), not the combined E2 corpus ($n{=}1{,}704$
+when spec-confusion and implementation-screening are pooled; see
 \texttt{prevention\_summary.json}).
 B1 lacks an explicit rejection mechanism (FAR 100\%), while M improves both
 PDR (+3.8\,pp over B2) and FAR ($-$3.8\,pp) on this fixed mutant set.
+A2 matches B2 at 91.2\% / 8.8\%, so the pooled ${-}3.8$\,pp FAR lift is not a
+larger witness budget alone.
+B6 and M\_lite have no \texttt{prevention\_full\_v1} rows; as formal-only modes
+without Screen they equal B2/A2 on prevention by design, and we do not invent
+B6 FAR figures.
 A paired bootstrap over mutant IDs ($B{=}5{,}000$, seed~42;
 \texttt{e2\_pdr\_far\_bootstrap.json}) yields
 $\Delta\mathrm{PDR}(\mathrm{M}{-}\mathrm{B2})$ 95\% CI
@@ -487,6 +552,10 @@ prevention story: Ordering and GuardInversion achieve the highest recall.
 Ordering and guard-inversion defects are prevented most effectively;
 boundary shifts favour B2; arithmetic/output residues remain
 (Chapter~\ref{ch:discussion}).
+On the industrial slice, Screen cuts FAR from 56.8\% to 32.6\% (bootstrap 95\%
+CI on the FAR drop: $[-31.8,\,-17.4]$\,pp); all 32 B2-accept/M-reject cases
+have Conf.${=}1$ under B2/A2/M (Table~\ref{tab:e2-screen-vignette}).
+Pooled FAR 5.0\% is aggregate only, not the release claim.
 Equal-$K$ Conf.\ ranking (\texttt{M\_eq}, Section~\ref{sec:results:rq4})
 shows M can match or exceed B2 on mean Conf.\ at $K{=}3$, but prevention
 value of the conjunctive gate is read from E2 PDR/FAR under the shared mutant
@@ -512,8 +581,8 @@ Fixed-oracle E1 M-win compares strengthened~M ($K{=}5$ bundle) to B2
 The matched-budget ranking is \texttt{run\_e1\_equal\_k\_v1}:
 \texttt{M\_eq} ($K{=}3$, \texttt{semantic\_ir}, advisory gate) reaches
 100.0\% vs.\ B2 97.5\% (${+}2.5$\,pp; paired 3/0/117).
-This is the matched-budget Conf.\ ranking for C4, not a substitute for E6's
-within-M feedback isolation (+7.7\,pp).
+The three wins are a matched-budget Conf.\ check for C4, not a substitute for
+E6's within-M feedback isolation (+7.7\,pp all-task; +8.2\,pp on headroom).
 \input{tables/equal_k_m_vs_b2}
 \input{tables/equal_k_unified}
 
@@ -528,22 +597,76 @@ Table~\ref{tab:deployment-boundary} synthesises the deployment rule from
 E3 (non-monotone tertiles on canonical E1; Section~\ref{sec:results:rq2}),
 E10 (unfiltered: M ${+}1.0$\,pp near ceiling), E12 (B2 slightly more
 seed-stable), E11 (external SOFL), and E8c (real-derived slices).
-E6 remains the mechanism anchor (+7.7\,pp typed IR under controlled
-comparison); E2 supplies the prevention rationale for deploying the
-conjunctive gate.
+E6 remains the mechanism anchor (headroom strata in
+Table~\ref{tab:e6-headroom}; all-task +7.7\,pp as supporting aggregate); E2
+supplies the prevention rationale, read first on the industrial slice
+(Table~\ref{tab:e2-decomp-availability}).
 Supporting sampling evidence appears in Section~\ref{sec:results:e4}
 (SMT vs.\ random boundary coverage).
 
+\input{tables/e6_ext_multi_status}
+
+\paragraph{Cross-model saturation and regression guard.}
+The catch-all failure is not specific to one model family, but the benefit of
+additional feedback depends on remaining repair headroom.
+On \texttt{gemini-2.5-flash}, frozen hard seeds yield ${+}26.5$\,pp for
+scenario-aware feedback over test-only feedback (pooled $n{=}80$, CI excludes
+zero).
+Applying the same headroom filter to archived HKCA09/GitHub/RealSpec/industrial
+hard seeds (\texttt{run\_ext\_hardseed\_e6\_v2}) yields a transferring
+\texttt{wrong\_relop} contrast: ${+}20.6$\,pp on $n{=}79$ pairs (22/1/56;
+CI $[12.7,\,28.6]$), with pooled headroom $n{=}186$ at ${+}18.3$\,pp
+(CI $[13.2,\,23.8]$).
+HKCA09 gemini alone: ${+}18.8$\,pp ($n{=}17$; CI excludes~0).
+External impl-screening (Table~\ref{tab:e2-ext-screen}) shows GitHub Screen
+transfer (FAR 60.4\%$\rightarrow$11.5\%) beside published-industrial saturation.
+On industrial-pattern tasks, GPT-4o and Claude both reach 100.0\%
+with B2 while the fuller mode reaches 95.5\%; DeepSeek retains more headroom
+(80.7\% for B2 and 72.5\% for M).
+Regression guard: when B2 already achieves Accept${=}1$ (or 100\% mean Conf.\ on
+the release suite), do not escalate to~M; the fuller loop can regress under
+strong models.
+Stronger models often saturate under ordinary test feedback; that pattern
+motivates conditional deployment rather than always running the full pipeline.
+The controlled causal estimate remains E6 on the primary endpoint; Gemini and
+the filtered external hard-seed row support transfer under headroom, while
+GPT-4o and Claude demonstrate saturation on industrial-pattern tasks.
+Public and reconstructed ranking corpora support the deployment boundary, but
+they do not constitute repository-scale validation.
+
+\paragraph{Failure modes and escalation limits.}
+Four negative results bound when \emph{not} to escalate.
+First, in the partial-failure band ($0{<}$test-only Conf.${<}1$, $n{=}101$),
+Semantic IR is ${-}2.5$\,pp vs.\ test-only: do not force SIFR when B2 is
+already partially succeeding.
+Second, on industrial-pattern tasks GPT-4o and Claude reach 100.0\% with B2
+while fuller M falls to 95.5\%: do not escalate when B2 already Accept${=}1$.
+Third, E14 shows length-matched execution traces can beat the tested Semantic
+IR on mean Conf.\ (85.4\% vs.\ 75.1\%); SIFR is a light structured channel
+relative to unstructured test feedback, not the uniquely best structured
+renderer.
+Fourth, the pre-hoc HTE tree reaches precision only 0.167: treat it as a
+checklist reminder, not a predictor.
+Table~\ref{tab:deployment-boundary} records these limits beside the positive
+escalation triggers.
+
 \paragraph{Answer to RQ4 / C4.}
 Prefer B2 by default; escalate to~M when release requires
-$\mathrm{Accept}{=}1$ or target FAR${\le}5\%$ \emph{and} repair headroom
-remains (E6 rescue when test-only Conf.\ collapses).
+$\mathrm{Accept}{=}1$ or a contractual FAR budget exists \emph{and} repair
+headroom remains (E6 rescue when test-only Conf.\ collapses).
+Do not read the industrial Screen lift (FAR 56.8\% to 32.6\%) as attainment of
+FAR${\le}5\%$ on that mutant set.
+Do not escalate when test-only Conf.\ is already partial ($0{<}\mathrm{Conf}{<}1$)
+or when B2 already achieves Accept${=}1$.
 Do not escalate from overlap tertiles alone (E3 non-monotone).
 External pilots often tie B2 with \texttt{M\_eq} and reinforce the default
 (Table~\ref{tab:deployment-boundary}).
 Versus VerifierLoop-FSF (B6): full~M's irreducible increment is conjunctive
 $\mathrm{Accept}$ plus PDR/FAR (and E6 typed IR when operating inside M)---not
 aggregate Conf.\ dominance over B6 or B2 on near-ceiling corpora.
+B6 prevention equals B2/A2 by design when Screen is off; cite BENCH-120
+Conf.\ contrast only for conformance, not B6 FAR without
+\texttt{prevention\_full\_v1} rows.
 When contracts are simple enough that baselines already saturate, B2 is the
 right choice; Section~\ref{sec:results:acl-case} shows when the gate still
 earns its keep.
@@ -568,7 +691,7 @@ Mean pass rate on a domestic-style suite can look excellent.
 An SMT witness for the residual
 $(\mathit{role}{=}2,\mathit{scope}{=}2,\mathit{mfa}{=}1)$ forces
 \texttt{OTHERWISE}; the candidate returns $\mathit{permit}{=}1$.
-Conjunctive Accept therefore yields $\mathrm{Conf}<1$ and refuses release
+Conjunctive Accept yields $\mathrm{Conf}<1$ and refuses release
 (Listing~\ref{lst:acl-ir}).
 A pluggable high-severity screen can additionally flag fail-open residuals
 even when a sparse suite happens to miss them.
@@ -642,10 +765,10 @@ rule.
 Figure~\ref{fig:e10-overlap} stratifies the unfiltered E10 sample by
 overlap-rate tertile alongside Table~\ref{tab:e3-tiers} on the hard set.
 Together they bound C1: neither corpus shows monotone M dominance over B2
-across tertiles; E6 (+7.7\,pp vs.\ unstructured test-only under full~M)
-isolates the typed-feedback mechanism; fixed-oracle E10 places M slightly
-ahead on aggregate (${+}1.0$\,pp) while E12 shows B2 slightly more
-seed-stable.
+across tertiles; E6 (+7.7\,pp all-task vs.\ unstructured test-only under
+full~M; +8.2\,pp on headroom) isolates the typed-feedback mechanism;
+fixed-oracle E10 places M slightly ahead on aggregate (${+}1.0$\,pp) while
+E12 shows B2 slightly more seed-stable.
 
 \paragraph{Answer to RQ2.}
 E3 tertiles on canonical E1 are not monotone: M does not uniformly beat B2
@@ -677,8 +800,8 @@ ${\approx}1.18$).
 Pre-fix latency premiums and pre-fix Conf.\ tables are historical only.
 
 \noindent The lead causal evidence remains E6 (catch-all rescue under
-headroom), E2 (FAR/PDR), equal-$K$ Conf.\ ranking, the ACL interception case,
-and Table~\ref{tab:deployment-boundary}.
+headroom), E2 (industrial FAR then pooled PDR/FAR), equal-$K$ Conf.\ ranking,
+the ACL interception case, and Table~\ref{tab:deployment-boundary}.
 
 % -----------------------------------------------------------------------------
 \section*{Chapter Summary}
@@ -686,12 +809,17 @@ and Table~\ref{tab:deployment-boundary}.
 % -----------------------------------------------------------------------------
 
 The main-text spine follows the evidence ladder.
-RQ1/C2: E6 (+7.7\,pp; 14/14 catch-all rescues, 0/14 ordering) with E14 and
-field-structure scope.
-RQ3/C3: conjunctive Accept improves FAR/PDR (E2: M 95.0\%/5.0\% vs.\ B2
-91.2\%/8.8\%).
-RQ4/C4: B2 default; escalate for Accept/FAR under headroom; equal-$K$
-${+}2.5$\,pp; public ACL case shows tests green, Accept red.
+RQ1/C2: E6 headroom strata (Table~\ref{tab:e6-headroom}; +8.2\,pp on
+test-only Conf.${<}1$; collapsed $n{=}13$ explains mechanism; all-task
++7.7\,pp supporting; 14/18 decisive wins) with E14 and field-structure scope.
+RQ3/C3: conjunctive Accept improves FAR/PDR (E2 industrial slice
+56.8\%$\to$32.6\% primary; pooled M 95.0\%/5.0\% vs.\ B2 91.2\%/8.8\%
+aggregate only, not release claim).
+RQ4/C4: B2 default; escalate for Accept or contractual FAR budget under
+headroom; Screen does not attain FAR${\le}5\%$ on industrial slice; do not
+force Semantic IR in the partial band or when B2 already Accept${=}1$; equal-$K$
+${+}2.5$\,pp matched-budget check; public ACL case shows tests green, Accept
+red.
 RQ2: overlap tertiles are non-monotone (negative bound).
 Near-ceiling E1/E12 are ranking archive, not the safety headline.
 Chapter~\ref{ch:discussion} states saturation scope honestly.

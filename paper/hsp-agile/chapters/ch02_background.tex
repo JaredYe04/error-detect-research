@@ -1,6 +1,6 @@
 %% ch02_background.tex — Chapter 2: Background and Related Work
 %% HSP-Agile CCF-B Report, Ye Xujun, ECNU, July 2026
-%% Staging rewrite (_rewrite/); do not edit live chapters/ from this file.
+%% Step-1 polish output; do not edit live chapters/ from this file.
 
 \chapter{Background and Related Work}
 \label{ch:background}
@@ -106,7 +106,7 @@ toward a ``natural'' \texttt{if} order rather than mandated precedence;
 scenario edges (e.g.\ $<$ vs.\ $\le$).
 Test-feedback repair~\citep{chen2021codex} helps only when tests hit the
 violated region; fixed suites often miss thin catch-alls and overlap slices.
-HSP-Agile therefore synthesises region witnesses with Z3 rather than relying
+HSP-Agile synthesises region witnesses with Z3 rather than relying
 on sampled unit tests alone.
 
 % ─────────────────────────────────────────────────────────────────────────────
@@ -177,7 +177,7 @@ Prevention guarantees remain bounded by suite coverage
 
 Static analysers encode recurring structural bug
 patterns~\citep{hovemeyer2004findbugs,cousot1977abstract}.
-HSP-Agile's pattern guard lifts the idea to \emph{requirements-level}
+The pattern guard in HSP-Agile lifts the idea to \emph{requirements-level}
 violations: signatures that cannot conform to FSF regardless of tested inputs.
 Catalogue RF01--RF14~\citep{li2023iet_faultprevention}
 (Appendix~\ref{app:patterns}) includes missing preconditions, wrong defaults,
@@ -368,7 +368,7 @@ not a substitute for those tables.
 \end{inlinetable}
 
 \noindent
-Relative to these lines of work, \textsc{SgDP}'s increment is the
+Relative to these lines of work, the increment of \textsc{SgDP} is the
 \emph{combination} of FSF first-match witnesses, specification-indexed
 Semantic Feedback IR, and conjunctive $\mathrm{Accept}$ under PDR/FAR
 evaluation~\citep{chen2021codex,loughridge2024dafnybench,sun2024clover,legoues2019apr}.
@@ -407,9 +407,10 @@ engineering hinge:
 Deployment guidance (C4) then chooses when to pay for the full loop versus a
 lighter test-feedback baseline (B2): escalate when Accept/FAR headroom or
 residual-region risk warrants it.
+The escalation checklist (HTE) is a deployment policy, not a validated
+predictor or a fourth algorithmic contribution.
 The catch-all vignette of Chapter~\ref{ch:intro} remains the conceptual
 anchor for those claims; overlapping-guard tasks are a secondary stress on
 ordering.
 Empirical ranking of baselines, equal-$K$ Conf.\ comparisons, and prevention
 (PDR/FAR) appear in Chapters~\ref{ch:experiments}--\ref{ch:results}.
-

@@ -1,4 +1,4 @@
-%% ch06_experimental_setup.tex  —  Chapter 6: Experimental Setup (rewrite staging)
+%% ch06_experimental_setup.tex  —  Chapter 6: Experimental Setup (Step 1 polish staging)
 %% HSP-Agile CCF-B Report, East China Normal University, 2026
 %% Ye Xujun
 
@@ -12,6 +12,7 @@ Hardware, modes, metrics, and experiment tracks are stated once;
 threats are previewed briefly and analysed in Chapter~\ref{ch:discussion}.
 
 \input{tables/authoritative_numbers}
+\input{tables/master_protocol}
 
 \begin{inlinetable}{Claim-to-experiment map (Tier-1 focus).}
   \label{tab:claim-map}
@@ -44,7 +45,8 @@ stress-test rather than a universal-effectiveness headline.
 
 \paragraph{RQ1 (Specification-indexed Feedback IR).}
 Does Semantic Feedback IR improve repair beyond unstructured test-only
-feedback? (E6, E14 scope, hard combo-seed probe; primarily C2.)
+feedback?
+(E6, E14 scope, hard combo-seed probe; primarily C2.)
 
 \paragraph{RQ2 (Gap vs.\ Guard-Overlap Density; negative).}
 Does the M--baseline gap grow monotonically with guard-overlap density?
@@ -52,7 +54,8 @@ Does the M--baseline gap grow monotonically with guard-overlap density?
 
 \paragraph{RQ3 (Conjunctive Accept vs.\ Conf Alone).}
 Does conjunctive $\mathrm{Accept}$ improve prevention versus mean
-conformance alone? (E2, A2 vs.\ M; primarily C3.)
+conformance alone?
+(E2, A2 vs.\ M; primarily C3.)
 
 \paragraph{RQ4 (Deployment Boundary).}
 Under what conditions should practitioners deploy M versus B2?
@@ -89,10 +92,10 @@ Qwen2.5-27B-Instruct~\citep{yang2024qwen25} (\textsf{Qwen-27B}) through an
 OpenAI-compatible gateway.
 Temperatures: $T_\text{gen}{=}0.7$, $T_\text{repair}{=}0.0$; token cap 4096
 per call (Chapter~\ref{ch:method}).
-Repair budget~$K$ is not uniform: primary fixed-oracle ranking
+Repair budget~$K$ is not uniform across corpora: primary fixed-oracle ranking
 (E1/E10/E12 M-win) uses strengthened M with $K{=}5$ (best-effort argmax
 Conf.); B1/B2 keep baseline budgets.
-Mechanism and controlled comparisons (notably E6; historical pre-fix
+Mechanism and controlled comparisons (E6; historical pre-fix
 matrix) use $K{=}3$.
 
 \subsection{Corpora and Measurement Correction}
@@ -105,8 +108,8 @@ inflated false failures (${\sim}$5\% Strict on canonical E1).
 Fixed first-match others witnesses enable fair evaluation; primary B1/B2/M
 aggregates cite the fixed-oracle M-win runs.
 Pre-fix runs (\code{run\_e1\_canonical\_v1}/
-\code{run\_hard\_full\_parallel\_v1} and related) are archive only---never
-primary ranking evidence.
+\code{run\_hard\_full\_parallel\_v1} and related) are archive only and must
+never serve as primary ranking evidence.
 Fixed-oracle A1--A3 live in \code{run\_e1\_ablation\_fixed\_v1}
 (Table~\ref{tab:ablation-fixed}).
 
@@ -164,7 +167,7 @@ Ordered FSF artefacts are rare in public repos, so the corpus is
 constructed to be discriminative (baselines fail non-trivially),
 formally valid (Z3-satisfiable), and diverse in orderings and boundaries.
 DafnyBench~\citep{loughridge2024dafnybench} targets annotation-heavy
-verification, not FSF precedence.
+verification rather than FSF precedence.
 
 \subsection{Hard Synthetic Benchmark (E1)}
 
@@ -181,8 +184,8 @@ Figure~\ref{fig:benchmark-pipeline} shows the path; Table~\ref{tab:benchmark-sta
 summarises the set (mean guard-overlap rate 1.8 scenarios per input point).
 Under fixed-oracle E1 (\code{run\_e1\_m\_win\_v2}), B1 mean Conf.\ is 84.2\%;
 discriminative signal sits in per-task variance
-(Figure~\ref{fig:conf-distribution}) and prevention metrics, not aggregate
-mean Conf.\ alone.
+(Figure~\ref{fig:conf-distribution}) and prevention metrics rather than in
+aggregate mean Conf.\ alone.
 
 \begin{figure}[t]
   \centering
@@ -314,7 +317,7 @@ B0 is a deterministic template renderer (formal upper bound; Conf.\ computed
 ex post).
 B1 is one-shot LLM with no loop.
 B2 adds iterative FSF-derived unit-test feedback~\citep{zhu1997specification}
-at $K{=}3$ (even when M uses $K{=}5$ on M-win harnesses); no Z3, no pattern
+at $K{=}3$ (even when M uses $K{=}5$ on M-win harnesses); it has no Z3 checker and no pattern
 guard.
 B3--B5 isolate unstructured self-improvement
 (Self-Refine~\citep{madaan2023selfrefine}, Self-Debug~\citep{chen2024selfdebug},
@@ -348,11 +351,13 @@ Each applies one first-order operator to a known-correct artefact;
 non-compilable mutants are excluded.
 These operators model recurring LLM guard-generation failures: lost
 preconditions, reversed comparisons, missing branches, boundary shifts, and
-incorrect first-match order.  They are defined over guard semantics and
-postconditions rather than copied from the RF01--RF14 detector catalogue.
+incorrect first-match order.
+They are defined over guard semantics and postconditions rather than copied
+from the RF01--RF14 detector catalogue.
 Consequently, a mutant can evade the configured static screen yet still fail a
 SpecIR witness, or trigger the screen without being tied to one hand-written
-pattern.  Per-operator PDR/FAR reports this distinction instead of treating
+pattern.
+Per-operator PDR/FAR reports this distinction instead of treating
 all injected faults as one detector-friendly pool.
 
 \paragraph{Miniature example (PDR/FAR counting).}
@@ -444,7 +449,7 @@ win rates without a Holm claim.
 On the historical pre-fix corpus, observed M--B1/B2 Conf.\ gaps are
 negligible and under-powered (post-hoc power ${\approx}3.6\%$ for
 $|\delta|{=}0.014$; \texttt{power\_analysis.json}).
-Fixed-oracle E1 therefore emphasises per-task win rates; multi-seed
+Fixed-oracle E1 emphasises per-task win rates; multi-seed
 stability uses \code{run\_e12\_m\_win\_v1}, with E3/E10 stratification and E2
 prevention as complementary evidence.
 
@@ -455,7 +460,7 @@ E12-full re-runs 120 tasks ${\times}$ seeds $\{0,1,2\}$ ${\times}$ B1/B2/M under
 the M-win protocol (\code{run\_e12\_m\_win\_v1}; M $K{=}5$).
 Outcomes: per-seed mean Conf.\ ranking and pooled paired win rate M vs.\ B2.
 B2 reaches 100\% Conf.\ on every seed; M averages 99.7\%---M does not lead
-every seed.
+every seed, and B2 is slightly more seed-stable at the ceiling.
 
 %=============================================================================
 \section{Threats to Validity (Preview)}
@@ -488,5 +493,5 @@ Primary B1/B2/M ranking cites fixed-oracle M-win run ids
 (Table~\ref{tab:corpus-card}); E6 and E2 use dedicated mechanism/prevention
 corpora.
 Metrics are Conf., strict success, PDR/FAR, and cost; statistics use
-non-parametric tests with Holm only on the pre-fix multi-mode archive.
+non-parametric tests with Holm correction only on the pre-fix multi-mode archive.
 Threats are previewed here and fully analysed in Chapter~\ref{ch:discussion}.

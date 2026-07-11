@@ -1,0 +1,29 @@
+% Summarised from data/processed/e6_headroom_summary.json (decisive rates included).
+\begin{table}[t]
+  \centering
+  \caption{E6 headroom strata for Semantic IR vs.\ test-only feedback.
+    The broad headroom set keeps the original paired evidence; the collapsed
+    Conf.$=0$ subset explains the mechanism but is small and should not be
+    overclaimed.
+    Decisive tasks are the non-ties ($W{+}L{=}18$): win rate 14/18 with Wilson
+    CI on that rate (not on $\Delta$Conf.).}
+  \label{tab:e6-headroom}
+  \footnotesize
+  \renewcommand{\arraystretch}{1.08}
+  \begin{tabular}{@{}lrrrrr@{}}
+    \toprule
+    Stratum & $n$ & W/L/T & $\Delta$ pp & 95\% CI & Cliff sign \\
+    \midrule
+    All tasks
+      & 120 & 14/4/102 & $+7.7$ & $[2.3,\,13.6]$ & $0.08$ \\
+    Test-only Conf. $<1$
+      & 114 & 14/4/96 & $+8.2$ & $[2.3,\,14.4]$ & $0.09$ \\
+    Test-only Conf. $=0$
+      & 13 & 13/0/0 & $+90.7$ & $[88.8,\,93.3]$ & $1.00$ \\
+    $0<$ test-only Conf. $<1$
+      & 101 & 1/4/96 & $-2.5$ & $[-5.8,\,0.2]$ & $-0.03$ \\
+    Decisive ($W\cup L$)
+      & 18 & 14/4/0 & --- & $[54.8,\,91.0]\%$ & --- \\
+    \bottomrule
+  \end{tabular}
+\end{table}

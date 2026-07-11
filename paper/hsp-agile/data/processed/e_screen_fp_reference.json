@@ -1,0 +1,16 @@
+{
+  "screen": "PatternGuard hard blocking threshold (high or critical)",
+  "benchmark": "src.benchmarks.load_benchmark()",
+  "n_reference_tasks": 120,
+  "blocking_false_positive_count": 0,
+  "blocking_false_positive_rate": 0.0,
+  "any_pattern_hit_count": 120,
+  "any_pattern_hit_rate": 1.0,
+  "advisory_pattern_counts": {
+    "RF06": 93,
+    "RF08": 120
+  },
+  "blocking_pattern_counts": {},
+  "blocking_examples": [],
+  "interpretation": "Clean references trigger advisory rules, but the hard Screen would not reject any reference task."
+}

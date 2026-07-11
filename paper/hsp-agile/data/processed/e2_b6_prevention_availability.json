@@ -1,0 +1,48 @@
+{
+  "prevention_jsonl": "artifacts/prevention_eval/prevention_full_v1/prevention_eval.jsonl",
+  "prevention_jsonl_exists": true,
+  "prevention_summary": "artifacts/prevention_eval/prevention_full_v1/prevention_summary.json",
+  "prevention_summary_exists": true,
+  "modes_in_prevention": [
+    "A1",
+    "A2",
+    "A3",
+    "B1",
+    "B2",
+    "M"
+  ],
+  "eval_counts": {
+    "A1": {
+      "impl_screening": 852,
+      "spec_confusion": 852
+    },
+    "A2": {
+      "impl_screening": 852,
+      "spec_confusion": 852
+    },
+    "A3": {
+      "impl_screening": 852,
+      "spec_confusion": 852
+    },
+    "B1": {
+      "impl_screening": 852,
+      "spec_confusion": 852
+    },
+    "B2": {
+      "impl_screening": 852,
+      "spec_confusion": 852
+    },
+    "M": {
+      "impl_screening": 852,
+      "spec_confusion": 852
+    }
+  },
+  "b6_prevention_exists": false,
+  "m_lite_prevention_exists": false,
+  "b6_run_level_artifacts": {
+    "run_b6_full_v1": true,
+    "run_b6_full_v2": true,
+    "run_b6_stratified_v1": true
+  },
+  "note": "B6 data exists for run-level conformance, but not for prevention impl_screening/spec_confusion in prevention_full_v1."
+}

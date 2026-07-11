@@ -1,0 +1,40 @@
+---
+description: Mentor writing standards for HSP-Agile English paper prose
+globs: paper/hsp-agile/**/*.tex,paper/hsp-agile-conference/**/*.tex,paper/hsp-agile/**/*.md
+alwaysApply: false
+---
+
+# English Paper Writing (Mentor Standards)
+
+## Workflow
+
+1. Draft in your own English first: complete sentences, one idea per sentence.
+2. Use LLM polish only for clarity and grammar; do not change claims or numbers.
+3. Author confirms each adopted change before it enters LaTeX.
+
+Do not write final prose directly into `main.tex` without a human-readable draft checkpoint such as `_rewrite/*.md` or section notes.
+
+## Readability
+
+1. Start abstract, then become concrete: claim or problem first, then notation, algorithm steps, and metrics.
+2. Define basic terms before use: FAR, PDR, headroom, `Phi_i`, and Accept each need one plain sentence at first mention.
+3. Use running examples to explain methods and theory: the catch-all tier classifier and ACL case should anchor major sections.
+4. Integrate figure, prose, and math: every figure/table needs a claim sentence and a how-to-read sentence; equations should follow intuitive prose.
+
+## Section Pattern
+
+```latex
+% Bad: jumps to symbols.
+$\mathrm{Accept}\Leftrightarrow\mathrm{Conf}{=}1\wedge P^H(c)=0$.
+
+% Good: abstract description first, then math.
+Release is safe only when the candidate matches every witness \emph{and}
+clears the structural screen:
+$\mathrm{Accept}\Leftrightarrow\mathrm{Conf}{=}1\wedge P^H(c)=0$.
+```
+
+## Agent Behavior
+
+- Prefer short paragraphs over dense inline lists.
+- Avoid internal codenames such as E6 or `M_eq` without expanding them once per section.
+- Numbers must match `paper/hsp-agile/artifacts/AUTHORITATIVE_NUMBERS.md`; never invent statistics in prose.

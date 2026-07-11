@@ -1,7 +1,7 @@
 %% ch09_conclusion.tex  —  Chapter 9: Conclusion and Future Work
 %% HSP-Agile CCF-B Report, East China Normal University, 2026
 %% Ye Xujun
-%% Staged rewrite (_rewrite/); do not treat as live chapters/ until promoted.
+%% Step 1 polish staging: _pipeline/step1_polish/
 
 \chapter{Conclusion and Future Work}
 \label{ch:conclusion}
@@ -14,9 +14,14 @@ On ordered-guard contracts that decision matters because a busy Reject/Pass
 suite can stay green while a catch-all residual still returns the wrong
 tier---the classifier vignette in which \texttt{OTHERWISE} must yield
 \texttt{Review} yet an LLM candidate emits \texttt{Pass}.
-HSP-Agile realises the conjunctive gate on SOFL/FSF with first-match
-witnesses, a typed Semantic Feedback IR for repair under headroom, and a
-pluggable screen.
+HSP-Agile offers headroom-conditioned catch-all repair under a SpecIR
+first-match oracle, plus a conditional dual-gate acceptance check for
+ordered-guard specifications:
+$\mathrm{Accept}\Leftrightarrow\mathrm{Conf}{=}1\wedge\mathrm{Screen}{=}\mathit{pass}$.
+The contribution is an operational acceptance-checking stack---not a new SMT
+solver or a proof system---realised on SOFL/FSF with a pluggable screen.
+As a formal-engineering method, the check is a bounded operational criterion
+under a faithful SpecIR encoding, not a theorem of program safety.
 
 
 %=============================================================================
@@ -30,21 +35,39 @@ overlaps---escape everyday unit suites; unstructured feedback does not name
 the broken guard.
 
 \paragraph{Evidence.}
-Conjunctive Accept cuts escaped defects at comparable mean conformance
-(E2: M PDR $95.0\%$ / FAR $5.0\%$ vs.\ B2 $91.2\%$ / $8.8\%$).
+Conjunctive Accept cuts escaped defects at comparable mean conformance.
+Prevention evidence is industrial-first: Screen cuts FAR from 56.8\% to
+32.6\% on $n{=}132$ mutants; the pooled 8.8\% to 5.0\% reading is aggregate
+only and is not the release claim.
 When repair still has headroom, typed feedback rescues the failures that
-test-only dumps miss (E6: semantic\_ir $86.9\%$ vs.\ test\_only $79.1\%$,
-${+}7.7$\,pp; W/L/T $14/4/102$; 95\% CI $[2.3,\,13.6]$\,pp; $p{=}0.018$;
-all 14 Conf.\ wins are \texttt{others} rescues, none are ordering repairs).
+test-only dumps miss (E6: on test-only Conf.${<}1$, ${+}8.2$\,pp; all-task
+supporting aggregate ${+}7.7$\,pp; semantic\_ir $86.9\%$ vs.\ test\_only
+79.1\%; W/L/T $14/4/102$; 95\% CI $[2.3,\,13.6]$\,pp; $p{=}0.018$;
+all 14 Conf.\ wins are \texttt{others} rescues, none are ordering repairs;
+14/18 decisive wins, 77.8\%; Wilson 95\% CI $[54.8,\,91.0]$).
+When test-only Conf.\ is already partial ($0{<}\mathrm{Conf}{<}1$), keep B2
+rather than forcing Semantic IR (${-}2.5$\,pp).
+SIFR is not claimed superior to every structured feedback channel (E14:
+\texttt{execution\_trace\_matched} 85.4\% vs.\ \texttt{semantic\_ir} 75.1\%).
+The controlled causal estimate for SIFR remains E6 on BENCH-120; Gemini and
+filtered external hard seeds are protocol-transfer diagnostics, not a second
+${+}7.7$\,pp headline.
 Equal-$K$ Conf.\ ranking places \texttt{M\_eq} at $100.0\%$ vs.\ B2 $97.5\%$
-(${+}2.5$\,pp; $3/0/117$).
+(${+}2.5$\,pp; $3/0/117$) as a matched-budget check, not a substitute for
+E6's within-M feedback isolation.
 The public ACL case shows the operational signature: tests green, Accept red.
 
 \paragraph{Deployment.}
 Prefer test-feedback (B2) by default; escalate to full mode~M when release
-requires $\mathrm{Accept}{=}1$ or FAR${\le}5\%$ and headroom remains
-(Table~\ref{tab:deployment-boundary}).
+requires $\mathrm{Accept}{=}1$ or a contractual FAR budget exists \emph{and}
+headroom remains (Table~\ref{tab:deployment-boundary}).
+Screen helps on industrial-pattern mutants but does not attain FAR${\le}5\%$
+on that slice.
+When B2 already achieves Accept${=}1$ (GPT-4o/Claude industrial-pattern:
+B2 100.0\% vs.\ M 95.5\%), do not escalate.
 When contracts are simple enough that B2 saturates, the cheaper loop is enough.
+The pre-hoc HTE checklist (precision 0.167) is a deployment policy, not a
+fourth algorithmic contribution.
 
 \paragraph{Scope.}
 Gains are headroom-dependent.
@@ -61,13 +84,19 @@ material, not as the safety headline.
 \begin{enumerate}
   \item Score release by FAR/PDR under conjunctive Accept
         ($\mathrm{Conf}{=}1$ and $\mathrm{Screen}{=}\mathit{pass}$), not by a
-        higher mean pass rate alone.
+        higher mean pass rate alone; read E2 industrial FAR first, then pooled
+        aggregate.
   \item Typed feedback matters as catch-all rescue under collapsed test-only
         Conf.: the E6 win profile on BENCH-120 is \texttt{others} residual
-        rescue (14/14); ordering defects motivate $\Phi_i$ witnesses and E2,
+        rescue (14/14; 14/18 decisive); the partial-failure band does not
+        favour typed IR (${-}2.5$\,pp); keep B2 there rather than forcing
+        Semantic IR; ordering defects motivate $\Phi_i$ witnesses and E2,
         not the E6 Conf.\ delta.
   \item Pay for the full loop only when the release bar and headroom demand
-        it (Table~\ref{tab:deployment-boundary}).
+        it (Table~\ref{tab:deployment-boundary}); escalate on Accept or a
+        contractual FAR budget, not on pooled FAR${\le}5\%$ attainment;
+        B6 prevention equals B2/A2 by design when Screen is off (HardSynthetic
+        FAR 0\%; industrial B6 unavailable in \texttt{prevention\_full\_v1}).
 \end{enumerate}
 
 
@@ -104,6 +133,10 @@ pilots already reported.
 It is a practical decision framework: structured feedback and conjunctive
 release keep many specification-conformance defects out of the ship gate on
 ordered-guard workflows, while remaining usable inside a sprint.
-The evidence that matters is E2 (FAR/PDR), E6 (catch-all rescue), equal-$K$
-Conf.\ ranking, the ACL interception case, and
+The evidence that matters is E2 (industrial FAR 56.8\%$\to$32.6\% primary;
+pooled PDR/FAR aggregate only), E6 on BENCH-120 (headroom strata and
+catch-all rescue), equal-$K$ Conf.\ ranking, the ACL interception case, and
 Table~\ref{tab:deployment-boundary}.
+Filtered external hard seeds support protocol transfer under test-only
+Conf.${<}1$; they do not replace the controlled E6 causal estimate.
+

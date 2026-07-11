@@ -446,7 +446,7 @@ Package: multirow 2021/03/15 v2.8 Span multiple rows of a table
 \multirow@dima=\skip54
 \bigstrutjot=\dimen196
 ) (enumitem.sty
-Package: enumitem 2019/06/20 v3.9 Customized lists
+Package: enumitem 2025/02/06 v3.11 Customized lists
 \labelindent=\skip55
 \enit@outerparindent=\dimen197
 \enit@toks=\toks30
@@ -1077,13 +1077,13 @@ Requested font "ntx-Italic-tlf-ot1" at 7.3pt
 Requested font "ntx-Italic-tlf-ot1" at 5.5pt
  -> ntx-Italic-tlf-ot1
 
-Underfull \hbox (badness 10000) in paragraph at lines 84--87
+Underfull \hbox (badness 10000) in paragraph at lines 94--97
 []\TU/TeXGyreTermesX(0)/b/it/9 Index Terms\TU/TeXGyreTermesX(0)/b/n/9 —acceptan
 ce checking, mutant rejection,
  []
 
 LaTeX Font Info:    Font shape `TU/TeXGyreTermesX(0)/m/sc' will be
-(Font)              scaled to size 10.0pt on input line 90.
+(Font)              scaled to size 10.0pt on input line 100.
 Requested font "[TeXGyreTermesX-Regular.otf]/OT:script=latn;language=dflt;-ss05
 ;+tnum;+lnum;+smcp;+pcap;mapping=tex-text;" at 10.0pt
  -> TeXGyreTermesX-Regular.otf
@@ -1116,7 +1116,7 @@ Requested font "ntxexa" at 10.0pt
 
 ]
 LaTeX Font Info:    Font shape `TU/TeXGyreTermesX(0)/m/sc' will be
-(Font)              scaled to size 8.0pt on input line 192.
+(Font)              scaled to size 8.0pt on input line 225.
 Requested font "[TeXGyreTermesX-Regular.otf]/OT:script=latn;language=dflt;-ss05
 ;+tnum;+lnum;+smcp;+pcap;mapping=tex-text;" at 8.0pt
  -> TeXGyreTermesX-Regular.otf
@@ -1172,63 +1172,409 @@ Requested font "ntx-Bold-tlf-ot1" at 5.5pt
  -> ntx-Bold-tlf-ot1
 Requested font "[lmmono8-regular]:" at 8.0pt
  -> lmmono8-regular
-
-Underfull \hbox (badness 3460) in paragraph at lines 280--298
+ [2]
+Underfull \hbox (badness 3460) in paragraph at lines 315--335
 \TU/TeXGyreTermesX(0)/m/n/10 back IR and repair, up to budget $\OML/ntxmi/m/it/
 10 K$\TU/TeXGyreTermesX(0)/m/n/10 ; on exhaustion
  []
 
 
-Underfull \hbox (badness 2478) in paragraph at lines 280--298
+Underfull \hbox (badness 2478) in paragraph at lines 315--335
 \TU/TeXGyreTermesX(0)/m/n/10 return $[] [][] []\LMS/ntxsy/m/n/10 ¹\OML/ntxmi/m/
 it/10 c[]; t\LMS/ntxsy/m/n/10 º$\TU/TeXGyreTermesX(0)/m/n/10 . Prevention evalu
 ation injects
  []
 
 Package hyperref Info: bookmark level for unknown algorithm defaults to 0 on in
-put line 300.
-[2]
+put line 341.
 LaTeX Font Info:    Font shape `TU/TeXGyreTermesX(0)/m/n' will be
-(Font)              scaled to size 7.3pt on input line 345.
+(Font)              scaled to size 7.3pt on input line 386.
 Requested font "[TeXGyreTermesX-Regular.otf]/OT:script=latn;language=dflt;-ss05
 ;+tnum;+lnum;mapping=tex-text;" at 7.3pt
  -> TeXGyreTermesX-Regular.otf
 LaTeX Font Info:    Font shape `TU/TeXGyreTermesX(0)/m/n' will be
-(Font)              scaled to size 5.5pt on input line 345.
+(Font)              scaled to size 5.5pt on input line 386.
 Requested font "[TeXGyreTermesX-Regular.otf]/OT:script=latn;language=dflt;-ss05
 ;+tnum;+lnum;mapping=tex-text;" at 5.5pt
  -> TeXGyreTermesX-Regular.otf
 
-Underfull \hbox (badness 3209) in paragraph at lines 348--359
+Underfull \hbox (badness 3209) in paragraph at lines 389--403
 \TU/TeXGyreTermesX(0)/b/n/10 Mutants (E2). \TU/TeXGyreTermesX(0)/m/n/10 The ope
 rators model recurring guard-
  []
 
+(../hsp-agile/tables/master_protocol
 Requested font "ntx-Bold-tlf-ot1" at 8.0pt
  -> ntx-Bold-tlf-ot1
 Requested font "ntx-Bold-tlf-ot1" at 6.2pt
  -> ntx-Bold-tlf-ot1
 
-Underfull \hbox (badness 10000) in paragraph at lines 373--374
+Underfull \hbox (badness 10000) in paragraph at lines 16--16
+[]\TU/TeXGyreTermesX(0)/m/n/8 Feedback /
+ []
+
+
+Underfull \hbox (badness 1776) in paragraph at lines 16--17
+[]\TU/TeXGyreTermesX(0)/m/n/8 Primary met-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 18--19
+[]\TU/TeXGyreTermesX(0)/m/n/8 DGA /
+ []
+
+
+Underfull \hbox (badness 7468) in paragraph at lines 21--22
+\TU/TeXGyreTermesX(0)/m/n/8 gate reported
+ []
+
+
+Underfull \hbox (badness 2452) in paragraph at lines 23--24
+[]\TU/TeXGyreTermesX(0)/m/n/8 PDR / FAR
+ []
+
+
+Underfull \hbox (badness 6893) in paragraph at lines 27--28
+\TU/TeXGyreTermesX(0)/m/n/8 pected / Se-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 28--29
+[]\TU/TeXGyreTermesX(0)/m/n/8 BENCH-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 28--29
+\TU/TeXGyreTermesX(0)/m/n/8 120 and
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 28--29
+\TU/TeXGyreTermesX(0)/m/n/8 headroom
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 29--30
+[]$\U/ntxmia/m/it/8 ^^A$\TU/TeXGyreTermesX(0)/m/n/8 Conf.,
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 30--31
+[]\TU/TeXGyreTermesX(0)/m/n/8 External
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 33--34
+[]\TU/TeXGyreTermesX(0)/m/n/8 Same as
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 34--35
+[]\TU/TeXGyreTermesX(0)/m/n/8 RealSpec /
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 34--35
+\TU/TeXGyreTermesX(0)/m/n/8 HKCA09
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 34--35
+\TU/TeXGyreTermesX(0)/m/n/8 / GitHub /
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 35--36
+[]\TU/TeXGyreTermesX(0)/m/n/8 Conf. and
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 35--36
+\TU/TeXGyreTermesX(0)/m/n/8 saturation
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 39--40
+[]\TU/TeXGyreTermesX(0)/m/n/8 Pre-hoc rule,
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 39--40
+\TU/TeXGyreTermesX(0)/m/n/8 no attempt-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 39--40
+\TU/TeXGyreTermesX(0)/m/n/8 history
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 40--41
+\TU/TeXGyreTermesX(0)/m/n/8 + synthetic
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 41--42
+[]\TU/TeXGyreTermesX(0)/m/n/8 Escalation
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 41--42
+\TU/TeXGyreTermesX(0)/m/n/8 precision /
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 42--43
+[]\TU/TeXGyreTermesX(0)/m/n/8 Stress
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 43--44
+[]\TU/TeXGyreTermesX(0)/m/n/8 B1 / B2 /
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 43--44
+\TU/TeXGyreTermesX(0)/m/n/8 strengthened
+ []
+
+
+Underfull \hbox (badness 2035) in paragraph at lines 45--46
+\TU/TeXGyreTermesX(0)/m/n/8 matched feed-
+ []
+
+
+Underfull \hbox (badness 3323) in paragraph at lines 45--46
+\TU/TeXGyreTermesX(0)/m/n/8 back + advi-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 46--47
+[]\TU/TeXGyreTermesX(0)/m/n/8 Fixed-oracle
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 47--48
+[]\TU/TeXGyreTermesX(0)/m/n/8 Near-ceiling
+ []
+
+
+Overfull \hbox (39.8357pt too wide) in paragraph at lines 14--50
+ [][] 
+ []
+
+)
+Underfull \hbox (badness 10000) in paragraph at lines 421--422
 []\TU/TeXGyreTermesX(0)/m/n/8 Primary E1/E6/E12 (overlap-
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 378--379
+Underfull \hbox (badness 10000) in paragraph at lines 426--427
 []\TU/TeXGyreTermesX(0)/m/n/8 Public SOFL modules;
  []
 
+[3]
+Underfull \vbox (badness 1024) has occurred while \output is active []
+
+
+(../hsp-agile/tables/e6_headroom_summary
+Overfull \hbox (24.75133pt too wide) in paragraph at lines 13--29
+ [][] 
+ []
+
+)
 File: ../hsp-agile/figures/feedback_variant_bar.pdf Graphic file (type pdf)
 <use ../hsp-agile/figures/feedback_variant_bar.pdf>
+ [4] (../hsp-agile/tables/e2_decomp_availability
+Requested font "[lmmonocaps10-regular]:" at 8.0pt
+ -> lmmonocaps10-regular
+)
+(../hsp-agile/tables/e2_screen_vignette
+Overfull \hbox (82.26404pt too wide) in paragraph at lines 11--20
+ [][] 
+ []
+
+) (../hsp-agile/tables/screen_false_positive
+LaTeX Font Info:    Font shape `TU/TeXGyreTermesX(0)/b/sc' will be
+(Font)              scaled to size 8.0pt on input line 6.
+Requested font "[TeXGyreTermesX-Bold.otf]/OT:script=latn;language=dflt;-ss05;+t
+num;+lnum;+smcp;+pcap;mapping=tex-text;" at 8.0pt
+ -> TeXGyreTermesX-Bold.otf
+)
 File: ../hsp-agile/figures/prevention_bar.pdf Graphic file (type pdf)
 <use ../hsp-agile/figures/prevention_bar.pdf>
 File: ../hsp-agile/figures/performance_vs_overlap.pdf Graphic file (type pdf)
 <use ../hsp-agile/figures/performance_vs_overlap.pdf>
-[3]
-Underfull \vbox (badness 7012) has occurred while \output is active []
+ [5]
+(../hsp-agile/tables/e6_ext_multi_status
+Underfull \hbox (badness 10000) in paragraph at lines 20--21
+[]\TU/lmtt/m/n/8 run_ir_combo_seed_gemini_n40_v1 \TU/TeXGyreTermesX(0)/m/n/8 +
+ []
 
- [4]
-[5] (main.bbl)
+
+Underfull \hbox (badness 10000) in paragraph at lines 21--24
+[]\OT1/minntx/m/n/8 26\OML/ntxmi/m/it/8 :\OT1/minntx/m/n/8 5$ \TU/TeXGyreTermes
+X(0)/m/n/8 pp, CI [21.0, 32.2]; vs.
+ []
+
+
+Underfull \hbox (badness 4168) in paragraph at lines 24--26
+[]\TU/TeXGyreTermesX(0)/m/n/8 Significant support vs. un-
+ []
+
+
+Underfull \hbox (badness 1424) in paragraph at lines 24--26
+\TU/TeXGyreTermesX(0)/m/n/8 structured feedback; do not
+ []
+
+
+Underfull \hbox (badness 5756) in paragraph at lines 27--29
+[]\TU/lmtt/m/n/8 run_ext_hardseed_e6_v2 \TU/TeXGyreTermesX(0)/m/n/8 (HKCA09 +
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 29--33
+[]\TU/TeXGyreTermesX(0)/m/n/8 Protocol filter test-only Conf.$[]\OT1/minntx/m/n
+/8 1$\TU/TeXGyreTermesX(0)/m/n/8 :
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 29--33
+\TU/TeXGyreTermesX(0)/m/n/8 22/1/56, CI $\LMS/ntxsy/m/n/8 »\OT1/minntx/m/n/8 12
+\OML/ntxmi/m/it/8 :\OT1/minntx/m/n/8 7\OML/ntxmi/m/it/8 ;  \OT1/minntx/m/n/8 28
+\OML/ntxmi/m/it/8 :\OT1/minntx/m/n/8 6\LMS/ntxsy/m/n/8 ¼$\TU/TeXGyreTermesX(0)/
+m/n/8 ; pooled
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 29--33
+\TU/TeXGyreTermesX(0)/m/n/8 headroom $\OML/ntxmi/m/it/8 n[]\OT1/minntx/m/n/8 18
+6$\TU/TeXGyreTermesX(0)/m/n/8 , $[]\OT1/minntx/m/n/8 18\OML/ntxmi/m/it/8 :\OT1/
+minntx/m/n/8 3$ \TU/TeXGyreTermesX(0)/m/n/8 pp, CI
+ []
+
+
+Underfull \hbox (badness 2393) in paragraph at lines 33--35
+[]\TU/TeXGyreTermesX(0)/m/n/8 Protocol transfer under the
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 33--35
+\TU/TeXGyreTermesX(0)/m/n/8 same Conf.$[]\OT1/minntx/m/n/8 1$ \TU/TeXGyreTermes
+X(0)/m/n/8 filter as
+ []
+
+
+Underfull \hbox (badness 1845) in paragraph at lines 33--35
+\TU/TeXGyreTermesX(0)/m/n/8 BENCH-120 headroom; not
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 39--40
+[]\TU/TeXGyreTermesX(0)/m/n/8 Protocol transfer under
+ []
+
+
+Underfull \hbox (badness 6300) in paragraph at lines 42--44
+[]\TU/TeXGyreTermesX(0)/m/n/8 Headroom filter: $\OML/ntxmi/m/it/8 n[]\OT1/minnt
+x/m/n/8 17$\TU/TeXGyreTermesX(0)/m/n/8 , $[]\OT1/minntx/m/n/8 18\OML/ntxmi/m/it
+/8 :\OT1/minntx/m/n/8 8$ \TU/TeXGyreTermesX(0)/m/n/8 pp,
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 44--45
+[]\TU/TeXGyreTermesX(0)/m/n/8 Protocol transfer under
+ []
+
+
+Underfull \hbox (badness 2865) in paragraph at lines 45--46
+[]\TU/TeXGyreTermesX(0)/m/n/8 Real/headroom and RealSpec
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 46--47
+[]\TU/lmtt/m/n/8 run_real_e6_headroom_v1\TU/TeXGyreTermesX(0)/m/n/8 ;
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 47--50
+[]\TU/TeXGyreTermesX(0)/m/n/8 57 paired real/headroom tasks
+ []
+
+
+Underfull \hbox (badness 3148) in paragraph at lines 47--50
+\TU/TeXGyreTermesX(0)/m/n/8 and 30 RealSpec B1-fail tasks all
+ []
+
+
+Underfull \hbox (badness 2600) in paragraph at lines 47--50
+\TU/TeXGyreTermesX(0)/m/n/8 saturate at 100.0% for \TU/lmtt/m/n/8 test_only\TU/
+TeXGyreTermesX(0)/m/n/8 ,
+ []
+
+
+Underfull \hbox (badness 6110) in paragraph at lines 50--51
+[]\TU/TeXGyreTermesX(0)/m/n/8 Saturation diagnostic when
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 55--56
+[]\TU/TeXGyreTermesX(0)/m/n/8 Boundary when saturated
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 57--59
+[]\TU/lmtt/m/n/8 run_github_harvest_v2\TU/TeXGyreTermesX(0)/m/n/8 ;
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 57--59
+\TU/lmtt/m/n/8 run_hkca09_b1b2m_v1\TU/TeXGyreTermesX(0)/m/n/8 ;
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 59--62
+[]\TU/TeXGyreTermesX(0)/m/n/8 GitHub: B2=\TU/lmtt/m/n/8 M_eq\TU/TeXGyreTermesX(
+0)/m/n/8 =92.0% (0/0/48).
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 59--62
+\TU/TeXGyreTermesX(0)/m/n/8 HKCA09: B2=\TU/lmtt/m/n/8 M_eq\TU/TeXGyreTermesX(0)
+/m/n/8 =100.0%.
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 62--64
+[]\TU/TeXGyreTermesX(0)/m/n/8 C4 external validity and
+ []
+
+
+Underfull \hbox (badness 7685) in paragraph at lines 62--64
+\TU/TeXGyreTermesX(0)/m/n/8 saturation/tie evidence, not
+ []
+
+)
+Underfull \hbox (badness 1596) in paragraph at lines 634--642
+\TU/TeXGyreTermesX(0)/m/n/10 than a substitute for E6. Unified external equal-$
+\OML/ntxmi/m/it/10 K$ \TU/TeXGyreTermesX(0)/m/n/10 (Ta-
+ []
+
+
+Overfull \hbox (11.86435pt too wide) in paragraph at lines 675--689
+ [][] 
+ []
+
+(../hsp-agile/tables/e2_ext_screen
+Overfull \hbox (29.15234pt too wide) in paragraph at lines 10--19
+ [][] 
+ []
+
+) [6]
+Underfull \vbox (badness 2837) has occurred while \output is active []
+
+ [7]
+(main.bbl [8])
 
 ** Conference Paper **
 Before submitting the final camera ready copy, remember to:
@@ -1244,11 +1590,11 @@ Before submitting the final camera ready copy, remember to:
 Package balance Warning: You have called \balance in second column
 (balance)                Columns might not be balanced.
 
-[6] (main.aux)
+[9] (main.aux)
 
 LaTeX Font Warning: Some font shapes were not available, defaults substituted.
 
 Package rerunfilecheck Info: File `main.out' has not changed.
-(rerunfilecheck)             Checksum: 0D6F1C84A4875F9831844CB8016405F9;3353.
+(rerunfilecheck)             Checksum: B42DC4EF24A7A151FF0A5E3CE2A84305;3464.
  )
-Output written on main.xdv (6 pages, 299172 bytes).
+Output written on main.xdv (9 pages, 443908 bytes).

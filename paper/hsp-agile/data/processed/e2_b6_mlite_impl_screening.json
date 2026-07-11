@@ -1,0 +1,139 @@
+{
+  "source": "offline_accept_candidate_code",
+  "corpus": "HardSynthetic-180 regenerated with hard_gen seed=42",
+  "seed": 42,
+  "n_tasks": 180,
+  "note": "Same-denominator impl-screening on reconstructed HardSynthetic-180. Does not restore the 33 industrial tasks from prevention_full_v1. Primary screen delta remains M vs A2 on archived prevention_full_v1 (n=852).",
+  "rows": [
+    {
+      "mode": "B2",
+      "eval_type": "impl_screening",
+      "n": 720,
+      "detection_rate": 0.5,
+      "false_accept_rate": 0.5,
+      "strict_conformance": 0.7185929232804232,
+      "by_operator": {
+        "ICO": {
+          "n": 180,
+          "pdr": 1.0
+        },
+        "WRO": {
+          "n": 180,
+          "pdr": 1.0
+        },
+        "MBO": {
+          "n": 180,
+          "pdr": 0.0
+        },
+        "DRO": {
+          "n": 180,
+          "pdr": 0.0
+        }
+      }
+    },
+    {
+      "mode": "B6",
+      "eval_type": "impl_screening",
+      "n": 720,
+      "detection_rate": 0.5,
+      "false_accept_rate": 0.5,
+      "strict_conformance": 0.7185929232804232,
+      "by_operator": {
+        "ICO": {
+          "n": 180,
+          "pdr": 1.0
+        },
+        "WRO": {
+          "n": 180,
+          "pdr": 1.0
+        },
+        "MBO": {
+          "n": 180,
+          "pdr": 0.0
+        },
+        "DRO": {
+          "n": 180,
+          "pdr": 0.0
+        }
+      }
+    },
+    {
+      "mode": "M_lite",
+      "eval_type": "impl_screening",
+      "n": 720,
+      "detection_rate": 0.5,
+      "false_accept_rate": 0.5,
+      "strict_conformance": 0.7185929232804232,
+      "by_operator": {
+        "ICO": {
+          "n": 180,
+          "pdr": 1.0
+        },
+        "WRO": {
+          "n": 180,
+          "pdr": 1.0
+        },
+        "MBO": {
+          "n": 180,
+          "pdr": 0.0
+        },
+        "DRO": {
+          "n": 180,
+          "pdr": 0.0
+        }
+      }
+    },
+    {
+      "mode": "A2",
+      "eval_type": "impl_screening",
+      "n": 720,
+      "detection_rate": 0.5,
+      "false_accept_rate": 0.5,
+      "strict_conformance": 0.7185929232804232,
+      "by_operator": {
+        "ICO": {
+          "n": 180,
+          "pdr": 1.0
+        },
+        "WRO": {
+          "n": 180,
+          "pdr": 1.0
+        },
+        "MBO": {
+          "n": 180,
+          "pdr": 0.0
+        },
+        "DRO": {
+          "n": 180,
+          "pdr": 0.0
+        }
+      }
+    },
+    {
+      "mode": "M",
+      "eval_type": "impl_screening",
+      "n": 720,
+      "detection_rate": 0.5,
+      "false_accept_rate": 0.5,
+      "strict_conformance": 0.7185929232804232,
+      "by_operator": {
+        "ICO": {
+          "n": 180,
+          "pdr": 1.0
+        },
+        "WRO": {
+          "n": 180,
+          "pdr": 1.0
+        },
+        "MBO": {
+          "n": 180,
+          "pdr": 0.0
+        },
+        "DRO": {
+          "n": 180,
+          "pdr": 0.0
+        }
+      }
+    }
+  ]
+}

@@ -1,6 +1,6 @@
 %% ch08_discussion.tex  —  Chapter 8: Discussion and Threats to Validity
 %% HSP-Agile CCF-B Report, East China Normal University, 2026
-%% Rewrite staging: _rewrite/ (Formalist+Pedagogue)
+%% Step 1 polish staging: _pipeline/step1_polish/
 
 \chapter{Discussion and Threats to Validity}
 \label{ch:discussion}
@@ -26,32 +26,68 @@ Conjunctive release
 binds witness conformance to a structural screen
 (Equation~\eqref{eq:accept}).
 A candidate that greens a busy unit suite can still fail Accept when a
-critical pattern remains---or when a thin residual region was never exercised.
+critical pattern remains, or when a thin residual region was never exercised.
 
 Two controlled results support that reading.
 Under feedback isolation (E6), scenario-indexed Semantic Feedback IR lifts
-mean Conf.\ from 79.1\% (\texttt{test\_only}) to 86.9\%
-(\texttt{semantic\_ir}): ${+}7.7$\,pp, W/L/T $14/4/102$,
-95\% CI $[2.3,13.6]$, Wilcoxon $p{=}0.018$.
+mean Conf.\ on headroom tasks: from 79.1\% (\texttt{test\_only}) to 86.9\%
+(\texttt{semantic\_ir}) on the full panel (${+}7.7$\,pp supporting
+aggregate), and ${+}8.2$\,pp on the broad headroom set where test-only
+Conf.${<}1$ ($n{=}114$; W/L/T $14/4/96$; CI $[2.3,14.4]$).
+The collapsed subset with test-only Conf.${=}0$ ($n{=}13$) explains the
+rescue regime (${+}90.7$\,pp; 13/13 wins) but is too small to headline alone.
+The partial-failure band ($0{<}$test-only Conf.${<}1$, $n{=}101$) does not
+favour typed IR (${-}2.5$\,pp; CI $[-5.8,0.2]$), because failures there are
+often multi-scenario or arithmetic partial mismatches in which a single
+scenario label can mis-steer repair.
 All fourteen Conf.\ wins are catch-all/\texttt{others} rescues; none are
 ordering-only uniqueness wins.
+Among the 18 decisive (non-tie) tasks, Semantic IR wins 14/18 (77.8\%;
+Wilson 95\% CI $[54.8,\,91.0]$).
+The partial-failure band ($0{<}$test-only Conf.${<}1$, $n{=}101$) does not
+favour typed IR (${-}2.5$\,pp; CI $[-5.8,0.2]$); keep B2 rather than forcing
+Semantic IR there.
 That profile matches the primary vignette: Reject and Pass tests stay green
 while the residual \texttt{OTHERWISE} branch still returns Pass instead of
 Review.
-Under implementation screening (E2), mode~M reaches PDR 95.0\% / FAR 5.0\%
-versus B2's 91.2\% / 8.8\%, so fewer first-order mutants escape the
-conjunctive gate.
+Under implementation screening (E2), the industrial slice ($n{=}132$) moves
+FAR from 56.8\% (B2/A2) to 32.6\% (M)---the primary prevention claim
+(bootstrap 95\% CI on the FAR drop: $[-31.8,\,-17.4]$\,pp; excludes~0).
+Pooled over $n{=}852$ that lift appears as FAR 8.8\% to 5.0\% (PDR 91.2\% to
+95.0\%), but HardSynthetic mutants do not exercise Screen and pooled FAR 5.0\%
+is \emph{not} the release claim.
 
 Equal-$K$ Conf.\ ranking places M\_eq at 100.0\% mean Conf.\ against B2's 97.5\%
 (${+}2.5$\,pp; $3/0/117$) when both modes share $K{=}3$.
+The three wins are a matched-budget Conf.\ check, not a substitute for E6's
+within-M feedback isolation.
 Near-ceiling Conf.\ rankings on the strengthened $K{=}5$ bundle (fixed-oracle
 E1/E10) and the multi-seed E12 matrix are saturation context rather than a
 Conf.\ crown: B2 reaches 100\% Conf.\ on every E12 seed while M averages
 99.7\%.
 Aggregate E1/E10 place M at or above B2; seed stability slightly favours B2.
-The practical reading is therefore conditional---prefer B2 for mean Conf.\ and
-latency; escalate to~M when $\mathrm{Accept}{=}1$ or FAR${\le}5\%$ is required
-and repair headroom remains (Table~\ref{tab:deployment-boundary}).
+The practical reading is conditional: prefer B2 for mean Conf.\ and
+latency; escalate to~M when $\mathrm{Accept}{=}1$ or a contractual FAR budget
+exists \emph{and} repair headroom remains
+(Table~\ref{tab:deployment-boundary}).
+Do not read the industrial Screen lift (FAR 56.8\% to 32.6\%) as attainment of
+FAR${\le}5\%$ on that mutant set.
+When B2 already achieves Accept${=}1$ (or 100\% mean Conf.\ on the release
+suite), do not escalate---the fuller loop can regress under strong models
+(GPT-4o/Claude industrial-pattern: B2 100.0\% vs.\ M 95.5\%).
+The controlled causal estimate for SIFR remains E6 on BENCH-120; Gemini
+hard-seed and public-corpus runs bound saturation and transfer, not a second
+${+}7.7$\,pp headline.
+
+\paragraph{Failure modes and escalation limits.}
+Four negative results bound when \emph{not} to escalate: partial-failure band
+(${-}2.5$\,pp; do not force SIFR); GPT-4o/Claude industrial-pattern regression
+(B2 100.0\% vs.\ M 95.5\%); E14 length-matched traces beating bare Semantic IR
+(85.4\% vs.\ 75.1\%); and HTE precision 0.167 (checklist only, not a
+predictor).
+Table~\ref{tab:deployment-boundary} records these limits beside the positive
+triggers in Section~\ref{sec:results:rq4}.
+
 
 \paragraph{When baselines already saturate.}
 Industrial-pattern, desensitized, and several harvest slices often tie B2 with
@@ -61,6 +97,7 @@ choice.
 Value concentrates on contracts with logical traps---catch-all fail-closed
 residuals, MFA step-up bands, ordered overlaps---where a green dashboard can
 still hide an escaped defect (Section~\ref{sec:results:acl-case}).
+
 
 \paragraph{Strengthened mode~M and measurement.}
 Default mode~M on the fixed-oracle ranking runs combines several engineering
@@ -95,8 +132,12 @@ When release quality is measured by escaped defects rather than average
 agreement, prevention metrics dominate the reading.
 The conjunctive gate can still reject candidates that pass all witnesses yet
 exhibit high-severity pattern violations---candidates that B1/B2's
-single-criterion gate would accept---yielding the E2 FAR reduction from
-8.8\% to 5.0\%.
+single-criterion gate would accept.
+On industrial-style mutants, Screen cuts FAR from 56.8\% to 32.6\%---the
+primary prevention claim.
+Pooled over the implementation-screening set that yields FAR 8.8\% to 5.0\%,
+but HardSynthetic mutants do not exercise Screen and pooled FAR 5.0\% is
+\emph{not} the release claim.
 Earlier snapshots in which Conf.\ and Strict diverged under the buggy
 others-witness oracle are superseded; the enduring lesson is conjunctive
 selectivity plus honest measurement, not a single Strict headline.
@@ -116,8 +157,10 @@ On fixed-oracle E1, mode~M and B2 incur comparable mean wall-clock latency
 ($10{,}457$\,ms vs.\ $9{,}576$\,ms) at similar mean llm\_calls
 (${\approx}1.16$ vs.\ ${\approx}1.18$).
 When mean Conf.\ and latency suffice, Table~\ref{tab:deployment-boundary}
-prescribes B2; escalate to~M only when $\mathrm{Accept}{=}1$ or
-FAR${\le}5\%$ is required.
+prescribes B2; escalate to~M only when $\mathrm{Accept}{=}1$ or a contractual
+FAR budget exists \emph{and} repair headroom remains.
+Screen helps on industrial-pattern mutants but does not attain FAR${\le}5\%$
+on that slice.
 The conjunctive predicate additionally yields an auditable decision
 record---which witnesses and patterns were decisive---rather than a bare
 pass/fail bit~\citep{harman2004maff,beck2004xp}.
@@ -149,7 +192,7 @@ entire PoC catalogue can be swapped for a CI analyser or LLM review agent that
 emits the same severity-tagged vetoes.
 E7's per-smell F1 guides catalogue expansion; it does not freeze fourteen
 rules as the only admissible $\mathrm{Screen}$.
-The fourteen-rule catalogue is therefore an evaluated implementation choice,
+The fourteen-rule catalogue is an evaluated implementation choice,
 not evidence of completeness.  E2 includes semantic mutants beyond direct
 rule matches, and the A2 ablation separates the screen's prevention role from
 the witness/repair contribution to conformance.
@@ -158,8 +201,9 @@ the witness/repair contribution to conformance.
 Proposition~\ref{thm:far-bound} is a finite-sample envelope under
 independent witness draws; the deployed $\Phi_i$ suite is deterministic and
 does not assume that independence.
-Release decisions should cite empirical E2 FAR (5.0\% vs.\ B2 8.8\%), not the
-symbolic $(1-\varepsilon)^n$ expression.
+Release decisions should cite empirical E2 FAR (industrial slice 56.8\% to
+32.6\%; pooled 5.0\% vs.\ B2 8.8\%), not the symbolic
+$(1-\varepsilon)^n$ expression.
 
 
 %=============================================================================
@@ -183,9 +227,9 @@ HumanEval-FSF and E11 external slices), branching is shallow
 (typically ${\le}4$ branches), or each branch returns a simple scalar so that
 ordinary failures already expose assignment mistakes.
 Under those conditions the lightweight loop is the rational default.
-M's contribution on the hard benchmark is therefore conditional: E6 typed
-feedback under headroom, E2 prevention, and conjunctive $\mathrm{Accept}$
-when those release bars apply.
+M's contribution on the hard benchmark is conditional: E6 typed
+feedback under headroom, E2 prevention on industrial-style mutants, and
+conjunctive $\mathrm{Accept}$ when those release bars apply.
 
 \subsection{Deployment Boundary Conditions}
 \label{sec:disc:deployment}
@@ -193,12 +237,17 @@ when those release bars apply.
 Table~\ref{tab:deployment-boundary} summarises the decision: match feedback
 depth to the release bar, not to overlap tertiles alone (canonical E3 is
 non-monotone).
+The pre-hoc HTE diagnostic remains deliberately conservative: the best
+inspected tree over hard-task metadata reaches precision 0.167 and recall
+0.786 against a 0.117 base positive rate, while external summaries are mostly
+saturated, tied, or aggregate-only.
+We treat HTE as a checklist policy rather than as a validated predictor.
 
 \begin{table}[t]
   \centering
   \caption{\textbf{Deployment boundary:} release bar + headroom (not overlap).
-    Prefer B2 for mean Conf./latency; escalate to~M when Accept or FAR targets
-    apply \emph{and} repair headroom remains.
+    Prefer B2 for mean Conf./latency; escalate to~M when Accept or a contractual
+    FAR budget applies \emph{and} repair headroom remains.
     Within M, prefer \texttt{semantic\_ir} for localisation/audit and
     \texttt{execution\_trace\_matched} for mean Conf.\ (E14).
     Overlap tertiles (E3) are non-monotone---not a deployment trigger.}
@@ -211,8 +260,10 @@ non-monotone).
     \midrule
     Default & Mean Conf.\ / latency & --- \\
     Release bar & Mean Conf.\ sufficient & $\mathrm{Accept}{=}1$ \\
-    Prevention & --- & FAR${\le}5\%$ (E2) \\
+    Prevention & No FAR contract & Contractual FAR budget \\
     Headroom & Saturated endpoint / ties & Collapsed test-only Conf.\ (E6) \\
+    Partial Conf. & $0{<}$test-only Conf.${<}1$ & Do not force SIFR \\
+    Strong-model Accept & B2 already Accept${=}1$ & Do not escalate \\
     Feedback render & Unstructured OK if Conf.\ holds & IR (audit) / trace (Conf.) \\
     Seed stability & B2 first every E12 seed & E1/E10 M$\ge$B2 aggregate \\
     Hybrid cost & M\_lite not a shortcut (E18) & Full IR$+$gate integration \\
@@ -223,8 +274,11 @@ non-monotone).
 
 \paragraph{Hybrid baselines.}
 For mean Conf.\ alone, prefer B2 over verifier-loop hybrids (E13).
-M\_lite (E18) and B6 do not reproduce M's prevention profile: deploy full
-IR$+$gate integration or stay on B2.
+M\_lite (E18) and B6 do not reproduce M's prevention profile: as formal-only
+modes without Screen, B6 prevention equals B2/A2 by design (HardSynthetic FAR
+0\%; industrial B6 unavailable in \texttt{prevention\_full\_v1}), and we do not
+report B6 FAR without \texttt{prevention\_full\_v1} rows.
+Deploy full IR$+$gate integration or stay on B2.
 
 The framework does not yet encode temporal LTL/CTL properties, infinite-domain
 arithmetic beyond LIA, or probabilistic semantics.
@@ -242,20 +296,31 @@ BENCH-120 balances overlap-filtered discriminative tasks against LLM API cost.
 Post-hoc power for the tiny fixed-oracle M--B2 Conf.\ gap is low
 ($|\delta|{\approx}0.014$); doubling $n$ would not materially change
 inference.
-We therefore emphasise per-task win rate, equal-$K$ Conf.\ ranking, E10
+We emphasise per-task win rate, equal-$K$ Conf.\ ranking, E10
 (unfiltered), E12 (multi-seed), and prevention metrics alongside aggregate
 means.
 Author-construction bias is mitigated by the real-priority micro-benchmark
-($n{=}30$), GitHub harvest, HKCA09, and desensitized published-industrial
-pilots---still not live vendor traces.
+($n{=}30$), GitHub harvest ($n{=}48$; B1 headroom then B2${=}$\texttt{M\_eq}),
+HKCA09, and desensitized published-industrial pilots---still not live vendor
+traces (NDA intake pending; public harvest $\neq$ proprietary dump).
+External impl-screening shows GitHub Screen transfer
+(FAR 60.4\%$\rightarrow$11.5\%) beside published-industrial saturation
+(0 Screen-hits); industrial-132 remains the primary Screen claim.
 Industrial specifications may add state, external services, or composite
 scenario structure absent from the template family.
 The E2 prevention estimate is conditional on an author-selected first-order
 mutant distribution derived from SOFL fault patterns.  Although the operators
 extend beyond direct RF01--RF14 matches, the study does not establish screen
 completeness, clean-repository false-rejection rates, or repository-scale
-safety.  The 5.0\% FAR is therefore an empirical result for this constructed
+safety.  The 5.0\% pooled FAR is an empirical result for this constructed
 population, not a universal release guarantee.
+Finite witnesses approximate Conf.; Conf.${=}1$ is not a completeness claim
+over the full input space.
+Accept is sound only relative to a faithful SpecIR$\to$SMT encoding of the
+guards under evaluation; encoding bugs (such as the disclosed others-witness
+fault) change measured Conf.\ and must be treated as measurement corrections.
+The Screen catalogue is a configurable instance, not a completeness proof over
+defect classes.
 
 \paragraph{Overlap filter and claim scope.}
 The Z3 overlap filter retains tasks where first-match ordering defects are
@@ -271,11 +336,15 @@ Primary results use \texttt{ecnu-plus} (Qwen-family); E16/E6-max use
 \texttt{gpt-4o}, \texttt{claude-sonnet-4-6}, and \texttt{deepseek-v3.2}
 (Section~\ref{sec:results:n1n}).
 Cross-endpoint evidence shows that headroom, rather than model prestige alone,
-determines the value of added repair structure.  On industrial-pattern tasks,
-B2 reaches 100\% Conf.\ under GPT-4o and Claude, while Gemini hard-seed repair
-retains a ${+}26.5$\,pp structured-over-test-only contrast (CI excludes zero).
-The controlled ${+}7.7$\,pp result remains primary-endpoint evidence; the
-commercial and Gemini runs establish saturation and transfer boundaries.
+determines the value of added repair structure.
+On industrial-pattern tasks, B2 reaches 100\% Conf.\ under GPT-4o and Claude
+while M reaches 95.5\%; Gemini hard-seed repair retains a ${+}26.5$\,pp
+structured-over-test-only contrast (CI excludes zero).
+Regression guard: when B2 already achieves Accept${=}1$, do not escalate to~M.
+The controlled headroom evidence (+8.2\,pp on test-only Conf.${<}1$; all-task
++7.7\,pp as supporting aggregate) remains primary-endpoint evidence on
+BENCH-120; the commercial and Gemini runs establish saturation and transfer
+boundaries, not a second causal headline.
 
 \paragraph{Witness coverage and SMT theory class.}
 The checker generates a small number of witnesses per branch inside a
@@ -357,7 +426,12 @@ Semantic Feedback IR or pattern guard.
 On stratified and full hard exports, aggregate Conf.\ rankings are
 seed-sensitive near ceiling (cf.\ E12); the irreducible increment of full~M
 over such hybrids remains conjunctive $\mathrm{Accept}$ together with
-PDR/FAR---and the E6 typed-IR gain when operating inside M's repair loop.
+PDR/FAR on industrial-style mutants---and the E6 typed-IR gain when operating
+inside M's repair loop under headroom.
+B6 prevention equals B2/A2 by design when Screen is off (HardSynthetic FAR
+0\%; industrial B6 unavailable in \texttt{prevention\_full\_v1}); cite
+BENCH-120 Conf.\ (B6 81.1\% vs.\ M\_lite 79.0\%) for conformance only, not
+B6 FAR without \texttt{prevention\_full\_v1} rows.
 Clover remains the verified CEGIS reference for Dafny; B6 is our FSF
 adaptation, not a drop-in of a third-party FSF product.
 
@@ -401,15 +475,23 @@ Adapters (E8) and the real-priority micro-benchmark
 rewritten as SpecIR without semantic loss.
 Claims are scoped to ordered-guard / FSF-style workflows; live vendor
 replication remains future work.
+Headroom-filtered external hard seeds
+(\texttt{run\_ext\_hardseed\_e6\_v2}: \texttt{wrong\_relop} $n{=}79$,
+${+}20.6$\,pp; HKCA09 gemini $n{=}17$, ${+}18.8$\,pp) support protocol transfer
+under test-only Conf.${<}1$; they do not solve external validity on their own.
 
 \paragraph{Construct validity --- Conf., PDR, and FAR.}
 $\mathrm{Conf}$ approximates oracle agreement on a finite witness set
-$\mathcal{D}(t)$; $\mathrm{PDR}$/$\mathrm{FAR}$ score rejection of
-first-order mutants under the conjunctive Accept gate.
+$\mathcal{D}(t)$; $\mathrm{Conf}{=}1$ is not a completeness claim over the full
+input space.
+$\mathrm{PDR}$/$\mathrm{FAR}$ score rejection of first-order mutants under the
+conjunctive Accept gate.
 Neither construct covers higher-order faults, environment faults outside the
 FSF signature, timing/concurrency, or inputs outside the SMT domain box.
+Accept is sound only relative to a faithful SpecIR$\to$SMT encoding of the
+guards under evaluation.
 Theorem~\ref{thm:far-bound} does not license operational release decisions;
-cite empirical E2 FAR instead.
+cite empirical E2 FAR instead (industrial slice first, then pooled aggregate).
 \emph{Disclosure:} a prior others-witness bug inflated false failures on
 canonical E1; primary B1/B2/M aggregates cite the fixed-oracle
 \texttt{run\_e1\_m\_win\_v2} only

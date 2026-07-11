@@ -1,0 +1,41 @@
+---
+description: CCF-B Accept bar, evidence ladder, and subagent workflow for HSP-Agile paper
+globs: paper/hsp-agile/**/*,paper/hsp-agile-conference/**/*
+alwaysApply: false
+---
+
+# CCF-B Accept Target
+
+Goal: an Accept-grade CCF-B paper (ICSME/SANER/QRS class), not an engineering demo.
+
+## Lead Claims
+
+1. DGA + decomposition: PDR/FAR with a B2 -> B6 -> A2 -> M ladder (E2-Decomp).
+2. SIFR under headroom: primary endpoint on subset `H` where test-only fails (E6-H), not 14/120 wins alone.
+3. External + HTE: RealSpec/HKCA09 holdout, with escalation only when Accept/FAR requires it.
+
+Never headline "M beats B2 on mean Conf" or universal +7.7pp without a headroom qualifier.
+
+## Fairness
+
+Each paper version needs one Master Protocol Table. Every reported number must trace to a run id in `paper/hsp-agile/artifacts/AUTHORITATIVE_NUMBERS.md`.
+
+## Subagent Parallel Map
+
+| Agent | Scope | Deliverable |
+|-------|-------|-------------|
+| Exp-Causal | E2-B6, E2-Decomp, E-Screen-FP | `prevention_summary.json`, decomposition figure |
+| Exp-Mechanism | E6-H, E-CatchAll-40, Cliff's delta | `e6_headroom_*.csv`, updated E6 figure |
+| Exp-External | E6-Ext, E6-Multi | external corpus tables |
+| Exp-Deploy | E-HTE | escalation precision/recall report |
+| Paper-AlgoDraft | A1-A4 English drafts in `_rewrite/` | draft prose only |
+| Paper-Conf / Paper-Full | After authoritative-number sync | conference and full-paper updates |
+| QA | Refresh assets and mock PC review | Accept-bar checklist pass |
+
+Sync point: experiment agents finish, then refresh authoritative numbers, then paper agents may cite new statistics.
+
+## Conference vs Full Thesis
+
+- Conference (`paper/hsp-agile-conference/`): algorithms, causal results, and deployment rule.
+- Full thesis/report (`paper/hsp-agile/`): proofs, appendix stress tests, and extended tables.
+- Share tables via `\input{../hsp-agile/tables/...}` where practical to avoid drift.

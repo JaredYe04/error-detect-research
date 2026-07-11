@@ -1,0 +1,66 @@
+% Generated from Exp-External artifacts + run_ext_hardseed_e6_v2 protocol filter.
+\begin{table*}[t]
+  \centering
+  \caption{External and multi-seed status for the feedback-isolation claim.
+  Significant support is separated from saturation and mixed/null slices.
+  The headroom-filtered external row applies the frozen
+  \texttt{E6\_EXT\_HARDSEED} protocol (retain pairs with test-only Conf.${<}1$).}
+  \label{tab:e6-ext-multi-status}
+  \footnotesize
+  \begin{tabular}{@{}p{0.20\linewidth}p{0.28\linewidth}p{0.25\linewidth}p{0.19\linewidth}@{}}
+    \toprule
+    \textbf{Slice} & \textbf{Run / artifact} & \textbf{Key result} & \textbf{Use} \\
+    \midrule
+    BENCH-120 E6 anchor
+      & \texttt{run\_feedback\_v2}
+      & \texttt{semantic\_ir} vs.\ \texttt{test\_only}: ${+}7.7$ pp;
+        W/L/T 14/4/102; 95\% CI [2.3, 13.6]
+      & Lead C2 mechanism, not external. \\
+    E6-Multi hard combo seeds
+      & \texttt{run\_ir\_combo\_seed\_gemini\_n40\_v1} + \texttt{extra40\_v1}
+      & 240 paired cells: FULL vs.\ \texttt{test\_only} ${+}26.5$ pp,
+        CI [21.0, 32.2]; vs.\ \texttt{test\_expected} ${+}26.7$ pp,
+        CI [21.0, 32.3]
+      & Significant support vs.\ unstructured feedback; do not claim uniqueness
+        over every structured ablation. \\
+    Ext.\ hard-seed headroom
+      & \texttt{run\_ext\_hardseed\_e6\_v2}
+        (HKCA09 + GitHub + RealSpec + industrial archives)
+      & Protocol filter test-only Conf.${<}1$:
+        \texttt{wrong\_relop} $n{=}79$, ${+}20.6$ pp, W/L/T 22/1/56,
+        CI $[12.7,\,28.6]$; pooled headroom $n{=}186$, ${+}18.3$ pp,
+        CI $[13.2,\,23.8]$
+      & Protocol transfer under the same Conf.${<}1$ filter as BENCH-120
+        headroom; not ``external validity solved.'' \\
+    GitHub harvest \texttt{wrong\_relop} (gemini)
+      & \texttt{run\_github\_wrong\_relop\_gemini\_v1}
+      & After Conf.${<}1$ filter: $n{=}3$, ${+}16.7$ pp, W/L/T 1/0/2;
+        CI includes 0 (injectable relop seeds are rare on this corpus)
+      & Protocol transfer under Conf.${<}1$; not a second ${+}7.7$ pp claim. \\
+    HKCA09 \texttt{wrong\_relop} (gemini)
+      & \texttt{run\_hkca09\_wrong\_relop\_gemini\_v2}
+      & Headroom filter: $n{=}17$, ${+}18.8$ pp, W/L/T 4/0/13,
+        CI $[3.9,\,37.5]$ (excludes 0)
+      & Protocol transfer under Conf.${<}1$; supporting external C2. \\
+    Real/headroom and RealSpec E6
+      & \texttt{run\_real\_e6\_headroom\_v1}; \texttt{run\_realspec\_e6\_b1fail\_v1}
+      & 57 paired real/headroom tasks and 30 RealSpec B1-fail tasks all
+        saturate at 100.0\% for \texttt{test\_only}, \texttt{test\_expected},
+        and \texttt{semantic\_ir}
+      & Saturation diagnostic when Conf.\ is already ceiling. \\
+    HKCA09 hard seeds (unfiltered)
+      & \texttt{run\_hkca09\_hard\_seed\_e6\_v1} + \texttt{v2}
+      & Without the Conf.${<}1$ filter, families mix in sign
+        (e.g., unfiltered \texttt{wrong\_relop} CI includes 0)
+      & Boundary when saturated pairs are retained; prefer the filtered row. \\
+    GitHub / HKCA09 / desensitized ranking
+      & \texttt{run\_github\_harvest\_v2}; \texttt{run\_hkca09\_b1b2m\_v1};
+        \texttt{run\_desens\_real\_sofl\_v1}
+      & GitHub: B2=\texttt{M\_eq}=92.0\% (0/0/48).
+        HKCA09: B2=\texttt{M\_eq}=100.0\%.
+        Desensitized pilot: all modes 100.0\%.
+      & C4 external validity and saturation/tie evidence, not feedback-isolation
+        evidence. \\
+    \bottomrule
+  \end{tabular}
+\end{table*}
