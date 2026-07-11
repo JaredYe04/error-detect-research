@@ -1,0 +1,26 @@
+{
+  "n_rows": 126,
+  "n_seeds": 14,
+  "mean_conf": {
+    "ir_nl_only": 1.0,
+    "ir_no_constraint": 1.0,
+    "ir_no_expected": 1.0,
+    "ir_no_reason": 0.9911,
+    "ir_no_scenario_id": 1.0,
+    "ir_no_suggested_fix": 0.9911,
+    "semantic_ir": 1.0,
+    "test_expected": 1.0,
+    "test_only": 0.9911
+  },
+  "mean_delta_vs_frozen": {
+    "ir_nl_only": 0.125,
+    "ir_no_constraint": 0.125,
+    "ir_no_expected": 0.125,
+    "ir_no_reason": 0.1161,
+    "ir_no_scenario_id": 0.125,
+    "ir_no_suggested_fix": 0.1161,
+    "semantic_ir": 0.125,
+    "test_expected": 0.125,
+    "test_only": 0.1161
+  }
+}

@@ -1,0 +1,9 @@
+{
+  "n": 30,
+  "mean_conf": {
+    "test_expected": 1.0,
+    "test_only": 1.0,
+    "semantic_ir": 1.0
+  },
+  "note": "saturated under ecnu-plus; rerun with weaker model"
+}

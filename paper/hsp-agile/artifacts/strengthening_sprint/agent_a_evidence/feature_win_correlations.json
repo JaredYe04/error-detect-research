@@ -1,0 +1,32 @@
+[
+  {
+    "feature": "n_guard_atoms",
+    "n": 18,
+    "corr": -0.3407
+  },
+  {
+    "feature": "n_and_ops",
+    "n": 18,
+    "corr": -0.3407
+  },
+  {
+    "feature": "n_rel_ops",
+    "n": 18,
+    "corr": -0.3407
+  },
+  {
+    "feature": "mean_atoms_per_guard",
+    "n": 18,
+    "corr": -0.3407
+  },
+  {
+    "feature": "prompt_spec_len",
+    "n": 18,
+    "corr": -0.2934
+  },
+  {
+    "feature": "overlap_rate",
+    "n": 18,
+    "corr": -0.0347
+  }
+]

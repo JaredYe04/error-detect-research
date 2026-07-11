@@ -1,0 +1,26 @@
+{
+  "ridge_delta_coefs": {
+    "overlap_rate": -0.0532,
+    "n_guard_atoms": -0.0106,
+    "n_and_ops": -0.0106,
+    "n_rel_ops": -0.0106,
+    "mean_atoms_per_guard": -0.0116,
+    "max_atoms_per_guard": 0.0,
+    "prompt_spec_len": -0.0182,
+    "n_outputs": 0.0,
+    "n_inputs": 0.0,
+    "n_scenarios": 0.0
+  },
+  "logistic_win_coefs": {
+    "overlap_rate": -0.5624,
+    "n_guard_atoms": -0.0488,
+    "n_and_ops": -0.0488,
+    "n_rel_ops": -0.0488,
+    "mean_atoms_per_guard": -0.0503,
+    "max_atoms_per_guard": 0.0,
+    "prompt_spec_len": -0.2593,
+    "n_outputs": 0.0,
+    "n_inputs": 0.0,
+    "n_scenarios": 0.0
+  }
+}

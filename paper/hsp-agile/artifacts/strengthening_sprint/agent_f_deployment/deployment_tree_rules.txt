@@ -1,0 +1,13 @@
+|--- overlap_rate <= 1.09
+|   |--- prompt_spec_len <= 684.50
+|   |   |--- class: 1
+|   |--- prompt_spec_len >  684.50
+|   |   |--- class: 0
+|--- overlap_rate >  1.09
+|   |--- prompt_spec_len <= 684.50
+|   |   |--- overlap_rate <= 1.35
+|   |   |   |--- class: 1
+|   |   |--- overlap_rate >  1.35
+|   |   |   |--- class: 0
+|   |--- prompt_spec_len >  684.50
+|   |   |--- class: 0

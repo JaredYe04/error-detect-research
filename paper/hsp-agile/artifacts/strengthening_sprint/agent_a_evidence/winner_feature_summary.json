@@ -1,0 +1,1525 @@
+{
+  "source_e6": "D:\\repos\\error-detect-research\\artifacts\\run_feedback_v2\\feedback_variants\\results.jsonl",
+  "source_tasks": "D:\\repos\\error-detect-research\\benchmarks\\hard_tasks_annotated.json",
+  "n_tasks": 120,
+  "n_e6_rows": 360,
+  "E6_winner_counts": {
+    "tie": 118,
+    "semantic_ir": 2
+  },
+  "E6_CA_group_counts": {
+    "tie": 102,
+    "M_win": 14,
+    "A_win": 4
+  },
+  "by_E6_CA_group": {
+    "group_key": "E6_CA_group",
+    "groups": {
+      "tie": {
+        "n": 102,
+        "task_ids": [
+          "HardSynthetic.HardCase001",
+          "HardSynthetic.HardCase002",
+          "HardSynthetic.HardCase003",
+          "HardSynthetic.HardCase006",
+          "HardSynthetic.HardCase007",
+          "HardSynthetic.HardCase008",
+          "HardSynthetic.HardCase009",
+          "HardSynthetic.HardCase011",
+          "HardSynthetic.HardCase013",
+          "HardSynthetic.HardCase014",
+          "HardSynthetic.HardCase015",
+          "HardSynthetic.HardCase016",
+          "HardSynthetic.HardCase017",
+          "HardSynthetic.HardCase018",
+          "HardSynthetic.HardCase019",
+          "HardSynthetic.HardCase020",
+          "HardSynthetic.HardCase021",
+          "HardSynthetic.HardCase022",
+          "HardSynthetic.HardCase023",
+          "HardSynthetic.HardCase024",
+          "HardSynthetic.HardCase025",
+          "HardSynthetic.HardCase026",
+          "HardSynthetic.HardCase027",
+          "HardSynthetic.HardCase029",
+          "HardSynthetic.HardCase030",
+          "HardSynthetic.HardCase032",
+          "HardSynthetic.HardCase033",
+          "HardSynthetic.HardCase034",
+          "HardSynthetic.HardCase035",
+          "HardSynthetic.HardCase036",
+          "HardSynthetic.HardCase038",
+          "HardSynthetic.HardCase039",
+          "HardSynthetic.HardCase040",
+          "HardSynthetic.HardCase041",
+          "HardSynthetic.HardCase042",
+          "HardSynthetic.HardCase043",
+          "HardSynthetic.HardCase044",
+          "HardSynthetic.HardCase045",
+          "HardSynthetic.HardCase046",
+          "HardSynthetic.HardCase048",
+          "HardSynthetic.HardCase049",
+          "HardSynthetic.HardCase050",
+          "HardSynthetic.HardCase051",
+          "HardSynthetic.HardCase052",
+          "HardSynthetic.HardCase053",
+          "HardSynthetic.HardCase054",
+          "HardSynthetic.HardCase055",
+          "HardSynthetic.HardCase056",
+          "HardSynthetic.HardCase057",
+          "HardSynthetic.HardCase058",
+          "HardSynthetic.HardCase059",
+          "HardSynthetic.HardCase060",
+          "HardSynthetic.HardCase061",
+          "HardSynthetic.HardCase062",
+          "HardSynthetic.HardCase063",
+          "HardSynthetic.HardCase064",
+          "HardSynthetic.HardCase066",
+          "HardSynthetic.HardCase069",
+          "HardSynthetic.HardCase070",
+          "HardSynthetic.HardCase072",
+          "HardSynthetic.HardCase073",
+          "HardSynthetic.HardCase074",
+          "HardSynthetic.HardCase075",
+          "HardSynthetic.HardCase076",
+          "HardSynthetic.HardCase077",
+          "HardSynthetic.HardCase078",
+          "HardSynthetic.HardCase079",
+          "HardSynthetic.HardCase080",
+          "HardSynthetic.HardCase081",
+          "HardSynthetic.HardCase082",
+          "HardSynthetic.HardCase083",
+          "HardSynthetic.HardCase084",
+          "HardSynthetic.HardCase085",
+          "HardSynthetic.HardCase086",
+          "HardSynthetic.HardCase087",
+          "HardSynthetic.HardCase088",
+          "HardSynthetic.HardCase089",
+          "HardSynthetic.HardCase090",
+          "HardSynthetic.HardCase091",
+          "HardSynthetic.HardCase092",
+          "HardSynthetic.HardCase095",
+          "HardSynthetic.HardCase096",
+          "HardSynthetic.HardCase098",
+          "HardSynthetic.HardCase099",
+          "HardSynthetic.HardCase100",
+          "HardSynthetic.HardCase101",
+          "HardSynthetic.HardCase103",
+          "HardSynthetic.HardCase105",
+          "HardSynthetic.HardCase106",
+          "HardSynthetic.HardCase107",
+          "HardSynthetic.HardCase108",
+          "HardSynthetic.HardCase109",
+          "HardSynthetic.HardCase110",
+          "HardSynthetic.HardCase111",
+          "HardSynthetic.HardCase112",
+          "HardSynthetic.HardCase113",
+          "HardSynthetic.HardCase115",
+          "HardSynthetic.HardCase117",
+          "HardSynthetic.HardCase120",
+          "HardSynthetic.HardCase121",
+          "HardSynthetic.HardCase123",
+          "HardSynthetic.HardCase125"
+        ],
+        "features": {
+          "n_scenarios": {
+            "n": 102,
+            "mean": 7.0,
+            "median": 7.0,
+            "std": 0.0,
+            "min": 7.0,
+            "max": 7.0
+          },
+          "n_inputs": {
+            "n": 102,
+            "mean": 5.0,
+            "median": 5.0,
+            "std": 0.0,
+            "min": 5.0,
+            "max": 5.0
+          },
+          "n_outputs": {
+            "n": 102,
+            "mean": 3.0,
+            "median": 3.0,
+            "std": 0.0,
+            "min": 3.0,
+            "max": 3.0
+          },
+          "overlap_rate": {
+            "n": 102,
+            "mean": 1.2460882352941176,
+            "median": 1.208,
+            "std": 0.16834630166999182,
+            "min": 0.917,
+            "max": 1.625
+          },
+          "boundary_density": {
+            "n": 102,
+            "mean": 2.5448166666666667,
+            "median": 2.5714,
+            "std": 0.09995902634177037,
+            "min": 2.4286,
+            "max": 2.7143
+          },
+          "prompt_spec_len": {
+            "n": 102,
+            "mean": 680.3725490196078,
+            "median": 681.0,
+            "std": 7.420765043727429,
+            "min": 671.0,
+            "max": 699.0
+          },
+          "n_repair_attempts_semantic_ir": {
+            "n": 102,
+            "mean": 2.9901960784313726,
+            "median": 3.0,
+            "std": 0.09901475429766743,
+            "min": 2.0,
+            "max": 3.0
+          },
+          "n_repair_attempts_test_only": {
+            "n": 102,
+            "mean": 2.980392156862745,
+            "median": 3.0,
+            "std": 0.13933307603182385,
+            "min": 2.0,
+            "max": 3.0
+          },
+          "mean_feedback_len_semantic_ir": {
+            "n": 102,
+            "mean": 1008.3006535947712,
+            "median": 1205.3333333333333,
+            "std": 368.9085215487652,
+            "min": 0.0,
+            "max": 1206.0
+          },
+          "mean_feedback_len_test_only": {
+            "n": 102,
+            "mean": 972.7712418300654,
+            "median": 1205.3333333333333,
+            "std": 367.48820949150775,
+            "min": 0.0,
+            "max": 1206.0
+          },
+          "n_violations_first_fail_semantic_ir": {
+            "n": 102,
+            "mean": 2.627450980392157,
+            "median": 3.0,
+            "std": 0.8891153532780057,
+            "min": 0.0,
+            "max": 3.0
+          },
+          "conf_test_only": {
+            "n": 102,
+            "mean": 0.8898225957049486,
+            "median": 0.875,
+            "std": 0.037503742601150074,
+            "min": 0.8571428571428571,
+            "max": 1.0
+          },
+          "conf_semantic_ir": {
+            "n": 102,
+            "mean": 0.8898225957049486,
+            "median": 0.875,
+            "std": 0.037503742601150074,
+            "min": 0.8571428571428571,
+            "max": 1.0
+          }
+        },
+        "overlap_tier_counts": {
+          "high": 34,
+          "medium": 28,
+          "low": 40
+        },
+        "guard_complexity_counts": {
+          "Nested": 102
+        },
+        "mean_delta_C_minus_A": 0.0
+      },
+      "M_win": {
+        "n": 14,
+        "task_ids": [
+          "HardSynthetic.HardCase004",
+          "HardSynthetic.HardCase005",
+          "HardSynthetic.HardCase010",
+          "HardSynthetic.HardCase012",
+          "HardSynthetic.HardCase028",
+          "HardSynthetic.HardCase037",
+          "HardSynthetic.HardCase047",
+          "HardSynthetic.HardCase065",
+          "HardSynthetic.HardCase097",
+          "HardSynthetic.HardCase104",
+          "HardSynthetic.HardCase116",
+          "HardSynthetic.HardCase118",
+          "HardSynthetic.HardCase122",
+          "HardSynthetic.HardCase124"
+        ],
+        "features": {
+          "n_scenarios": {
+            "n": 14,
+            "mean": 7.0,
+            "median": 7.0,
+            "std": 0.0,
+            "min": 7.0,
+            "max": 7.0
+          },
+          "n_inputs": {
+            "n": 14,
+            "mean": 5.0,
+            "median": 5.0,
+            "std": 0.0,
+            "min": 5.0,
+            "max": 5.0
+          },
+          "n_outputs": {
+            "n": 14,
+            "mean": 3.0,
+            "median": 3.0,
+            "std": 0.0,
+            "min": 3.0,
+            "max": 3.0
+          },
+          "overlap_rate": {
+            "n": 14,
+            "mean": 1.1962857142857142,
+            "median": 1.1665,
+            "std": 0.16372323202067782,
+            "min": 1.0,
+            "max": 1.5
+          },
+          "boundary_density": {
+            "n": 14,
+            "mean": 2.540807142857143,
+            "median": 2.5714,
+            "std": 0.08268794409647102,
+            "min": 2.4286,
+            "max": 2.7143
+          },
+          "prompt_spec_len": {
+            "n": 14,
+            "mean": 680.0,
+            "median": 681.0,
+            "std": 6.385078759829887,
+            "min": 671.0,
+            "max": 693.0
+          },
+          "n_repair_attempts_semantic_ir": {
+            "n": 14,
+            "mean": 3.0,
+            "median": 3.0,
+            "std": 0.0,
+            "min": 3.0,
+            "max": 3.0
+          },
+          "n_repair_attempts_test_only": {
+            "n": 14,
+            "mean": 3.0,
+            "median": 3.0,
+            "std": 0.0,
+            "min": 3.0,
+            "max": 3.0
+          },
+          "mean_feedback_len_semantic_ir": {
+            "n": 14,
+            "mean": 830.8095238095239,
+            "median": 1004.3333333333334,
+            "std": 402.6871431855446,
+            "min": 398.0,
+            "max": 1206.0
+          },
+          "mean_feedback_len_test_only": {
+            "n": 14,
+            "mean": 559.8571428571429,
+            "median": 402.0,
+            "std": 483.1566558481359,
+            "min": 265.3333333333333,
+            "max": 2072.6666666666665
+          },
+          "n_violations_first_fail_semantic_ir": {
+            "n": 14,
+            "mean": 2.142857142857143,
+            "median": 3.0,
+            "std": 1.027105182026191,
+            "min": 1.0,
+            "max": 3.0
+          },
+          "conf_test_only": {
+            "n": 14,
+            "mean": 0.044642857142857144,
+            "median": 0.0,
+            "std": 0.16703827619526523,
+            "min": 0.0,
+            "max": 0.625
+          },
+          "conf_semantic_ir": {
+            "n": 14,
+            "mean": 0.9107142857142857,
+            "median": 0.875,
+            "std": 0.04279604925109131,
+            "min": 0.875,
+            "max": 0.9583333333333334
+          }
+        },
+        "overlap_tier_counts": {
+          "low": 7,
+          "medium": 3,
+          "high": 4
+        },
+        "guard_complexity_counts": {
+          "Nested": 14
+        },
+        "mean_delta_C_minus_A": 0.8660714285714286
+      },
+      "A_win": {
+        "n": 4,
+        "task_ids": [
+          "HardSynthetic.HardCase067",
+          "HardSynthetic.HardCase068",
+          "HardSynthetic.HardCase071",
+          "HardSynthetic.HardCase094"
+        ],
+        "features": {
+          "n_scenarios": {
+            "n": 4,
+            "mean": 7.0,
+            "median": 7.0,
+            "std": 0.0,
+            "min": 7.0,
+            "max": 7.0
+          },
+          "n_inputs": {
+            "n": 4,
+            "mean": 5.0,
+            "median": 5.0,
+            "std": 0.0,
+            "min": 5.0,
+            "max": 5.0
+          },
+          "n_outputs": {
+            "n": 4,
+            "mean": 3.0,
+            "median": 3.0,
+            "std": 0.0,
+            "min": 3.0,
+            "max": 3.0
+          },
+          "overlap_rate": {
+            "n": 4,
+            "mean": 1.20825,
+            "median": 1.25,
+            "std": 0.08350000000000002,
+            "min": 1.083,
+            "max": 1.25
+          },
+          "boundary_density": {
+            "n": 4,
+            "mean": 2.607125,
+            "median": 2.5714,
+            "std": 0.07145000000000001,
+            "min": 2.5714,
+            "max": 2.7143
+          },
+          "prompt_spec_len": {
+            "n": 4,
+            "mean": 684.25,
+            "median": 682.5,
+            "std": 4.716990566028302,
+            "min": 681.0,
+            "max": 691.0
+          },
+          "n_repair_attempts_semantic_ir": {
+            "n": 4,
+            "mean": 3.0,
+            "median": 3.0,
+            "std": 0.0,
+            "min": 3.0,
+            "max": 3.0
+          },
+          "n_repair_attempts_test_only": {
+            "n": 4,
+            "mean": 3.0,
+            "median": 3.0,
+            "std": 0.0,
+            "min": 3.0,
+            "max": 3.0
+          },
+          "mean_feedback_len_semantic_ir": {
+            "n": 4,
+            "mean": 739.5,
+            "median": 603.0,
+            "std": 648.1820446162967,
+            "min": 132.66666666666666,
+            "max": 1619.3333333333333
+          },
+          "mean_feedback_len_test_only": {
+            "n": 4,
+            "mean": 1003.6666666666667,
+            "median": 1205.3333333333335,
+            "std": 403.7782669843548,
+            "min": 398.0,
+            "max": 1206.0
+          },
+          "n_violations_first_fail_semantic_ir": {
+            "n": 4,
+            "mean": 1.5,
+            "median": 1.5,
+            "std": 1.7320508075688772,
+            "min": 0.0,
+            "max": 3.0
+          },
+          "conf_test_only": {
+            "n": 4,
+            "mean": 0.8958333333333334,
+            "median": 0.875,
+            "std": 0.041666666666666685,
+            "min": 0.875,
+            "max": 0.9583333333333334
+          },
+          "conf_semantic_ir": {
+            "n": 4,
+            "mean": 0.1875,
+            "median": 0.0,
+            "std": 0.375,
+            "min": 0.0,
+            "max": 0.75
+          }
+        },
+        "overlap_tier_counts": {
+          "medium": 3,
+          "low": 1
+        },
+        "guard_complexity_counts": {
+          "Nested": 4
+        },
+        "mean_delta_C_minus_A": -0.7083333333333334
+      }
+    }
+  },
+  "by_E6_winner": {
+    "group_key": "E6_winner",
+    "groups": {
+      "tie": {
+        "n": 118,
+        "task_ids": [
+          "HardSynthetic.HardCase001",
+          "HardSynthetic.HardCase002",
+          "HardSynthetic.HardCase003",
+          "HardSynthetic.HardCase004",
+          "HardSynthetic.HardCase006",
+          "HardSynthetic.HardCase007",
+          "HardSynthetic.HardCase008",
+          "HardSynthetic.HardCase009",
+          "HardSynthetic.HardCase011",
+          "HardSynthetic.HardCase012",
+          "HardSynthetic.HardCase013",
+          "HardSynthetic.HardCase014",
+          "HardSynthetic.HardCase015",
+          "HardSynthetic.HardCase016",
+          "HardSynthetic.HardCase017",
+          "HardSynthetic.HardCase018",
+          "HardSynthetic.HardCase019",
+          "HardSynthetic.HardCase020",
+          "HardSynthetic.HardCase021",
+          "HardSynthetic.HardCase022",
+          "HardSynthetic.HardCase023",
+          "HardSynthetic.HardCase024",
+          "HardSynthetic.HardCase025",
+          "HardSynthetic.HardCase026",
+          "HardSynthetic.HardCase027",
+          "HardSynthetic.HardCase028",
+          "HardSynthetic.HardCase029",
+          "HardSynthetic.HardCase030",
+          "HardSynthetic.HardCase032",
+          "HardSynthetic.HardCase033",
+          "HardSynthetic.HardCase034",
+          "HardSynthetic.HardCase035",
+          "HardSynthetic.HardCase036",
+          "HardSynthetic.HardCase037",
+          "HardSynthetic.HardCase038",
+          "HardSynthetic.HardCase039",
+          "HardSynthetic.HardCase040",
+          "HardSynthetic.HardCase041",
+          "HardSynthetic.HardCase042",
+          "HardSynthetic.HardCase043",
+          "HardSynthetic.HardCase044",
+          "HardSynthetic.HardCase045",
+          "HardSynthetic.HardCase046",
+          "HardSynthetic.HardCase047",
+          "HardSynthetic.HardCase048",
+          "HardSynthetic.HardCase049",
+          "HardSynthetic.HardCase050",
+          "HardSynthetic.HardCase051",
+          "HardSynthetic.HardCase052",
+          "HardSynthetic.HardCase053",
+          "HardSynthetic.HardCase054",
+          "HardSynthetic.HardCase055",
+          "HardSynthetic.HardCase056",
+          "HardSynthetic.HardCase057",
+          "HardSynthetic.HardCase058",
+          "HardSynthetic.HardCase059",
+          "HardSynthetic.HardCase060",
+          "HardSynthetic.HardCase061",
+          "HardSynthetic.HardCase062",
+          "HardSynthetic.HardCase063",
+          "HardSynthetic.HardCase064",
+          "HardSynthetic.HardCase065",
+          "HardSynthetic.HardCase066",
+          "HardSynthetic.HardCase067",
+          "HardSynthetic.HardCase068",
+          "HardSynthetic.HardCase069",
+          "HardSynthetic.HardCase070",
+          "HardSynthetic.HardCase071",
+          "HardSynthetic.HardCase072",
+          "HardSynthetic.HardCase073",
+          "HardSynthetic.HardCase074",
+          "HardSynthetic.HardCase075",
+          "HardSynthetic.HardCase076",
+          "HardSynthetic.HardCase077",
+          "HardSynthetic.HardCase078",
+          "HardSynthetic.HardCase079",
+          "HardSynthetic.HardCase080",
+          "HardSynthetic.HardCase081",
+          "HardSynthetic.HardCase082",
+          "HardSynthetic.HardCase083",
+          "HardSynthetic.HardCase084",
+          "HardSynthetic.HardCase085",
+          "HardSynthetic.HardCase086",
+          "HardSynthetic.HardCase087",
+          "HardSynthetic.HardCase088",
+          "HardSynthetic.HardCase089",
+          "HardSynthetic.HardCase090",
+          "HardSynthetic.HardCase091",
+          "HardSynthetic.HardCase092",
+          "HardSynthetic.HardCase094",
+          "HardSynthetic.HardCase095",
+          "HardSynthetic.HardCase096",
+          "HardSynthetic.HardCase097",
+          "HardSynthetic.HardCase098",
+          "HardSynthetic.HardCase099",
+          "HardSynthetic.HardCase100",
+          "HardSynthetic.HardCase101",
+          "HardSynthetic.HardCase103",
+          "HardSynthetic.HardCase104",
+          "HardSynthetic.HardCase105",
+          "HardSynthetic.HardCase106",
+          "HardSynthetic.HardCase107",
+          "HardSynthetic.HardCase108",
+          "HardSynthetic.HardCase109",
+          "HardSynthetic.HardCase110",
+          "HardSynthetic.HardCase111",
+          "HardSynthetic.HardCase112",
+          "HardSynthetic.HardCase113",
+          "HardSynthetic.HardCase115",
+          "HardSynthetic.HardCase116",
+          "HardSynthetic.HardCase117",
+          "HardSynthetic.HardCase118",
+          "HardSynthetic.HardCase120",
+          "HardSynthetic.HardCase121",
+          "HardSynthetic.HardCase122",
+          "HardSynthetic.HardCase123",
+          "HardSynthetic.HardCase124",
+          "HardSynthetic.HardCase125"
+        ],
+        "features": {
+          "n_scenarios": {
+            "n": 118,
+            "mean": 7.0,
+            "median": 7.0,
+            "std": 0.0,
+            "min": 7.0,
+            "max": 7.0
+          },
+          "n_inputs": {
+            "n": 118,
+            "mean": 5.0,
+            "median": 5.0,
+            "std": 0.0,
+            "min": 5.0,
+            "max": 5.0
+          },
+          "n_outputs": {
+            "n": 118,
+            "mean": 3.0,
+            "median": 3.0,
+            "std": 0.0,
+            "min": 3.0,
+            "max": 3.0
+          },
+          "overlap_rate": {
+            "n": 118,
+            "mean": 1.2398898305084747,
+            "median": 1.208,
+            "std": 0.16674391973170236,
+            "min": 0.917,
+            "max": 1.625
+          },
+          "boundary_density": {
+            "n": 118,
+            "mean": 2.547212711864407,
+            "median": 2.5714,
+            "std": 0.09758785701626715,
+            "min": 2.4286,
+            "max": 2.7143
+          },
+          "prompt_spec_len": {
+            "n": 118,
+            "mean": 680.5084745762712,
+            "median": 681.0,
+            "std": 7.230923340352113,
+            "min": 671.0,
+            "max": 699.0
+          },
+          "n_repair_attempts_semantic_ir": {
+            "n": 118,
+            "mean": 2.9915254237288136,
+            "median": 3.0,
+            "std": 0.09205746178983233,
+            "min": 2.0,
+            "max": 3.0
+          },
+          "n_repair_attempts_test_only": {
+            "n": 118,
+            "mean": 2.983050847457627,
+            "median": 3.0,
+            "std": 0.12963135419615376,
+            "min": 2.0,
+            "max": 3.0
+          },
+          "mean_feedback_len_semantic_ir": {
+            "n": 118,
+            "mean": 981.6271186440678,
+            "median": 1205.3333333333333,
+            "std": 385.06804363989033,
+            "min": 0.0,
+            "max": 1619.3333333333333
+          },
+          "mean_feedback_len_test_only": {
+            "n": 118,
+            "mean": 935.6610169491526,
+            "median": 1205.3333333333333,
+            "std": 398.34784863836836,
+            "min": 0.0,
+            "max": 2072.6666666666665
+          },
+          "n_violations_first_fail_semantic_ir": {
+            "n": 118,
+            "mean": 2.542372881355932,
+            "median": 3.0,
+            "std": 0.9575973119781959,
+            "min": 0.0,
+            "max": 3.0
+          },
+          "conf_test_only": {
+            "n": 118,
+            "mean": 0.8048325262308313,
+            "median": 0.875,
+            "std": 0.26270810916764875,
+            "min": 0.0,
+            "max": 1.0
+          },
+          "conf_semantic_ir": {
+            "n": 118,
+            "mean": 0.8680387409200968,
+            "median": 0.875,
+            "std": 0.1463508838190267,
+            "min": 0.0,
+            "max": 1.0
+          }
+        },
+        "overlap_tier_counts": {
+          "high": 38,
+          "medium": 33,
+          "low": 47
+        },
+        "guard_complexity_counts": {
+          "Nested": 118
+        },
+        "mean_delta_C_minus_A": 0.06320621468926554
+      },
+      "semantic_ir": {
+        "n": 2,
+        "task_ids": [
+          "HardSynthetic.HardCase005",
+          "HardSynthetic.HardCase010"
+        ],
+        "features": {
+          "n_scenarios": {
+            "n": 2,
+            "mean": 7.0,
+            "median": 7.0,
+            "std": 0.0,
+            "min": 7.0,
+            "max": 7.0
+          },
+          "n_inputs": {
+            "n": 2,
+            "mean": 5.0,
+            "median": 5.0,
+            "std": 0.0,
+            "min": 5.0,
+            "max": 5.0
+          },
+          "n_outputs": {
+            "n": 2,
+            "mean": 3.0,
+            "median": 3.0,
+            "std": 0.0,
+            "min": 3.0,
+            "max": 3.0
+          },
+          "overlap_rate": {
+            "n": 2,
+            "mean": 1.1875,
+            "median": 1.1875,
+            "std": 0.08838834764831845,
+            "min": 1.125,
+            "max": 1.25
+          },
+          "boundary_density": {
+            "n": 2,
+            "mean": 2.5,
+            "median": 2.5,
+            "std": 0.10097484835343917,
+            "min": 2.4286,
+            "max": 2.5714
+          },
+          "prompt_spec_len": {
+            "n": 2,
+            "mean": 677.5,
+            "median": 677.5,
+            "std": 9.192388155425117,
+            "min": 671.0,
+            "max": 684.0
+          },
+          "n_repair_attempts_semantic_ir": {
+            "n": 2,
+            "mean": 3.0,
+            "median": 3.0,
+            "std": 0.0,
+            "min": 3.0,
+            "max": 3.0
+          },
+          "n_repair_attempts_test_only": {
+            "n": 2,
+            "mean": 3.0,
+            "median": 3.0,
+            "std": 0.0,
+            "min": 3.0,
+            "max": 3.0
+          },
+          "mean_feedback_len_semantic_ir": {
+            "n": 2,
+            "mean": 802.0,
+            "median": 802.0,
+            "std": 571.3422791987304,
+            "min": 398.0,
+            "max": 1206.0
+          },
+          "mean_feedback_len_test_only": {
+            "n": 2,
+            "mean": 333.66666666666663,
+            "median": 333.66666666666663,
+            "std": 96.63792676216151,
+            "min": 265.3333333333333,
+            "max": 402.0
+          },
+          "n_violations_first_fail_semantic_ir": {
+            "n": 2,
+            "mean": 2.0,
+            "median": 2.0,
+            "std": 1.4142135623730951,
+            "min": 1.0,
+            "max": 3.0
+          },
+          "conf_test_only": {
+            "n": 2,
+            "mean": 0.0,
+            "median": 0.0,
+            "std": 0.0,
+            "min": 0.0,
+            "max": 0.0
+          },
+          "conf_semantic_ir": {
+            "n": 2,
+            "mean": 0.9166666666666667,
+            "median": 0.9166666666666667,
+            "std": 0.05892556509887899,
+            "min": 0.875,
+            "max": 0.9583333333333334
+          }
+        },
+        "overlap_tier_counts": {
+          "medium": 1,
+          "low": 1
+        },
+        "guard_complexity_counts": {
+          "Nested": 2
+        },
+        "mean_delta_C_minus_A": 0.9166666666666667
+      }
+    }
+  },
+  "effect_sizes": {
+    "n_M_win": 14,
+    "n_A_win": 4,
+    "n_tie": 102,
+    "n_B2_like_A_ge_C": 106,
+    "note": "B2-like = A_win + tie (A >= C). M-win = C > A.",
+    "features": {
+      "n_scenarios": {
+        "cohen_d_M_win_vs_B2_like": 0.0,
+        "cohen_d_M_win_vs_A_win": 0.0,
+        "cohen_d_M_win_vs_tie": 0.0,
+        "mean_M_win": 7.0,
+        "mean_B2_like": 7.0,
+        "mean_A_win": 7.0,
+        "mean_tie": 7.0,
+        "median_M_win": 7.0,
+        "median_B2_like": 7.0,
+        "median_A_win": 7.0,
+        "median_tie": 7.0
+      },
+      "n_inputs": {
+        "cohen_d_M_win_vs_B2_like": 0.0,
+        "cohen_d_M_win_vs_A_win": 0.0,
+        "cohen_d_M_win_vs_tie": 0.0,
+        "mean_M_win": 5.0,
+        "mean_B2_like": 5.0,
+        "mean_A_win": 5.0,
+        "mean_tie": 5.0,
+        "median_M_win": 5.0,
+        "median_B2_like": 5.0,
+        "median_A_win": 5.0,
+        "median_tie": 5.0
+      },
+      "n_outputs": {
+        "cohen_d_M_win_vs_B2_like": 0.0,
+        "cohen_d_M_win_vs_A_win": 0.0,
+        "cohen_d_M_win_vs_tie": 0.0,
+        "mean_M_win": 3.0,
+        "mean_B2_like": 3.0,
+        "mean_A_win": 3.0,
+        "mean_tie": 3.0,
+        "median_M_win": 3.0,
+        "median_B2_like": 3.0,
+        "median_A_win": 3.0,
+        "median_tie": 3.0
+      },
+      "overlap_rate": {
+        "cohen_d_M_win_vs_B2_like": -0.2920576014085635,
+        "cohen_d_M_win_vs_A_win": -0.07874206180559573,
+        "cohen_d_M_win_vs_tie": -0.2967517349390318,
+        "mean_M_win": 1.1962857142857142,
+        "mean_B2_like": 1.2446603773584906,
+        "mean_A_win": 1.20825,
+        "mean_tie": 1.2460882352941176,
+        "median_M_win": 1.1665,
+        "median_B2_like": 1.229,
+        "median_A_win": 1.25,
+        "median_tie": 1.208
+      },
+      "boundary_density": {
+        "cohen_d_M_win_vs_B2_like": -0.06504832635819731,
+        "cohen_d_M_win_vs_A_win": -0.8217813672137781,
+        "cohen_d_M_win_vs_tie": -0.04085382371671901,
+        "mean_M_win": 2.540807142857143,
+        "mean_B2_like": 2.547167924528302,
+        "mean_A_win": 2.607125,
+        "mean_tie": 2.5448166666666667,
+        "median_M_win": 2.5714,
+        "median_B2_like": 2.5714,
+        "median_A_win": 2.5714,
+        "median_tie": 2.5714
+      },
+      "prompt_spec_len": {
+        "cohen_d_M_win_vs_B2_like": -0.07148685268668659,
+        "cohen_d_M_win_vs_A_win": -0.695909407642074,
+        "cohen_d_M_win_vs_tie": -0.050963763840874594,
+        "mean_M_win": 680.0,
+        "mean_B2_like": 680.5188679245283,
+        "mean_A_win": 684.25,
+        "mean_tie": 680.3725490196078,
+        "median_M_win": 681.0,
+        "median_B2_like": 681.0,
+        "median_A_win": 682.5,
+        "median_tie": 681.0
+      },
+      "n_repair_attempts_semantic_ir": {
+        "cohen_d_M_win_vs_B2_like": 0.10296590037343788,
+        "cohen_d_M_win_vs_A_win": 0.0,
+        "cohen_d_M_win_vs_tie": 0.10519416553972573,
+        "mean_M_win": 3.0,
+        "mean_B2_like": 2.990566037735849,
+        "mean_A_win": 3.0,
+        "mean_tie": 2.9901960784313726,
+        "median_M_win": 3.0,
+        "median_B2_like": 3.0,
+        "median_A_win": 3.0,
+        "median_tie": 3.0
+      },
+      "n_repair_attempts_test_only": {
+        "cohen_d_M_win_vs_B2_like": 0.1463141737685512,
+        "cohen_d_M_win_vs_A_win": 0.0,
+        "cohen_d_M_win_vs_tie": 0.14950900031927988,
+        "mean_M_win": 3.0,
+        "mean_B2_like": 2.981132075471698,
+        "mean_A_win": 3.0,
+        "mean_tie": 2.980392156862745,
+        "median_M_win": 3.0,
+        "median_B2_like": 3.0,
+        "median_A_win": 3.0,
+        "median_tie": 3.0
+      },
+      "mean_feedback_len_semantic_ir": {
+        "cohen_d_M_win_vs_B2_like": -0.4358989860924044,
+        "cohen_d_M_win_vs_A_win": 0.19900334154288757,
+        "cohen_d_M_win_vs_tie": -0.4759559152072114,
+        "mean_M_win": 830.8095238095239,
+        "mean_B2_like": 998.1572327044025,
+        "mean_A_win": 739.5,
+        "mean_tie": 1008.3006535947712,
+        "median_M_win": 1004.3333333333334,
+        "median_B2_like": 1205.3333333333333,
+        "median_A_win": 603.0,
+        "median_tie": 1205.3333333333333
+      },
+      "mean_feedback_len_test_only": {
+        "cohen_d_M_win_vs_B2_like": -1.0856104842991212,
+        "cohen_d_M_win_vs_A_win": -0.9456900287567517,
+        "cohen_d_M_win_vs_tie": -1.079655817707048,
+        "mean_M_win": 559.8571428571429,
+        "mean_B2_like": 973.937106918239,
+        "mean_A_win": 1003.6666666666667,
+        "mean_tie": 972.7712418300654,
+        "median_M_win": 402.0,
+        "median_B2_like": 1205.3333333333333,
+        "median_A_win": 1205.3333333333335,
+        "median_tie": 1205.3333333333333
+      },
+      "n_violations_first_fail_semantic_ir": {
+        "cohen_d_M_win_vs_B2_like": -0.4632415006399924,
+        "cohen_d_M_win_vs_A_win": 0.5395415843971626,
+        "cohen_d_M_win_vs_tie": -0.5349228962253851,
+        "mean_M_win": 2.142857142857143,
+        "mean_B2_like": 2.5849056603773586,
+        "mean_A_win": 1.5,
+        "mean_tie": 2.627450980392157,
+        "median_M_win": 3.0,
+        "median_B2_like": 3.0,
+        "median_A_win": 1.5,
+        "median_tie": 3.0
+      },
+      "conf_test_only": {
+        "cohen_d_M_win_vs_B2_like": -12.857783065947295,
+        "cohen_d_M_win_vs_A_win": -5.613105867940921,
+        "cohen_d_M_win_vs_tie": -12.701330645027445,
+        "mean_M_win": 0.044642857142857144,
+        "mean_B2_like": 0.8900494159928122,
+        "mean_A_win": 0.8958333333333334,
+        "mean_tie": 0.8898225957049486,
+        "median_M_win": 0.0,
+        "median_B2_like": 0.875,
+        "median_A_win": 0.875,
+        "median_tie": 0.875
+      },
+      "conf_semantic_ir": {
+        "cohen_d_M_win_vs_B2_like": 0.3265050748150729,
+        "cohen_d_M_win_vs_A_win": 4.333244662053634,
+        "cohen_d_M_win_vs_tie": 0.5477006059809147,
+        "mean_M_win": 0.9107142857142857,
+        "mean_B2_like": 0.8633198562443846,
+        "mean_A_win": 0.1875,
+        "mean_tie": 0.8898225957049486,
+        "median_M_win": 0.875,
+        "median_B2_like": 0.875,
+        "median_A_win": 0.0,
+        "median_tie": 0.875
+      }
+    }
+  },
+  "thresholds": {
+    "base_rate_M_win": 0.11666666666666667,
+    "n_tasks": 120,
+    "n_M_win": 14,
+    "m_win_median_overlap_rate": 1.1665,
+    "m_win_median_n_scenarios": 7.0,
+    "m_win_mean_overlap_rate": 1.1962857142857142,
+    "m_win_mean_n_scenarios": 7.0
+  },
+  "threshold_rules_top": [
+    {
+      "n_subset": 13,
+      "n_M_win": 13,
+      "win_rate": 1.0,
+      "share_of_all_wins": 0.9285714285714286,
+      "lift_vs_base": 8.571428571428571,
+      "task_ids_wins": [
+        "HardSynthetic.HardCase004",
+        "HardSynthetic.HardCase005",
+        "HardSynthetic.HardCase010",
+        "HardSynthetic.HardCase012",
+        "HardSynthetic.HardCase028",
+        "HardSynthetic.HardCase047",
+        "HardSynthetic.HardCase065",
+        "HardSynthetic.HardCase097",
+        "HardSynthetic.HardCase104",
+        "HardSynthetic.HardCase116",
+        "HardSynthetic.HardCase118",
+        "HardSynthetic.HardCase122",
+        "HardSynthetic.HardCase124"
+      ],
+      "rule": "conf_test_only==0",
+      "vacuous": false
+    },
+    {
+      "n_subset": 13,
+      "n_M_win": 13,
+      "win_rate": 1.0,
+      "share_of_all_wins": 0.9285714285714286,
+      "lift_vs_base": 8.571428571428571,
+      "task_ids_wins": [
+        "HardSynthetic.HardCase004",
+        "HardSynthetic.HardCase005",
+        "HardSynthetic.HardCase010",
+        "HardSynthetic.HardCase012",
+        "HardSynthetic.HardCase028",
+        "HardSynthetic.HardCase047",
+        "HardSynthetic.HardCase065",
+        "HardSynthetic.HardCase097",
+        "HardSynthetic.HardCase104",
+        "HardSynthetic.HardCase116",
+        "HardSynthetic.HardCase118",
+        "HardSynthetic.HardCase122",
+        "HardSynthetic.HardCase124"
+      ],
+      "rule": "conf_test_only<0.25",
+      "vacuous": false
+    },
+    {
+      "n_subset": 13,
+      "n_M_win": 13,
+      "win_rate": 1.0,
+      "share_of_all_wins": 0.9285714285714286,
+      "lift_vs_base": 8.571428571428571,
+      "task_ids_wins": [
+        "HardSynthetic.HardCase004",
+        "HardSynthetic.HardCase005",
+        "HardSynthetic.HardCase010",
+        "HardSynthetic.HardCase012",
+        "HardSynthetic.HardCase028",
+        "HardSynthetic.HardCase047",
+        "HardSynthetic.HardCase065",
+        "HardSynthetic.HardCase097",
+        "HardSynthetic.HardCase104",
+        "HardSynthetic.HardCase116",
+        "HardSynthetic.HardCase118",
+        "HardSynthetic.HardCase122",
+        "HardSynthetic.HardCase124"
+      ],
+      "rule": "conf_test_only<0.5",
+      "vacuous": false
+    },
+    {
+      "n_subset": 6,
+      "n_M_win": 6,
+      "win_rate": 1.0,
+      "share_of_all_wins": 0.42857142857142855,
+      "lift_vs_base": 8.571428571428571,
+      "task_ids_wins": [
+        "HardSynthetic.HardCase004",
+        "HardSynthetic.HardCase010",
+        "HardSynthetic.HardCase047",
+        "HardSynthetic.HardCase118",
+        "HardSynthetic.HardCase122",
+        "HardSynthetic.HardCase124"
+      ],
+      "rule": "conf_test_only==0_AND_overlap_tier==low",
+      "vacuous": false
+    },
+    {
+      "n_subset": 4,
+      "n_M_win": 4,
+      "win_rate": 1.0,
+      "share_of_all_wins": 0.2857142857142857,
+      "lift_vs_base": 8.571428571428571,
+      "task_ids_wins": [
+        "HardSynthetic.HardCase012",
+        "HardSynthetic.HardCase065",
+        "HardSynthetic.HardCase097",
+        "HardSynthetic.HardCase116"
+      ],
+      "rule": "conf_test_only==0_AND_overlap_tier==high",
+      "vacuous": false
+    },
+    {
+      "n_subset": 48,
+      "n_M_win": 7,
+      "win_rate": 0.14583333333333334,
+      "share_of_all_wins": 0.5,
+      "lift_vs_base": 1.25,
+      "task_ids_wins": [
+        "HardSynthetic.HardCase004",
+        "HardSynthetic.HardCase010",
+        "HardSynthetic.HardCase037",
+        "HardSynthetic.HardCase047",
+        "HardSynthetic.HardCase118",
+        "HardSynthetic.HardCase122",
+        "HardSynthetic.HardCase124"
+      ],
+      "rule": "overlap_tier==low",
+      "vacuous": false
+    },
+    {
+      "n_subset": 80,
+      "n_M_win": 10,
+      "win_rate": 0.125,
+      "share_of_all_wins": 0.7142857142857143,
+      "lift_vs_base": 1.0714285714285714,
+      "task_ids_wins": [
+        "HardSynthetic.HardCase004",
+        "HardSynthetic.HardCase010",
+        "HardSynthetic.HardCase012",
+        "HardSynthetic.HardCase028",
+        "HardSynthetic.HardCase037",
+        "HardSynthetic.HardCase047",
+        "HardSynthetic.HardCase097",
+        "HardSynthetic.HardCase118",
+        "HardSynthetic.HardCase122",
+        "HardSynthetic.HardCase124"
+      ],
+      "rule": "boundary_density>=2.571",
+      "vacuous": false
+    },
+    {
+      "n_subset": 115,
+      "n_M_win": 14,
+      "win_rate": 0.12173913043478261,
+      "share_of_all_wins": 1.0,
+      "lift_vs_base": 1.0434782608695652,
+      "task_ids_wins": [
+        "HardSynthetic.HardCase004",
+        "HardSynthetic.HardCase005",
+        "HardSynthetic.HardCase010",
+        "HardSynthetic.HardCase012",
+        "HardSynthetic.HardCase028",
+        "HardSynthetic.HardCase037",
+        "HardSynthetic.HardCase047",
+        "HardSynthetic.HardCase065",
+        "HardSynthetic.HardCase097",
+        "HardSynthetic.HardCase104",
+        "HardSynthetic.HardCase116",
+        "HardSynthetic.HardCase118",
+        "HardSynthetic.HardCase122",
+        "HardSynthetic.HardCase124"
+      ],
+      "rule": "overlap_rate>=1.000",
+      "vacuous": false
+    },
+    {
+      "n_subset": 38,
+      "n_M_win": 4,
+      "win_rate": 0.10526315789473684,
+      "share_of_all_wins": 0.2857142857142857,
+      "lift_vs_base": 0.9022556390977443,
+      "task_ids_wins": [
+        "HardSynthetic.HardCase012",
+        "HardSynthetic.HardCase065",
+        "HardSynthetic.HardCase097",
+        "HardSynthetic.HardCase116"
+      ],
+      "rule": "overlap_rate>=1.300",
+      "vacuous": false
+    },
+    {
+      "n_subset": 38,
+      "n_M_win": 4,
+      "win_rate": 0.10526315789473684,
+      "share_of_all_wins": 0.2857142857142857,
+      "lift_vs_base": 0.9022556390977443,
+      "task_ids_wins": [
+        "HardSynthetic.HardCase012",
+        "HardSynthetic.HardCase065",
+        "HardSynthetic.HardCase097",
+        "HardSynthetic.HardCase116"
+      ],
+      "rule": "overlap_rate>=1.333",
+      "vacuous": false
+    },
+    {
+      "n_subset": 38,
+      "n_M_win": 4,
+      "win_rate": 0.10526315789473684,
+      "share_of_all_wins": 0.2857142857142857,
+      "lift_vs_base": 0.9022556390977443,
+      "task_ids_wins": [
+        "HardSynthetic.HardCase012",
+        "HardSynthetic.HardCase065",
+        "HardSynthetic.HardCase097",
+        "HardSynthetic.HardCase116"
+      ],
+      "rule": "overlap_tier==high",
+      "vacuous": false
+    },
+    {
+      "n_subset": 38,
+      "n_M_win": 4,
+      "win_rate": 0.10526315789473684,
+      "share_of_all_wins": 0.2857142857142857,
+      "lift_vs_base": 0.9022556390977443,
+      "task_ids_wins": [
+        "HardSynthetic.HardCase012",
+        "HardSynthetic.HardCase065",
+        "HardSynthetic.HardCase097",
+        "HardSynthetic.HardCase116"
+      ],
+      "rule": "overlap_tier==high_AND_n_scenarios>=7",
+      "vacuous": false
+    },
+    {
+      "n_subset": 38,
+      "n_M_win": 4,
+      "win_rate": 0.10526315789473684,
+      "share_of_all_wins": 0.2857142857142857,
+      "lift_vs_base": 0.9022556390977443,
+      "task_ids_wins": [
+        "HardSynthetic.HardCase012",
+        "HardSynthetic.HardCase065",
+        "HardSynthetic.HardCase097",
+        "HardSynthetic.HardCase116"
+      ],
+      "rule": "overlap_rate>=1.3_AND_n_scenarios>=7",
+      "vacuous": false
+    },
+    {
+      "n_subset": 72,
+      "n_M_win": 7,
+      "win_rate": 0.09722222222222222,
+      "share_of_all_wins": 0.5,
+      "lift_vs_base": 0.8333333333333334,
+      "task_ids_wins": [
+        "HardSynthetic.HardCase005",
+        "HardSynthetic.HardCase012",
+        "HardSynthetic.HardCase028",
+        "HardSynthetic.HardCase065",
+        "HardSynthetic.HardCase097",
+        "HardSynthetic.HardCase104",
+        "HardSynthetic.HardCase116"
+      ],
+      "rule": "overlap_rate>=1.200",
+      "vacuous": false
+    },
+    {
+      "n_subset": 72,
+      "n_M_win": 7,
+      "win_rate": 0.09722222222222222,
+      "share_of_all_wins": 0.5,
+      "lift_vs_base": 0.8333333333333334,
+      "task_ids_wins": [
+        "HardSynthetic.HardCase005",
+        "HardSynthetic.HardCase012",
+        "HardSynthetic.HardCase028",
+        "HardSynthetic.HardCase065",
+        "HardSynthetic.HardCase097",
+        "HardSynthetic.HardCase104",
+        "HardSynthetic.HardCase116"
+      ],
+      "rule": "overlap_rate>=1.208",
+      "vacuous": false
+    },
+    {
+      "n_subset": 34,
+      "n_M_win": 3,
+      "win_rate": 0.08823529411764706,
+      "share_of_all_wins": 0.21428571428571427,
+      "lift_vs_base": 0.7563025210084034,
+      "task_ids_wins": [
+        "HardSynthetic.HardCase005",
+        "HardSynthetic.HardCase028",
+        "HardSynthetic.HardCase104"
+      ],
+      "rule": "overlap_tier==medium",
+      "vacuous": false
+    },
+    {
+      "n_subset": 46,
+      "n_M_win": 4,
+      "win_rate": 0.08695652173913043,
+      "share_of_all_wins": 0.2857142857142857,
+      "lift_vs_base": 0.7453416149068323,
+      "task_ids_wins": [
+        "HardSynthetic.HardCase012",
+        "HardSynthetic.HardCase065",
+        "HardSynthetic.HardCase097",
+        "HardSynthetic.HardCase116"
+      ],
+      "rule": "overlap_rate>=1.292",
+      "vacuous": false
+    },
+    {
+      "n_subset": 82,
+      "n_M_win": 7,
+      "win_rate": 0.08536585365853659,
+      "share_of_all_wins": 0.5,
+      "lift_vs_base": 0.7317073170731708,
+      "task_ids_wins": [
+        "HardSynthetic.HardCase005",
+        "HardSynthetic.HardCase012",
+        "HardSynthetic.HardCase028",
+        "HardSynthetic.HardCase065",
+        "HardSynthetic.HardCase097",
+        "HardSynthetic.HardCase104",
+        "HardSynthetic.HardCase116"
+      ],
+      "rule": "overlap_rate>=1.167",
+      "vacuous": false
+    },
+    {
+      "n_subset": 82,
+      "n_M_win": 7,
+      "win_rate": 0.08536585365853659,
+      "share_of_all_wins": 0.5,
+      "lift_vs_base": 0.7317073170731708,
+      "task_ids_wins": [
+        "HardSynthetic.HardCase005",
+        "HardSynthetic.HardCase012",
+        "HardSynthetic.HardCase028",
+        "HardSynthetic.HardCase065",
+        "HardSynthetic.HardCase097",
+        "HardSynthetic.HardCase104",
+        "HardSynthetic.HardCase116"
+      ],
+      "rule": "overlap_rate>=1.167_AND_n_scenarios>=7",
+      "vacuous": false
+    },
+    {
+      "n_subset": 27,
+      "n_M_win": 2,
+      "win_rate": 0.07407407407407407,
+      "share_of_all_wins": 0.14285714285714285,
+      "lift_vs_base": 0.6349206349206349,
+      "task_ids_wins": [
+        "HardSynthetic.HardCase065",
+        "HardSynthetic.HardCase116"
+      ],
+      "rule": "overlap_rate>=1.400",
+      "vacuous": false
+    },
+    {
+      "n_subset": 0,
+      "n_M_win": 0,
+      "win_rate": null,
+      "share_of_all_wins": 0.0,
+      "lift_vs_base": null,
+      "task_ids_wins": [],
+      "rule": "guard_complexity==AND",
+      "vacuous": false
+    },
+    {
+      "n_subset": 0,
+      "n_M_win": 0,
+      "win_rate": null,
+      "share_of_all_wins": 0.0,
+      "lift_vs_base": null,
+      "task_ids_wins": [],
+      "rule": "guard_complexity==Mixed",
+      "vacuous": false
+    },
+    {
+      "n_subset": 0,
+      "n_M_win": 0,
+      "win_rate": null,
+      "share_of_all_wins": 0.0,
+      "lift_vs_base": null,
+      "task_ids_wins": [],
+      "rule": "guard_complexity==Arithmetic",
+      "vacuous": false
+    },
+    {
+      "n_subset": 0,
+      "n_M_win": 0,
+      "win_rate": null,
+      "share_of_all_wins": 0.0,
+      "lift_vs_base": null,
+      "task_ids_wins": [],
+      "rule": "guard_complexity==Simple",
+      "vacuous": false
+    },
+    {
+      "n_subset": 120,
+      "n_M_win": 14,
+      "win_rate": 0.11666666666666667,
+      "share_of_all_wins": 1.0,
+      "lift_vs_base": 1.0,
+      "task_ids_wins": [
+        "HardSynthetic.HardCase004",
+        "HardSynthetic.HardCase005",
+        "HardSynthetic.HardCase010",
+        "HardSynthetic.HardCase012",
+        "HardSynthetic.HardCase028",
+        "HardSynthetic.HardCase037",
+        "HardSynthetic.HardCase047",
+        "HardSynthetic.HardCase065",
+        "HardSynthetic.HardCase097",
+        "HardSynthetic.HardCase104",
+        "HardSynthetic.HardCase116",
+        "HardSynthetic.HardCase118",
+        "HardSynthetic.HardCase122",
+        "HardSynthetic.HardCase124"
+      ],
+      "rule": "n_scenarios>=7",
+      "vacuous": true
+    },
+    {
+      "n_subset": 120,
+      "n_M_win": 14,
+      "win_rate": 0.11666666666666667,
+      "share_of_all_wins": 1.0,
+      "lift_vs_base": 1.0,
+      "task_ids_wins": [
+        "HardSynthetic.HardCase004",
+        "HardSynthetic.HardCase005",
+        "HardSynthetic.HardCase010",
+        "HardSynthetic.HardCase012",
+        "HardSynthetic.HardCase028",
+        "HardSynthetic.HardCase037",
+        "HardSynthetic.HardCase047",
+        "HardSynthetic.HardCase065",
+        "HardSynthetic.HardCase097",
+        "HardSynthetic.HardCase104",
+        "HardSynthetic.HardCase116",
+        "HardSynthetic.HardCase118",
+        "HardSynthetic.HardCase122",
+        "HardSynthetic.HardCase124"
+      ],
+      "rule": "boundary_density>=2.429",
+      "vacuous": true
+    },
+    {
+      "n_subset": 120,
+      "n_M_win": 14,
+      "win_rate": 0.11666666666666667,
+      "share_of_all_wins": 1.0,
+      "lift_vs_base": 1.0,
+      "task_ids_wins": [
+        "HardSynthetic.HardCase004",
+        "HardSynthetic.HardCase005",
+        "HardSynthetic.HardCase010",
+        "HardSynthetic.HardCase012",
+        "HardSynthetic.HardCase028",
+        "HardSynthetic.HardCase037",
+        "HardSynthetic.HardCase047",
+        "HardSynthetic.HardCase065",
+        "HardSynthetic.HardCase097",
+        "HardSynthetic.HardCase104",
+        "HardSynthetic.HardCase116",
+        "HardSynthetic.HardCase118",
+        "HardSynthetic.HardCase122",
+        "HardSynthetic.HardCase124"
+      ],
+      "rule": "guard_complexity==Nested",
+      "vacuous": true
+    }
+  ],
+  "note": "M_win = conf(semantic_ir) > conf(test_only). B2-like = A >= C. Effect sizes: Cohen's d."
+}

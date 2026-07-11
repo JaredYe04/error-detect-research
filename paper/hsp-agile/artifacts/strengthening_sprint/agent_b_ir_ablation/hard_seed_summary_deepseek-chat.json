@@ -1,0 +1,160 @@
+{
+  "n_rows": 378,
+  "mean_conf_by_seed_variant": {
+    "combo_invert_relop|ir_nl_only": 1.0,
+    "combo_invert_relop|ir_no_constraint": 1.0,
+    "combo_invert_relop|ir_no_expected": 1.0,
+    "combo_invert_relop|ir_no_reason": 1.0,
+    "combo_invert_relop|ir_no_scenario_id": 1.0,
+    "combo_invert_relop|ir_no_suggested_fix": 1.0,
+    "combo_invert_relop|semantic_ir": 1.0,
+    "combo_invert_relop|test_expected": 1.0,
+    "combo_invert_relop|test_only": 1.0,
+    "combo_swap_relop|ir_nl_only": 1.0,
+    "combo_swap_relop|ir_no_constraint": 1.0,
+    "combo_swap_relop|ir_no_expected": 1.0,
+    "combo_swap_relop|ir_no_reason": 1.0,
+    "combo_swap_relop|ir_no_scenario_id": 1.0,
+    "combo_swap_relop|ir_no_suggested_fix": 1.0,
+    "combo_swap_relop|semantic_ir": 1.0,
+    "combo_swap_relop|test_expected": 1.0,
+    "combo_swap_relop|test_only": 1.0,
+    "drop_first_guard|ir_nl_only": 1.0,
+    "drop_first_guard|ir_no_constraint": 1.0,
+    "drop_first_guard|ir_no_expected": 1.0,
+    "drop_first_guard|ir_no_reason": 1.0,
+    "drop_first_guard|ir_no_scenario_id": 1.0,
+    "drop_first_guard|ir_no_suggested_fix": 1.0,
+    "drop_first_guard|semantic_ir": 1.0,
+    "drop_first_guard|test_expected": 1.0,
+    "drop_first_guard|test_only": 1.0
+  },
+  "paired_full_vs_ablation": {
+    "combo_invert_relop|FULL_vs_ir_nl_only": {
+      "wins": 0,
+      "losses": 0,
+      "ties": 14
+    },
+    "combo_invert_relop|FULL_vs_ir_no_suggested_fix": {
+      "wins": 0,
+      "losses": 0,
+      "ties": 14
+    },
+    "combo_invert_relop|FULL_vs_ir_no_scenario_id": {
+      "wins": 0,
+      "losses": 0,
+      "ties": 14
+    },
+    "combo_invert_relop|FULL_vs_test_expected": {
+      "wins": 0,
+      "losses": 0,
+      "ties": 14
+    },
+    "combo_invert_relop|FULL_vs_ir_no_reason": {
+      "wins": 0,
+      "losses": 0,
+      "ties": 14
+    },
+    "combo_invert_relop|FULL_vs_ir_no_expected": {
+      "wins": 0,
+      "losses": 0,
+      "ties": 14
+    },
+    "combo_invert_relop|FULL_vs_test_only": {
+      "wins": 0,
+      "losses": 0,
+      "ties": 14
+    },
+    "combo_invert_relop|FULL_vs_ir_no_constraint": {
+      "wins": 0,
+      "losses": 0,
+      "ties": 14
+    },
+    "drop_first_guard|FULL_vs_ir_nl_only": {
+      "wins": 0,
+      "losses": 0,
+      "ties": 14
+    },
+    "drop_first_guard|FULL_vs_ir_no_suggested_fix": {
+      "wins": 0,
+      "losses": 0,
+      "ties": 14
+    },
+    "drop_first_guard|FULL_vs_ir_no_scenario_id": {
+      "wins": 0,
+      "losses": 0,
+      "ties": 14
+    },
+    "drop_first_guard|FULL_vs_test_expected": {
+      "wins": 0,
+      "losses": 0,
+      "ties": 14
+    },
+    "drop_first_guard|FULL_vs_ir_no_reason": {
+      "wins": 0,
+      "losses": 0,
+      "ties": 14
+    },
+    "drop_first_guard|FULL_vs_ir_no_expected": {
+      "wins": 0,
+      "losses": 0,
+      "ties": 14
+    },
+    "drop_first_guard|FULL_vs_test_only": {
+      "wins": 0,
+      "losses": 0,
+      "ties": 14
+    },
+    "drop_first_guard|FULL_vs_ir_no_constraint": {
+      "wins": 0,
+      "losses": 0,
+      "ties": 14
+    },
+    "combo_swap_relop|FULL_vs_ir_nl_only": {
+      "wins": 0,
+      "losses": 0,
+      "ties": 14
+    },
+    "combo_swap_relop|FULL_vs_ir_no_suggested_fix": {
+      "wins": 0,
+      "losses": 0,
+      "ties": 14
+    },
+    "combo_swap_relop|FULL_vs_ir_no_scenario_id": {
+      "wins": 0,
+      "losses": 0,
+      "ties": 14
+    },
+    "combo_swap_relop|FULL_vs_test_expected": {
+      "wins": 0,
+      "losses": 0,
+      "ties": 14
+    },
+    "combo_swap_relop|FULL_vs_ir_no_reason": {
+      "wins": 0,
+      "losses": 0,
+      "ties": 14
+    },
+    "combo_swap_relop|FULL_vs_ir_no_expected": {
+      "wins": 0,
+      "losses": 0,
+      "ties": 14
+    },
+    "combo_swap_relop|FULL_vs_test_only": {
+      "wins": 0,
+      "losses": 0,
+      "ties": 14
+    },
+    "combo_swap_relop|FULL_vs_ir_no_constraint": {
+      "wins": 0,
+      "losses": 0,
+      "ties": 14
+    }
+  },
+  "model": "deepseek-chat",
+  "seed_types": [
+    "combo_swap_relop",
+    "combo_invert_relop",
+    "drop_first_guard"
+  ]
+}

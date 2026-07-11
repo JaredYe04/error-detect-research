@@ -1,0 +1,160 @@
+{
+  "n_rows": 1080,
+  "mean_conf_by_seed_variant": {
+    "combo_invert_relop|ir_nl_only": 0.0719,
+    "combo_invert_relop|ir_no_constraint": 0.3875,
+    "combo_invert_relop|ir_no_expected": 0.3875,
+    "combo_invert_relop|ir_no_reason": 0.3094,
+    "combo_invert_relop|ir_no_scenario_id": 0.4531,
+    "combo_invert_relop|ir_no_suggested_fix": 0.2719,
+    "combo_invert_relop|semantic_ir": 0.3406,
+    "combo_invert_relop|test_expected": 0.05,
+    "combo_invert_relop|test_only": 0.0688,
+    "combo_swap_relop|ir_nl_only": 0.1187,
+    "combo_swap_relop|ir_no_constraint": 0.3969,
+    "combo_swap_relop|ir_no_expected": 0.2781,
+    "combo_swap_relop|ir_no_reason": 0.4062,
+    "combo_swap_relop|ir_no_scenario_id": 0.3875,
+    "combo_swap_relop|ir_no_suggested_fix": 0.3656,
+    "combo_swap_relop|semantic_ir": 0.3906,
+    "combo_swap_relop|test_expected": 0.0437,
+    "combo_swap_relop|test_only": 0.0469,
+    "drop_first_guard|ir_nl_only": 0.1,
+    "drop_first_guard|ir_no_constraint": 0.3469,
+    "drop_first_guard|ir_no_expected": 0.3156,
+    "drop_first_guard|ir_no_reason": 0.3688,
+    "drop_first_guard|ir_no_scenario_id": 0.3187,
+    "drop_first_guard|ir_no_suggested_fix": 0.275,
+    "drop_first_guard|semantic_ir": 0.4,
+    "drop_first_guard|test_expected": 0.0594,
+    "drop_first_guard|test_only": 0.0187
+  },
+  "paired_full_vs_ablation": {
+    "combo_invert_relop|FULL_vs_ir_no_suggested_fix": {
+      "wins": 7,
+      "losses": 6,
+      "ties": 27
+    },
+    "combo_invert_relop|FULL_vs_ir_nl_only": {
+      "wins": 14,
+      "losses": 4,
+      "ties": 22
+    },
+    "combo_invert_relop|FULL_vs_test_only": {
+      "wins": 14,
+      "losses": 4,
+      "ties": 22
+    },
+    "combo_invert_relop|FULL_vs_test_expected": {
+      "wins": 14,
+      "losses": 3,
+      "ties": 23
+    },
+    "combo_invert_relop|FULL_vs_ir_no_reason": {
+      "wins": 8,
+      "losses": 5,
+      "ties": 27
+    },
+    "combo_invert_relop|FULL_vs_ir_no_scenario_id": {
+      "wins": 6,
+      "losses": 8,
+      "ties": 26
+    },
+    "combo_invert_relop|FULL_vs_ir_no_constraint": {
+      "wins": 5,
+      "losses": 6,
+      "ties": 29
+    },
+    "combo_invert_relop|FULL_vs_ir_no_expected": {
+      "wins": 7,
+      "losses": 8,
+      "ties": 25
+    },
+    "combo_swap_relop|FULL_vs_ir_no_suggested_fix": {
+      "wins": 7,
+      "losses": 7,
+      "ties": 26
+    },
+    "combo_swap_relop|FULL_vs_ir_nl_only": {
+      "wins": 15,
+      "losses": 5,
+      "ties": 20
+    },
+    "combo_swap_relop|FULL_vs_test_only": {
+      "wins": 15,
+      "losses": 3,
+      "ties": 22
+    },
+    "combo_swap_relop|FULL_vs_test_expected": {
+      "wins": 16,
+      "losses": 4,
+      "ties": 20
+    },
+    "combo_swap_relop|FULL_vs_ir_no_reason": {
+      "wins": 6,
+      "losses": 5,
+      "ties": 29
+    },
+    "combo_swap_relop|FULL_vs_ir_no_scenario_id": {
+      "wins": 7,
+      "losses": 6,
+      "ties": 27
+    },
+    "combo_swap_relop|FULL_vs_ir_no_constraint": {
+      "wins": 7,
+      "losses": 7,
+      "ties": 26
+    },
+    "combo_swap_relop|FULL_vs_ir_no_expected": {
+      "wins": 11,
+      "losses": 5,
+      "ties": 24
+    },
+    "drop_first_guard|FULL_vs_ir_no_suggested_fix": {
+      "wins": 10,
+      "losses": 4,
+      "ties": 26
+    },
+    "drop_first_guard|FULL_vs_ir_nl_only": {
+      "wins": 17,
+      "losses": 3,
+      "ties": 20
+    },
+    "drop_first_guard|FULL_vs_test_only": {
+      "wins": 18,
+      "losses": 1,
+      "ties": 21
+    },
+    "drop_first_guard|FULL_vs_test_expected": {
+      "wins": 17,
+      "losses": 1,
+      "ties": 22
+    },
+    "drop_first_guard|FULL_vs_ir_no_reason": {
+      "wins": 8,
+      "losses": 4,
+      "ties": 28
+    },
+    "drop_first_guard|FULL_vs_ir_no_scenario_id": {
+      "wins": 9,
+      "losses": 3,
+      "ties": 28
+    },
+    "drop_first_guard|FULL_vs_ir_no_constraint": {
+      "wins": 9,
+      "losses": 5,
+      "ties": 26
+    },
+    "drop_first_guard|FULL_vs_ir_no_expected": {
+      "wins": 11,
+      "losses": 4,
+      "ties": 25
+    }
+  },
+  "model": "gemini-2.5-flash",
+  "seed_types": [
+    "combo_swap_relop",
+    "combo_invert_relop",
+    "drop_first_guard"
+  ]
+}

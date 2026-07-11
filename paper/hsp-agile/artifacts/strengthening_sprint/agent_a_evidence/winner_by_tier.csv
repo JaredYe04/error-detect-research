@@ -1,0 +1,13 @@
+feature,level,n,wins,losses,ties,win_rate_among_decisive,mean_delta_pp,median_delta_pp
+overlap_density_tier,high,38,4,0,34,1.0,9.211,0.0
+overlap_density_tier,low,48,7,1,40,0.875,10.503,0.0
+overlap_density_tier,medium,34,3,3,28,0.5,2.206,0.0
+overlap_bin,<=1.0,11,2,0,9,1.0,11.742,0.0
+overlap_bin,1.0-1.25,63,8,4,51,0.6667,7.143,0.0
+overlap_bin,1.25-1.5,39,4,0,35,1.0,8.974,0.0
+overlap_bin,>1.5,7,0,0,7,0.0,0.0,0.0
+atoms_bin,<=12,0,0,0,0,0.0,,
+atoms_bin,13-16,0,0,0,0,0.0,,
+atoms_bin,17-20,120,14,4,102,0.7778,7.743,0.0
+atoms_bin,>20,0,0,0,0,0.0,,
+multi_output,1,120,14,4,102,0.7778,7.743,0.0

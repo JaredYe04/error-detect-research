@@ -1,0 +1,144 @@
+{
+  "n_rows": 144,
+  "n_tasks": 18,
+  "mean_conf": {
+    "ir_nl_only": 1.0,
+    "ir_no_constraint": 1.0,
+    "ir_no_expected": 1.0,
+    "ir_no_reason": 1.0,
+    "ir_no_scenario_id": 1.0,
+    "ir_no_suggested_fix": 1.0,
+    "semantic_ir": 1.0,
+    "test_only": 1.0
+  },
+  "paired_vs_full_ir": [
+    {
+      "a": "semantic_ir",
+      "b": "ir_nl_only",
+      "n": 18,
+      "wins": 0,
+      "losses": 0,
+      "ties": 18,
+      "mean_delta_pp": 0.0
+    },
+    {
+      "a": "semantic_ir",
+      "b": "ir_no_constraint",
+      "n": 18,
+      "wins": 0,
+      "losses": 0,
+      "ties": 18,
+      "mean_delta_pp": 0.0
+    },
+    {
+      "a": "semantic_ir",
+      "b": "ir_no_expected",
+      "n": 18,
+      "wins": 0,
+      "losses": 0,
+      "ties": 18,
+      "mean_delta_pp": 0.0
+    },
+    {
+      "a": "semantic_ir",
+      "b": "ir_no_reason",
+      "n": 18,
+      "wins": 0,
+      "losses": 0,
+      "ties": 18,
+      "mean_delta_pp": 0.0
+    },
+    {
+      "a": "semantic_ir",
+      "b": "ir_no_scenario_id",
+      "n": 18,
+      "wins": 0,
+      "losses": 0,
+      "ties": 18,
+      "mean_delta_pp": 0.0
+    },
+    {
+      "a": "semantic_ir",
+      "b": "ir_no_suggested_fix",
+      "n": 18,
+      "wins": 0,
+      "losses": 0,
+      "ties": 18,
+      "mean_delta_pp": 0.0
+    },
+    {
+      "a": "semantic_ir",
+      "b": "test_only",
+      "n": 18,
+      "wins": 0,
+      "losses": 0,
+      "ties": 18,
+      "mean_delta_pp": 0.0
+    }
+  ],
+  "paired_vs_test_only": [
+    {
+      "a": "ir_nl_only",
+      "b": "test_only",
+      "n": 18,
+      "wins": 0,
+      "losses": 0,
+      "ties": 18,
+      "mean_delta_pp": 0.0
+    },
+    {
+      "a": "ir_no_constraint",
+      "b": "test_only",
+      "n": 18,
+      "wins": 0,
+      "losses": 0,
+      "ties": 18,
+      "mean_delta_pp": 0.0
+    },
+    {
+      "a": "ir_no_expected",
+      "b": "test_only",
+      "n": 18,
+      "wins": 0,
+      "losses": 0,
+      "ties": 18,
+      "mean_delta_pp": 0.0
+    },
+    {
+      "a": "ir_no_reason",
+      "b": "test_only",
+      "n": 18,
+      "wins": 0,
+      "losses": 0,
+      "ties": 18,
+      "mean_delta_pp": 0.0
+    },
+    {
+      "a": "ir_no_scenario_id",
+      "b": "test_only",
+      "n": 18,
+      "wins": 0,
+      "losses": 0,
+      "ties": 18,
+      "mean_delta_pp": 0.0
+    },
+    {
+      "a": "ir_no_suggested_fix",
+      "b": "test_only",
+      "n": 18,
+      "wins": 0,
+      "losses": 0,
+      "ties": 18,
+      "mean_delta_pp": 0.0
+    },
+    {
+      "a": "semantic_ir",
+      "b": "test_only",
+      "n": 18,
+      "wins": 0,
+      "losses": 0,
+      "ties": 18,
+      "mean_delta_pp": 0.0
+    }
+  ]
+}

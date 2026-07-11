@@ -11,31 +11,20 @@ Status for the HSP-Agile CCF-B Accept push as of 2026-07-10.
 Authoritative run IDs, protocol boundaries, and headline values are recorded in
 [AUTHORITATIVE_NUMBERS.md](AUTHORITATIVE_NUMBERS.md).
 
-## P1 — complete
+## P1 — complete (updated 2026-07-11)
 
-- A1–A3 ablations are explicitly scoped as historical pre-fix evidence.
-- Conference and report claims are synchronized.
-- E14 paired analysis is recorded and used to bound the uniqueness claim.
-- C2 causal wording distinguishes the E6 single-factor result from the bundled
-  fixed-oracle E1 deployment comparison.
-
-The causal interpretation and the E14 paired results are documented in
-[P1_CAUSAL_NOTES.md](P1_CAUSAL_NOTES.md).
-
-## P2 — complete
-
-- Related-work positioning covers Clover, DafnyBench, Self-Debug/Reflexion,
-  and the B6 verifier-loop comparator.
-- The conference text states that SgDP complements B2 and does not establish a
-  universal M \(>\) B2 ranking.
-- The report briefly positions solver-directed witnesses relative to
-  QuickCheck/property-based testing.
+- Fixed-oracle A1–A3 promoted: A3 −25.8 / A1 −17.5 / A2 0.0 (advisory+ceiling).
+- Equal-K `M_eq` +2.5 pp cited in abstract / Ch7 / conference.
+- E14 paired analysis scopes C2 uniqueness.
+- Strengthening-sprint IR uniqueness: **partial** — see
+  `strengthening_sprint/DATA_VERDICT.md`; gemini combo n=40 expand running.
 
 ## Remaining
 
-- **Single-factor B2 vs M′:** optional. Hold budget, gate, selection policy, and
-  formal-case budget fixed while varying only the Semantic Feedback IR surface.
-  See [P1_CAUSAL_NOTES.md](P1_CAUSAL_NOTES.md).
+- **Gemini combo n=40** (`run_ir_combo_seed_gemini_n40_v1`): expand only non-saturated
+  endpoint; promote to paper **only if** CI-stable FULL−A / FULL−B across seeds.
+- **Single-factor B2 vs M′ (semantic_ir only):** optional; equal-K M_eq already
+  closer than K=5 bundle.
 
 ## Paper sync checklist
 

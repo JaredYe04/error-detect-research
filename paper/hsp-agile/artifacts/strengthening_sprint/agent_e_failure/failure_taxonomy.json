@@ -1,0 +1,2380 @@
+[
+  {
+    "task_id": "HardSynthetic.HardCase001",
+    "feedback_variant": "semantic_ir",
+    "final_conf": 0.875,
+    "success": false,
+    "primary_category": "Arithmetic",
+    "secondary_tags": [
+      "Arithmetic"
+    ],
+    "repair_regression": false,
+    "over_repair": false,
+    "n_attempts": 3,
+    "violation_types_raw": [
+      "arithmetic"
+    ],
+    "corpus": "run_feedback_v2/E6",
+    "delta_vs_test_only": 0.0,
+    "mechanism_role": "tie",
+    "ir_failed": true
+  },
+  {
+    "task_id": "HardSynthetic.HardCase002",
+    "feedback_variant": "semantic_ir",
+    "final_conf": 0.875,
+    "success": false,
+    "primary_category": "Arithmetic",
+    "secondary_tags": [
+      "Arithmetic"
+    ],
+    "repair_regression": false,
+    "over_repair": false,
+    "n_attempts": 3,
+    "violation_types_raw": [
+      "arithmetic"
+    ],
+    "corpus": "run_feedback_v2/E6",
+    "delta_vs_test_only": 0.0,
+    "mechanism_role": "tie",
+    "ir_failed": true
+  },
+  {
+    "task_id": "HardSynthetic.HardCase003",
+    "feedback_variant": "semantic_ir",
+    "final_conf": 0.875,
+    "success": false,
+    "primary_category": "Arithmetic",
+    "secondary_tags": [
+      "Arithmetic"
+    ],
+    "repair_regression": false,
+    "over_repair": false,
+    "n_attempts": 3,
+    "violation_types_raw": [
+      "arithmetic"
+    ],
+    "corpus": "run_feedback_v2/E6",
+    "delta_vs_test_only": 0.0,
+    "mechanism_role": "tie",
+    "ir_failed": true
+  },
+  {
+    "task_id": "HardSynthetic.HardCase005",
+    "feedback_variant": "semantic_ir",
+    "final_conf": 0.875,
+    "success": false,
+    "primary_category": "Arithmetic",
+    "secondary_tags": [
+      "Arithmetic"
+    ],
+    "repair_regression": false,
+    "over_repair": false,
+    "n_attempts": 3,
+    "violation_types_raw": [
+      "arithmetic"
+    ],
+    "corpus": "run_feedback_v2/E6",
+    "delta_vs_test_only": 0.875,
+    "mechanism_role": "ir_rescues",
+    "ir_failed": true
+  },
+  {
+    "task_id": "HardSynthetic.HardCase006",
+    "feedback_variant": "semantic_ir",
+    "final_conf": 0.875,
+    "success": false,
+    "primary_category": "Arithmetic",
+    "secondary_tags": [
+      "Arithmetic"
+    ],
+    "repair_regression": false,
+    "over_repair": false,
+    "n_attempts": 3,
+    "violation_types_raw": [
+      "arithmetic"
+    ],
+    "corpus": "run_feedback_v2/E6",
+    "delta_vs_test_only": 0.0,
+    "mechanism_role": "tie",
+    "ir_failed": true
+  },
+  {
+    "task_id": "HardSynthetic.HardCase004",
+    "feedback_variant": "semantic_ir",
+    "final_conf": 0.9583333333333334,
+    "success": false,
+    "primary_category": "Arithmetic",
+    "secondary_tags": [
+      "Arithmetic"
+    ],
+    "repair_regression": false,
+    "over_repair": false,
+    "n_attempts": 3,
+    "violation_types_raw": [
+      "arithmetic"
+    ],
+    "corpus": "run_feedback_v2/E6",
+    "delta_vs_test_only": 0.958333,
+    "mechanism_role": "ir_rescues",
+    "ir_failed": true
+  },
+  {
+    "task_id": "HardSynthetic.HardCase007",
+    "feedback_variant": "semantic_ir",
+    "final_conf": 0.875,
+    "success": false,
+    "primary_category": "RepairRegression",
+    "secondary_tags": [
+      "Arithmetic"
+    ],
+    "repair_regression": true,
+    "over_repair": true,
+    "n_attempts": 3,
+    "violation_types_raw": [
+      "arithmetic"
+    ],
+    "corpus": "run_feedback_v2/E6",
+    "delta_vs_test_only": 0.0,
+    "mechanism_role": "tie",
+    "ir_failed": true
+  },
+  {
+    "task_id": "HardSynthetic.HardCase008",
+    "feedback_variant": "semantic_ir",
+    "final_conf": 0.875,
+    "success": false,
+    "primary_category": "Arithmetic",
+    "secondary_tags": [
+      "Arithmetic"
+    ],
+    "repair_regression": false,
+    "over_repair": false,
+    "n_attempts": 3,
+    "violation_types_raw": [
+      "arithmetic"
+    ],
+    "corpus": "run_feedback_v2/E6",
+    "delta_vs_test_only": 0.0,
+    "mechanism_role": "tie",
+    "ir_failed": true
+  },
+  {
+    "task_id": "HardSynthetic.HardCase010",
+    "feedback_variant": "semantic_ir",
+    "final_conf": 0.9583333333333334,
+    "success": false,
+    "primary_category": "Arithmetic",
+    "secondary_tags": [
+      "Arithmetic"
+    ],
+    "repair_regression": false,
+    "over_repair": false,
+    "n_attempts": 3,
+    "violation_types_raw": [
+      "arithmetic"
+    ],
+    "corpus": "run_feedback_v2/E6",
+    "delta_vs_test_only": 0.958333,
+    "mechanism_role": "ir_rescues",
+    "ir_failed": true
+  },
+  {
+    "task_id": "HardSynthetic.HardCase009",
+    "feedback_variant": "semantic_ir",
+    "final_conf": 0.875,
+    "success": false,
+    "primary_category": "Arithmetic",
+    "secondary_tags": [
+      "Arithmetic"
+    ],
+    "repair_regression": false,
+    "over_repair": false,
+    "n_attempts": 3,
+    "violation_types_raw": [
+      "arithmetic"
+    ],
+    "corpus": "run_feedback_v2/E6",
+    "delta_vs_test_only": 0.0,
+    "mechanism_role": "tie",
+    "ir_failed": true
+  },
+  {
+    "task_id": "HardSynthetic.HardCase012",
+    "feedback_variant": "semantic_ir",
+    "final_conf": 0.875,
+    "success": false,
+    "primary_category": "Arithmetic",
+    "secondary_tags": [
+      "Arithmetic"
+    ],
+    "repair_regression": false,
+    "over_repair": false,
+    "n_attempts": 3,
+    "violation_types_raw": [
+      "arithmetic"
+    ],
+    "corpus": "run_feedback_v2/E6",
+    "delta_vs_test_only": 0.875,
+    "mechanism_role": "ir_rescues",
+    "ir_failed": true
+  },
+  {
+    "task_id": "HardSynthetic.HardCase013",
+    "feedback_variant": "semantic_ir",
+    "final_conf": 0.9583333333333334,
+    "success": false,
+    "primary_category": "Arithmetic",
+    "secondary_tags": [
+      "Arithmetic"
+    ],
+    "repair_regression": false,
+    "over_repair": false,
+    "n_attempts": 3,
+    "violation_types_raw": [
+      "arithmetic"
+    ],
+    "corpus": "run_feedback_v2/E6",
+    "delta_vs_test_only": 0.0,
+    "mechanism_role": "tie",
+    "ir_failed": true
+  },
+  {
+    "task_id": "HardSynthetic.HardCase011",
+    "feedback_variant": "semantic_ir",
+    "final_conf": 0.875,
+    "success": false,
+    "primary_category": "Arithmetic",
+    "secondary_tags": [
+      "Arithmetic"
+    ],
+    "repair_regression": false,
+    "over_repair": false,
+    "n_attempts": 3,
+    "violation_types_raw": [
+      "arithmetic"
+    ],
+    "corpus": "run_feedback_v2/E6",
+    "delta_vs_test_only": 0.0,
+    "mechanism_role": "tie",
+    "ir_failed": true
+  },
+  {
+    "task_id": "HardSynthetic.HardCase014",
+    "feedback_variant": "semantic_ir",
+    "final_conf": 0.875,
+    "success": false,
+    "primary_category": "Arithmetic",
+    "secondary_tags": [
+      "Arithmetic"
+    ],
+    "repair_regression": false,
+    "over_repair": false,
+    "n_attempts": 3,
+    "violation_types_raw": [
+      "arithmetic"
+    ],
+    "corpus": "run_feedback_v2/E6",
+    "delta_vs_test_only": 0.0,
+    "mechanism_role": "tie",
+    "ir_failed": true
+  },
+  {
+    "task_id": "HardSynthetic.HardCase015",
+    "feedback_variant": "semantic_ir",
+    "final_conf": 0.875,
+    "success": false,
+    "primary_category": "Arithmetic",
+    "secondary_tags": [
+      "Arithmetic"
+    ],
+    "repair_regression": false,
+    "over_repair": false,
+    "n_attempts": 3,
+    "violation_types_raw": [
+      "arithmetic"
+    ],
+    "corpus": "run_feedback_v2/E6",
+    "delta_vs_test_only": 0.0,
+    "mechanism_role": "tie",
+    "ir_failed": true
+  },
+  {
+    "task_id": "HardSynthetic.HardCase016",
+    "feedback_variant": "semantic_ir",
+    "final_conf": 0.875,
+    "success": false,
+    "primary_category": "Arithmetic",
+    "secondary_tags": [
+      "Arithmetic"
+    ],
+    "repair_regression": false,
+    "over_repair": false,
+    "n_attempts": 3,
+    "violation_types_raw": [
+      "arithmetic"
+    ],
+    "corpus": "run_feedback_v2/E6",
+    "delta_vs_test_only": 0.0,
+    "mechanism_role": "tie",
+    "ir_failed": true
+  },
+  {
+    "task_id": "HardSynthetic.HardCase017",
+    "feedback_variant": "semantic_ir",
+    "final_conf": 0.875,
+    "success": false,
+    "primary_category": "Arithmetic",
+    "secondary_tags": [
+      "Arithmetic"
+    ],
+    "repair_regression": false,
+    "over_repair": false,
+    "n_attempts": 3,
+    "violation_types_raw": [
+      "arithmetic"
+    ],
+    "corpus": "run_feedback_v2/E6",
+    "delta_vs_test_only": 0.0,
+    "mechanism_role": "tie",
+    "ir_failed": true
+  },
+  {
+    "task_id": "HardSynthetic.HardCase018",
+    "feedback_variant": "semantic_ir",
+    "final_conf": 0.875,
+    "success": false,
+    "primary_category": "Arithmetic",
+    "secondary_tags": [
+      "Arithmetic"
+    ],
+    "repair_regression": false,
+    "over_repair": false,
+    "n_attempts": 3,
+    "violation_types_raw": [
+      "arithmetic"
+    ],
+    "corpus": "run_feedback_v2/E6",
+    "delta_vs_test_only": 0.0,
+    "mechanism_role": "tie",
+    "ir_failed": true
+  },
+  {
+    "task_id": "HardSynthetic.HardCase020",
+    "feedback_variant": "semantic_ir",
+    "final_conf": 0.875,
+    "success": false,
+    "primary_category": "Arithmetic",
+    "secondary_tags": [
+      "Arithmetic"
+    ],
+    "repair_regression": false,
+    "over_repair": false,
+    "n_attempts": 3,
+    "violation_types_raw": [
+      "arithmetic"
+    ],
+    "corpus": "run_feedback_v2/E6",
+    "delta_vs_test_only": 0.0,
+    "mechanism_role": "tie",
+    "ir_failed": true
+  },
+  {
+    "task_id": "HardSynthetic.HardCase019",
+    "feedback_variant": "semantic_ir",
+    "final_conf": 0.875,
+    "success": false,
+    "primary_category": "Arithmetic",
+    "secondary_tags": [
+      "Arithmetic"
+    ],
+    "repair_regression": false,
+    "over_repair": false,
+    "n_attempts": 3,
+    "violation_types_raw": [
+      "arithmetic"
+    ],
+    "corpus": "run_feedback_v2/E6",
+    "delta_vs_test_only": 0.0,
+    "mechanism_role": "tie",
+    "ir_failed": true
+  },
+  {
+    "task_id": "HardSynthetic.HardCase022",
+    "feedback_variant": "semantic_ir",
+    "final_conf": 0.875,
+    "success": false,
+    "primary_category": "Arithmetic",
+    "secondary_tags": [
+      "Arithmetic"
+    ],
+    "repair_regression": false,
+    "over_repair": false,
+    "n_attempts": 3,
+    "violation_types_raw": [
+      "arithmetic"
+    ],
+    "corpus": "run_feedback_v2/E6",
+    "delta_vs_test_only": 0.0,
+    "mechanism_role": "tie",
+    "ir_failed": true
+  },
+  {
+    "task_id": "HardSynthetic.HardCase021",
+    "feedback_variant": "semantic_ir",
+    "final_conf": 0.875,
+    "success": false,
+    "primary_category": "Arithmetic",
+    "secondary_tags": [
+      "Arithmetic"
+    ],
+    "repair_regression": false,
+    "over_repair": false,
+    "n_attempts": 3,
+    "violation_types_raw": [
+      "arithmetic"
+    ],
+    "corpus": "run_feedback_v2/E6",
+    "delta_vs_test_only": 0.0,
+    "mechanism_role": "tie",
+    "ir_failed": true
+  },
+  {
+    "task_id": "HardSynthetic.HardCase024",
+    "feedback_variant": "semantic_ir",
+    "final_conf": 0.875,
+    "success": false,
+    "primary_category": "Arithmetic",
+    "secondary_tags": [
+      "Arithmetic"
+    ],
+    "repair_regression": false,
+    "over_repair": false,
+    "n_attempts": 3,
+    "violation_types_raw": [
+      "arithmetic"
+    ],
+    "corpus": "run_feedback_v2/E6",
+    "delta_vs_test_only": 0.0,
+    "mechanism_role": "tie",
+    "ir_failed": true
+  },
+  {
+    "task_id": "HardSynthetic.HardCase023",
+    "feedback_variant": "semantic_ir",
+    "final_conf": 0.875,
+    "success": false,
+    "primary_category": "Arithmetic",
+    "secondary_tags": [
+      "Arithmetic"
+    ],
+    "repair_regression": false,
+    "over_repair": false,
+    "n_attempts": 3,
+    "violation_types_raw": [
+      "arithmetic"
+    ],
+    "corpus": "run_feedback_v2/E6",
+    "delta_vs_test_only": 0.0,
+    "mechanism_role": "tie",
+    "ir_failed": true
+  },
+  {
+    "task_id": "HardSynthetic.HardCase025",
+    "feedback_variant": "semantic_ir",
+    "final_conf": 0.9583333333333334,
+    "success": false,
+    "primary_category": "Arithmetic",
+    "secondary_tags": [
+      "Arithmetic"
+    ],
+    "repair_regression": false,
+    "over_repair": false,
+    "n_attempts": 3,
+    "violation_types_raw": [
+      "arithmetic"
+    ],
+    "corpus": "run_feedback_v2/E6",
+    "delta_vs_test_only": 0.0,
+    "mechanism_role": "tie",
+    "ir_failed": true
+  },
+  {
+    "task_id": "HardSynthetic.HardCase028",
+    "feedback_variant": "semantic_ir",
+    "final_conf": 0.875,
+    "success": false,
+    "primary_category": "Arithmetic",
+    "secondary_tags": [
+      "Arithmetic"
+    ],
+    "repair_regression": false,
+    "over_repair": false,
+    "n_attempts": 3,
+    "violation_types_raw": [
+      "arithmetic"
+    ],
+    "corpus": "run_feedback_v2/E6",
+    "delta_vs_test_only": 0.875,
+    "mechanism_role": "ir_rescues",
+    "ir_failed": true
+  },
+  {
+    "task_id": "HardSynthetic.HardCase027",
+    "feedback_variant": "semantic_ir",
+    "final_conf": 0.875,
+    "success": false,
+    "primary_category": "Arithmetic",
+    "secondary_tags": [
+      "Arithmetic"
+    ],
+    "repair_regression": false,
+    "over_repair": false,
+    "n_attempts": 3,
+    "violation_types_raw": [
+      "arithmetic"
+    ],
+    "corpus": "run_feedback_v2/E6",
+    "delta_vs_test_only": 0.0,
+    "mechanism_role": "tie",
+    "ir_failed": true
+  },
+  {
+    "task_id": "HardSynthetic.HardCase026",
+    "feedback_variant": "semantic_ir",
+    "final_conf": 0.875,
+    "success": false,
+    "primary_category": "Arithmetic",
+    "secondary_tags": [
+      "Arithmetic"
+    ],
+    "repair_regression": false,
+    "over_repair": false,
+    "n_attempts": 3,
+    "violation_types_raw": [
+      "arithmetic"
+    ],
+    "corpus": "run_feedback_v2/E6",
+    "delta_vs_test_only": 0.0,
+    "mechanism_role": "tie",
+    "ir_failed": true
+  },
+  {
+    "task_id": "HardSynthetic.HardCase029",
+    "feedback_variant": "semantic_ir",
+    "final_conf": 1.0,
+    "success": true,
+    "primary_category": "Other",
+    "secondary_tags": [],
+    "repair_regression": false,
+    "over_repair": false,
+    "n_attempts": 3,
+    "violation_types_raw": [],
+    "corpus": "run_feedback_v2/E6",
+    "delta_vs_test_only": 0.0,
+    "mechanism_role": "tie",
+    "ir_failed": false
+  },
+  {
+    "task_id": "HardSynthetic.HardCase030",
+    "feedback_variant": "semantic_ir",
+    "final_conf": 0.875,
+    "success": false,
+    "primary_category": "Arithmetic",
+    "secondary_tags": [
+      "Arithmetic"
+    ],
+    "repair_regression": false,
+    "over_repair": false,
+    "n_attempts": 3,
+    "violation_types_raw": [
+      "arithmetic"
+    ],
+    "corpus": "run_feedback_v2/E6",
+    "delta_vs_test_only": 0.0,
+    "mechanism_role": "tie",
+    "ir_failed": true
+  },
+  {
+    "task_id": "HardSynthetic.HardCase033",
+    "feedback_variant": "semantic_ir",
+    "final_conf": 0.875,
+    "success": false,
+    "primary_category": "Arithmetic",
+    "secondary_tags": [
+      "Arithmetic"
+    ],
+    "repair_regression": false,
+    "over_repair": false,
+    "n_attempts": 3,
+    "violation_types_raw": [
+      "arithmetic"
+    ],
+    "corpus": "run_feedback_v2/E6",
+    "delta_vs_test_only": 0.0,
+    "mechanism_role": "tie",
+    "ir_failed": true
+  },
+  {
+    "task_id": "HardSynthetic.HardCase032",
+    "feedback_variant": "semantic_ir",
+    "final_conf": 0.9583333333333334,
+    "success": false,
+    "primary_category": "Arithmetic",
+    "secondary_tags": [
+      "Arithmetic"
+    ],
+    "repair_regression": false,
+    "over_repair": false,
+    "n_attempts": 3,
+    "violation_types_raw": [
+      "arithmetic"
+    ],
+    "corpus": "run_feedback_v2/E6",
+    "delta_vs_test_only": 0.0,
+    "mechanism_role": "tie",
+    "ir_failed": true
+  },
+  {
+    "task_id": "HardSynthetic.HardCase034",
+    "feedback_variant": "semantic_ir",
+    "final_conf": 0.9583333333333334,
+    "success": false,
+    "primary_category": "Arithmetic",
+    "secondary_tags": [
+      "Arithmetic"
+    ],
+    "repair_regression": false,
+    "over_repair": false,
+    "n_attempts": 3,
+    "violation_types_raw": [
+      "arithmetic"
+    ],
+    "corpus": "run_feedback_v2/E6",
+    "delta_vs_test_only": 0.0,
+    "mechanism_role": "tie",
+    "ir_failed": true
+  },
+  {
+    "task_id": "HardSynthetic.HardCase036",
+    "feedback_variant": "semantic_ir",
+    "final_conf": 0.875,
+    "success": false,
+    "primary_category": "Arithmetic",
+    "secondary_tags": [
+      "Arithmetic"
+    ],
+    "repair_regression": false,
+    "over_repair": true,
+    "n_attempts": 3,
+    "violation_types_raw": [
+      "arithmetic"
+    ],
+    "corpus": "run_feedback_v2/E6",
+    "delta_vs_test_only": 0.0,
+    "mechanism_role": "tie",
+    "ir_failed": true
+  },
+  {
+    "task_id": "HardSynthetic.HardCase035",
+    "feedback_variant": "semantic_ir",
+    "final_conf": 0.875,
+    "success": false,
+    "primary_category": "Arithmetic",
+    "secondary_tags": [
+      "Arithmetic"
+    ],
+    "repair_regression": false,
+    "over_repair": false,
+    "n_attempts": 3,
+    "violation_types_raw": [
+      "arithmetic"
+    ],
+    "corpus": "run_feedback_v2/E6",
+    "delta_vs_test_only": 0.0,
+    "mechanism_role": "tie",
+    "ir_failed": true
+  },
+  {
+    "task_id": "HardSynthetic.HardCase037",
+    "feedback_variant": "semantic_ir",
+    "final_conf": 0.9583333333333334,
+    "success": false,
+    "primary_category": "Arithmetic",
+    "secondary_tags": [
+      "Arithmetic"
+    ],
+    "repair_regression": false,
+    "over_repair": false,
+    "n_attempts": 3,
+    "violation_types_raw": [
+      "arithmetic"
+    ],
+    "corpus": "run_feedback_v2/E6",
+    "delta_vs_test_only": 0.333333,
+    "mechanism_role": "ir_rescues",
+    "ir_failed": true
+  },
+  {
+    "task_id": "HardSynthetic.HardCase038",
+    "feedback_variant": "semantic_ir",
+    "final_conf": 0.875,
+    "success": false,
+    "primary_category": "Arithmetic",
+    "secondary_tags": [
+      "Arithmetic"
+    ],
+    "repair_regression": false,
+    "over_repair": false,
+    "n_attempts": 3,
+    "violation_types_raw": [
+      "arithmetic"
+    ],
+    "corpus": "run_feedback_v2/E6",
+    "delta_vs_test_only": 0.0,
+    "mechanism_role": "tie",
+    "ir_failed": true
+  },
+  {
+    "task_id": "HardSynthetic.HardCase039",
+    "feedback_variant": "semantic_ir",
+    "final_conf": 0.875,
+    "success": false,
+    "primary_category": "Arithmetic",
+    "secondary_tags": [
+      "Arithmetic"
+    ],
+    "repair_regression": false,
+    "over_repair": false,
+    "n_attempts": 3,
+    "violation_types_raw": [
+      "arithmetic"
+    ],
+    "corpus": "run_feedback_v2/E6",
+    "delta_vs_test_only": 0.0,
+    "mechanism_role": "tie",
+    "ir_failed": true
+  },
+  {
+    "task_id": "HardSynthetic.HardCase040",
+    "feedback_variant": "semantic_ir",
+    "final_conf": 0.875,
+    "success": false,
+    "primary_category": "Arithmetic",
+    "secondary_tags": [
+      "Arithmetic"
+    ],
+    "repair_regression": false,
+    "over_repair": true,
+    "n_attempts": 3,
+    "violation_types_raw": [
+      "arithmetic"
+    ],
+    "corpus": "run_feedback_v2/E6",
+    "delta_vs_test_only": 0.0,
+    "mechanism_role": "tie",
+    "ir_failed": true
+  },
+  {
+    "task_id": "HardSynthetic.HardCase041",
+    "feedback_variant": "semantic_ir",
+    "final_conf": 0.875,
+    "success": false,
+    "primary_category": "Arithmetic",
+    "secondary_tags": [
+      "Arithmetic"
+    ],
+    "repair_regression": false,
+    "over_repair": false,
+    "n_attempts": 3,
+    "violation_types_raw": [
+      "arithmetic"
+    ],
+    "corpus": "run_feedback_v2/E6",
+    "delta_vs_test_only": 0.0,
+    "mechanism_role": "tie",
+    "ir_failed": true
+  },
+  {
+    "task_id": "HardSynthetic.HardCase042",
+    "feedback_variant": "semantic_ir",
+    "final_conf": 0.875,
+    "success": false,
+    "primary_category": "Arithmetic",
+    "secondary_tags": [
+      "Arithmetic"
+    ],
+    "repair_regression": false,
+    "over_repair": false,
+    "n_attempts": 3,
+    "violation_types_raw": [
+      "arithmetic"
+    ],
+    "corpus": "run_feedback_v2/E6",
+    "delta_vs_test_only": 0.0,
+    "mechanism_role": "tie",
+    "ir_failed": true
+  },
+  {
+    "task_id": "HardSynthetic.HardCase043",
+    "feedback_variant": "semantic_ir",
+    "final_conf": 0.875,
+    "success": false,
+    "primary_category": "Arithmetic",
+    "secondary_tags": [
+      "Arithmetic"
+    ],
+    "repair_regression": false,
+    "over_repair": false,
+    "n_attempts": 3,
+    "violation_types_raw": [
+      "arithmetic"
+    ],
+    "corpus": "run_feedback_v2/E6",
+    "delta_vs_test_only": 0.0,
+    "mechanism_role": "tie",
+    "ir_failed": true
+  },
+  {
+    "task_id": "HardSynthetic.HardCase044",
+    "feedback_variant": "semantic_ir",
+    "final_conf": 0.875,
+    "success": false,
+    "primary_category": "Arithmetic",
+    "secondary_tags": [
+      "Arithmetic"
+    ],
+    "repair_regression": false,
+    "over_repair": false,
+    "n_attempts": 3,
+    "violation_types_raw": [
+      "arithmetic"
+    ],
+    "corpus": "run_feedback_v2/E6",
+    "delta_vs_test_only": 0.0,
+    "mechanism_role": "tie",
+    "ir_failed": true
+  },
+  {
+    "task_id": "HardSynthetic.HardCase045",
+    "feedback_variant": "semantic_ir",
+    "final_conf": 0.875,
+    "success": false,
+    "primary_category": "Arithmetic",
+    "secondary_tags": [
+      "Arithmetic"
+    ],
+    "repair_regression": false,
+    "over_repair": false,
+    "n_attempts": 3,
+    "violation_types_raw": [
+      "arithmetic"
+    ],
+    "corpus": "run_feedback_v2/E6",
+    "delta_vs_test_only": 0.0,
+    "mechanism_role": "tie",
+    "ir_failed": true
+  },
+  {
+    "task_id": "HardSynthetic.HardCase046",
+    "feedback_variant": "semantic_ir",
+    "final_conf": 0.875,
+    "success": false,
+    "primary_category": "Arithmetic",
+    "secondary_tags": [
+      "Arithmetic"
+    ],
+    "repair_regression": false,
+    "over_repair": false,
+    "n_attempts": 3,
+    "violation_types_raw": [
+      "arithmetic"
+    ],
+    "corpus": "run_feedback_v2/E6",
+    "delta_vs_test_only": 0.0,
+    "mechanism_role": "tie",
+    "ir_failed": true
+  },
+  {
+    "task_id": "HardSynthetic.HardCase047",
+    "feedback_variant": "semantic_ir",
+    "final_conf": 0.9583333333333334,
+    "success": false,
+    "primary_category": "Arithmetic",
+    "secondary_tags": [
+      "Arithmetic"
+    ],
+    "repair_regression": false,
+    "over_repair": false,
+    "n_attempts": 3,
+    "violation_types_raw": [
+      "arithmetic"
+    ],
+    "corpus": "run_feedback_v2/E6",
+    "delta_vs_test_only": 0.958333,
+    "mechanism_role": "ir_rescues",
+    "ir_failed": true
+  },
+  {
+    "task_id": "HardSynthetic.HardCase050",
+    "feedback_variant": "semantic_ir",
+    "final_conf": 0.875,
+    "success": false,
+    "primary_category": "Arithmetic",
+    "secondary_tags": [
+      "Arithmetic"
+    ],
+    "repair_regression": false,
+    "over_repair": false,
+    "n_attempts": 3,
+    "violation_types_raw": [
+      "arithmetic"
+    ],
+    "corpus": "run_feedback_v2/E6",
+    "delta_vs_test_only": 0.0,
+    "mechanism_role": "tie",
+    "ir_failed": true
+  },
+  {
+    "task_id": "HardSynthetic.HardCase048",
+    "feedback_variant": "semantic_ir",
+    "final_conf": 0.875,
+    "success": false,
+    "primary_category": "Arithmetic",
+    "secondary_tags": [
+      "Arithmetic"
+    ],
+    "repair_regression": false,
+    "over_repair": false,
+    "n_attempts": 3,
+    "violation_types_raw": [
+      "arithmetic"
+    ],
+    "corpus": "run_feedback_v2/E6",
+    "delta_vs_test_only": 0.0,
+    "mechanism_role": "tie",
+    "ir_failed": true
+  },
+  {
+    "task_id": "HardSynthetic.HardCase049",
+    "feedback_variant": "semantic_ir",
+    "final_conf": 1.0,
+    "success": true,
+    "primary_category": "Other",
+    "secondary_tags": [],
+    "repair_regression": false,
+    "over_repair": false,
+    "n_attempts": 3,
+    "violation_types_raw": [],
+    "corpus": "run_feedback_v2/E6",
+    "delta_vs_test_only": 0.0,
+    "mechanism_role": "tie",
+    "ir_failed": false
+  },
+  {
+    "task_id": "HardSynthetic.HardCase051",
+    "feedback_variant": "semantic_ir",
+    "final_conf": 0.875,
+    "success": false,
+    "primary_category": "Arithmetic",
+    "secondary_tags": [
+      "Arithmetic"
+    ],
+    "repair_regression": false,
+    "over_repair": false,
+    "n_attempts": 3,
+    "violation_types_raw": [
+      "arithmetic"
+    ],
+    "corpus": "run_feedback_v2/E6",
+    "delta_vs_test_only": 0.0,
+    "mechanism_role": "tie",
+    "ir_failed": true
+  },
+  {
+    "task_id": "HardSynthetic.HardCase052",
+    "feedback_variant": "semantic_ir",
+    "final_conf": 0.875,
+    "success": false,
+    "primary_category": "Arithmetic",
+    "secondary_tags": [
+      "Arithmetic"
+    ],
+    "repair_regression": false,
+    "over_repair": false,
+    "n_attempts": 3,
+    "violation_types_raw": [
+      "arithmetic"
+    ],
+    "corpus": "run_feedback_v2/E6",
+    "delta_vs_test_only": 0.0,
+    "mechanism_role": "tie",
+    "ir_failed": true
+  },
+  {
+    "task_id": "HardSynthetic.HardCase053",
+    "feedback_variant": "semantic_ir",
+    "final_conf": 0.875,
+    "success": false,
+    "primary_category": "Arithmetic",
+    "secondary_tags": [
+      "Arithmetic"
+    ],
+    "repair_regression": false,
+    "over_repair": false,
+    "n_attempts": 3,
+    "violation_types_raw": [
+      "arithmetic"
+    ],
+    "corpus": "run_feedback_v2/E6",
+    "delta_vs_test_only": 0.0,
+    "mechanism_role": "tie",
+    "ir_failed": true
+  },
+  {
+    "task_id": "HardSynthetic.HardCase054",
+    "feedback_variant": "semantic_ir",
+    "final_conf": 0.875,
+    "success": false,
+    "primary_category": "Arithmetic",
+    "secondary_tags": [
+      "Arithmetic"
+    ],
+    "repair_regression": false,
+    "over_repair": false,
+    "n_attempts": 3,
+    "violation_types_raw": [
+      "arithmetic"
+    ],
+    "corpus": "run_feedback_v2/E6",
+    "delta_vs_test_only": 0.0,
+    "mechanism_role": "tie",
+    "ir_failed": true
+  },
+  {
+    "task_id": "HardSynthetic.HardCase055",
+    "feedback_variant": "semantic_ir",
+    "final_conf": 0.875,
+    "success": false,
+    "primary_category": "Arithmetic",
+    "secondary_tags": [
+      "Arithmetic"
+    ],
+    "repair_regression": false,
+    "over_repair": false,
+    "n_attempts": 3,
+    "violation_types_raw": [
+      "arithmetic"
+    ],
+    "corpus": "run_feedback_v2/E6",
+    "delta_vs_test_only": 0.0,
+    "mechanism_role": "tie",
+    "ir_failed": true
+  },
+  {
+    "task_id": "HardSynthetic.HardCase056",
+    "feedback_variant": "semantic_ir",
+    "final_conf": 0.875,
+    "success": false,
+    "primary_category": "Arithmetic",
+    "secondary_tags": [
+      "Arithmetic"
+    ],
+    "repair_regression": false,
+    "over_repair": false,
+    "n_attempts": 3,
+    "violation_types_raw": [
+      "arithmetic"
+    ],
+    "corpus": "run_feedback_v2/E6",
+    "delta_vs_test_only": 0.0,
+    "mechanism_role": "tie",
+    "ir_failed": true
+  },
+  {
+    "task_id": "HardSynthetic.HardCase058",
+    "feedback_variant": "semantic_ir",
+    "final_conf": 0.875,
+    "success": false,
+    "primary_category": "Arithmetic",
+    "secondary_tags": [
+      "Arithmetic"
+    ],
+    "repair_regression": false,
+    "over_repair": false,
+    "n_attempts": 3,
+    "violation_types_raw": [
+      "arithmetic"
+    ],
+    "corpus": "run_feedback_v2/E6",
+    "delta_vs_test_only": 0.0,
+    "mechanism_role": "tie",
+    "ir_failed": true
+  },
+  {
+    "task_id": "HardSynthetic.HardCase057",
+    "feedback_variant": "semantic_ir",
+    "final_conf": 0.875,
+    "success": false,
+    "primary_category": "Arithmetic",
+    "secondary_tags": [
+      "Arithmetic"
+    ],
+    "repair_regression": false,
+    "over_repair": false,
+    "n_attempts": 3,
+    "violation_types_raw": [
+      "arithmetic"
+    ],
+    "corpus": "run_feedback_v2/E6",
+    "delta_vs_test_only": 0.0,
+    "mechanism_role": "tie",
+    "ir_failed": true
+  },
+  {
+    "task_id": "HardSynthetic.HardCase060",
+    "feedback_variant": "semantic_ir",
+    "final_conf": 0.875,
+    "success": false,
+    "primary_category": "Arithmetic",
+    "secondary_tags": [
+      "Arithmetic"
+    ],
+    "repair_regression": false,
+    "over_repair": false,
+    "n_attempts": 3,
+    "violation_types_raw": [
+      "arithmetic"
+    ],
+    "corpus": "run_feedback_v2/E6",
+    "delta_vs_test_only": 0.0,
+    "mechanism_role": "tie",
+    "ir_failed": true
+  },
+  {
+    "task_id": "HardSynthetic.HardCase061",
+    "feedback_variant": "semantic_ir",
+    "final_conf": 0.875,
+    "success": false,
+    "primary_category": "RepairRegression",
+    "secondary_tags": [
+      "Arithmetic"
+    ],
+    "repair_regression": true,
+    "over_repair": true,
+    "n_attempts": 3,
+    "violation_types_raw": [
+      "arithmetic"
+    ],
+    "corpus": "run_feedback_v2/E6",
+    "delta_vs_test_only": 0.0,
+    "mechanism_role": "tie",
+    "ir_failed": true
+  },
+  {
+    "task_id": "HardSynthetic.HardCase059",
+    "feedback_variant": "semantic_ir",
+    "final_conf": 0.9583333333333334,
+    "success": false,
+    "primary_category": "Arithmetic",
+    "secondary_tags": [
+      "Arithmetic"
+    ],
+    "repair_regression": false,
+    "over_repair": false,
+    "n_attempts": 3,
+    "violation_types_raw": [
+      "arithmetic"
+    ],
+    "corpus": "run_feedback_v2/E6",
+    "delta_vs_test_only": 0.0,
+    "mechanism_role": "tie",
+    "ir_failed": true
+  },
+  {
+    "task_id": "HardSynthetic.HardCase063",
+    "feedback_variant": "semantic_ir",
+    "final_conf": 0.9583333333333334,
+    "success": false,
+    "primary_category": "RepairRegression",
+    "secondary_tags": [
+      "Arithmetic"
+    ],
+    "repair_regression": true,
+    "over_repair": true,
+    "n_attempts": 3,
+    "violation_types_raw": [
+      "arithmetic"
+    ],
+    "corpus": "run_feedback_v2/E6",
+    "delta_vs_test_only": 0.0,
+    "mechanism_role": "tie",
+    "ir_failed": true
+  },
+  {
+    "task_id": "HardSynthetic.HardCase062",
+    "feedback_variant": "semantic_ir",
+    "final_conf": 0.875,
+    "success": false,
+    "primary_category": "Arithmetic",
+    "secondary_tags": [
+      "Arithmetic"
+    ],
+    "repair_regression": false,
+    "over_repair": false,
+    "n_attempts": 3,
+    "violation_types_raw": [
+      "arithmetic"
+    ],
+    "corpus": "run_feedback_v2/E6",
+    "delta_vs_test_only": 0.0,
+    "mechanism_role": "tie",
+    "ir_failed": true
+  },
+  {
+    "task_id": "HardSynthetic.HardCase065",
+    "feedback_variant": "semantic_ir",
+    "final_conf": 0.875,
+    "success": false,
+    "primary_category": "Arithmetic",
+    "secondary_tags": [
+      "Arithmetic"
+    ],
+    "repair_regression": false,
+    "over_repair": false,
+    "n_attempts": 3,
+    "violation_types_raw": [
+      "arithmetic"
+    ],
+    "corpus": "run_feedback_v2/E6",
+    "delta_vs_test_only": 0.875,
+    "mechanism_role": "ir_rescues",
+    "ir_failed": true
+  },
+  {
+    "task_id": "HardSynthetic.HardCase064",
+    "feedback_variant": "semantic_ir",
+    "final_conf": 0.875,
+    "success": false,
+    "primary_category": "Arithmetic",
+    "secondary_tags": [
+      "Arithmetic"
+    ],
+    "repair_regression": false,
+    "over_repair": false,
+    "n_attempts": 3,
+    "violation_types_raw": [
+      "arithmetic"
+    ],
+    "corpus": "run_feedback_v2/E6",
+    "delta_vs_test_only": 0.0,
+    "mechanism_role": "tie",
+    "ir_failed": true
+  },
+  {
+    "task_id": "HardSynthetic.HardCase066",
+    "feedback_variant": "semantic_ir",
+    "final_conf": 0.875,
+    "success": false,
+    "primary_category": "Arithmetic",
+    "secondary_tags": [
+      "Arithmetic"
+    ],
+    "repair_regression": false,
+    "over_repair": false,
+    "n_attempts": 3,
+    "violation_types_raw": [
+      "arithmetic"
+    ],
+    "corpus": "run_feedback_v2/E6",
+    "delta_vs_test_only": 0.0,
+    "mechanism_role": "tie",
+    "ir_failed": true
+  },
+  {
+    "task_id": "HardSynthetic.HardCase067",
+    "feedback_variant": "semantic_ir",
+    "final_conf": 0.0,
+    "success": false,
+    "primary_category": "RepairRegression",
+    "secondary_tags": [
+      "Arithmetic"
+    ],
+    "repair_regression": true,
+    "over_repair": false,
+    "n_attempts": 3,
+    "violation_types_raw": [
+      "arithmetic"
+    ],
+    "corpus": "run_feedback_v2/E6",
+    "delta_vs_test_only": -0.875,
+    "mechanism_role": "test_only_better",
+    "ir_failed": true
+  },
+  {
+    "task_id": "HardSynthetic.HardCase068",
+    "feedback_variant": "semantic_ir",
+    "final_conf": 0.0,
+    "success": false,
+    "primary_category": "RepairRegression",
+    "secondary_tags": [
+      "Arithmetic"
+    ],
+    "repair_regression": true,
+    "over_repair": true,
+    "n_attempts": 3,
+    "violation_types_raw": [
+      "arithmetic"
+    ],
+    "corpus": "run_feedback_v2/E6",
+    "delta_vs_test_only": -0.875,
+    "mechanism_role": "test_only_better",
+    "ir_failed": true
+  },
+  {
+    "task_id": "HardSynthetic.HardCase070",
+    "feedback_variant": "semantic_ir",
+    "final_conf": 0.8571428571428571,
+    "success": false,
+    "primary_category": "Arithmetic",
+    "secondary_tags": [
+      "Arithmetic"
+    ],
+    "repair_regression": false,
+    "over_repair": false,
+    "n_attempts": 3,
+    "violation_types_raw": [
+      "arithmetic"
+    ],
+    "corpus": "run_feedback_v2/E6",
+    "delta_vs_test_only": 0.0,
+    "mechanism_role": "tie",
+    "ir_failed": true
+  },
+  {
+    "task_id": "HardSynthetic.HardCase069",
+    "feedback_variant": "semantic_ir",
+    "final_conf": 0.875,
+    "success": false,
+    "primary_category": "Arithmetic",
+    "secondary_tags": [
+      "Arithmetic"
+    ],
+    "repair_regression": false,
+    "over_repair": false,
+    "n_attempts": 3,
+    "violation_types_raw": [
+      "arithmetic"
+    ],
+    "corpus": "run_feedback_v2/E6",
+    "delta_vs_test_only": 0.0,
+    "mechanism_role": "tie",
+    "ir_failed": true
+  },
+  {
+    "task_id": "HardSynthetic.HardCase072",
+    "feedback_variant": "semantic_ir",
+    "final_conf": 0.875,
+    "success": false,
+    "primary_category": "Arithmetic",
+    "secondary_tags": [
+      "Arithmetic"
+    ],
+    "repair_regression": false,
+    "over_repair": false,
+    "n_attempts": 3,
+    "violation_types_raw": [
+      "arithmetic"
+    ],
+    "corpus": "run_feedback_v2/E6",
+    "delta_vs_test_only": 0.0,
+    "mechanism_role": "tie",
+    "ir_failed": true
+  },
+  {
+    "task_id": "HardSynthetic.HardCase071",
+    "feedback_variant": "semantic_ir",
+    "final_conf": 0.75,
+    "success": false,
+    "primary_category": "RepairRegression",
+    "secondary_tags": [
+      "Arithmetic",
+      "Other"
+    ],
+    "repair_regression": true,
+    "over_repair": true,
+    "n_attempts": 3,
+    "violation_types_raw": [
+      "arithmetic",
+      "output"
+    ],
+    "corpus": "run_feedback_v2/E6",
+    "delta_vs_test_only": -0.125,
+    "mechanism_role": "test_only_better",
+    "ir_failed": true
+  },
+  {
+    "task_id": "HardSynthetic.HardCase073",
+    "feedback_variant": "semantic_ir",
+    "final_conf": 0.875,
+    "success": false,
+    "primary_category": "Arithmetic",
+    "secondary_tags": [
+      "Arithmetic"
+    ],
+    "repair_regression": false,
+    "over_repair": false,
+    "n_attempts": 3,
+    "violation_types_raw": [
+      "arithmetic"
+    ],
+    "corpus": "run_feedback_v2/E6",
+    "delta_vs_test_only": 0.0,
+    "mechanism_role": "tie",
+    "ir_failed": true
+  },
+  {
+    "task_id": "HardSynthetic.HardCase075",
+    "feedback_variant": "semantic_ir",
+    "final_conf": 0.875,
+    "success": false,
+    "primary_category": "RepairRegression",
+    "secondary_tags": [
+      "Arithmetic"
+    ],
+    "repair_regression": true,
+    "over_repair": true,
+    "n_attempts": 3,
+    "violation_types_raw": [
+      "arithmetic"
+    ],
+    "corpus": "run_feedback_v2/E6",
+    "delta_vs_test_only": 0.0,
+    "mechanism_role": "tie",
+    "ir_failed": true
+  },
+  {
+    "task_id": "HardSynthetic.HardCase074",
+    "feedback_variant": "semantic_ir",
+    "final_conf": 1.0,
+    "success": true,
+    "primary_category": "Other",
+    "secondary_tags": [],
+    "repair_regression": false,
+    "over_repair": false,
+    "n_attempts": 3,
+    "violation_types_raw": [],
+    "corpus": "run_feedback_v2/E6",
+    "delta_vs_test_only": 0.0,
+    "mechanism_role": "tie",
+    "ir_failed": false
+  },
+  {
+    "task_id": "HardSynthetic.HardCase076",
+    "feedback_variant": "semantic_ir",
+    "final_conf": 1.0,
+    "success": true,
+    "primary_category": "Other",
+    "secondary_tags": [],
+    "repair_regression": false,
+    "over_repair": false,
+    "n_attempts": 3,
+    "violation_types_raw": [],
+    "corpus": "run_feedback_v2/E6",
+    "delta_vs_test_only": 0.0,
+    "mechanism_role": "tie",
+    "ir_failed": false
+  },
+  {
+    "task_id": "HardSynthetic.HardCase078",
+    "feedback_variant": "semantic_ir",
+    "final_conf": 0.875,
+    "success": false,
+    "primary_category": "Arithmetic",
+    "secondary_tags": [
+      "Arithmetic"
+    ],
+    "repair_regression": false,
+    "over_repair": false,
+    "n_attempts": 3,
+    "violation_types_raw": [
+      "arithmetic"
+    ],
+    "corpus": "run_feedback_v2/E6",
+    "delta_vs_test_only": 0.0,
+    "mechanism_role": "tie",
+    "ir_failed": true
+  },
+  {
+    "task_id": "HardSynthetic.HardCase079",
+    "feedback_variant": "semantic_ir",
+    "final_conf": 0.875,
+    "success": false,
+    "primary_category": "Arithmetic",
+    "secondary_tags": [
+      "Arithmetic"
+    ],
+    "repair_regression": false,
+    "over_repair": false,
+    "n_attempts": 3,
+    "violation_types_raw": [
+      "arithmetic"
+    ],
+    "corpus": "run_feedback_v2/E6",
+    "delta_vs_test_only": 0.0,
+    "mechanism_role": "tie",
+    "ir_failed": true
+  },
+  {
+    "task_id": "HardSynthetic.HardCase077",
+    "feedback_variant": "semantic_ir",
+    "final_conf": 0.875,
+    "success": false,
+    "primary_category": "Arithmetic",
+    "secondary_tags": [
+      "Arithmetic"
+    ],
+    "repair_regression": false,
+    "over_repair": false,
+    "n_attempts": 3,
+    "violation_types_raw": [
+      "arithmetic"
+    ],
+    "corpus": "run_feedback_v2/E6",
+    "delta_vs_test_only": 0.0,
+    "mechanism_role": "tie",
+    "ir_failed": true
+  },
+  {
+    "task_id": "HardSynthetic.HardCase080",
+    "feedback_variant": "semantic_ir",
+    "final_conf": 0.875,
+    "success": false,
+    "primary_category": "Arithmetic",
+    "secondary_tags": [
+      "Arithmetic"
+    ],
+    "repair_regression": false,
+    "over_repair": false,
+    "n_attempts": 3,
+    "violation_types_raw": [
+      "arithmetic"
+    ],
+    "corpus": "run_feedback_v2/E6",
+    "delta_vs_test_only": 0.0,
+    "mechanism_role": "tie",
+    "ir_failed": true
+  },
+  {
+    "task_id": "HardSynthetic.HardCase081",
+    "feedback_variant": "semantic_ir",
+    "final_conf": 0.875,
+    "success": false,
+    "primary_category": "Arithmetic",
+    "secondary_tags": [
+      "Arithmetic"
+    ],
+    "repair_regression": false,
+    "over_repair": false,
+    "n_attempts": 3,
+    "violation_types_raw": [
+      "arithmetic"
+    ],
+    "corpus": "run_feedback_v2/E6",
+    "delta_vs_test_only": 0.0,
+    "mechanism_role": "tie",
+    "ir_failed": true
+  },
+  {
+    "task_id": "HardSynthetic.HardCase082",
+    "feedback_variant": "semantic_ir",
+    "final_conf": 0.875,
+    "success": false,
+    "primary_category": "Arithmetic",
+    "secondary_tags": [
+      "Arithmetic"
+    ],
+    "repair_regression": false,
+    "over_repair": false,
+    "n_attempts": 3,
+    "violation_types_raw": [
+      "arithmetic"
+    ],
+    "corpus": "run_feedback_v2/E6",
+    "delta_vs_test_only": 0.0,
+    "mechanism_role": "tie",
+    "ir_failed": true
+  },
+  {
+    "task_id": "HardSynthetic.HardCase084",
+    "feedback_variant": "semantic_ir",
+    "final_conf": 0.875,
+    "success": false,
+    "primary_category": "RepairRegression",
+    "secondary_tags": [
+      "Arithmetic"
+    ],
+    "repair_regression": true,
+    "over_repair": true,
+    "n_attempts": 3,
+    "violation_types_raw": [
+      "arithmetic"
+    ],
+    "corpus": "run_feedback_v2/E6",
+    "delta_vs_test_only": 0.0,
+    "mechanism_role": "tie",
+    "ir_failed": true
+  },
+  {
+    "task_id": "HardSynthetic.HardCase083",
+    "feedback_variant": "semantic_ir",
+    "final_conf": 0.875,
+    "success": false,
+    "primary_category": "Arithmetic",
+    "secondary_tags": [
+      "Arithmetic"
+    ],
+    "repair_regression": false,
+    "over_repair": false,
+    "n_attempts": 3,
+    "violation_types_raw": [
+      "arithmetic"
+    ],
+    "corpus": "run_feedback_v2/E6",
+    "delta_vs_test_only": 0.0,
+    "mechanism_role": "tie",
+    "ir_failed": true
+  },
+  {
+    "task_id": "HardSynthetic.HardCase085",
+    "feedback_variant": "semantic_ir",
+    "final_conf": 0.875,
+    "success": false,
+    "primary_category": "Arithmetic",
+    "secondary_tags": [
+      "Arithmetic"
+    ],
+    "repair_regression": false,
+    "over_repair": true,
+    "n_attempts": 3,
+    "violation_types_raw": [
+      "arithmetic"
+    ],
+    "corpus": "run_feedback_v2/E6",
+    "delta_vs_test_only": 0.0,
+    "mechanism_role": "tie",
+    "ir_failed": true
+  },
+  {
+    "task_id": "HardSynthetic.HardCase087",
+    "feedback_variant": "semantic_ir",
+    "final_conf": 0.875,
+    "success": false,
+    "primary_category": "RepairRegression",
+    "secondary_tags": [
+      "Arithmetic"
+    ],
+    "repair_regression": true,
+    "over_repair": true,
+    "n_attempts": 3,
+    "violation_types_raw": [
+      "arithmetic"
+    ],
+    "corpus": "run_feedback_v2/E6",
+    "delta_vs_test_only": 0.0,
+    "mechanism_role": "tie",
+    "ir_failed": true
+  },
+  {
+    "task_id": "HardSynthetic.HardCase086",
+    "feedback_variant": "semantic_ir",
+    "final_conf": 0.875,
+    "success": false,
+    "primary_category": "Arithmetic",
+    "secondary_tags": [
+      "Arithmetic"
+    ],
+    "repair_regression": false,
+    "over_repair": false,
+    "n_attempts": 3,
+    "violation_types_raw": [
+      "arithmetic"
+    ],
+    "corpus": "run_feedback_v2/E6",
+    "delta_vs_test_only": 0.0,
+    "mechanism_role": "tie",
+    "ir_failed": true
+  },
+  {
+    "task_id": "HardSynthetic.HardCase088",
+    "feedback_variant": "semantic_ir",
+    "final_conf": 1.0,
+    "success": true,
+    "primary_category": "Other",
+    "secondary_tags": [],
+    "repair_regression": false,
+    "over_repair": false,
+    "n_attempts": 3,
+    "violation_types_raw": [],
+    "corpus": "run_feedback_v2/E6",
+    "delta_vs_test_only": 0.0,
+    "mechanism_role": "tie",
+    "ir_failed": false
+  },
+  {
+    "task_id": "HardSynthetic.HardCase090",
+    "feedback_variant": "semantic_ir",
+    "final_conf": 0.875,
+    "success": false,
+    "primary_category": "Arithmetic",
+    "secondary_tags": [
+      "Arithmetic"
+    ],
+    "repair_regression": false,
+    "over_repair": false,
+    "n_attempts": 3,
+    "violation_types_raw": [
+      "arithmetic"
+    ],
+    "corpus": "run_feedback_v2/E6",
+    "delta_vs_test_only": 0.0,
+    "mechanism_role": "tie",
+    "ir_failed": true
+  },
+  {
+    "task_id": "HardSynthetic.HardCase089",
+    "feedback_variant": "semantic_ir",
+    "final_conf": 0.875,
+    "success": false,
+    "primary_category": "Arithmetic",
+    "secondary_tags": [
+      "Arithmetic"
+    ],
+    "repair_regression": false,
+    "over_repair": false,
+    "n_attempts": 3,
+    "violation_types_raw": [
+      "arithmetic"
+    ],
+    "corpus": "run_feedback_v2/E6",
+    "delta_vs_test_only": 0.0,
+    "mechanism_role": "tie",
+    "ir_failed": true
+  },
+  {
+    "task_id": "HardSynthetic.HardCase092",
+    "feedback_variant": "semantic_ir",
+    "final_conf": 0.875,
+    "success": false,
+    "primary_category": "RepairRegression",
+    "secondary_tags": [
+      "Arithmetic"
+    ],
+    "repair_regression": true,
+    "over_repair": true,
+    "n_attempts": 3,
+    "violation_types_raw": [
+      "arithmetic"
+    ],
+    "corpus": "run_feedback_v2/E6",
+    "delta_vs_test_only": 0.0,
+    "mechanism_role": "tie",
+    "ir_failed": true
+  },
+  {
+    "task_id": "HardSynthetic.HardCase094",
+    "feedback_variant": "semantic_ir",
+    "final_conf": 0.0,
+    "success": false,
+    "primary_category": "RepairRegression",
+    "secondary_tags": [
+      "Arithmetic"
+    ],
+    "repair_regression": true,
+    "over_repair": true,
+    "n_attempts": 3,
+    "violation_types_raw": [
+      "arithmetic"
+    ],
+    "corpus": "run_feedback_v2/E6",
+    "delta_vs_test_only": -0.958333,
+    "mechanism_role": "test_only_better",
+    "ir_failed": true
+  },
+  {
+    "task_id": "HardSynthetic.HardCase091",
+    "feedback_variant": "semantic_ir",
+    "final_conf": 0.9583333333333334,
+    "success": false,
+    "primary_category": "Arithmetic",
+    "secondary_tags": [
+      "Arithmetic"
+    ],
+    "repair_regression": false,
+    "over_repair": false,
+    "n_attempts": 3,
+    "violation_types_raw": [
+      "arithmetic"
+    ],
+    "corpus": "run_feedback_v2/E6",
+    "delta_vs_test_only": 0.0,
+    "mechanism_role": "tie",
+    "ir_failed": true
+  },
+  {
+    "task_id": "HardSynthetic.HardCase095",
+    "feedback_variant": "semantic_ir",
+    "final_conf": 0.875,
+    "success": false,
+    "primary_category": "Arithmetic",
+    "secondary_tags": [
+      "Arithmetic"
+    ],
+    "repair_regression": false,
+    "over_repair": false,
+    "n_attempts": 3,
+    "violation_types_raw": [
+      "arithmetic"
+    ],
+    "corpus": "run_feedback_v2/E6",
+    "delta_vs_test_only": 0.0,
+    "mechanism_role": "tie",
+    "ir_failed": true
+  },
+  {
+    "task_id": "HardSynthetic.HardCase096",
+    "feedback_variant": "semantic_ir",
+    "final_conf": 0.875,
+    "success": false,
+    "primary_category": "Arithmetic",
+    "secondary_tags": [
+      "Arithmetic"
+    ],
+    "repair_regression": false,
+    "over_repair": false,
+    "n_attempts": 3,
+    "violation_types_raw": [
+      "arithmetic"
+    ],
+    "corpus": "run_feedback_v2/E6",
+    "delta_vs_test_only": 0.0,
+    "mechanism_role": "tie",
+    "ir_failed": true
+  },
+  {
+    "task_id": "HardSynthetic.HardCase097",
+    "feedback_variant": "semantic_ir",
+    "final_conf": 0.875,
+    "success": false,
+    "primary_category": "Arithmetic",
+    "secondary_tags": [
+      "Arithmetic"
+    ],
+    "repair_regression": false,
+    "over_repair": false,
+    "n_attempts": 3,
+    "violation_types_raw": [
+      "arithmetic"
+    ],
+    "corpus": "run_feedback_v2/E6",
+    "delta_vs_test_only": 0.875,
+    "mechanism_role": "ir_rescues",
+    "ir_failed": true
+  },
+  {
+    "task_id": "HardSynthetic.HardCase100",
+    "feedback_variant": "semantic_ir",
+    "final_conf": 0.875,
+    "success": false,
+    "primary_category": "Arithmetic",
+    "secondary_tags": [
+      "Arithmetic"
+    ],
+    "repair_regression": false,
+    "over_repair": false,
+    "n_attempts": 3,
+    "violation_types_raw": [
+      "arithmetic"
+    ],
+    "corpus": "run_feedback_v2/E6",
+    "delta_vs_test_only": 0.0,
+    "mechanism_role": "tie",
+    "ir_failed": true
+  },
+  {
+    "task_id": "HardSynthetic.HardCase099",
+    "feedback_variant": "semantic_ir",
+    "final_conf": 0.875,
+    "success": false,
+    "primary_category": "Arithmetic",
+    "secondary_tags": [
+      "Arithmetic"
+    ],
+    "repair_regression": false,
+    "over_repair": false,
+    "n_attempts": 3,
+    "violation_types_raw": [
+      "arithmetic"
+    ],
+    "corpus": "run_feedback_v2/E6",
+    "delta_vs_test_only": 0.0,
+    "mechanism_role": "tie",
+    "ir_failed": true
+  },
+  {
+    "task_id": "HardSynthetic.HardCase101",
+    "feedback_variant": "semantic_ir",
+    "final_conf": 0.8571428571428571,
+    "success": false,
+    "primary_category": "RepairRegression",
+    "secondary_tags": [
+      "Arithmetic"
+    ],
+    "repair_regression": true,
+    "over_repair": true,
+    "n_attempts": 3,
+    "violation_types_raw": [
+      "arithmetic"
+    ],
+    "corpus": "run_feedback_v2/E6",
+    "delta_vs_test_only": 0.0,
+    "mechanism_role": "tie",
+    "ir_failed": true
+  },
+  {
+    "task_id": "HardSynthetic.HardCase098",
+    "feedback_variant": "semantic_ir",
+    "final_conf": 0.9583333333333334,
+    "success": false,
+    "primary_category": "Arithmetic",
+    "secondary_tags": [
+      "Arithmetic"
+    ],
+    "repair_regression": false,
+    "over_repair": false,
+    "n_attempts": 3,
+    "violation_types_raw": [
+      "arithmetic"
+    ],
+    "corpus": "run_feedback_v2/E6",
+    "delta_vs_test_only": 0.0,
+    "mechanism_role": "tie",
+    "ir_failed": true
+  },
+  {
+    "task_id": "HardSynthetic.HardCase104",
+    "feedback_variant": "semantic_ir",
+    "final_conf": 0.875,
+    "success": false,
+    "primary_category": "Arithmetic",
+    "secondary_tags": [
+      "Arithmetic"
+    ],
+    "repair_regression": false,
+    "over_repair": false,
+    "n_attempts": 3,
+    "violation_types_raw": [
+      "arithmetic"
+    ],
+    "corpus": "run_feedback_v2/E6",
+    "delta_vs_test_only": 0.875,
+    "mechanism_role": "ir_rescues",
+    "ir_failed": true
+  },
+  {
+    "task_id": "HardSynthetic.HardCase103",
+    "feedback_variant": "semantic_ir",
+    "final_conf": 0.875,
+    "success": false,
+    "primary_category": "Arithmetic",
+    "secondary_tags": [
+      "Arithmetic"
+    ],
+    "repair_regression": false,
+    "over_repair": false,
+    "n_attempts": 3,
+    "violation_types_raw": [
+      "arithmetic"
+    ],
+    "corpus": "run_feedback_v2/E6",
+    "delta_vs_test_only": 0.0,
+    "mechanism_role": "tie",
+    "ir_failed": true
+  },
+  {
+    "task_id": "HardSynthetic.HardCase105",
+    "feedback_variant": "semantic_ir",
+    "final_conf": 0.8571428571428571,
+    "success": false,
+    "primary_category": "Arithmetic",
+    "secondary_tags": [
+      "Arithmetic"
+    ],
+    "repair_regression": false,
+    "over_repair": false,
+    "n_attempts": 3,
+    "violation_types_raw": [
+      "arithmetic"
+    ],
+    "corpus": "run_feedback_v2/E6",
+    "delta_vs_test_only": 0.0,
+    "mechanism_role": "tie",
+    "ir_failed": true
+  },
+  {
+    "task_id": "HardSynthetic.HardCase107",
+    "feedback_variant": "semantic_ir",
+    "final_conf": 1.0,
+    "success": true,
+    "primary_category": "Other",
+    "secondary_tags": [],
+    "repair_regression": false,
+    "over_repair": false,
+    "n_attempts": 2,
+    "violation_types_raw": [],
+    "corpus": "run_feedback_v2/E6",
+    "delta_vs_test_only": 0.0,
+    "mechanism_role": "tie",
+    "ir_failed": false
+  },
+  {
+    "task_id": "HardSynthetic.HardCase106",
+    "feedback_variant": "semantic_ir",
+    "final_conf": 0.9583333333333334,
+    "success": false,
+    "primary_category": "RepairRegression",
+    "secondary_tags": [
+      "Arithmetic"
+    ],
+    "repair_regression": true,
+    "over_repair": true,
+    "n_attempts": 3,
+    "violation_types_raw": [
+      "arithmetic"
+    ],
+    "corpus": "run_feedback_v2/E6",
+    "delta_vs_test_only": 0.0,
+    "mechanism_role": "tie",
+    "ir_failed": true
+  },
+  {
+    "task_id": "HardSynthetic.HardCase108",
+    "feedback_variant": "semantic_ir",
+    "final_conf": 0.875,
+    "success": false,
+    "primary_category": "Arithmetic",
+    "secondary_tags": [
+      "Arithmetic"
+    ],
+    "repair_regression": false,
+    "over_repair": false,
+    "n_attempts": 3,
+    "violation_types_raw": [
+      "arithmetic"
+    ],
+    "corpus": "run_feedback_v2/E6",
+    "delta_vs_test_only": 0.0,
+    "mechanism_role": "tie",
+    "ir_failed": true
+  },
+  {
+    "task_id": "HardSynthetic.HardCase110",
+    "feedback_variant": "semantic_ir",
+    "final_conf": 0.875,
+    "success": false,
+    "primary_category": "Arithmetic",
+    "secondary_tags": [
+      "Arithmetic"
+    ],
+    "repair_regression": false,
+    "over_repair": false,
+    "n_attempts": 3,
+    "violation_types_raw": [
+      "arithmetic"
+    ],
+    "corpus": "run_feedback_v2/E6",
+    "delta_vs_test_only": 0.0,
+    "mechanism_role": "tie",
+    "ir_failed": true
+  },
+  {
+    "task_id": "HardSynthetic.HardCase109",
+    "feedback_variant": "semantic_ir",
+    "final_conf": 0.875,
+    "success": false,
+    "primary_category": "Arithmetic",
+    "secondary_tags": [
+      "Arithmetic"
+    ],
+    "repair_regression": false,
+    "over_repair": false,
+    "n_attempts": 3,
+    "violation_types_raw": [
+      "arithmetic"
+    ],
+    "corpus": "run_feedback_v2/E6",
+    "delta_vs_test_only": 0.0,
+    "mechanism_role": "tie",
+    "ir_failed": true
+  },
+  {
+    "task_id": "HardSynthetic.HardCase111",
+    "feedback_variant": "semantic_ir",
+    "final_conf": 0.9583333333333334,
+    "success": false,
+    "primary_category": "RepairRegression",
+    "secondary_tags": [
+      "Arithmetic"
+    ],
+    "repair_regression": true,
+    "over_repair": true,
+    "n_attempts": 3,
+    "violation_types_raw": [
+      "arithmetic"
+    ],
+    "corpus": "run_feedback_v2/E6",
+    "delta_vs_test_only": 0.0,
+    "mechanism_role": "tie",
+    "ir_failed": true
+  },
+  {
+    "task_id": "HardSynthetic.HardCase112",
+    "feedback_variant": "semantic_ir",
+    "final_conf": 0.875,
+    "success": false,
+    "primary_category": "Arithmetic",
+    "secondary_tags": [
+      "Arithmetic"
+    ],
+    "repair_regression": false,
+    "over_repair": false,
+    "n_attempts": 3,
+    "violation_types_raw": [
+      "arithmetic"
+    ],
+    "corpus": "run_feedback_v2/E6",
+    "delta_vs_test_only": 0.0,
+    "mechanism_role": "tie",
+    "ir_failed": true
+  },
+  {
+    "task_id": "HardSynthetic.HardCase116",
+    "feedback_variant": "semantic_ir",
+    "final_conf": 0.875,
+    "success": false,
+    "primary_category": "RepairRegression",
+    "secondary_tags": [
+      "Arithmetic"
+    ],
+    "repair_regression": true,
+    "over_repair": true,
+    "n_attempts": 3,
+    "violation_types_raw": [
+      "arithmetic"
+    ],
+    "corpus": "run_feedback_v2/E6",
+    "delta_vs_test_only": 0.875,
+    "mechanism_role": "ir_rescues",
+    "ir_failed": true
+  },
+  {
+    "task_id": "HardSynthetic.HardCase113",
+    "feedback_variant": "semantic_ir",
+    "final_conf": 0.875,
+    "success": false,
+    "primary_category": "Arithmetic",
+    "secondary_tags": [
+      "Arithmetic"
+    ],
+    "repair_regression": false,
+    "over_repair": false,
+    "n_attempts": 3,
+    "violation_types_raw": [
+      "arithmetic"
+    ],
+    "corpus": "run_feedback_v2/E6",
+    "delta_vs_test_only": 0.0,
+    "mechanism_role": "tie",
+    "ir_failed": true
+  },
+  {
+    "task_id": "HardSynthetic.HardCase115",
+    "feedback_variant": "semantic_ir",
+    "final_conf": 0.875,
+    "success": false,
+    "primary_category": "Arithmetic",
+    "secondary_tags": [
+      "Arithmetic"
+    ],
+    "repair_regression": false,
+    "over_repair": false,
+    "n_attempts": 3,
+    "violation_types_raw": [
+      "arithmetic"
+    ],
+    "corpus": "run_feedback_v2/E6",
+    "delta_vs_test_only": 0.0,
+    "mechanism_role": "tie",
+    "ir_failed": true
+  },
+  {
+    "task_id": "HardSynthetic.HardCase117",
+    "feedback_variant": "semantic_ir",
+    "final_conf": 0.875,
+    "success": false,
+    "primary_category": "RepairRegression",
+    "secondary_tags": [
+      "Arithmetic"
+    ],
+    "repair_regression": true,
+    "over_repair": true,
+    "n_attempts": 3,
+    "violation_types_raw": [
+      "arithmetic"
+    ],
+    "corpus": "run_feedback_v2/E6",
+    "delta_vs_test_only": 0.0,
+    "mechanism_role": "tie",
+    "ir_failed": true
+  },
+  {
+    "task_id": "HardSynthetic.HardCase118",
+    "feedback_variant": "semantic_ir",
+    "final_conf": 0.9583333333333334,
+    "success": false,
+    "primary_category": "Arithmetic",
+    "secondary_tags": [
+      "Arithmetic"
+    ],
+    "repair_regression": false,
+    "over_repair": false,
+    "n_attempts": 3,
+    "violation_types_raw": [
+      "arithmetic"
+    ],
+    "corpus": "run_feedback_v2/E6",
+    "delta_vs_test_only": 0.958333,
+    "mechanism_role": "ir_rescues",
+    "ir_failed": true
+  },
+  {
+    "task_id": "HardSynthetic.HardCase120",
+    "feedback_variant": "semantic_ir",
+    "final_conf": 0.875,
+    "success": false,
+    "primary_category": "Arithmetic",
+    "secondary_tags": [
+      "Arithmetic"
+    ],
+    "repair_regression": false,
+    "over_repair": false,
+    "n_attempts": 3,
+    "violation_types_raw": [
+      "arithmetic"
+    ],
+    "corpus": "run_feedback_v2/E6",
+    "delta_vs_test_only": 0.0,
+    "mechanism_role": "tie",
+    "ir_failed": true
+  },
+  {
+    "task_id": "HardSynthetic.HardCase121",
+    "feedback_variant": "semantic_ir",
+    "final_conf": 0.875,
+    "success": false,
+    "primary_category": "Arithmetic",
+    "secondary_tags": [
+      "Arithmetic"
+    ],
+    "repair_regression": false,
+    "over_repair": false,
+    "n_attempts": 3,
+    "violation_types_raw": [
+      "arithmetic"
+    ],
+    "corpus": "run_feedback_v2/E6",
+    "delta_vs_test_only": 0.0,
+    "mechanism_role": "tie",
+    "ir_failed": true
+  },
+  {
+    "task_id": "HardSynthetic.HardCase122",
+    "feedback_variant": "semantic_ir",
+    "final_conf": 0.9583333333333334,
+    "success": false,
+    "primary_category": "Arithmetic",
+    "secondary_tags": [
+      "Arithmetic"
+    ],
+    "repair_regression": false,
+    "over_repair": false,
+    "n_attempts": 3,
+    "violation_types_raw": [
+      "arithmetic"
+    ],
+    "corpus": "run_feedback_v2/E6",
+    "delta_vs_test_only": 0.958333,
+    "mechanism_role": "ir_rescues",
+    "ir_failed": true
+  },
+  {
+    "task_id": "HardSynthetic.HardCase123",
+    "feedback_variant": "semantic_ir",
+    "final_conf": 0.875,
+    "success": false,
+    "primary_category": "Arithmetic",
+    "secondary_tags": [
+      "Arithmetic"
+    ],
+    "repair_regression": false,
+    "over_repair": false,
+    "n_attempts": 3,
+    "violation_types_raw": [
+      "arithmetic"
+    ],
+    "corpus": "run_feedback_v2/E6",
+    "delta_vs_test_only": 0.0,
+    "mechanism_role": "tie",
+    "ir_failed": true
+  },
+  {
+    "task_id": "HardSynthetic.HardCase124",
+    "feedback_variant": "semantic_ir",
+    "final_conf": 0.875,
+    "success": false,
+    "primary_category": "Arithmetic",
+    "secondary_tags": [
+      "Arithmetic"
+    ],
+    "repair_regression": false,
+    "over_repair": false,
+    "n_attempts": 3,
+    "violation_types_raw": [
+      "arithmetic"
+    ],
+    "corpus": "run_feedback_v2/E6",
+    "delta_vs_test_only": 0.875,
+    "mechanism_role": "ir_rescues",
+    "ir_failed": true
+  },
+  {
+    "task_id": "HardSynthetic.HardCase125",
+    "feedback_variant": "semantic_ir",
+    "final_conf": 0.8571428571428571,
+    "success": false,
+    "primary_category": "Arithmetic",
+    "secondary_tags": [
+      "Arithmetic"
+    ],
+    "repair_regression": false,
+    "over_repair": false,
+    "n_attempts": 3,
+    "violation_types_raw": [
+      "arithmetic"
+    ],
+    "corpus": "run_feedback_v2/E6",
+    "delta_vs_test_only": 0.0,
+    "mechanism_role": "tie",
+    "ir_failed": true
+  }
+]

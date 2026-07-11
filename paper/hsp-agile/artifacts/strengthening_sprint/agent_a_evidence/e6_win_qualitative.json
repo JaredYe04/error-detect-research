@@ -1,0 +1,438 @@
+[
+  {
+    "task_id": "HardSynthetic.HardCase004",
+    "conf_ir": 0.9583333333333334,
+    "conf_test_only": 0.0,
+    "delta": 0.9583,
+    "ir_primary_qual": "Arithmetic",
+    "test_only_primary_qual": "Arithmetic",
+    "ir_cat_counts": {
+      "Arithmetic": 3
+    },
+    "sample_feedback": {
+      "violation_type": "arithmetic",
+      "scenario_index": 8,
+      "constraint_text": "others",
+      "reason": "Scenario 8: arithmetic expression inconsistent with oracle.",
+      "suggested_fix": "correct the output expression for the active scenario",
+      "expected": {
+        "risk": 0,
+        "action": 0,
+        "score": 0
+      },
+      "observed": {
+        "risk": 0,
+        "action": 5,
+        "score": 0
+      }
+    }
+  },
+  {
+    "task_id": "HardSynthetic.HardCase005",
+    "conf_ir": 0.875,
+    "conf_test_only": 0.0,
+    "delta": 0.875,
+    "ir_primary_qual": "Arithmetic",
+    "test_only_primary_qual": "Arithmetic",
+    "ir_cat_counts": {
+      "Arithmetic": 9
+    },
+    "sample_feedback": {
+      "violation_type": "arithmetic",
+      "scenario_index": 8,
+      "constraint_text": "others",
+      "reason": "Scenario 8: arithmetic expression inconsistent with oracle.",
+      "suggested_fix": "correct the output expression for the active scenario",
+      "expected": {
+        "risk": 0,
+        "action": 0,
+        "score": 0
+      },
+      "observed": {
+        "risk": 0,
+        "action": 2,
+        "score": 0
+      }
+    }
+  },
+  {
+    "task_id": "HardSynthetic.HardCase010",
+    "conf_ir": 0.9583333333333334,
+    "conf_test_only": 0.0,
+    "delta": 0.9583,
+    "ir_primary_qual": "Arithmetic",
+    "test_only_primary_qual": "Arithmetic",
+    "ir_cat_counts": {
+      "Arithmetic": 3
+    },
+    "sample_feedback": {
+      "violation_type": "arithmetic",
+      "scenario_index": 8,
+      "constraint_text": "others",
+      "reason": "Scenario 8: arithmetic expression inconsistent with oracle.",
+      "suggested_fix": "correct the output expression for the active scenario",
+      "expected": {
+        "risk": 0,
+        "action": 0,
+        "score": 0
+      },
+      "observed": {
+        "risk": 0,
+        "action": 5,
+        "score": 0
+      }
+    }
+  },
+  {
+    "task_id": "HardSynthetic.HardCase012",
+    "conf_ir": 0.875,
+    "conf_test_only": 0.0,
+    "delta": 0.875,
+    "ir_primary_qual": "Arithmetic",
+    "test_only_primary_qual": "Arithmetic",
+    "ir_cat_counts": {
+      "Arithmetic": 9
+    },
+    "sample_feedback": {
+      "violation_type": "arithmetic",
+      "scenario_index": 8,
+      "constraint_text": "others",
+      "reason": "Scenario 8: arithmetic expression inconsistent with oracle.",
+      "suggested_fix": "correct the output expression for the active scenario",
+      "expected": {
+        "risk": 0,
+        "action": 0,
+        "score": 0
+      },
+      "observed": {
+        "risk": 0,
+        "action": 5,
+        "score": 0
+      }
+    }
+  },
+  {
+    "task_id": "HardSynthetic.HardCase028",
+    "conf_ir": 0.875,
+    "conf_test_only": 0.0,
+    "delta": 0.875,
+    "ir_primary_qual": "Arithmetic",
+    "test_only_primary_qual": "Arithmetic",
+    "ir_cat_counts": {
+      "Arithmetic": 9
+    },
+    "sample_feedback": {
+      "violation_type": "arithmetic",
+      "scenario_index": 8,
+      "constraint_text": "others",
+      "reason": "Scenario 8: arithmetic expression inconsistent with oracle.",
+      "suggested_fix": "correct the output expression for the active scenario",
+      "expected": {
+        "risk": 0,
+        "action": 0,
+        "score": 0
+      },
+      "observed": {
+        "risk": 0,
+        "action": 5,
+        "score": 0
+      }
+    }
+  },
+  {
+    "task_id": "HardSynthetic.HardCase037",
+    "conf_ir": 0.9583333333333334,
+    "conf_test_only": 0.625,
+    "delta": 0.3333,
+    "ir_primary_qual": "Arithmetic",
+    "test_only_primary_qual": "Arithmetic",
+    "ir_cat_counts": {
+      "Arithmetic": 3
+    },
+    "sample_feedback": {
+      "violation_type": "arithmetic",
+      "scenario_index": 8,
+      "constraint_text": "others",
+      "reason": "Scenario 8: arithmetic expression inconsistent with oracle.",
+      "suggested_fix": "correct the output expression for the active scenario",
+      "expected": {
+        "risk": 0,
+        "action": 0,
+        "score": 0
+      },
+      "observed": {
+        "risk": 0,
+        "action": 5,
+        "score": 0
+      }
+    }
+  },
+  {
+    "task_id": "HardSynthetic.HardCase047",
+    "conf_ir": 0.9583333333333334,
+    "conf_test_only": 0.0,
+    "delta": 0.9583,
+    "ir_primary_qual": "Arithmetic",
+    "test_only_primary_qual": "Arithmetic",
+    "ir_cat_counts": {
+      "Arithmetic": 3
+    },
+    "sample_feedback": {
+      "violation_type": "arithmetic",
+      "scenario_index": 8,
+      "constraint_text": "others",
+      "reason": "Scenario 8: arithmetic expression inconsistent with oracle.",
+      "suggested_fix": "correct the output expression for the active scenario",
+      "expected": {
+        "risk": 0,
+        "action": 0,
+        "score": 0
+      },
+      "observed": {
+        "risk": 0,
+        "action": 5,
+        "score": 0
+      }
+    }
+  },
+  {
+    "task_id": "HardSynthetic.HardCase065",
+    "conf_ir": 0.875,
+    "conf_test_only": 0.0,
+    "delta": 0.875,
+    "ir_primary_qual": "Arithmetic",
+    "test_only_primary_qual": "Arithmetic",
+    "ir_cat_counts": {
+      "Arithmetic": 9
+    },
+    "sample_feedback": {
+      "violation_type": "arithmetic",
+      "scenario_index": 8,
+      "constraint_text": "others",
+      "reason": "Scenario 8: arithmetic expression inconsistent with oracle.",
+      "suggested_fix": "correct the output expression for the active scenario",
+      "expected": {
+        "risk": 0,
+        "action": 0,
+        "score": 0
+      },
+      "observed": {
+        "risk": 0,
+        "action": 5,
+        "score": 0
+      }
+    }
+  },
+  {
+    "task_id": "HardSynthetic.HardCase097",
+    "conf_ir": 0.875,
+    "conf_test_only": 0.0,
+    "delta": 0.875,
+    "ir_primary_qual": "Arithmetic",
+    "test_only_primary_qual": "Arithmetic",
+    "ir_cat_counts": {
+      "Arithmetic": 9
+    },
+    "sample_feedback": {
+      "violation_type": "arithmetic",
+      "scenario_index": 8,
+      "constraint_text": "others",
+      "reason": "Scenario 8: arithmetic expression inconsistent with oracle.",
+      "suggested_fix": "correct the output expression for the active scenario",
+      "expected": {
+        "risk": 0,
+        "action": 0,
+        "score": 0
+      },
+      "observed": {
+        "risk": 0,
+        "action": 5,
+        "score": 0
+      }
+    }
+  },
+  {
+    "task_id": "HardSynthetic.HardCase104",
+    "conf_ir": 0.875,
+    "conf_test_only": 0.0,
+    "delta": 0.875,
+    "ir_primary_qual": "Arithmetic",
+    "test_only_primary_qual": "Arithmetic",
+    "ir_cat_counts": {
+      "Arithmetic": 9
+    },
+    "sample_feedback": {
+      "violation_type": "arithmetic",
+      "scenario_index": 8,
+      "constraint_text": "others",
+      "reason": "Scenario 8: arithmetic expression inconsistent with oracle.",
+      "suggested_fix": "correct the output expression for the active scenario",
+      "expected": {
+        "risk": 0,
+        "action": 0,
+        "score": 0
+      },
+      "observed": {
+        "risk": 0,
+        "action": 2,
+        "score": 0
+      }
+    }
+  },
+  {
+    "task_id": "HardSynthetic.HardCase116",
+    "conf_ir": 0.875,
+    "conf_test_only": 0.0,
+    "delta": 0.875,
+    "ir_primary_qual": "Arithmetic",
+    "test_only_primary_qual": "Arithmetic",
+    "ir_cat_counts": {
+      "Arithmetic": 6
+    },
+    "sample_feedback": {
+      "violation_type": "arithmetic",
+      "scenario_index": 8,
+      "constraint_text": "others",
+      "reason": "Scenario 8: arithmetic expression inconsistent with oracle.",
+      "suggested_fix": "correct the output expression for the active scenario",
+      "expected": {
+        "risk": 0,
+        "action": 0,
+        "score": 0
+      },
+      "observed": {
+        "risk": 0,
+        "action": 5,
+        "score": 0
+      }
+    }
+  },
+  {
+    "task_id": "HardSynthetic.HardCase118",
+    "conf_ir": 0.9583333333333334,
+    "conf_test_only": 0.0,
+    "delta": 0.9583,
+    "ir_primary_qual": "Arithmetic",
+    "test_only_primary_qual": "Arithmetic",
+    "ir_cat_counts": {
+      "Arithmetic": 3
+    },
+    "sample_feedback": {
+      "violation_type": "arithmetic",
+      "scenario_index": 8,
+      "constraint_text": "others",
+      "reason": "Scenario 8: arithmetic expression inconsistent with oracle.",
+      "suggested_fix": "correct the output expression for the active scenario",
+      "expected": {
+        "risk": 0,
+        "action": 0,
+        "score": 0
+      },
+      "observed": {
+        "risk": 0,
+        "action": 5,
+        "score": 0
+      }
+    }
+  },
+  {
+    "task_id": "HardSynthetic.HardCase122",
+    "conf_ir": 0.9583333333333334,
+    "conf_test_only": 0.0,
+    "delta": 0.9583,
+    "ir_primary_qual": "Arithmetic",
+    "test_only_primary_qual": "Arithmetic",
+    "ir_cat_counts": {
+      "Arithmetic": 3
+    },
+    "sample_feedback": {
+      "violation_type": "arithmetic",
+      "scenario_index": 8,
+      "constraint_text": "others",
+      "reason": "Scenario 8: arithmetic expression inconsistent with oracle.",
+      "suggested_fix": "correct the output expression for the active scenario",
+      "expected": {
+        "risk": 0,
+        "action": 0,
+        "score": 0
+      },
+      "observed": {
+        "risk": 0,
+        "action": 5,
+        "score": 0
+      }
+    }
+  },
+  {
+    "task_id": "HardSynthetic.HardCase124",
+    "conf_ir": 0.875,
+    "conf_test_only": 0.0,
+    "delta": 0.875,
+    "ir_primary_qual": "Arithmetic",
+    "test_only_primary_qual": "Arithmetic",
+    "ir_cat_counts": {
+      "Arithmetic": 9
+    },
+    "sample_feedback": {
+      "violation_type": "arithmetic",
+      "scenario_index": 8,
+      "constraint_text": "others",
+      "reason": "Scenario 8: arithmetic expression inconsistent with oracle.",
+      "suggested_fix": "correct the output expression for the active scenario",
+      "expected": {
+        "risk": 0,
+        "action": 0,
+        "score": 0
+      },
+      "observed": {
+        "risk": 0,
+        "action": 2,
+        "score": 0
+      }
+    }
+  },
+  {
+    "task_id": "HardSynthetic.HardCase067",
+    "conf_ir": 0.0,
+    "conf_test_only": 0.875,
+    "delta": -0.875,
+    "ir_primary_qual": "LOSS_vs_test_only",
+    "test_only_primary_qual": null,
+    "ir_cat_counts": {},
+    "sample_feedback": null,
+    "role": "test_only_win"
+  },
+  {
+    "task_id": "HardSynthetic.HardCase068",
+    "conf_ir": 0.0,
+    "conf_test_only": 0.875,
+    "delta": -0.875,
+    "ir_primary_qual": "LOSS_vs_test_only",
+    "test_only_primary_qual": null,
+    "ir_cat_counts": {},
+    "sample_feedback": null,
+    "role": "test_only_win"
+  },
+  {
+    "task_id": "HardSynthetic.HardCase071",
+    "conf_ir": 0.75,
+    "conf_test_only": 0.875,
+    "delta": -0.125,
+    "ir_primary_qual": "LOSS_vs_test_only",
+    "test_only_primary_qual": null,
+    "ir_cat_counts": {},
+    "sample_feedback": null,
+    "role": "test_only_win"
+  },
+  {
+    "task_id": "HardSynthetic.HardCase094",
+    "conf_ir": 0.0,
+    "conf_test_only": 0.9583333333333334,
+    "delta": -0.9583,
+    "ir_primary_qual": "LOSS_vs_test_only",
+    "test_only_primary_qual": null,
+    "ir_cat_counts": {},
+    "sample_feedback": null,
+    "role": "test_only_win"
+  }
+]

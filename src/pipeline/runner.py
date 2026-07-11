@@ -96,6 +96,8 @@ def build_repair_feedback(
         rendered = FeedbackRenderer.render(ir.records, variant=variant)
     parts = [rendered]
     # For structured M-style variants, append failing-scenario postconditions.
+    # Field-level IR ablations (ir_*) intentionally skip this appendix so the only
+    # changing channel is FeedbackRenderer.render (Agent B causal hygiene).
     if variant in {"semantic_ir", "execution_trace_matched", "verifier_loop"}:
         scenario_note = _scenario_postcondition_hint(task, ir.records)
         if scenario_note:

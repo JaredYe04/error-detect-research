@@ -16,6 +16,7 @@ Papers must distinguish three corpora. Do not mix numbers across rows.
 | **Primary ranking** (fixed others-witness oracle) | E1, E10, E12, **A1–A3 ablation** | `run_e1_m_win_v2`, `run_e10_m_win_v1`, `run_e12_m_win_v1`, **`run_e1_ablation_fixed_v1`** | Strengthened M: $K{=}5$ bundle — **stress-test only** | B1/B2/M Conf / Strict; ablation Δ |
 | **Equal-K Conf.** | B2 vs M_eq | **`run_e1_equal_k_v1`** | Both $K{=}3$; M_eq uses `semantic_ir` + advisory gate | **Primary equal-K Conf ranking** (+2.5 pp) |
 | **Mechanism / prevention** | E6, E2 | `run_feedback_v2`, `prevention_full_v1` | E6: $K{=}3$ feedback isolation (**lead C2**); E2: PDR/FAR | +7.7 pp (CI excludes 0); PDR/FAR |
+| **Hard-seed C2 support** | combo seeds @ gemini | **`run_ir_combo_seed_gemini_n40_v1`** | $n{=}40$×3 seeds; freeze buggy code → one T=0 repair | Supporting: FULL vs test_only/expected CI excl 0; not vs ir_no_expected |
 | **Historical pre-fix** | archive only | `run_e1_canonical_v1` / `run_hard_full_parallel_v1` | Buggy others-witness (~5% Strict) | Label historical; never primary |
 
 **Causal clarity (P1):** Fixed-oracle E1 M vs B2 is a **bundle** ($K{=}5$, advisory gate, `execution_trace_matched`, argmax)—**not** single-factor C2. E14 scopes uniqueness (`semantic_ir` 75.1% ≠ `execution_trace_matched` 85.4%; paired mean Conf. 5/19/96). See `artifacts/P1_CAUSAL_NOTES.md`.
@@ -110,7 +111,8 @@ advisory gate + ceiling is expected—cite E2 PDR/FAR for the guard. Script:
 
 ## Unchanged mechanism / prevention numbers
 
-\subsection{E6 (`run_feedback_v2`)
+### E6 (
+un_feedback_v2)
 
 | Variant | Mean Conf. |
 |---------|------------|
@@ -118,27 +120,19 @@ advisory gate + ceiling is expected—cite E2 PDR/FAR for the guard. Script:
 | B test_expected | 78.9% |
 | C semantic_ir | 86.9% |
 
-C−A = **+7.7 pp** (primary typed-IR / single-factor C2 claim). Source: `feedback_variant_summary.csv`.
+C-A = **+7.7 pp** (primary typed-IR / single-factor C2 claim). Source: eedback_variant_summary.csv.
 
-**Paired stats** (`e6_paired_summary.json`; `scripts/e6_paired_analysis.py`):
+**Paired stats** (e6_paired_summary.json; scripts/e6_paired_analysis.py):
 
-| Contrast | W/L/T | Δ (pp) | 95% CI (pp) | Wilcoxon p |
-|----------|-------|--------|-------------|------------|
-| C−A | 14/4/102 | +7.7 | [2.3, 13.6] | 0.018 |
-| C−B | 14/4/102 | +8.0 | [2.2, 14.0] | 0.027 |
+| Contrast | W/L/T | Delta (pp) | 95% CI (pp) | Wilcoxon p |
+|----------|-------|------------|-------------|------------|
+| C-A | 14/4/102 | +7.7 | [2.3, 13.6] | 0.018 |
+| C-B | 14/4/102 | +8.0 | [2.2, 14.0] | 0.027 |
 
-Both CIs exclude 0. Paper table: `tables/e6_paired_stats.tex`.
+Both CIs exclude 0. Paper table: 	ables/e6_paired_stats.tex.
 
-**Paired stats** (`e6_paired_summary.json`, script `e6_paired_analysis.py`):
-
-| Contrast | W/L/T | Δ (pp) | 95% CI (pp) | Wilcoxon p |
-|----------|-------|--------|-------------|------------|
-| C−A | 14/4/102 | +7.7 | [2.3, 13.6] | 0.018 |
-| C−B | 14/4/102 | +8.0 | [2.2, 14.0] | 0.027 |
-
-Both CIs exclude zero. Cite Table `tab:e6-paired` in papers.
-
-### E14 (`run_e14_sweep_v1`) — uniqueness scope, not primary C2
+### E14 (
+un_e14_sweep_v1) --- uniqueness scope, not primary C2
 
 | Variant | Mean strict Conf. |
 |---------|-------------------|
@@ -147,16 +141,34 @@ Both CIs exclude zero. Cite Table `tab:e6-paired` in papers.
 | semantic_ir | 75.1% |
 | execution_trace_matched | **85.4%** |
 
-Paired mean Conf. (`e14_paired_summary`): semantic_ir vs execution_trace_matched **5 / 19 / 96** (W/L/T, −10.3 pp); vs test_only 18 / 16 / 86 (+1.3 pp). Script: `paper/hsp-agile/scripts/e14_paired_analysis.py`. Details: `P1_CAUSAL_NOTES.md`.
+Paired mean Conf. (e14_paired_summary): semantic_ir vs execution_trace_matched **5 / 19 / 96** (W/L/T, -10.3 pp); vs test_only 18 / 16 / 86 (+1.3 pp). Script: paper/hsp-agile/scripts/e14_paired_analysis.py. Details: P1_CAUSAL_NOTES.md.
 
-### E2 (`prevention_full_v1`, impl-screening n=852)
+### Hard combo-seed support (
+un_ir_combo_seed_gemini_n40_v1)
+
+Model gemini-2.5-flash; n=40 tasks x 3 seed types; freeze injected buggy code then one T=0 repair (1080 jobs).
+
+**Pooled** (n=120 task x seed cells), FULL=semantic_ir:
+
+| Contrast | Delta (pp) | W/L/T | 95% CI (pp) | Excl. 0 |
+|----------|------------|-------|-------------|---------|
+| vs test_only | **+33.2** | 47/8/65 | [25.1, 41.9] | **Yes** |
+| vs test_expected | **+32.6** | 47/8/65 | [24.6, 41.1] | **Yes** |
+| vs ir_no_expected | +5.0 | 29/17/74 | [-3.5, 13.6] | No |
+
+Per-seed FULL vs test_only also CI-excl-0 (+27.2 / +34.4 / +38.1 pp).
+Cite as supporting C2 under harder bugs; not uniqueness vs every structured ablation.
+Table: 	ables/gemini_combo_n40.tex. JSON: data/processed/gemini_combo_n40_summary.json.
+gpt-4o-mini / deepseek combo saturate (~100%) --- do not cite as weak-model evidence.
+
+### E2 (prevention_full_v1, impl-screening n=852)
 
 | Mode | PDR | FAR |
 |------|-----|-----|
 | B2 | 91.2% | 8.8% |
 | M | 95.0% | 5.0% |
 
-Abstract cites M PDR 95.0% / FAR 5.0% vs B2. Source: `prevention_summary.json` → `by_eval_type.*.impl_screening`.
+Abstract cites M PDR 95.0% / FAR 5.0% vs B2. Source: prevention_summary.json -> y_eval_type.*.impl_screening.
 
 ---
 

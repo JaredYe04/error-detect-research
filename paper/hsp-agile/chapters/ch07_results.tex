@@ -206,6 +206,31 @@ primary single-factor lever vs.\ unstructured feedback.
   }
 \end{table}
 
+\subsection{Hard Combo-Seed Support (gemini, $n{=}40$)}
+\label{sec:results:gemini-combo}
+
+E6 isolates feedback on the primary endpoint under natural repair failures.
+To test whether typed IR still helps when bugs are \emph{structurally harder},
+we freeze injected combo seeds
+(\texttt{combo\_invert\_relop}, \texttt{combo\_swap\_relop},
+\texttt{drop\_first\_guard}) on 40 hard tasks and run one $T{=}0$ repair under
+each feedback surface (\texttt{run\_ir\_combo\_seed\_gemini\_n40\_v1},
+\texttt{gemini-2.5-flash}; 1080 jobs).
+Table~\ref{tab:gemini-combo-n40} summarises paired contrasts.
+
+\input{tables/gemini_combo_n40}
+
+Pooled over 120 task$\times$seed cells, FULL (\texttt{semantic\_ir}) beats
+\texttt{test\_only} by ${+}33.2$\,pp (47/8/65; CI $[25.1,\,41.9]$) and
+\texttt{test\_expected} by ${+}32.6$\,pp (47/8/65; CI $[24.6,\,41.1]$)---both
+intervals exclude zero on every seed type.
+FULL vs.\ \texttt{ir\_no\_expected} is only ${+}5.0$\,pp with CI including
+zero---so this run \emph{reinforces} C2 against unstructured and
+expected-string feedback under harder bugs, while remaining consistent with
+E14: typed IR is not uniquely best among all structured ablations.
+gpt-4o-mini and deepseek-chat saturate on the same combo protocol
+(${\approx}100\%$ Conf.) and are not used as weak-model evidence.
+
 \subsection{Ablation Study (A1--A3; fixed-oracle primary)}
 \label{sec:results:ablation-fixed}
 
@@ -268,11 +293,16 @@ the primary component ranking after the measurement correction.
 \paragraph{Answer to RQ1 / C2.}
 Under controlled isolation of feedback content (E6, full~M, $K{=}3$), typed
 Semantic Feedback IR is the largest single-factor repair lever vs.\
-unstructured test-only (+7.7\,pp).
+unstructured test-only (+7.7\,pp; CI excludes~0).
 E14 scopes uniqueness among structured surfaces
 (\texttt{semantic\_ir} 75.1\% does not match
 \texttt{execution\_trace\_matched} 85.4\%; paired 5/19/96)---do not read C2
 as ``typed IR beats every structured trace.''
+Hard combo seeds on \texttt{gemini-2.5-flash} ($n{=}40$;
+Table~\ref{tab:gemini-combo-n40}) further support C2 vs.\
+\texttt{test\_only}/\texttt{test\_expected} (pooled ${+}33$\,pp-class gaps;
+CI excludes~0) without overturning the E14 non-uniqueness scope
+(FULL vs.\ \texttt{ir\_no\_expected} CI includes~0).
 Fixed-oracle E1 M vs.\ B2 is a multi-factor bundle, not C2 isolation.
 Fixed-oracle component ablations
 (Table~\ref{tab:ablation-fixed}): repair (A3) and the formal checker (A1)
@@ -637,11 +667,14 @@ pre-fix canonical run are retained only as historical context
     strict evaluation failures per task.
     \emph{Note:} Primary B1/B2/M use the fixed first-match others-witness
     oracle (\texttt{run\_e1\_m\_win\_v2}).
-    B3--B5 and A1--A3 rows are historical \texttt{run\_e1\_canonical\_v1}
-    under the buggy others-witness oracle (A1--A3 \emph{not} re-run under the
-    fixed oracle) and are \emph{not} primary claims.
+    Fixed-oracle component ablations (A1--A3) are Table~\ref{tab:ablation-fixed}
+    (\texttt{run\_e1\_ablation\_fixed\_v1}).
+    B3--B5 and daggered A1--A3 rows below are historical
+    \texttt{run\_e1\_canonical\_v1} under the buggy others-witness oracle and
+    are \emph{not} primary claims.
     Report M vs.\ B2 as win rate and means (2/120 wins, 0 losses, 118 ties;
-    ${+}1.7$\,pp); no Holm claim is asserted for this run.}
+    ${+}1.7$\,pp); no Holm claim is asserted for this run.
+    Equal-$K$ Conf.\ ranking is Table~\ref{tab:equal-k} (\texttt{M\_eq} vs.\ B2).}
   \label{tab:main-results}
   \centering
   \thesistable{%
@@ -670,8 +703,9 @@ pre-fix canonical run are retained only as historical context
 
 Table~\ref{tab:main-results} states the aggregate means under the fixed
 oracle: M reaches 100\% Conf./Strict, ahead of B2 (98.3\%) and B1 (84.2\%).
-Historical A1--A3 (pre-fix; not re-run) supply component-ranking context
-only---do not compare their Conf.\ to the fixed-oracle primary row.
+Primary component ranking is the fixed-oracle ablation
+(Table~\ref{tab:ablation-fixed}: A3 $-$25.8\,pp, A1 $-$17.5\,pp, A2 $0.0$\,pp);
+daggered historical A1--A3 rows are archive only.
 
 \begin{figure}[t]
   \centering

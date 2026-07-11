@@ -1,0 +1,69 @@
+﻿
+=== run_ir_hard_seed_ablation_ecnu_plus_n120_v1 rows=810
+  ?: n=810 Conf=97.5%
+
+=== run_ir_hard_seed_ablation_ecnu_plus_n120_slice30_60_v1 rows=810
+  ?: n=810 Conf=98.0%
+
+=== run_ir_hard_seed_ablation_gpt4omini_v1 rows=378
+  ?: n=378 Conf=99.8%
+
+=== run_ir_hard_seed_ablation_gemini_flash_v1 rows=646
+  ?: n=646 Conf=69.1%
+
+=== run_ir_hard_seed_ablation_ecnu_plus_v1 rows=391
+  ?: n=391 Conf=96.7%
+
+=== run_ir_hard_seed_realspec_wrong_relop_gemini_full_v1 rows=711
+  ?: n=711 Conf=61.3%
+
+=== run_ir_hard_seed_realspec_gemini_n20_40_v1 rows=486
+  ?: n=486 Conf=83.3%
+
+=== run_ir_hard_seed_realspec_gpt4omini_v1 rows=270
+  ?: n=270 Conf=100.0%
+
+=== run_ir_hard_seed_realspec_gemini_v1 rows=1084
+  ?: n=1084 Conf=80.2%
+
+=== run_ir_hard_seed_realspec_ecnu_v1 rows=378
+  ?: n=378 Conf=94.6%
+
+=== run_ir_combo_seed_deepseek_v1 rows=378
+  ?: n=378 Conf=100.0%
+
+=== run_ir_combo_seed_gemini_v1 rows=378
+  ?: n=378 Conf=10.5%
+
+=== run_ir_combo_seed_gpt4omini_v1 rows=378
+  ?: n=378 Conf=99.8%
+
+=== run_realspec_v1_b1b2m rows=309 | model=None, modes=['B1', 'B2', 'M']
+  B1: n=103 Conf=90.3%
+  B2: n=103 Conf=100.0%
+  M: n=103 Conf=100.0%
+MISSING run_realspec_e6_b1fail_v1
+MISSING run_realspec_e6_b1fail_gemini_v1
+
+=== run_realspec_repair_only_gemini_v1 rows=0
+
+=== run_ir_seeded_others_ablation_v1 rows=126
+  ?: n=126 Conf=99.7%
+
+=== run_ir_repair_only_ablation_v1 rows=4
+  ?: n=4 Conf=100.0%
+MISSING run_ir_field_ablation_headroom34
+
+=== run_e1_equal_k_v1 rows=240 | model=None, modes=['B2', 'M_eq']
+  B2: n=120 Conf=97.5%
+  M_eq: n=120 Conf=100.0%
+
+=== run_e1_ablation_fixed_v1 rows=360 | model=None, modes=['A1', 'A2', 'A3']
+  A1: n=120 Conf=82.5%
+  A2: n=120 Conf=100.0%
+  A3: n=120 Conf=74.2%
+
+=== run_pubind_pilot_v1 rows=30 | model=None, modes=['B1', 'B2', 'M_eq']
+  B1: n=10 Conf=80.0%
+  B2: n=10 Conf=100.0%
+  M_eq: n=10 Conf=100.0%

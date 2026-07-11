@@ -1,0 +1,27 @@
+{
+  "n_rows": 309,
+  "mean_conf_by_mode": {
+    "B1": 0.9029,
+    "B2": 1.0,
+    "M": 1.0
+  },
+  "n_by_mode": {
+    "B1": 103,
+    "B2": 103,
+    "M": 103
+  },
+  "mean_conf_by_source_mode": {
+    "industrial_pattern|B1": 0.8387,
+    "industrial_pattern|B2": 1.0,
+    "industrial_pattern|M": 1.0,
+    "published_case|B1": 0.9,
+    "published_case|B2": 1.0,
+    "published_case|M": 1.0,
+    "real_derived|B1": 0.925,
+    "real_derived|B2": 1.0,
+    "real_derived|M": 1.0,
+    "textbook|B1": 0.9545,
+    "textbook|B2": 1.0,
+    "textbook|M": 1.0
+  }
+}

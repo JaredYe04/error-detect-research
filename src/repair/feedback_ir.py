@@ -19,6 +19,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 from typing import Any
+import re
 
 
 # ---------------------------------------------------------------------------
@@ -109,6 +110,13 @@ class FeedbackRenderer:
         "execution_trace",
         "execution_trace_matched",
         "reflexion",
+        # Field-level ablations (Paper Strengthening Sprint / Agent B)
+        "ir_no_scenario_id",
+        "ir_no_expected",
+        "ir_no_constraint",
+        "ir_no_reason",
+        "ir_no_suggested_fix",
+        "ir_nl_only",
     )
 
     @staticmethod
@@ -128,6 +136,18 @@ class FeedbackRenderer:
             return FeedbackRenderer._render_execution_trace_matched(records)
         if variant == "reflexion":
             return FeedbackRenderer._render_reflexion(records)
+        if variant == "ir_no_scenario_id":
+            return FeedbackRenderer._render_ir_no_scenario_id(records)
+        if variant == "ir_no_expected":
+            return FeedbackRenderer._render_ir_no_expected(records)
+        if variant == "ir_no_constraint":
+            return FeedbackRenderer._render_ir_no_constraint(records)
+        if variant == "ir_no_reason":
+            return FeedbackRenderer._render_ir_no_reason(records)
+        if variant == "ir_no_suggested_fix":
+            return FeedbackRenderer._render_ir_no_suggested_fix(records)
+        if variant == "ir_nl_only":
+            return FeedbackRenderer._render_ir_nl_only(records)
         return FeedbackRenderer._render_full(records)
 
     @staticmethod
@@ -217,6 +237,80 @@ class FeedbackRenderer:
             lines.append(f"    reason: {r.reason}")
             if r.suggested_fix:
                 lines.append(f"    fix hint: {r.suggested_fix}")
+        return "\n".join(lines)
+
+    @staticmethod
+    def _render_ir_no_scenario_id(records: list[SemanticFeedback]) -> str:
+        """Full IR minus scenario index / 'Scenario N' wording."""
+        lines = ["Specification-level violations (Semantic Feedback IR):"]
+        for r in records:
+            reason = re.sub(r"Scenario\s*\d+", "the matched scenario", r.reason or "", flags=re.I)
+            lines.append(f"  [{r.violation_type}] guard ({r.constraint_text})")
+            lines.append(f"    inputs={r.inputs}")
+            lines.append(f"    expected={r.expected}, observed={r.observed}")
+            lines.append(f"    reason: {reason}")
+            if r.suggested_fix:
+                lines.append(f"    fix hint: {r.suggested_fix}")
+        return "\n".join(lines)
+
+    @staticmethod
+    def _render_ir_no_expected(records: list[SemanticFeedback]) -> str:
+        lines = ["Specification-level violations (Semantic Feedback IR):"]
+        for r in records:
+            lines.append(f"  [{r.violation_type}] Scenario {r.scenario_index}: {r.constraint_text}")
+            lines.append(f"    inputs={r.inputs}")
+            lines.append(f"    observed={r.observed}")
+            lines.append(f"    reason: {r.reason}")
+            if r.suggested_fix:
+                lines.append(f"    fix hint: {r.suggested_fix}")
+        return "\n".join(lines)
+
+    @staticmethod
+    def _render_ir_no_constraint(records: list[SemanticFeedback]) -> str:
+        """Omit guard/constraint text (boundary witness predicate)."""
+        lines = ["Specification-level violations (Semantic Feedback IR):"]
+        for r in records:
+            lines.append(f"  [{r.violation_type}] Scenario {r.scenario_index}")
+            lines.append(f"    inputs={r.inputs}")
+            lines.append(f"    expected={r.expected}, observed={r.observed}")
+            lines.append(f"    reason: {r.reason}")
+            if r.suggested_fix:
+                lines.append(f"    fix hint: {r.suggested_fix}")
+        return "\n".join(lines)
+
+    @staticmethod
+    def _render_ir_no_reason(records: list[SemanticFeedback]) -> str:
+        lines = ["Specification-level violations (Semantic Feedback IR):"]
+        for r in records:
+            lines.append(f"  [{r.violation_type}] Scenario {r.scenario_index}: {r.constraint_text}")
+            lines.append(f"    inputs={r.inputs}")
+            lines.append(f"    expected={r.expected}, observed={r.observed}")
+            if r.suggested_fix:
+                lines.append(f"    fix hint: {r.suggested_fix}")
+        return "\n".join(lines)
+
+    @staticmethod
+    def _render_ir_no_suggested_fix(records: list[SemanticFeedback]) -> str:
+        lines = ["Specification-level violations (Semantic Feedback IR):"]
+        for r in records:
+            lines.append(f"  [{r.violation_type}] Scenario {r.scenario_index}: {r.constraint_text}")
+            lines.append(f"    inputs={r.inputs}")
+            lines.append(f"    expected={r.expected}, observed={r.observed}")
+            lines.append(f"    reason: {r.reason}")
+        return "\n".join(lines)
+
+    @staticmethod
+    def _render_ir_nl_only(records: list[SemanticFeedback]) -> str:
+        """Natural-language paraphrase without structured field labels."""
+        lines = ["The implementation does not match the ordered-guard specification."]
+        for r in records:
+            lines.append(
+                f"On inputs {r.inputs} the code returned {r.observed} but should return "
+                f"{r.expected} under the first matching scenario whose guard is "
+                f"'{r.constraint_text}' (scenario #{r.scenario_index}). {r.reason}"
+            )
+            if r.suggested_fix:
+                lines.append(f"Consider: {r.suggested_fix}.")
         return "\n".join(lines)
 
 

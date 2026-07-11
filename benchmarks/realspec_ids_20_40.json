@@ -1,0 +1,22 @@
+[
+  "ExternalSOFL.NetworkRoute",
+  "ExternalSOFL.WaterTank",
+  "IndustrialSOFL.LoanUnderwrite",
+  "IndustrialSOFL.AtmWithdraw",
+  "IndustrialSOFL.WireTransferGate",
+  "IndustrialSOFL.CallRoute",
+  "IndustrialSOFL.SmsThrottle",
+  "IndustrialSOFL.BadgeAccess",
+  "IndustrialSOFL.ApiAcl",
+  "IndustrialSOFL.DoseAlert",
+  "IndustrialSOFL.LabCritical",
+  "IndustrialSOFL.PickPriority",
+  "IndustrialSOFL.ReorderPoint",
+  "IndustrialSOFL.ScadaTrip",
+  "IndustrialSOFL.GridDispatch",
+  "IndustrialSOFL.SeatUpgrade",
+  "IndustrialSOFL.FareRule",
+  "IndustrialSOFL.AutoPremium",
+  "IndustrialSOFL.ClaimTriage",
+  "IndustrialSOFL.IntersectionPhase"
+]

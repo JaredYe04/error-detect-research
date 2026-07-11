@@ -1,0 +1,12 @@
+[
+  "ExternalSOFL.CacheEvict",
+  "HumanEval.HE062.blood_pressure_cat",
+  "IndustrialSOFL.ApiRateLimit",
+  "IndustrialSOFL.AtmWithdraw",
+  "IndustrialSOFL.DoseAlert",
+  "IndustrialSOFL.LibraryRenew",
+  "IndustrialSOFL.WireTransferGate",
+  "MBPP.MBPP131.heart_rate_zone",
+  "MBPP.MBPP228.loan_risk",
+  "PubIndPilot.AtmWithdraw"
+]

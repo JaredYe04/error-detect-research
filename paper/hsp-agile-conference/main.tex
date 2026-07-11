@@ -416,6 +416,11 @@ E14 length-matched sweep: \texttt{semantic\_ir} 75.1\% vs.\
 \texttt{execution\_trace\_matched} 85.4\% (paired 5/19/96)---so C2 is
 \emph{relative to unstructured test feedback}, not uniqueness among all
 structured traces.
+Hard combo seeds on \texttt{gemini-2.5-flash} ($n{=}40$ tasks $\times$ 3
+seed types; \texttt{run\_ir\_combo\_seed\_gemini\_n40\_v1}) further support
+C2: pooled FULL vs.\ \texttt{test\_only} ${+}33.2$\,pp and vs.\
+\texttt{test\_expected} ${+}32.6$\,pp (both CI exclude~0); FULL vs.\
+\texttt{ir\_no\_expected} does not---consistent with E14.
 Practitioners who already emit rich execution traces may prefer those surfaces;
 our claim is that unstructured pass/fail is the wrong default when SpecIR
 witnesses are available.

@@ -1,0 +1,31 @@
+% Auto-generated from run_ir_combo_seed_gemini_n40_v1 — hard combo-seed C2 support.
+\begin{table}[t]
+  \centering
+  \caption{Hard combo-seed feedback contrast on \texttt{gemini-2.5-flash}
+    (\texttt{run\_ir\_combo\_seed\_gemini\_n40\_v1}; $n{=}40$ tasks $\times$ 3
+    seed types; paired per task$\times$seed).
+    FULL $=$ \texttt{semantic\_ir}.
+    Lead C2 remains E6 on \texttt{ecnu-plus}; this table is
+    \emph{supporting} evidence under harder injected bugs.
+    FULL beats unstructured test-only and test$+$expected (CI excludes~0 on
+    every seed and pooled); FULL vs.\ \texttt{ir\_no\_expected} does
+    \emph{not} exclude~0---do not claim uniqueness vs.\ every structured
+    ablation (consistent with E14).}
+  \label{tab:gemini-combo-n40}
+  \footnotesize
+  \begin{tabular}{lcccc}
+    \toprule
+    Contrast & $\Delta$ (pp) & W/L/T & 95\% CI (pp) & Excl.~0 \\
+    \midrule
+    \multicolumn{5}{l}{\textit{Pooled} ($n{=}120$ task$\times$seed cells)} \\
+    FULL vs.\ \texttt{test\_only} & \textbf{+33.2} & 47/8/65 & $[25.1,\,41.9]$ & Yes \\
+    FULL vs.\ \texttt{test\_expected} & \textbf{+32.6} & 47/8/65 & $[24.6,\,41.1]$ & Yes \\
+    FULL vs.\ \texttt{ir\_no\_expected} & $+5.0$ & 29/17/74 & $[-3.5,\,13.6]$ & No \\
+    \midrule
+    \multicolumn{5}{l}{\textit{By seed} (FULL vs.\ \texttt{test\_only})} \\
+    \texttt{combo\_invert\_relop} & $+27.2$ & 14/4/22 & $[14.1,\,41.6]$ & Yes \\
+    \texttt{combo\_swap\_relop} & $+34.4$ & 15/3/22 & $[19.7,\,49.7]$ & Yes \\
+    \texttt{drop\_first\_guard} & $+38.1$ & 18/1/21 & $[23.4,\,53.1]$ & Yes \\
+    \bottomrule
+  \end{tabular}
+\end{table}

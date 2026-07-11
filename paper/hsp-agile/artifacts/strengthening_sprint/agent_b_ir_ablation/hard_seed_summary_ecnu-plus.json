@@ -1,0 +1,160 @@
+{
+  "n_rows": 810,
+  "mean_conf_by_seed_variant": {
+    "invert_order|ir_nl_only": 0.9792,
+    "invert_order|ir_no_constraint": 0.9792,
+    "invert_order|ir_no_expected": 0.975,
+    "invert_order|ir_no_reason": 0.9833,
+    "invert_order|ir_no_scenario_id": 0.9917,
+    "invert_order|ir_no_suggested_fix": 0.9917,
+    "invert_order|semantic_ir": 0.975,
+    "invert_order|test_expected": 0.9917,
+    "invert_order|test_only": 0.9792,
+    "swap_bodies|ir_nl_only": 0.9833,
+    "swap_bodies|ir_no_constraint": 0.9917,
+    "swap_bodies|ir_no_expected": 0.9833,
+    "swap_bodies|ir_no_reason": 0.9958,
+    "swap_bodies|ir_no_scenario_id": 0.9875,
+    "swap_bodies|ir_no_suggested_fix": 0.9833,
+    "swap_bodies|semantic_ir": 0.9917,
+    "swap_bodies|test_expected": 0.9875,
+    "swap_bodies|test_only": 0.9792,
+    "wrong_relop|ir_nl_only": 0.9778,
+    "wrong_relop|ir_no_constraint": 0.9694,
+    "wrong_relop|ir_no_expected": 0.975,
+    "wrong_relop|ir_no_reason": 0.9486,
+    "wrong_relop|ir_no_scenario_id": 0.9778,
+    "wrong_relop|ir_no_suggested_fix": 0.9556,
+    "wrong_relop|semantic_ir": 0.9833,
+    "wrong_relop|test_expected": 0.9764,
+    "wrong_relop|test_only": 0.9722
+  },
+  "paired_full_vs_ablation": {
+    "swap_bodies|FULL_vs_ir_no_reason": {
+      "wins": 1,
+      "losses": 2,
+      "ties": 27
+    },
+    "swap_bodies|FULL_vs_ir_no_constraint": {
+      "wins": 2,
+      "losses": 2,
+      "ties": 26
+    },
+    "swap_bodies|FULL_vs_ir_no_suggested_fix": {
+      "wins": 3,
+      "losses": 1,
+      "ties": 26
+    },
+    "swap_bodies|FULL_vs_ir_nl_only": {
+      "wins": 3,
+      "losses": 1,
+      "ties": 26
+    },
+    "swap_bodies|FULL_vs_ir_no_expected": {
+      "wins": 3,
+      "losses": 1,
+      "ties": 26
+    },
+    "swap_bodies|FULL_vs_ir_no_scenario_id": {
+      "wins": 2,
+      "losses": 1,
+      "ties": 27
+    },
+    "swap_bodies|FULL_vs_test_expected": {
+      "wins": 1,
+      "losses": 0,
+      "ties": 29
+    },
+    "swap_bodies|FULL_vs_test_only": {
+      "wins": 5,
+      "losses": 2,
+      "ties": 23
+    },
+    "invert_order|FULL_vs_ir_no_reason": {
+      "wins": 3,
+      "losses": 5,
+      "ties": 22
+    },
+    "invert_order|FULL_vs_ir_no_constraint": {
+      "wins": 3,
+      "losses": 4,
+      "ties": 23
+    },
+    "invert_order|FULL_vs_ir_no_suggested_fix": {
+      "wins": 2,
+      "losses": 6,
+      "ties": 22
+    },
+    "invert_order|FULL_vs_ir_nl_only": {
+      "wins": 3,
+      "losses": 4,
+      "ties": 23
+    },
+    "invert_order|FULL_vs_ir_no_expected": {
+      "wins": 6,
+      "losses": 6,
+      "ties": 18
+    },
+    "invert_order|FULL_vs_ir_no_scenario_id": {
+      "wins": 1,
+      "losses": 5,
+      "ties": 24
+    },
+    "invert_order|FULL_vs_test_expected": {
+      "wins": 2,
+      "losses": 6,
+      "ties": 22
+    },
+    "invert_order|FULL_vs_test_only": {
+      "wins": 3,
+      "losses": 4,
+      "ties": 23
+    },
+    "wrong_relop|FULL_vs_ir_no_reason": {
+      "wins": 6,
+      "losses": 1,
+      "ties": 23
+    },
+    "wrong_relop|FULL_vs_ir_no_constraint": {
+      "wins": 5,
+      "losses": 2,
+      "ties": 23
+    },
+    "wrong_relop|FULL_vs_ir_no_suggested_fix": {
+      "wins": 7,
+      "losses": 1,
+      "ties": 22
+    },
+    "wrong_relop|FULL_vs_ir_nl_only": {
+      "wins": 4,
+      "losses": 2,
+      "ties": 24
+    },
+    "wrong_relop|FULL_vs_ir_no_expected": {
+      "wins": 2,
+      "losses": 0,
+      "ties": 28
+    },
+    "wrong_relop|FULL_vs_ir_no_scenario_id": {
+      "wins": 3,
+      "losses": 2,
+      "ties": 25
+    },
+    "wrong_relop|FULL_vs_test_expected": {
+      "wins": 2,
+      "losses": 1,
+      "ties": 27
+    },
+    "wrong_relop|FULL_vs_test_only": {
+      "wins": 4,
+      "losses": 1,
+      "ties": 25
+    }
+  },
+  "model": "ecnu-plus",
+  "seed_types": [
+    "swap_bodies",
+    "invert_order",
+    "wrong_relop"
+  ]
+}

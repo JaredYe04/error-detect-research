@@ -516,18 +516,24 @@ def run_feedback_variant_experiment(
     llm_client=None,
     parallelism: int = 6,
     model: str | None = None,
+    variants: list[tuple[str, str]] | None = None,
 ) -> None:
-    """Run E6: compare feedback variants A/B/C under the same M pipeline."""
+    """Run E6: compare feedback variants under the same M pipeline.
+
+    ``variants`` is a list of (variant_key, variant_label). Default is classic
+    A/B/C. Agent B field ablations pass an extended list.
+    """
     out_dir.mkdir(parents=True, exist_ok=True)
     results_path = out_dir / "results.jsonl"
     progress_path = out_dir / "progress.json"
     started_at = time.time()
 
-    variants = [
-        ("test_only", "A"),
-        ("test_expected", "B"),
-        ("semantic_ir", "C"),
-    ]
+    if variants is None:
+        variants = [
+            ("test_only", "A"),
+            ("test_expected", "B"),
+            ("semantic_ir", "C"),
+        ]
     done = _load_completed_keys(results_path, ("task_id", "feedback_variant"))
     pending: list[dict] = []
     for task in tasks:
@@ -637,7 +643,14 @@ def main() -> None:
     parser = argparse.ArgumentParser(description="Mechanism analysis sweep runner")
     parser.add_argument(
         "--experiment",
-        choices=["complexity", "boundary_density", "feedback_variants", "repair_dynamics", "all"],
+        choices=[
+            "complexity",
+            "boundary_density",
+            "feedback_variants",
+            "ir_field_ablation",
+            "repair_dynamics",
+            "all",
+        ],
         required=True,
     )
     parser.add_argument("--run-name", default=f"run_sweep_{datetime.now().strftime('%Y%m%d_%H%M%S')}")
@@ -709,6 +722,27 @@ def main() -> None:
         print(f"[sweep] E6 results (incremental): {out / 'results.jsonl'}")
         run_feedback_variant_experiment(
             tasks, out, llm_client=llm, parallelism=args.parallelism, model=args.model,
+        )
+    if exp == "ir_field_ablation":
+        out = run_dir / "ir_field_ablation"
+        field_variants = [
+            ("test_only", "A"),
+            ("semantic_ir", "FULL"),
+            ("ir_no_scenario_id", "NO_SID"),
+            ("ir_no_expected", "NO_EXP"),
+            ("ir_no_constraint", "NO_CON"),
+            ("ir_no_reason", "NO_REA"),
+            ("ir_no_suggested_fix", "NO_FIX"),
+            ("ir_nl_only", "NL"),
+        ]
+        print(f"[sweep] IR field ablation → {out}")
+        run_feedback_variant_experiment(
+            tasks,
+            out,
+            llm_client=llm,
+            parallelism=args.parallelism,
+            model=args.model,
+            variants=field_variants,
         )
     if exp in ("repair_dynamics", "all"):
         main_run = args.main_run or (ARTIFACTS / "run_ccf_b_main_v1")

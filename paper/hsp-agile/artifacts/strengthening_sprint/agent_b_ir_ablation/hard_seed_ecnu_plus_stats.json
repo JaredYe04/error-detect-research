@@ -1,0 +1,450 @@
+{
+  "n_rows_deduped": 378,
+  "models": [
+    "ecnu-plus"
+  ],
+  "seeds": [
+    "invert_order",
+    "swap_bodies",
+    "wrong_relop"
+  ],
+  "paired": {
+    "invert_order|FULL_vs_ir_nl_only": {
+      "n": 14,
+      "wins": 1,
+      "losses": 0,
+      "ties": 13,
+      "mean_delta": 0.008929,
+      "mean_delta_pp": 0.89,
+      "ci95": [
+        0.0,
+        0.026786
+      ],
+      "ci95_pp": [
+        0.0,
+        2.68
+      ],
+      "ci_excludes_0": false
+    },
+    "invert_order|FULL_vs_ir_no_constraint": {
+      "n": 14,
+      "wins": 3,
+      "losses": 0,
+      "ties": 11,
+      "mean_delta": 0.026786,
+      "mean_delta_pp": 2.68,
+      "ci95": [
+        0.0,
+        0.053571
+      ],
+      "ci95_pp": [
+        0.0,
+        5.36
+      ],
+      "ci_excludes_0": false
+    },
+    "invert_order|FULL_vs_ir_no_expected": {
+      "n": 14,
+      "wins": 1,
+      "losses": 1,
+      "ties": 12,
+      "mean_delta": 0.0,
+      "mean_delta_pp": 0.0,
+      "ci95": [
+        -0.026786,
+        0.026786
+      ],
+      "ci95_pp": [
+        -2.68,
+        2.68
+      ],
+      "ci_excludes_0": false
+    },
+    "invert_order|FULL_vs_ir_no_reason": {
+      "n": 14,
+      "wins": 3,
+      "losses": 1,
+      "ties": 10,
+      "mean_delta": 0.017857,
+      "mean_delta_pp": 1.79,
+      "ci95": [
+        -0.017857,
+        0.053571
+      ],
+      "ci95_pp": [
+        -1.79,
+        5.36
+      ],
+      "ci_excludes_0": false
+    },
+    "invert_order|FULL_vs_ir_no_scenario_id": {
+      "n": 14,
+      "wins": 3,
+      "losses": 1,
+      "ties": 10,
+      "mean_delta": 0.017857,
+      "mean_delta_pp": 1.79,
+      "ci95": [
+        -0.017857,
+        0.053571
+      ],
+      "ci95_pp": [
+        -1.79,
+        5.36
+      ],
+      "ci_excludes_0": false
+    },
+    "invert_order|FULL_vs_ir_no_suggested_fix": {
+      "n": 14,
+      "wins": 0,
+      "losses": 1,
+      "ties": 13,
+      "mean_delta": -0.008929,
+      "mean_delta_pp": -0.89,
+      "ci95": [
+        -0.026786,
+        0.0
+      ],
+      "ci95_pp": [
+        -2.68,
+        0.0
+      ],
+      "ci_excludes_0": false
+    },
+    "invert_order|FULL_vs_test_expected": {
+      "n": 14,
+      "wins": 1,
+      "losses": 1,
+      "ties": 12,
+      "mean_delta": 0.0,
+      "mean_delta_pp": 0.0,
+      "ci95": [
+        -0.026786,
+        0.026786
+      ],
+      "ci95_pp": [
+        -2.68,
+        2.68
+      ],
+      "ci_excludes_0": false
+    },
+    "invert_order|FULL_vs_test_only": {
+      "n": 14,
+      "wins": 4,
+      "losses": 1,
+      "ties": 9,
+      "mean_delta": 0.026786,
+      "mean_delta_pp": 2.68,
+      "ci95": [
+        -0.008929,
+        0.0625
+      ],
+      "ci95_pp": [
+        -0.89,
+        6.25
+      ],
+      "ci_excludes_0": false
+    },
+    "swap_bodies|FULL_vs_ir_nl_only": {
+      "n": 14,
+      "wins": 3,
+      "losses": 0,
+      "ties": 11,
+      "mean_delta": 0.026786,
+      "mean_delta_pp": 2.68,
+      "ci95": [
+        0.0,
+        0.053571
+      ],
+      "ci95_pp": [
+        0.0,
+        5.36
+      ],
+      "ci_excludes_0": false
+    },
+    "swap_bodies|FULL_vs_ir_no_constraint": {
+      "n": 14,
+      "wins": 3,
+      "losses": 0,
+      "ties": 11,
+      "mean_delta": 0.026786,
+      "mean_delta_pp": 2.68,
+      "ci95": [
+        0.0,
+        0.053571
+      ],
+      "ci95_pp": [
+        0.0,
+        5.36
+      ],
+      "ci_excludes_0": false
+    },
+    "swap_bodies|FULL_vs_ir_no_expected": {
+      "n": 14,
+      "wins": 1,
+      "losses": 0,
+      "ties": 13,
+      "mean_delta": 0.008929,
+      "mean_delta_pp": 0.89,
+      "ci95": [
+        0.0,
+        0.026786
+      ],
+      "ci95_pp": [
+        0.0,
+        2.68
+      ],
+      "ci_excludes_0": false
+    },
+    "swap_bodies|FULL_vs_ir_no_reason": {
+      "n": 14,
+      "wins": 1,
+      "losses": 0,
+      "ties": 13,
+      "mean_delta": 0.008929,
+      "mean_delta_pp": 0.89,
+      "ci95": [
+        0.0,
+        0.026786
+      ],
+      "ci95_pp": [
+        0.0,
+        2.68
+      ],
+      "ci_excludes_0": false
+    },
+    "swap_bodies|FULL_vs_ir_no_scenario_id": {
+      "n": 14,
+      "wins": 2,
+      "losses": 0,
+      "ties": 12,
+      "mean_delta": 0.017857,
+      "mean_delta_pp": 1.79,
+      "ci95": [
+        0.0,
+        0.044643
+      ],
+      "ci95_pp": [
+        0.0,
+        4.46
+      ],
+      "ci_excludes_0": false
+    },
+    "swap_bodies|FULL_vs_ir_no_suggested_fix": {
+      "n": 14,
+      "wins": 2,
+      "losses": 0,
+      "ties": 12,
+      "mean_delta": 0.080357,
+      "mean_delta_pp": 8.04,
+      "ci95": [
+        0.0,
+        0.232143
+      ],
+      "ci95_pp": [
+        0.0,
+        23.21
+      ],
+      "ci_excludes_0": false
+    },
+    "swap_bodies|FULL_vs_test_expected": {
+      "n": 14,
+      "wins": 1,
+      "losses": 0,
+      "ties": 13,
+      "mean_delta": 0.008929,
+      "mean_delta_pp": 0.89,
+      "ci95": [
+        0.0,
+        0.026786
+      ],
+      "ci95_pp": [
+        0.0,
+        2.68
+      ],
+      "ci_excludes_0": false
+    },
+    "swap_bodies|FULL_vs_test_only": {
+      "n": 14,
+      "wins": 5,
+      "losses": 0,
+      "ties": 9,
+      "mean_delta": 0.044643,
+      "mean_delta_pp": 4.46,
+      "ci95": [
+        0.017857,
+        0.071429
+      ],
+      "ci95_pp": [
+        1.79,
+        7.14
+      ],
+      "ci_excludes_0": true
+    },
+    "wrong_relop|FULL_vs_ir_nl_only": {
+      "n": 14,
+      "wins": 3,
+      "losses": 0,
+      "ties": 11,
+      "mean_delta": 0.050595,
+      "mean_delta_pp": 5.06,
+      "ci95": [
+        0.0,
+        0.107143
+      ],
+      "ci95_pp": [
+        0.0,
+        10.71
+      ],
+      "ci_excludes_0": false
+    },
+    "wrong_relop|FULL_vs_ir_no_constraint": {
+      "n": 14,
+      "wins": 2,
+      "losses": 0,
+      "ties": 12,
+      "mean_delta": 0.041667,
+      "mean_delta_pp": 4.17,
+      "ci95": [
+        0.0,
+        0.107143
+      ],
+      "ci95_pp": [
+        0.0,
+        10.71
+      ],
+      "ci_excludes_0": false
+    },
+    "wrong_relop|FULL_vs_ir_no_expected": {
+      "n": 14,
+      "wins": 4,
+      "losses": 0,
+      "ties": 10,
+      "mean_delta": 0.130952,
+      "mean_delta_pp": 13.1,
+      "ci95": [
+        0.017857,
+        0.252976
+      ],
+      "ci95_pp": [
+        1.79,
+        25.3
+      ],
+      "ci_excludes_0": true
+    },
+    "wrong_relop|FULL_vs_ir_no_reason": {
+      "n": 14,
+      "wins": 3,
+      "losses": 0,
+      "ties": 11,
+      "mean_delta": 0.068452,
+      "mean_delta_pp": 6.85,
+      "ci95": [
+        0.0,
+        0.160714
+      ],
+      "ci95_pp": [
+        0.0,
+        16.07
+      ],
+      "ci_excludes_0": false
+    },
+    "wrong_relop|FULL_vs_ir_no_scenario_id": {
+      "n": 14,
+      "wins": 3,
+      "losses": 0,
+      "ties": 11,
+      "mean_delta": 0.053571,
+      "mean_delta_pp": 5.36,
+      "ci95": [
+        0.0,
+        0.130952
+      ],
+      "ci95_pp": [
+        0.0,
+        13.1
+      ],
+      "ci_excludes_0": false
+    },
+    "wrong_relop|FULL_vs_ir_no_suggested_fix": {
+      "n": 14,
+      "wins": 4,
+      "losses": 0,
+      "ties": 10,
+      "mean_delta": 0.083333,
+      "mean_delta_pp": 8.33,
+      "ci95": [
+        0.011905,
+        0.184524
+      ],
+      "ci95_pp": [
+        1.19,
+        18.45
+      ],
+      "ci_excludes_0": true
+    },
+    "wrong_relop|FULL_vs_test_expected": {
+      "n": 14,
+      "wins": 3,
+      "losses": 0,
+      "ties": 11,
+      "mean_delta": 0.050595,
+      "mean_delta_pp": 5.06,
+      "ci95": [
+        0.0,
+        0.107143
+      ],
+      "ci95_pp": [
+        0.0,
+        10.71
+      ],
+      "ci_excludes_0": false
+    },
+    "wrong_relop|FULL_vs_test_only": {
+      "n": 14,
+      "wins": 3,
+      "losses": 0,
+      "ties": 11,
+      "mean_delta": 0.03869,
+      "mean_delta_pp": 3.87,
+      "ci95": [
+        0.0,
+        0.083333
+      ],
+      "ci95_pp": [
+        0.0,
+        8.33
+      ],
+      "ci_excludes_0": false
+    }
+  },
+  "mean_conf": {
+    "invert_order|ir_nl_only": 0.9821,
+    "invert_order|ir_no_constraint": 0.9643,
+    "invert_order|ir_no_expected": 0.9911,
+    "invert_order|ir_no_reason": 0.9732,
+    "invert_order|ir_no_scenario_id": 0.9732,
+    "invert_order|ir_no_suggested_fix": 1.0,
+    "invert_order|semantic_ir": 0.9911,
+    "invert_order|test_expected": 0.9911,
+    "invert_order|test_only": 0.9643,
+    "swap_bodies|ir_nl_only": 0.9732,
+    "swap_bodies|ir_no_constraint": 0.9732,
+    "swap_bodies|ir_no_expected": 0.9911,
+    "swap_bodies|ir_no_reason": 0.9911,
+    "swap_bodies|ir_no_scenario_id": 0.9821,
+    "swap_bodies|ir_no_suggested_fix": 0.9196,
+    "swap_bodies|semantic_ir": 1.0,
+    "swap_bodies|test_expected": 0.9911,
+    "swap_bodies|test_only": 0.9554,
+    "wrong_relop|ir_nl_only": 0.9494,
+    "wrong_relop|ir_no_constraint": 0.9583,
+    "wrong_relop|ir_no_expected": 0.869,
+    "wrong_relop|ir_no_reason": 0.9315,
+    "wrong_relop|ir_no_scenario_id": 0.9464,
+    "wrong_relop|ir_no_suggested_fix": 0.9167,
+    "wrong_relop|semantic_ir": 1.0,
+    "wrong_relop|test_expected": 0.9494,
+    "wrong_relop|test_only": 0.9613
+  }
+}

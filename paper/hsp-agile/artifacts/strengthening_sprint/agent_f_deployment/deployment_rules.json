@@ -1,0 +1,36 @@
+{
+  "pre_hoc_features": [
+    "overlap_rate",
+    "n_guard_atoms",
+    "n_and_ops",
+    "n_rel_ops",
+    "mean_atoms_per_guard",
+    "max_atoms_per_guard",
+    "prompt_spec_len",
+    "n_outputs",
+    "n_inputs",
+    "n_scenarios"
+  ],
+  "simple_tier_rule": [
+    {
+      "tier": "high",
+      "n": 38,
+      "mean_delta": 0.0921,
+      "recommend": "prefer_inspect_M"
+    },
+    {
+      "tier": "low",
+      "n": 48,
+      "mean_delta": 0.105,
+      "recommend": "prefer_inspect_M"
+    },
+    {
+      "tier": "medium",
+      "n": 34,
+      "mean_delta": 0.0221,
+      "recommend": "default_B2"
+    }
+  ],
+  "tree_rules_file": "deployment_tree_rules.txt",
+  "note": "Pre-hoc only; no attempt_history features. Signal may be weak ???report honestly."
+}

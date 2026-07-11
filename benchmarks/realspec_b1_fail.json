@@ -1,0 +1,853 @@
+[
+  {
+    "taskId": "ExternalSOFL.CacheEvict",
+    "kind": "process",
+    "sourceFile": "external://li2023iet_faultprevention",
+    "module": "ExternalSOFL",
+    "name": "evict_cache",
+    "signature": {
+      "inputs": [
+        {
+          "name": "hits",
+          "type": "int"
+        },
+        {
+          "name": "size",
+          "type": "int"
+        },
+        {
+          "name": "ttl",
+          "type": "int"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "evict",
+          "type": "int"
+        },
+        {
+          "name": "refresh",
+          "type": "int"
+        }
+      ]
+    },
+    "fsfScenarios": [
+      {
+        "index": 1,
+        "kind": "scenario",
+        "test": "ttl le 0",
+        "def": "evict eq 1 && refresh eq 0"
+      },
+      {
+        "index": 2,
+        "kind": "scenario",
+        "test": "hits ge 100 && size le 10",
+        "def": "evict eq 0 && refresh eq 1"
+      },
+      {
+        "index": 3,
+        "kind": "scenario",
+        "test": "hits ge 50 && ttl le 60",
+        "def": "evict eq 0 && refresh eq 1"
+      },
+      {
+        "index": 4,
+        "kind": "scenario",
+        "test": "size gt 50",
+        "def": "evict eq 1 && refresh eq 0"
+      },
+      {
+        "index": 5,
+        "kind": "others",
+        "test": "others",
+        "def": "evict eq 0 && refresh eq 0"
+      }
+    ],
+    "ext": [],
+    "promptSpec": "Process evict_cache(hits, size, ttl) -> (evict, refresh)\n\nFSF specification:\nif (ttl le 0) => evict eq 1 && refresh eq 0\nif (hits ge 100 && size le 10) => evict eq 0 && refresh eq 1\nif (hits ge 50 && ttl le 60) => evict eq 0 && refresh eq 1\nif (size gt 50) => evict eq 1 && refresh eq 0\nothers => evict eq 0 && refresh eq 0",
+    "sourceBasename": "li2023iet_faultprevention",
+    "externalProvenance": {
+      "source": "li2023iet_faultprevention",
+      "section": "RF pattern: resource lifecycle",
+      "generator": "manual_curation"
+    },
+    "referenceCode": "def evict_cache(hits: int, size: int, ttl: int) -> dict:\n    \"\"\"Reference implementation auto-generated from FSF.\"\"\"\n    if ttl <= 0:\n        return {\"evict\": 1, \"refresh\": 0}\n    elif hits >= 100  and  size <= 10:\n        return {\"evict\": 0, \"refresh\": 1}\n    elif hits >= 50  and  ttl <= 60:\n        return {\"evict\": 0, \"refresh\": 1}\n    elif size > 50:\n        return {\"evict\": 1, \"refresh\": 0}\n    else:\n        return {\"evict\": 0, \"refresh\": 0}\n",
+    "complexity": {
+      "scenario_count": 4,
+      "guard_complexity": "AND",
+      "overlap_rate": 1.0,
+      "has_external_vars": false,
+      "overlap_density_tier": "low"
+    },
+    "realspec": {
+      "source_file": "benchmarks/external_sofl.json",
+      "source_type": "textbook",
+      "content_hash": "1b21dda5b0ef9425",
+      "provenance": {
+        "source": "li2023iet_faultprevention",
+        "section": "RF pattern: resource lifecycle",
+        "generator": "manual_curation"
+      }
+    }
+  },
+  {
+    "taskId": "IndustrialSOFL.AtmWithdraw",
+    "kind": "process",
+    "sourceFile": "industrial://liu2004soflbook",
+    "module": "IndustrialSOFL",
+    "name": "atm_withdraw",
+    "signature": {
+      "inputs": [
+        {
+          "name": "balance",
+          "type": "int"
+        },
+        {
+          "name": "amount",
+          "type": "int"
+        },
+        {
+          "name": "pin_ok",
+          "type": "int"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "cash",
+          "type": "int"
+        },
+        {
+          "name": "status",
+          "type": "int"
+        }
+      ]
+    },
+    "fsfScenarios": [
+      {
+        "index": 1,
+        "kind": "scenario",
+        "test": "pin_ok eq 0",
+        "def": "cash eq 0 && status eq 2"
+      },
+      {
+        "index": 2,
+        "kind": "scenario",
+        "test": "amount gt balance",
+        "def": "cash eq 0 && status eq 3"
+      },
+      {
+        "index": 3,
+        "kind": "scenario",
+        "test": "amount gt 10",
+        "def": "cash eq 0 && status eq 4"
+      },
+      {
+        "index": 4,
+        "kind": "scenario",
+        "test": "amount gt 0 && amount le balance",
+        "def": "cash eq amount && status eq 1"
+      },
+      {
+        "index": 5,
+        "kind": "others",
+        "test": "others",
+        "def": "cash eq 0 && status eq 0"
+      }
+    ],
+    "ext": [],
+    "promptSpec": "Process atm_withdraw(balance, amount, pin_ok) -> (cash, status)\n\nFSF specification:\nif (pin_ok eq 0) => cash eq 0 && status eq 2\nif (amount gt balance) => cash eq 0 && status eq 3\nif (amount gt 10) => cash eq 0 && status eq 4\nif (amount gt 0 && amount le balance) => cash eq amount && status eq 1\nothers => cash eq 0 && status eq 0",
+    "sourceBasename": "liu2004soflbook",
+    "externalProvenance": {
+      "source": "liu2004soflbook",
+      "section": "ATM withdraw process (Agile-SOFL / textbook banking pattern, scaled)",
+      "generator": "manual_industrial_curation",
+      "corpus": "industrial_sofl"
+    },
+    "referenceCode": "def atm_withdraw(balance: int, amount: int, pin_ok: int) -> dict:\n    \"\"\"Reference implementation auto-generated from FSF.\"\"\"\n    if pin_ok == 0:\n        return {\"cash\": 0, \"status\": 2}\n    elif amount > balance:\n        return {\"cash\": 0, \"status\": 3}\n    elif amount > 10:\n        return {\"cash\": 0, \"status\": 4}\n    elif amount > 0  and  amount <= balance:\n        return {\"cash\": amount, \"status\": 1}\n    else:\n        return {\"cash\": 0, \"status\": 0}\n",
+    "complexity": {
+      "scenario_count": 4,
+      "guard_complexity": "AND",
+      "overlap_rate": 1.067,
+      "has_external_vars": false,
+      "overlap_density_tier": "medium"
+    },
+    "realspec": {
+      "source_file": "benchmarks/industrial_sofl.json",
+      "source_type": "industrial_pattern",
+      "content_hash": "60dc169bf357eeb7",
+      "provenance": {
+        "source": "liu2004soflbook",
+        "section": "ATM withdraw process (Agile-SOFL / textbook banking pattern, scaled)",
+        "generator": "manual_industrial_curation",
+        "corpus": "industrial_sofl"
+      }
+    }
+  },
+  {
+    "taskId": "IndustrialSOFL.WireTransferGate",
+    "kind": "process",
+    "sourceFile": "industrial://industrial_pattern:banking_loan",
+    "module": "IndustrialSOFL",
+    "name": "gate_wire_transfer",
+    "signature": {
+      "inputs": [
+        {
+          "name": "amount",
+          "type": "int"
+        },
+        {
+          "name": "dest_risk",
+          "type": "int"
+        },
+        {
+          "name": "auth_level",
+          "type": "int"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "allow",
+          "type": "int"
+        },
+        {
+          "name": "hold",
+          "type": "int"
+        }
+      ]
+    },
+    "fsfScenarios": [
+      {
+        "index": 1,
+        "kind": "scenario",
+        "test": "dest_risk ge 4",
+        "def": "allow eq 0 && hold eq 1"
+      },
+      {
+        "index": 2,
+        "kind": "scenario",
+        "test": "amount ge 15 && auth_level lt 3",
+        "def": "allow eq 0 && hold eq 1"
+      },
+      {
+        "index": 3,
+        "kind": "scenario",
+        "test": "amount ge 8 && auth_level ge 2",
+        "def": "allow eq 1 && hold eq 1"
+      },
+      {
+        "index": 4,
+        "kind": "scenario",
+        "test": "amount lt 8 && auth_level ge 1",
+        "def": "allow eq 1 && hold eq 0"
+      },
+      {
+        "index": 5,
+        "kind": "others",
+        "test": "others",
+        "def": "allow eq 0 && hold eq 0"
+      }
+    ],
+    "ext": [],
+    "promptSpec": "Process gate_wire_transfer(amount, dest_risk, auth_level) -> (allow, hold)\n\nFSF specification:\nif (dest_risk ge 4) => allow eq 0 && hold eq 1\nif (amount ge 15 && auth_level lt 3) => allow eq 0 && hold eq 1\nif (amount ge 8 && auth_level ge 2) => allow eq 1 && hold eq 1\nif (amount lt 8 && auth_level ge 1) => allow eq 1 && hold eq 0\nothers => allow eq 0 && hold eq 0",
+    "sourceBasename": "industrial_pattern:banking_loan",
+    "externalProvenance": {
+      "source": "industrial_pattern:banking_loan",
+      "section": "Wire transfer compliance gate with overlapping amount/auth bands",
+      "generator": "manual_industrial_curation",
+      "corpus": "industrial_sofl"
+    },
+    "referenceCode": "def gate_wire_transfer(amount: int, dest_risk: int, auth_level: int) -> dict:\n    \"\"\"Reference implementation auto-generated from FSF.\"\"\"\n    if dest_risk >= 4:\n        return {\"allow\": 0, \"hold\": 1}\n    elif amount >= 15  and  auth_level < 3:\n        return {\"allow\": 0, \"hold\": 1}\n    elif amount >= 8  and  auth_level >= 2:\n        return {\"allow\": 1, \"hold\": 1}\n    elif amount < 8  and  auth_level >= 1:\n        return {\"allow\": 1, \"hold\": 0}\n    else:\n        return {\"allow\": 0, \"hold\": 0}\n",
+    "complexity": {
+      "scenario_count": 4,
+      "guard_complexity": "AND",
+      "overlap_rate": 0.8,
+      "has_external_vars": false,
+      "overlap_density_tier": "low"
+    },
+    "realspec": {
+      "source_file": "benchmarks/industrial_sofl.json",
+      "source_type": "industrial_pattern",
+      "content_hash": "7dc98889acc43350",
+      "provenance": {
+        "source": "industrial_pattern:banking_loan",
+        "section": "Wire transfer compliance gate with overlapping amount/auth bands",
+        "generator": "manual_industrial_curation",
+        "corpus": "industrial_sofl"
+      }
+    }
+  },
+  {
+    "taskId": "IndustrialSOFL.DoseAlert",
+    "kind": "process",
+    "sourceFile": "industrial://industrial_pattern:medical_dosage",
+    "module": "IndustrialSOFL",
+    "name": "dose_alert",
+    "signature": {
+      "inputs": [
+        {
+          "name": "weight_kg",
+          "type": "int"
+        },
+        {
+          "name": "age",
+          "type": "int"
+        },
+        {
+          "name": "severity",
+          "type": "int"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "dose_u",
+          "type": "int"
+        },
+        {
+          "name": "alert",
+          "type": "int"
+        }
+      ]
+    },
+    "fsfScenarios": [
+      {
+        "index": 1,
+        "kind": "scenario",
+        "test": "severity ge 4 && age lt 5",
+        "def": "dose_u eq 0 && alert eq 3"
+      },
+      {
+        "index": 2,
+        "kind": "scenario",
+        "test": "age lt 5 && weight_kg lt 8",
+        "def": "dose_u eq 1 && alert eq 2"
+      },
+      {
+        "index": 3,
+        "kind": "scenario",
+        "test": "age ge 12 && severity ge 3",
+        "def": "dose_u eq 4 && alert eq 1"
+      },
+      {
+        "index": 4,
+        "kind": "scenario",
+        "test": "weight_kg ge 10 && severity ge 1",
+        "def": "dose_u eq 2 && alert eq 0"
+      },
+      {
+        "index": 5,
+        "kind": "others",
+        "test": "others",
+        "def": "dose_u eq 0 && alert eq 0"
+      }
+    ],
+    "ext": [],
+    "promptSpec": "Process dose_alert(weight_kg, age, severity) -> (dose_u, alert)\n\nFSF specification:\nif (severity ge 4 && age lt 5) => dose_u eq 0 && alert eq 3\nif (age lt 5 && weight_kg lt 8) => dose_u eq 1 && alert eq 2\nif (age ge 12 && severity ge 3) => dose_u eq 4 && alert eq 1\nif (weight_kg ge 10 && severity ge 1) => dose_u eq 2 && alert eq 0\nothers => dose_u eq 0 && alert eq 0",
+    "sourceBasename": "industrial_pattern:medical_dosage",
+    "externalProvenance": {
+      "source": "industrial_pattern:medical_dosage",
+      "section": "Pediatric / adult dosage alert decision table (scaled kg/age)",
+      "generator": "manual_industrial_curation",
+      "corpus": "industrial_sofl"
+    },
+    "referenceCode": "def dose_alert(weight_kg: int, age: int, severity: int) -> dict:\n    \"\"\"Reference implementation auto-generated from FSF.\"\"\"\n    if severity >= 4  and  age < 5:\n        return {\"dose_u\": 0, \"alert\": 3}\n    elif age < 5  and  weight_kg < 8:\n        return {\"dose_u\": 1, \"alert\": 2}\n    elif age >= 12  and  severity >= 3:\n        return {\"dose_u\": 4, \"alert\": 1}\n    elif weight_kg >= 10  and  severity >= 1:\n        return {\"dose_u\": 2, \"alert\": 0}\n    else:\n        return {\"dose_u\": 0, \"alert\": 0}\n",
+    "complexity": {
+      "scenario_count": 4,
+      "guard_complexity": "AND",
+      "overlap_rate": 1.2,
+      "has_external_vars": false,
+      "overlap_density_tier": "medium"
+    },
+    "realspec": {
+      "source_file": "benchmarks/industrial_sofl.json",
+      "source_type": "industrial_pattern",
+      "content_hash": "2988c3018d1c0259",
+      "provenance": {
+        "source": "industrial_pattern:medical_dosage",
+        "section": "Pediatric / adult dosage alert decision table (scaled kg/age)",
+        "generator": "manual_industrial_curation",
+        "corpus": "industrial_sofl"
+      }
+    }
+  },
+  {
+    "taskId": "IndustrialSOFL.ApiRateLimit",
+    "kind": "process",
+    "sourceFile": "industrial://industrial_pattern:cache_rate_limit",
+    "module": "IndustrialSOFL",
+    "name": "limit_api_rate",
+    "signature": {
+      "inputs": [
+        {
+          "name": "rps",
+          "type": "int"
+        },
+        {
+          "name": "burst",
+          "type": "int"
+        },
+        {
+          "name": "plan",
+          "type": "int"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "allow",
+          "type": "int"
+        },
+        {
+          "name": "retry_after",
+          "type": "int"
+        }
+      ]
+    },
+    "fsfScenarios": [
+      {
+        "index": 1,
+        "kind": "scenario",
+        "test": "plan ge 3",
+        "def": "allow eq 1 && retry_after eq 0"
+      },
+      {
+        "index": 2,
+        "kind": "scenario",
+        "test": "rps gt 15 && burst gt 8",
+        "def": "allow eq 0 && retry_after eq 10"
+      },
+      {
+        "index": 3,
+        "kind": "scenario",
+        "test": "rps gt 10 && plan ge 2",
+        "def": "allow eq 1 && retry_after eq 2"
+      },
+      {
+        "index": 4,
+        "kind": "scenario",
+        "test": "rps gt 10",
+        "def": "allow eq 0 && retry_after eq 5"
+      },
+      {
+        "index": 5,
+        "kind": "others",
+        "test": "others",
+        "def": "allow eq 0 && retry_after eq 0"
+      }
+    ],
+    "ext": [],
+    "promptSpec": "Process limit_api_rate(rps, burst, plan) -> (allow, retry_after)\n\nFSF specification:\nif (plan ge 3) => allow eq 1 && retry_after eq 0\nif (rps gt 15 && burst gt 8) => allow eq 0 && retry_after eq 10\nif (rps gt 10 && plan ge 2) => allow eq 1 && retry_after eq 2\nif (rps gt 10) => allow eq 0 && retry_after eq 5\nothers => allow eq 0 && retry_after eq 0",
+    "sourceBasename": "industrial_pattern:cache_rate_limit",
+    "externalProvenance": {
+      "source": "industrial_pattern:cache_rate_limit",
+      "section": "API gateway rate limit with plan override",
+      "generator": "manual_industrial_curation",
+      "corpus": "industrial_sofl"
+    },
+    "referenceCode": "def limit_api_rate(rps: int, burst: int, plan: int) -> dict:\n    \"\"\"Reference implementation auto-generated from FSF.\"\"\"\n    if plan >= 3:\n        return {\"allow\": 1, \"retry_after\": 0}\n    elif rps > 15  and  burst > 8:\n        return {\"allow\": 0, \"retry_after\": 10}\n    elif rps > 10  and  plan >= 2:\n        return {\"allow\": 1, \"retry_after\": 2}\n    elif rps > 10:\n        return {\"allow\": 0, \"retry_after\": 5}\n    else:\n        return {\"allow\": 0, \"retry_after\": 0}\n",
+    "complexity": {
+      "scenario_count": 4,
+      "guard_complexity": "AND",
+      "overlap_rate": 1.2,
+      "has_external_vars": false,
+      "overlap_density_tier": "medium"
+    },
+    "realspec": {
+      "source_file": "benchmarks/industrial_sofl.json",
+      "source_type": "industrial_pattern",
+      "content_hash": "35dd3cd3451a39d8",
+      "provenance": {
+        "source": "industrial_pattern:cache_rate_limit",
+        "section": "API gateway rate limit with plan override",
+        "generator": "manual_industrial_curation",
+        "corpus": "industrial_sofl"
+      }
+    }
+  },
+  {
+    "taskId": "IndustrialSOFL.LibraryRenew",
+    "kind": "process",
+    "sourceFile": "industrial://liu2004soflbook",
+    "module": "IndustrialSOFL",
+    "name": "library_renew",
+    "signature": {
+      "inputs": [
+        {
+          "name": "times_renewed",
+          "type": "int"
+        },
+        {
+          "name": "holds",
+          "type": "int"
+        },
+        {
+          "name": "overdue_d",
+          "type": "int"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "renewed",
+          "type": "int"
+        },
+        {
+          "name": "due_extend",
+          "type": "int"
+        }
+      ]
+    },
+    "fsfScenarios": [
+      {
+        "index": 1,
+        "kind": "scenario",
+        "test": "holds ge 1",
+        "def": "renewed eq 0 && due_extend eq 0"
+      },
+      {
+        "index": 2,
+        "kind": "scenario",
+        "test": "overdue_d ge 3",
+        "def": "renewed eq 0 && due_extend eq 0"
+      },
+      {
+        "index": 3,
+        "kind": "scenario",
+        "test": "times_renewed ge 3",
+        "def": "renewed eq 0 && due_extend eq 0"
+      },
+      {
+        "index": 4,
+        "kind": "scenario",
+        "test": "times_renewed le 2 && overdue_d eq 0",
+        "def": "renewed eq 1 && due_extend eq 2"
+      },
+      {
+        "index": 5,
+        "kind": "others",
+        "test": "others",
+        "def": "renewed eq 0 && due_extend eq 0"
+      }
+    ],
+    "ext": [],
+    "promptSpec": "Process library_renew(times_renewed, holds, overdue_d) -> (renewed, due_extend)\n\nFSF specification:\nif (holds ge 1) => renewed eq 0 && due_extend eq 0\nif (overdue_d ge 3) => renewed eq 0 && due_extend eq 0\nif (times_renewed ge 3) => renewed eq 0 && due_extend eq 0\nif (times_renewed le 2 && overdue_d eq 0) => renewed eq 1 && due_extend eq 2\nothers => renewed eq 0 && due_extend eq 0",
+    "sourceBasename": "liu2004soflbook",
+    "externalProvenance": {
+      "source": "liu2004soflbook",
+      "section": "Library renew policy (holds preempt renewals)",
+      "generator": "manual_industrial_curation",
+      "corpus": "industrial_sofl"
+    },
+    "referenceCode": "def library_renew(times_renewed: int, holds: int, overdue_d: int) -> dict:\n    \"\"\"Reference implementation auto-generated from FSF.\"\"\"\n    if holds >= 1:\n        return {\"renewed\": 0, \"due_extend\": 0}\n    elif overdue_d >= 3:\n        return {\"renewed\": 0, \"due_extend\": 0}\n    elif times_renewed >= 3:\n        return {\"renewed\": 0, \"due_extend\": 0}\n    elif times_renewed <= 2  and  overdue_d == 0:\n        return {\"renewed\": 1, \"due_extend\": 2}\n    else:\n        return {\"renewed\": 0, \"due_extend\": 0}\n",
+    "complexity": {
+      "scenario_count": 4,
+      "guard_complexity": "AND",
+      "overlap_rate": 0.933,
+      "has_external_vars": false,
+      "overlap_density_tier": "low"
+    },
+    "realspec": {
+      "source_file": "benchmarks/industrial_sofl.json",
+      "source_type": "industrial_pattern",
+      "content_hash": "8e211c196a4884c8",
+      "provenance": {
+        "source": "liu2004soflbook",
+        "section": "Library renew policy (holds preempt renewals)",
+        "generator": "manual_industrial_curation",
+        "corpus": "industrial_sofl"
+      }
+    }
+  },
+  {
+    "taskId": "PubIndPilot.AtmWithdraw",
+    "kind": "process",
+    "sourceFile": "industrial://liu2004soflbook",
+    "module": "IndustrialSOFL",
+    "name": "atm_withdraw_pilot",
+    "signature": {
+      "inputs": [
+        {
+          "name": "auth",
+          "type": "int"
+        },
+        {
+          "name": "balance",
+          "type": "int"
+        },
+        {
+          "name": "amount",
+          "type": "int"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "cash",
+          "type": "int"
+        },
+        {
+          "name": "status",
+          "type": "int"
+        }
+      ]
+    },
+    "fsfScenarios": [
+      {
+        "index": 1,
+        "kind": "scenario",
+        "test": "auth eq 0",
+        "def": "cash eq 0 && status eq 2"
+      },
+      {
+        "index": 2,
+        "kind": "scenario",
+        "test": "amount le 0",
+        "def": "cash eq 0 && status eq 1"
+      },
+      {
+        "index": 3,
+        "kind": "scenario",
+        "test": "amount gt balance",
+        "def": "cash eq 0 && status eq 1"
+      },
+      {
+        "index": 4,
+        "kind": "scenario",
+        "test": "auth gt 0 && amount gt 0 && amount le balance",
+        "def": "cash eq 1 && status eq 0"
+      },
+      {
+        "index": 5,
+        "kind": "others",
+        "test": "others",
+        "def": "cash eq 0 && status eq 0"
+      }
+    ],
+    "ext": [],
+    "promptSpec": "Process atm_withdraw_pilot(auth, balance, amount) -> (cash, status)\n\nFSF specification:\nif (auth eq 0) => cash eq 0 && status eq 2\nif (amount le 0) => cash eq 0 && status eq 1\nif (amount gt balance) => cash eq 0 && status eq 1\nif (auth gt 0 && amount gt 0 && amount le balance) => cash eq 1 && status eq 0\nothers => cash eq 0 && status eq 0",
+    "sourceBasename": "liu2004soflbook",
+    "externalProvenance": {
+      "source": "liu2004soflbook",
+      "section": "ATM withdraw under auth/balance guards",
+      "generator": "manual_industrial_curation",
+      "corpus": "industrial_sofl"
+    },
+    "referenceCode": "def atm_withdraw_pilot(auth: int, balance: int, amount: int) -> dict:\n    \"\"\"Reference implementation auto-generated from FSF.\"\"\"\n    if auth == 0:\n        return {\"cash\": 0, \"status\": 2}\n    elif amount <= 0:\n        return {\"cash\": 0, \"status\": 1}\n    elif amount > balance:\n        return {\"cash\": 0, \"status\": 1}\n    elif auth > 0  and  amount > 0  and  amount <= balance:\n        return {\"cash\": 1, \"status\": 0}\n    else:\n        return {\"cash\": 0, \"status\": 0}\n",
+    "complexity": {
+      "scenario_count": 4,
+      "guard_complexity": "Nested",
+      "overlap_rate": 1.0,
+      "has_external_vars": false,
+      "overlap_density_tier": "medium"
+    },
+    "realspec": {
+      "source_file": "benchmarks/published_industrial_pilot.json",
+      "source_type": "published_case",
+      "content_hash": "f089fca05457000e",
+      "provenance": {
+        "source": "liu2004soflbook",
+        "section": "ATM withdraw under auth/balance guards",
+        "generator": "manual_industrial_curation",
+        "corpus": "industrial_sofl"
+      }
+    }
+  },
+  {
+    "taskId": "HumanEval.HE062.blood_pressure_cat",
+    "kind": "process",
+    "sourceFile": "humaneval://HumanEval/62",
+    "module": "HumanEval",
+    "name": "blood_pressure_cat",
+    "signature": {
+      "inputs": [
+        {
+          "name": "systolic",
+          "type": "nat"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "bp_cat",
+          "type": "nat"
+        }
+      ]
+    },
+    "fsfScenarios": [
+      {
+        "index": 1,
+        "kind": "scenario",
+        "test": "systolic ge 140",
+        "def": "bp_cat eq 4"
+      },
+      {
+        "index": 2,
+        "kind": "scenario",
+        "test": "systolic ge 130",
+        "def": "bp_cat eq 3"
+      },
+      {
+        "index": 3,
+        "kind": "scenario",
+        "test": "systolic ge 120",
+        "def": "bp_cat eq 2"
+      },
+      {
+        "index": 4,
+        "kind": "scenario",
+        "test": "systolic ge 90",
+        "def": "bp_cat eq 1"
+      },
+      {
+        "index": 5,
+        "kind": "others",
+        "test": "others",
+        "def": "bp_cat eq 0"
+      }
+    ],
+    "ext": [],
+    "sourceBasename": "humaneval-derived",
+    "promptSpec": "Process blood_pressure_cat(systolic) -> (bp_cat)\n\nFSF specification:\nif (systolic ge 140) => bp_cat eq 4\nif (systolic ge 130) => bp_cat eq 3\nif (systolic ge 120) => bp_cat eq 2\nif (systolic ge 90) => bp_cat eq 1\nothers => bp_cat eq 0\n\nImportant: evaluate conditions in listed order (top-down precedence).",
+    "referenceCode": "def blood_pressure_cat(systolic: int) -> dict:\n    \"\"\"Reference implementation auto-generated from FSF.\"\"\"\n    if systolic >= 140:\n        return {\"bp_cat\": 4}\n    elif systolic >= 130:\n        return {\"bp_cat\": 3}\n    elif systolic >= 120:\n        return {\"bp_cat\": 2}\n    elif systolic >= 90:\n        return {\"bp_cat\": 1}\n    else:\n        return {\"bp_cat\": 0}\n",
+    "complexity": {
+      "scenario_count": 4,
+      "guard_complexity": "Simple",
+      "overlap_rate": 0.0,
+      "has_external_vars": false,
+      "overlap_density_tier": "low"
+    },
+    "realspec": {
+      "source_file": "benchmarks/real_derived/humaneval_fsf.json",
+      "source_type": "real_derived",
+      "content_hash": "ae2495fb04c4e99f",
+      "provenance": "benchmarks/real_derived/humaneval_fsf.json"
+    }
+  },
+  {
+    "taskId": "MBPP.MBPP131.heart_rate_zone",
+    "kind": "process",
+    "sourceFile": "mbpp://MBPP/131",
+    "module": "MBPP",
+    "name": "heart_rate_zone",
+    "signature": {
+      "inputs": [
+        {
+          "name": "bpm",
+          "type": "nat"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "zone",
+          "type": "nat"
+        }
+      ]
+    },
+    "fsfScenarios": [
+      {
+        "index": 1,
+        "kind": "scenario",
+        "test": "bpm ge 141",
+        "def": "zone eq 3"
+      },
+      {
+        "index": 2,
+        "kind": "scenario",
+        "test": "bpm ge 101",
+        "def": "zone eq 2"
+      },
+      {
+        "index": 3,
+        "kind": "scenario",
+        "test": "bpm ge 61",
+        "def": "zone eq 1"
+      },
+      {
+        "index": 4,
+        "kind": "others",
+        "test": "others",
+        "def": "zone eq 0"
+      }
+    ],
+    "ext": [],
+    "sourceBasename": "mbpp-derived",
+    "promptSpec": "Process heart_rate_zone(bpm) -> (zone)\n\nFSF specification:\nif (bpm ge 141) => zone eq 3\nif (bpm ge 101) => zone eq 2\nif (bpm ge 61) => zone eq 1\nothers => zone eq 0\n\nImportant: evaluate conditions in listed order (top-down precedence).",
+    "referenceCode": "def heart_rate_zone(bpm: int) -> dict:\n    \"\"\"Reference implementation auto-generated from FSF.\"\"\"\n    if bpm >= 141:\n        return {\"zone\": 3}\n    elif bpm >= 101:\n        return {\"zone\": 2}\n    elif bpm >= 61:\n        return {\"zone\": 1}\n    else:\n        return {\"zone\": 0}\n",
+    "complexity": {
+      "scenario_count": 3,
+      "guard_complexity": "Simple",
+      "overlap_rate": 0.0,
+      "has_external_vars": false,
+      "overlap_density_tier": "low"
+    },
+    "realspec": {
+      "source_file": "benchmarks/real_derived/mbpp_fsf.json",
+      "source_type": "real_derived",
+      "content_hash": "59b7f6a2c1e33dcd",
+      "provenance": "benchmarks/real_derived/mbpp_fsf.json"
+    }
+  },
+  {
+    "taskId": "MBPP.MBPP228.loan_risk",
+    "kind": "process",
+    "sourceFile": "mbpp://MBPP/228",
+    "module": "MBPP",
+    "name": "loan_risk",
+    "signature": {
+      "inputs": [
+        {
+          "name": "credit_score",
+          "type": "nat"
+        },
+        {
+          "name": "debt_ratio_pct",
+          "type": "nat"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "risk",
+          "type": "nat"
+        }
+      ]
+    },
+    "fsfScenarios": [
+      {
+        "index": 1,
+        "kind": "scenario",
+        "test": "credit_score lt 580 && debt_ratio_pct ge 50",
+        "def": "risk eq 3"
+      },
+      {
+        "index": 2,
+        "kind": "scenario",
+        "test": "credit_score lt 670 && debt_ratio_pct ge 43",
+        "def": "risk eq 2"
+      },
+      {
+        "index": 3,
+        "kind": "scenario",
+        "test": "credit_score lt 740",
+        "def": "risk eq 1"
+      },
+      {
+        "index": 4,
+        "kind": "others",
+        "test": "others",
+        "def": "risk eq 0"
+      }
+    ],
+    "ext": [],
+    "sourceBasename": "mbpp-derived",
+    "promptSpec": "Process loan_risk(credit_score,debt_ratio_pct) -> (risk)\n\nFSF specification:\nif (credit_score lt 580 && debt_ratio_pct ge 50) => risk eq 3\nif (credit_score lt 670 && debt_ratio_pct ge 43) => risk eq 2\nif (credit_score lt 740) => risk eq 1\nothers => risk eq 0\n\nImportant: evaluate conditions in listed order (top-down precedence).",
+    "referenceCode": "def loan_risk(credit_score: int, debt_ratio_pct: int) -> dict:\n    \"\"\"Reference implementation auto-generated from FSF.\"\"\"\n    if credit_score < 580  and  debt_ratio_pct >= 50:\n        return {\"risk\": 3}\n    elif credit_score < 670  and  debt_ratio_pct >= 43:\n        return {\"risk\": 2}\n    elif credit_score < 740:\n        return {\"risk\": 1}\n    else:\n        return {\"risk\": 0}\n",
+    "complexity": {
+      "scenario_count": 3,
+      "guard_complexity": "Nested",
+      "overlap_rate": 1.0,
+      "has_external_vars": false,
+      "overlap_density_tier": "high"
+    },
+    "realspec": {
+      "source_file": "benchmarks/real_derived/mbpp_fsf.json",
+      "source_type": "real_derived",
+      "content_hash": "f23458485e55471e",
+      "provenance": "benchmarks/real_derived/mbpp_fsf.json"
+    }
+  }
+]

@@ -1,0 +1,27 @@
+{
+  "semantic_ir_wins": [
+    "HardSynthetic.HardCase004",
+    "HardSynthetic.HardCase005",
+    "HardSynthetic.HardCase010",
+    "HardSynthetic.HardCase012",
+    "HardSynthetic.HardCase028",
+    "HardSynthetic.HardCase037",
+    "HardSynthetic.HardCase047",
+    "HardSynthetic.HardCase065",
+    "HardSynthetic.HardCase097",
+    "HardSynthetic.HardCase104",
+    "HardSynthetic.HardCase116",
+    "HardSynthetic.HardCase118",
+    "HardSynthetic.HardCase122",
+    "HardSynthetic.HardCase124"
+  ],
+  "test_only_wins": [
+    "HardSynthetic.HardCase067",
+    "HardSynthetic.HardCase068",
+    "HardSynthetic.HardCase071",
+    "HardSynthetic.HardCase094"
+  ],
+  "n_wins": 14,
+  "n_losses": 4,
+  "n_ties": 102
+}

@@ -1,0 +1,22 @@
+{
+  "always_B2": {
+    "mean_delta": 0.0,
+    "frac_m": 0.0
+  },
+  "always_M": {
+    "mean_delta": 0.07743054166666667,
+    "frac_m": 1.0
+  },
+  "tier_high_only": {
+    "mean_delta": 0.029166666666666667,
+    "frac_m": 0.31666666666666665
+  },
+  "overlap_gt_1.25": {
+    "mean_delta": 0.029166666666666667,
+    "frac_m": 0.38333333333333336
+  },
+  "atoms_gt_16": {
+    "mean_delta": 0.07743054166666667,
+    "frac_m": 1.0
+  }
+}
